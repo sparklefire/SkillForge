@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/sop_draft.schema.json",
+  "title": "SkillForge SOP Planner Draft",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["case_id", "title", "version", "steps"],
+  "properties": {
+    "case_id": {"type": "string", "minLength": 1},
+    "title": {"type": "string", "minLength": 1},
+    "version": {"type": "integer", "minimum": 1},
+    "steps": {
+      "type": "array",
+      "minItems": 8,
+      "maxItems": 15,
+      "items": {
+        "$ref": "https://skillforge.local/schemas/sop.schema.json#/$defs/step"
+      }
+    }
+  }
+}

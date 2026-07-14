@@ -60,12 +60,34 @@ bash scripts/check_dgx.sh
 
 ```bash
 python3 -m venv .venv
-.venv/bin/python -m pip install -e '.[dev]'
+.venv/bin/python -m pip install -r requirements.lock
+.venv/bin/python -m pip install -e . --no-deps
 .venv/bin/python -m pytest
 .venv/bin/python -m skillforge.demo
 ```
 
+也可以直接运行 `bash scripts/setup_native.sh` 完成上述环境安装。
+
 演示输出写入被 Git 忽略的 `outputs/demo_run/`，包含首轮 SOP、问题与证据、局部修订审计、修订后 SOP、检查清单、测验和工作流记录。
+
+原生摄取和 Web Demo：
+
+```bash
+.venv/bin/python scripts/generate_synthetic_assets.py
+.venv/bin/python -m skillforge.ingest \
+  --video outputs/synthetic_assets/synthetic_operation.mp4 \
+  --pdf outputs/synthetic_assets/synthetic_manual.pdf \
+  --audio outputs/synthetic_assets/synthetic_expert.wav \
+  --output outputs/synthetic_ingest \
+  --frame-interval 2 \
+  --synthetic
+bash scripts/check_native.sh
+bash scripts/start_native.sh
+```
+
+Web 默认监听 `0.0.0.0:7860`。页面包含上传预处理、质检问题与证据、修订前后对比和局部修订审计。ASR 默认关闭；只有同时勾选外部处理授权时，规范化音频才会发送给 StepAudio。
+
+关键帧视觉理解和 SOP 规划同样默认关闭。只有勾选对应能力并确认外部处理授权时，关键帧或 Evidence Catalog 才会发送给 Step Plan；原始 PDF 和原始视频不会由上传接口自动外发。
 
 ## 当前目录
 
@@ -110,3 +132,7 @@ P0 能力只有五项：
 - 模拟案例能稳定发现缺步骤、错误顺序、无依据工具和无依据参数，并用证据完成局部修订。
 - 模拟闭环的严重错误从 5 项降到 0 项，九个必要步骤和证据覆盖率均达到 100%。
 - 真实视频、PDF 和录音解析以及 Web 演示仍是下一阶段工作；上述模拟数字不得当作真实评测结果。
+
+## 冻结的 P0 运行路线
+
+P0 直接在 DGX Spark 上使用 Python 虚拟环境和用户级 FFmpeg 运行，不依赖 Docker、GPU 容器或 `nvcc`。Docker 仅在后续明确采用本地 GPU 模型或 NVIDIA VSS 时再启用，当前权限问题不阻塞主链路。

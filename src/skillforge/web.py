@@ -1,0 +1,196 @@
+"""Native FastAPI demo for uploads and the evidence-revision comparison."""
+
+from __future__ import annotations
+
+import json
+import os
+import re
+import uuid
+from pathlib import Path
+from typing import Annotated, Any
+
+import uvicorn
+from fastapi import FastAPI, File, Form, HTTPException, UploadFile
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
+from starlette.concurrency import run_in_threadpool
+
+from .demo import ROOT, run_demo
+from .ingest import IngestionPipeline
+
+
+MAX_UPLOAD_BYTES = 512 * 1024 * 1024
+ALLOWED_SUFFIXES = {
+    "video": {".mp4", ".mov", ".mkv", ".webm", ".avi"},
+    "pdf": {".pdf"},
+    "audio": {".wav", ".mp3", ".m4a", ".aac", ".ogg", ".flac"},
+}
+
+
+HTML = """<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>SkillForge 匠传</title>
+  <style>
+    :root{color-scheme:dark;--bg:#07110d;--panel:#102019;--line:#294235;--text:#eef7f0;--muted:#a6b9ac;--green:#73e2a7;--amber:#ffc766;--red:#ff7b7b}
+    *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 80% 0,#163327 0,transparent 38%),var(--bg);color:var(--text);font:15px/1.55 system-ui,-apple-system,"Noto Sans CJK SC",sans-serif}
+    main{max-width:1180px;margin:auto;padding:34px 20px 70px}h1{font-size:38px;margin:0 0 4px}h2{font-size:20px;margin:0 0 16px}p{color:var(--muted)}.tag{color:var(--green);letter-spacing:.14em;text-transform:uppercase;font-weight:700}.panel{background:color-mix(in srgb,var(--panel) 92%,transparent);border:1px solid var(--line);border-radius:18px;padding:20px;margin-top:18px;box-shadow:0 16px 50px #0004}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.metric{padding:15px;border:1px solid var(--line);border-radius:14px;background:#0a1712}.metric strong{display:block;font-size:28px;color:var(--green)}.cols{display:grid;grid-template-columns:1fr 1fr;gap:14px}.step,.issue,.change{border:1px solid var(--line);border-radius:12px;padding:13px;margin:9px 0;background:#0b1813}.issue{border-left:4px solid var(--red)}.change{border-left:4px solid var(--green)}.evidence{color:var(--amber);font-size:13px;margin-top:8px}.muted{color:var(--muted)}button{border:0;border-radius:10px;padding:11px 16px;background:var(--green);color:#062011;font-weight:800;cursor:pointer}input{width:100%;margin:6px 0 12px;padding:9px;border:1px solid var(--line);border-radius:8px;background:#08130f;color:var(--text)}label{display:block;color:var(--muted)}#status{margin-left:10px;color:var(--amber)}pre{white-space:pre-wrap;word-break:break-word;color:var(--muted)}@media(max-width:800px){.grid,.cols{grid-template-columns:1fr}h1{font-size:30px}}
+  </style>
+</head>
+<body><main>
+  <div class="tag">DGX native pipeline · no Docker required</div>
+  <h1>匠传 SkillForge</h1>
+  <p>从素材证据到 SOP，再到发现问题、引用证据和局部自动修订。</p>
+  <section class="panel"><h2>模拟闭环指标</h2><div id="metrics" class="grid"></div></section>
+  <section class="panel"><h2>发现问题 → 展示证据</h2><div id="issues"></div></section>
+  <section class="panel"><h2>修订前后对比</h2><div class="cols"><div><h3>修订前</h3><div id="before"></div></div><div><h3>修订后</h3><div id="after"></div></div></div></section>
+  <section class="panel"><h2>局部修订审计</h2><div id="changes"></div></section>
+  <section class="panel"><h2>上传素材并原生预处理</h2><p>上传内容只写入被 Git 忽略的本地输出目录。本页面不会自动把原始素材发送给外部模型。</p>
+    <form id="upload"><label>操作视频<input type="file" name="video" accept="video/*"></label><label>设备 PDF<input type="file" name="pdf" accept="application/pdf"></label><label>专家录音<input type="file" name="audio" accept="audio/*"></label><label><input style="width:auto" type="checkbox" name="transcribe" value="true">调用 StepAudio ASR</label><label><input style="width:auto" type="checkbox" name="analyze_visuals" value="true">调用 Step 3.7 分析关键帧</label><label><input style="width:auto" type="checkbox" name="plan_sop" value="true">根据证据规划 SOP</label><label><input style="width:auto" type="checkbox" name="external_processing_authorized" value="true">已确认允许把选定派生内容发送给外部 API</label><button>开始处理</button><span id="status"></span></form><pre id="ingest"></pre>
+  </section>
+</main>
+<script>
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pct=v=>`${(Number(v)*100).toFixed(0)}%`;
+async function loadDemo(){const r=await fetch('/api/demo');if(!r.ok){await fetch('/api/demo/run',{method:'POST'});return loadDemo()}const d=await r.json();const b=d.summary.before,a=d.summary.after;
+document.querySelector('#metrics').innerHTML=[['必要步骤',`${pct(b.required_step_coverage)} → ${pct(a.required_step_coverage)}`],['证据覆盖',`${pct(b.evidence_supported_required_steps)} → ${pct(a.evidence_supported_required_steps)}`],['严重错误',`${b.severe_error_count} → ${a.severe_error_count}`],['工作流',d.summary.workflow_state]].map(x=>`<div class="metric"><span class="muted">${esc(x[0])}</span><strong>${esc(x[1])}</strong></div>`).join('');
+document.querySelector('#issues').innerHTML=d.initial_conflicts.conflicts.map(c=>`<div class="issue"><b>${esc(c.kind)}</b> · ${esc(c.message)}<div class="evidence">${c.evidence.map(e=>`${esc(e.evidence_id)}：${esc(e.claim)}｜${esc(JSON.stringify(e.locator))}`).join('<br>')||'无来源内容：按规则拒绝'}</div></div>`).join('');
+const render=s=>s.steps.map(x=>`<div class="step"><b>${esc(x.step_id)} ${esc(x.title)}</b><div class="muted">${esc(x.action)}</div><div class="evidence">证据：${esc(x.evidence.join(', ')||'无')}</div></div>`).join('');document.querySelector('#before').innerHTML=render(d.before_sop);document.querySelector('#after').innerHTML=render(d.after_sop);
+document.querySelector('#changes').innerHTML=d.revision_audit.changes.map(c=>`<div class="change"><b>${esc(c.action)} · ${esc(c.path)}</b><div>${esc(c.reason)}</div><div class="evidence">证据：${esc(c.evidence_ids.join(', ')||'无依据，已删除')}</div></div>`).join('')}
+document.querySelector('#upload').addEventListener('submit',async e=>{e.preventDefault();const status=document.querySelector('#status');status.textContent='处理中…';const r=await fetch('/api/ingest',{method:'POST',body:new FormData(e.target)});const d=await r.json();status.textContent=r.ok?'完成':'失败';document.querySelector('#ingest').textContent=JSON.stringify(d,null,2)});loadDemo();
+</script></body></html>"""
+
+
+def _read_json(path: Path) -> Any:
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def _demo_payload(directory: Path) -> dict[str, Any]:
+    names = [
+        "summary",
+        "before_sop",
+        "after_sop",
+        "initial_conflicts",
+        "final_conflicts",
+        "revision_audit",
+    ]
+    missing = [name for name in names if not (directory / f"{name}.json").is_file()]
+    if missing:
+        raise FileNotFoundError(", ".join(missing))
+    return {name: _read_json(directory / f"{name}.json") for name in names}
+
+
+async def _save_upload(upload: UploadFile, path: Path) -> None:
+    total = 0
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("wb") as handle:
+        while chunk := await upload.read(1024 * 1024):
+            total += len(chunk)
+            if total > MAX_UPLOAD_BYTES:
+                path.unlink(missing_ok=True)
+                raise HTTPException(status_code=413, detail="单个文件不能超过 512 MiB")
+            handle.write(chunk)
+    await upload.close()
+
+
+def _suffix(kind: str, upload: UploadFile) -> str:
+    suffix = Path(upload.filename or "").suffix.lower()
+    if suffix not in ALLOWED_SUFFIXES[kind]:
+        raise HTTPException(status_code=400, detail=f"不支持的 {kind} 文件类型")
+    return suffix
+
+
+def create_app(output_root: Path | None = None) -> FastAPI:
+    root = (output_root or ROOT / "outputs").resolve()
+    root.mkdir(parents=True, exist_ok=True)
+    demo_dir = root / "demo_run"
+    app = FastAPI(title="SkillForge", version="0.1.0")
+
+    @app.get("/", response_class=HTMLResponse)
+    def index() -> str:
+        return HTML
+
+    @app.get("/health")
+    def health() -> dict[str, Any]:
+        return {"status": "ok", "runtime": "native-python", "docker_required": False}
+
+    @app.get("/api/demo")
+    def demo_data() -> JSONResponse:
+        try:
+            return JSONResponse(_demo_payload(demo_dir))
+        except FileNotFoundError as exc:
+            raise HTTPException(status_code=404, detail="模拟结果尚未生成") from exc
+
+    @app.post("/api/demo/run")
+    def execute_demo() -> dict[str, Any]:
+        return run_demo(ROOT / "cases" / "demo_case" / "synthetic", demo_dir)
+
+    @app.post("/api/ingest")
+    async def ingest_uploads(
+        video: Annotated[UploadFile | None, File()] = None,
+        pdf: Annotated[UploadFile | None, File()] = None,
+        audio: Annotated[UploadFile | None, File()] = None,
+        transcribe: Annotated[bool, Form()] = False,
+        analyze_visuals: Annotated[bool, Form()] = False,
+        plan_sop: Annotated[bool, Form()] = False,
+        external_processing_authorized: Annotated[bool, Form()] = False,
+    ) -> dict[str, Any]:
+        uploads = {"video": video, "pdf": pdf, "audio": audio}
+        if not any(uploads.values()):
+            raise HTTPException(status_code=400, detail="至少上传一个文件")
+        if (transcribe or analyze_visuals or plan_sop) and not external_processing_authorized:
+            raise HTTPException(
+                status_code=400,
+                detail="启用 ASR 前必须明确确认外部处理授权",
+            )
+        run_id = uuid.uuid4().hex[:12]
+        run_dir = root / "web_runs" / run_id
+        paths: dict[str, Path] = {}
+        for kind, upload in uploads.items():
+            if upload is None:
+                continue
+            path = run_dir / "input" / f"{kind}{_suffix(kind, upload)}"
+            await _save_upload(upload, path)
+            paths[kind] = path
+        pipeline = IngestionPipeline(run_dir / "result")
+        manifest = await run_in_threadpool(
+            pipeline.run,
+            video=paths.get("video"),
+            pdf=paths.get("pdf"),
+            audio=paths.get("audio"),
+            transcribe=transcribe,
+            analyze_visuals=analyze_visuals,
+            plan_sop=plan_sop,
+            external_processing_authorized=external_processing_authorized,
+            synthetic=False,
+            case_id=f"WEB-{run_id}",
+            title="上传素材生成的 SOP 草稿",
+        )
+        return {"run_id": run_id, "manifest": manifest}
+
+    @app.get("/artifacts/{run_id}/{artifact_path:path}")
+    def artifact(run_id: str, artifact_path: str) -> FileResponse:
+        if not re.fullmatch(r"[a-f0-9]{12}", run_id):
+            raise HTTPException(status_code=404)
+        candidate = (root / "web_runs" / run_id / "result" / artifact_path).resolve()
+        allowed = (root / "web_runs" / run_id / "result").resolve()
+        if allowed not in candidate.parents or not candidate.is_file():
+            raise HTTPException(status_code=404)
+        return FileResponse(candidate)
+    return app
+
+
+app = create_app()
+
+
+def main() -> int:
+    host = os.getenv("SKILLFORGE_HOST", "0.0.0.0")
+    port_text = os.getenv("SKILLFORGE_PORT", "7860")
+    if not re.fullmatch(r"\d{2,5}", port_text):
+        raise ValueError("SKILLFORGE_PORT 必须是端口数字")
+    uvicorn.run("skillforge.web:app", host=host, port=int(port_text), reload=False)
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
