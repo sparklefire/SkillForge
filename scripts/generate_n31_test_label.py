@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate a privacy-safe N31 test label matching the historical page geometry."""
+"""Generate a privacy-safe N31 test label matching the physical media."""
 
 from __future__ import annotations
 
@@ -12,8 +12,11 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
 
 
-PAGE_WIDTH_PT = 215.0
-PAGE_HEIGHT_PT = 368.0
+MEDIA_WIDTH_MM = 72.0
+MEDIA_HEIGHT_MM = 130.0
+POINTS_PER_MM = 72.0 / 25.4
+PAGE_WIDTH_PT = MEDIA_WIDTH_MM * POINTS_PER_MM
+PAGE_HEIGHT_PT = MEDIA_HEIGHT_MM * POINTS_PER_MM
 OUTPUT = Path("output/pdf/n31_skillforge_test_label.pdf")
 CN_FONT = "SkillForgeCN"
 CJK_FONT_CANDIDATES = (
@@ -94,7 +97,7 @@ def generate(destination: Path = OUTPUT) -> Path:
     c.drawString(23, 116, "□ 无跳纸      □ 无明显偏斜")
 
     c.setFont(CN_FONT, 8)
-    c.drawString(17, 86, "页面尺寸：75.85 × 129.82 mm")
+    c.drawString(17, 86, "页面尺寸：72.00 × 130.00 mm")
     c.drawString(17, 72, "打印设置：实际大小 / 100%，不要缩放")
 
     c.setFillColor(black)

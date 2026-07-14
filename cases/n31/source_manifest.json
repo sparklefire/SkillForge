@@ -45,6 +45,36 @@
       "rights_status": "用户提供的历史真实面单；包含客户与运单信息，仅本地提取页面几何，不读取正文、不上传外部服务、不提交Git、不进入演示画面"
     },
     {
+      "source_id": "N31_PHYSICAL_MEDIA_PRINT_PRIVATE",
+      "type": "image",
+      "title": "N31 实物介质与真实试印照片（私有）",
+      "local_path": "cases/n31/input/reference/N31_physical_media_print_private_20260714.jpg",
+      "sha256": "c00f885213c6557797ba28e1922c8c4c3b08bed1d652d341ca6703ef86ad5b39",
+      "image_dimensions": {
+        "width": 3072,
+        "height": 4096
+      },
+      "contains_sensitive_data": true,
+      "confirmed_observations": {
+        "device_model": "N31",
+        "media_feed_form": "FANFOLD",
+        "physical_label_width_mm": 72.0,
+        "physical_label_height_mm": 130.0,
+        "print_completed": true,
+        "front_label_boundary_visible": true,
+        "reverse_black_mark_status": "UNVERIFIED"
+      },
+      "evidence_basis": {
+        "media_feed_form": "USER_DECLARATION_AND_IMAGE",
+        "physical_dimensions": "USER_DECLARATION",
+        "print_completed": "IMAGE"
+      },
+      "role": "PHYSICAL_MEDIA_AND_PRINT_EVIDENCE",
+      "external_processing_status": "PROHIBITED",
+      "public_display_status": "PROHIBITED",
+      "rights_status": "用户提供的实物照片；含真实物流信息，仅本地用于介质和成功出纸核对，不上传外部服务、不提交Git、不进入演示画面"
+    },
+    {
       "source_id": "N31_MANUAL_REV1_0",
       "type": "pdf",
       "title": "汉印 N31 用户手册",
@@ -155,13 +185,13 @@
       "title": "SkillForge N31 虚构测试面单",
       "local_path": "output/pdf/n31_skillforge_test_label.pdf",
       "generator": "scripts/generate_n31_test_label.py",
-      "sha256": "e36b24aba51230c130f80b706907cdfcc2e4c42f3e6050ca0d46f58db48ce96c",
+      "sha256": "ad2ff9871789675f3aa9dbe42c4d88a9f4fd88c6c4ccd45f8e8911e15de8bd42",
       "pages": 1,
       "page_geometry": {
-        "width_pt": 215,
-        "height_pt": 368,
-        "width_mm": 75.85,
-        "height_mm": 129.82
+        "width_pt": 204.0944881889764,
+        "height_pt": 368.503937007874,
+        "width_mm": 72.0,
+        "height_mm": 130.0
       },
       "privacy_status": "SYNTHETIC_NO_REAL_CUSTOMER_DATA",
       "print_instruction": "按实际大小或100%打印，不缩放"
