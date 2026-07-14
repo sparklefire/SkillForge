@@ -55,6 +55,30 @@
         }
       ],
       "rights_status": "官方公开下载；仅作为本地输入和证据引用，未确认重新分发授权，不提交Git"
+    },
+    {
+      "source_id": "N31_TUTORIAL_VIDEO_REFERENCE",
+      "type": "video",
+      "title": "汉印N31开机装纸教程",
+      "source_url": null,
+      "local_path": "cases/n31/input/video/汉印N31开机装纸教程.mp4",
+      "sha256": "09285ec45219c39655d784685521591362cec3ab7f1fd584ab2dab2004cefdaa",
+      "media": {
+        "duration_ms": 20720,
+        "width": 1080,
+        "height": 1920,
+        "fps": 25,
+        "video_codec": "h264",
+        "audio_codec": "aac"
+      },
+      "observed_content": [
+        "连接电源",
+        "放入面单打印纸",
+        "调节内部移动导纸夹"
+      ],
+      "role": "REFERENCE_ONLY",
+      "provenance_status": "PENDING_SOURCE_URL",
+      "rights_status": "来源页面和复用授权尚未回填；仅本地参考，不提交Git，不作为自行拍摄的真实主视频"
     }
   ],
   "human_sources": [
