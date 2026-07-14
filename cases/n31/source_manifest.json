@@ -102,8 +102,16 @@
       "related_source_ids": [
         "N31_OFFICIAL_PRODUCT_PAGE"
       ],
-      "provenance_status": "MODEL_PAGE_VERIFIED_VIDEO_ORIGIN_UNVERIFIED",
-      "rights_status": "官方产品页可核对型号与外观，但该页面未提供此视频；视频原始下载页面和复用授权仍待回填，仅本地参考，不提交Git，不作为自行拍摄的真实主视频"
+      "acquisition": {
+        "channel": "京东购机订单客服",
+        "context": "购买N31后由客服私发的开机装纸售后指导素材",
+        "evidence_basis": "USER_DECLARATION",
+        "proof_path": null
+      },
+      "provenance_status": "USER_CONFIRMED_JD_POST_PURCHASE_SUPPORT_MATERIAL",
+      "external_processing_status": "NOT_AUTHORIZED",
+      "public_display_status": "NOT_AUTHORIZED",
+      "rights_status": "已确认获取渠道，但购机后收到售后指导素材不等于获得公开传播、改编或上传第三方AI服务的授权；仅本地参考，不提交Git，不用于公开成片，不作为自行拍摄的真实主视频"
     }
   ],
   "human_sources": [
