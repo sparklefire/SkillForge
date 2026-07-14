@@ -25,6 +25,26 @@
       "rights_status": "汉印官方网站公开页面；截图仅作私有来源存档和事实核对，不提交Git，不推定获得图片或页面内容的重新分发授权"
     },
     {
+      "source_id": "N31_PREVIOUS_LABEL_PRIVATE",
+      "type": "pdf",
+      "title": "历史真实面单（私有尺寸参考）",
+      "local_path": "cases/n31/input/reference/N31_previous_shipping_label_private.pdf",
+      "sha256": "cb4508b970a5d8826760fd80b83876974da6e2bbfa0174f91e72de1812850cd3",
+      "pages": 1,
+      "page_geometry": {
+        "width_pt": 215,
+        "height_pt": 368,
+        "width_mm": 75.85,
+        "height_mm": 129.82,
+        "rotation": 0
+      },
+      "contains_sensitive_data": true,
+      "role": "DIMENSION_REFERENCE_ONLY",
+      "external_processing_status": "PROHIBITED",
+      "public_display_status": "PROHIBITED",
+      "rights_status": "用户提供的历史真实面单；包含客户与运单信息，仅本地提取页面几何，不读取正文、不上传外部服务、不提交Git、不进入演示画面"
+    },
+    {
       "source_id": "N31_MANUAL_REV1_0",
       "type": "pdf",
       "title": "汉印 N31 用户手册",
@@ -126,6 +146,25 @@
       "type": "audio",
       "local_path": "cases/n31/input/audio/n31_expert_interview.m4a",
       "status": "PENDING_CAPTURE"
+    }
+  ],
+  "generated_artifacts": [
+    {
+      "artifact_id": "N31_SKILLFORGE_TEST_LABEL",
+      "type": "pdf",
+      "title": "SkillForge N31 虚构测试面单",
+      "local_path": "output/pdf/n31_skillforge_test_label.pdf",
+      "generator": "scripts/generate_n31_test_label.py",
+      "sha256": "e36b24aba51230c130f80b706907cdfcc2e4c42f3e6050ca0d46f58db48ce96c",
+      "pages": 1,
+      "page_geometry": {
+        "width_pt": 215,
+        "height_pt": 368,
+        "width_mm": 75.85,
+        "height_mm": 129.82
+      },
+      "privacy_status": "SYNTHETIC_NO_REAL_CUSTOMER_DATA",
+      "print_instruction": "按实际大小或100%打印，不缩放"
     }
   ]
 }
