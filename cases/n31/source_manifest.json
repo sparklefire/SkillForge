@@ -68,17 +68,47 @@
         "physical_label_height_mm": 130.0,
         "print_completed": true,
         "front_label_boundary_visible": true,
-        "reverse_black_mark_status": "UNVERIFIED"
+        "reverse_black_mark_status": "NOT_PRESENT",
+        "media_positioning_method": "GAP",
+        "learning_mode": "GAP_LABEL_LEARNING"
       },
       "evidence_basis": {
         "media_feed_form": "USER_DECLARATION_AND_IMAGE",
         "physical_dimensions": "USER_DECLARATION",
-        "print_completed": "IMAGE"
+        "print_completed": "IMAGE",
+        "reverse_black_mark_status": "N31_MEDIA_BACK_BOUNDARY_PRIVATE"
       },
+      "related_source_ids": [
+        "N31_MEDIA_BACK_BOUNDARY_PRIVATE"
+      ],
       "role": "PHYSICAL_MEDIA_AND_PRINT_EVIDENCE",
       "external_processing_status": "PROHIBITED",
       "public_display_status": "PROHIBITED",
       "rights_status": "用户提供的实物照片；含真实物流信息，仅本地用于介质和成功出纸核对，不上传外部服务、不提交Git、不进入演示画面"
+    },
+    {
+      "source_id": "N31_MEDIA_BACK_BOUNDARY_PRIVATE",
+      "type": "image",
+      "title": "N31 标签纸背面交界处照片（私有）",
+      "local_path": "cases/n31/input/reference/N31_media_back_boundary_20260714.jpg",
+      "sha256": "d92508a95b708ece161d1707ddb1115916daff1522486d304caefe2d47f0e9ba",
+      "image_dimensions": {
+        "width": 1322,
+        "height": 4096
+      },
+      "contains_sensitive_data": false,
+      "confirmed_observations": {
+        "view_side": "MEDIA_REVERSE",
+        "adjacent_label_boundaries_visible": true,
+        "periodic_black_mark_present": false,
+        "media_positioning_method": "GAP",
+        "required_learning_mode": "GAP_LABEL_LEARNING"
+      },
+      "evidence_basis": "USER_DECLARATION_AND_IMAGE",
+      "role": "MEDIA_POSITIONING_TYPE_EVIDENCE",
+      "external_processing_status": "NOT_REQUIRED",
+      "public_display_status": "PRIVATE_SOURCE_NOT_SELECTED_FOR_PUBLICATION",
+      "rights_status": "用户自行提供的标签纸背面照片；未见客户或运单正文，作为本地介质类型证据保存，不提交Git"
     },
     {
       "source_id": "N31_MANUAL_REV1_0",
