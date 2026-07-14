@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/sop.schema.json",
+  "title": "SkillForge SOP",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["case_id", "title", "version", "evidence_catalog", "steps"],
+  "properties": {
+    "case_id": {"type": "string", "minLength": 1},
+    "title": {"type": "string", "minLength": 1},
+    "version": {"type": "integer", "minimum": 1},
+    "evidence_catalog": {
+      "type": "array",
+      "items": {
+        "$ref": "https://skillforge.local/schemas/evidence.schema.json"
+      }
+    },
+    "steps": {
+      "type": "array",
+      "minItems": 8,
+      "maxItems": 15,
+      "items": {"$ref": "#/$defs/step"}
+    }
+  },
+  "$defs": {
+    "parameter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "value", "unit", "evidence_ids"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "value": {"type": ["string", "number"]},
+        "unit": {"type": "string"},
+        "evidence_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^E[0-9]{3}$"}
+        }
+      }
+    },
+    "step": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "step_id",
+        "title",
+        "action",
+        "object",
+        "prerequisites",
+        "tools",
+        "parameters",
+        "warnings",
+        "success_check",
+        "evidence",
+        "confidence",
+        "required",
+        "status"
+      ],
+      "properties": {
+        "step_id": {"type": "string", "pattern": "^S[0-9]{2}$"},
+        "title": {"type": "string", "minLength": 1},
+        "action": {"type": "string", "minLength": 1},
+        "object": {"type": "string", "minLength": 1},
+        "prerequisites": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^S[0-9]{2}$"}
+        },
+        "tools": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "parameters": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/parameter"}
+        },
+        "warnings": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1}
+        },
+        "success_check": {"type": "string", "minLength": 1},
+        "evidence": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^E[0-9]{3}$"}
+        },
+        "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+        "required": {"type": "boolean"},
+        "status": {"enum": ["DRAFT", "VERIFIED", "NEEDS_REVIEW", "REVISED"]}
+      }
+    }
+  }
+}

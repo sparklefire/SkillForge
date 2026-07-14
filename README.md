@@ -54,18 +54,36 @@ bash scripts/check_dgx.sh
 
 两个脚本都从本地 `.env` 读取配置，不输出密钥。
 
+## 运行 P0 模拟闭环
+
+模拟案例明确标注为虚构数据，只用于验证工程闭环，不能作为真实设备操作指南：
+
+```bash
+python3 -m venv .venv
+.venv/bin/python -m pip install -e '.[dev]'
+.venv/bin/python -m pytest
+.venv/bin/python -m skillforge.demo
+```
+
+演示输出写入被 Git 忽略的 `outputs/demo_run/`，包含首轮 SOP、问题与证据、局部修订审计、修订后 SOP、检查清单、测验和工作流记录。
+
 ## 当前目录
 
 ```text
 skillforge/
 ├── README.md
 ├── .env.example
+├── pyproject.toml
 ├── config/
 │   └── models.json
+├── schemas/
+├── src/skillforge/
+├── tests/
 ├── docs/
 ├── scripts/
 ├── cases/
 │   └── demo_case/
+│       ├── synthetic/
 │       ├── input/
 │       ├── derived/
 │       ├── gold/
@@ -85,3 +103,10 @@ P0 能力只有五项：
 5. 能在三分钟演示中稳定呈现修订前后对比。
 
 多语言、数字人、全生成视频、多案例和复杂权限系统均不在 P0 范围内。
+
+## 当前工程状态
+
+- 三类核心 JSON Schema、模型路由、Step Plan 安全客户端、显式状态机和结构化脱敏日志已实现。
+- 模拟案例能稳定发现缺步骤、错误顺序、无依据工具和无依据参数，并用证据完成局部修订。
+- 模拟闭环的严重错误从 5 项降到 0 项，九个必要步骤和证据覆盖率均达到 100%。
+- 真实视频、PDF 和录音解析以及 Web 演示仍是下一阶段工作；上述模拟数字不得当作真实评测结果。

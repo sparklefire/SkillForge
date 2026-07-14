@@ -1,0 +1,19 @@
+{
+  "required_step_ids": ["S01", "S02", "S03", "S04", "S05", "S06", "S07", "S08", "S09"],
+  "expected_order": ["S01", "S02", "S03", "S04", "S05", "S06", "S07", "S08", "S09"],
+  "order_rules": [
+    {"before": "S02", "after": "S03"},
+    {"before": "S03", "after": "S04"},
+    {"before": "S08", "after": "S09"}
+  ],
+  "allowed_tools": [
+    "warning sign",
+    "lockout tag",
+    "protective gloves",
+    "safety glasses",
+    "sealed waste bag",
+    "lint-free cloth",
+    "replacement filter"
+  ],
+  "allowed_parameters": []
+}

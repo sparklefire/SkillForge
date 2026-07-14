@@ -1,0 +1,17 @@
+{
+  "remove_step_id": "S02",
+  "swap_step_ids": ["S03", "S04"],
+  "unsupported_tool": {
+    "step_id": "S09",
+    "tool": "torque wrench"
+  },
+  "unsupported_parameter": {
+    "step_id": "S09",
+    "parameter": {
+      "name": "cover torque",
+      "value": 12,
+      "unit": "N·m",
+      "evidence_ids": []
+    }
+  }
+}
