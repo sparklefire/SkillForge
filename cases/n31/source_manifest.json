@@ -27,7 +27,7 @@
     {
       "source_id": "N31_PREVIOUS_LABEL_PRIVATE",
       "type": "pdf",
-      "title": "历史真实面单（私有尺寸参考）",
+      "title": "用户指定的历史真实试印面单（私有）",
       "local_path": "cases/n31/input/reference/N31_previous_shipping_label_private.pdf",
       "sha256": "cb4508b970a5d8826760fd80b83876974da6e2bbfa0174f91e72de1812850cd3",
       "pages": 1,
@@ -39,10 +39,16 @@
         "rotation": 0
       },
       "contains_sensitive_data": true,
-      "role": "DIMENSION_REFERENCE_ONLY",
+      "role": "PRIVATE_LOCAL_PRINT_TEST_INPUT",
+      "usage_status": "SELECTED_BY_USER_FOR_CURRENT_LOCAL_PRINT_TEST",
+      "allowed_operations": [
+        "LOCAL_PRINT",
+        "LOCAL_PAGE_GEOMETRY_CHECK"
+      ],
+      "print_instruction": "优先复用已经成功打印的设置；纸张选72×130毫米。因PDF页面宽75.85毫米，使用适合可打印区域，手动缩放时从94%至95%开始，不使用100%原尺寸",
       "external_processing_status": "PROHIBITED",
       "public_display_status": "PROHIBITED",
-      "rights_status": "用户提供的历史真实面单；包含客户与运单信息，仅本地提取页面几何，不读取正文、不上传外部服务、不提交Git、不进入演示画面"
+      "rights_status": "用户指定用于本机试印的历史真实面单；包含客户与运单信息，仅允许本地打印和页面几何核对，不上传外部服务、不提交Git，正文不得清晰进入主视频、特写或公开演示"
     },
     {
       "source_id": "N31_PHYSICAL_MEDIA_PRINT_PRIVATE",
@@ -194,6 +200,7 @@
         "height_mm": 130.0
       },
       "privacy_status": "SYNTHETIC_NO_REAL_CUSTOMER_DATA",
+      "usage_status": "NOT_SELECTED_FOR_CURRENT_CAPTURE_OPTIONAL_FALLBACK",
       "print_instruction": "按实际大小或100%打印，不缩放"
     }
   ]
