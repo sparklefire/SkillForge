@@ -1,0 +1,21 @@
+.env
+.env.*
+!.env.example
+
+__pycache__/
+*.py[cod]
+.DS_Store
+
+logs/*
+!logs/.gitkeep
+outputs/*
+!outputs/.gitkeep
+
+# 原始行业素材默认视为敏感数据，不提交到代码仓库。
+cases/*/input/*
+!cases/*/input/.gitkeep
+cases/*/derived/*
+!cases/*/derived/.gitkeep
+cases/*/output/*
+!cases/*/output/.gitkeep
+

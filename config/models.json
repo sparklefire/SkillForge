@@ -1,0 +1,28 @@
+{
+  "reasoning": {
+    "planner": {
+      "model": "step-3.7-flash",
+      "reasoning_effort": "medium"
+    },
+    "verifier": {
+      "model": "step-3.7-flash",
+      "reasoning_effort": "high"
+    },
+    "fast_extractor": {
+      "model": "step-3.5-flash-2603",
+      "reasoning_effort": "low"
+    },
+    "fallback": {
+      "model": "step-router-v1"
+    }
+  },
+  "audio": {
+    "asr": "stepaudio-2.5-asr",
+    "tts": "stepaudio-2.5-tts",
+    "realtime": "stepaudio-2.5-realtime"
+  },
+  "image": {
+    "generation_and_edit": "step-image-edit-2"
+  }
+}
+
