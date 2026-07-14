@@ -22,6 +22,12 @@
 SOP / 检查清单 / 测验 / 海报 / 培训视频
 ```
 
+## 真实主案例
+
+唯一真实主案例已经锁定为“汉印 N31 电子面单打印机更换标签纸、介质学习与试印验收”。采集执行单、口述提纲、授权模板和 Gold SOP 审核表见 [N31 案例目录](./cases/n31/README.md)。
+
+N31 原始视频、录音、厂商手册和完整授权书只保存在被 Git 忽略的 `cases/n31/input/`；仓库只保存脱敏来源记录、模板和人工审核结果。
+
 ## 已持久化内容
 
 - [赛事与方向评估](./评估NVIDIA的黑客松方向.md)
@@ -104,8 +110,14 @@ skillforge/
 ├── docs/
 ├── scripts/
 ├── cases/
-│   └── demo_case/
-│       ├── synthetic/
+│   ├── demo_case/
+│   │   ├── synthetic/
+│   │   ├── input/
+│   │   ├── derived/
+│   │   ├── gold/
+│   │   └── output/
+│   └── n31/
+│       ├── materials/
 │       ├── input/
 │       ├── derived/
 │       ├── gold/

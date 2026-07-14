@@ -1,0 +1,74 @@
+{
+  "case_id": "n31_media_change",
+  "title": "汉印 N31 电子面单打印机更换标签纸、介质学习与试印验收",
+  "sources": [
+    {
+      "source_id": "N31_MANUAL_REV1_0",
+      "type": "pdf",
+      "title": "汉印 N31 用户手册",
+      "revision": "Rev.1.0",
+      "url": "https://foreverfile.hprtcloud.com/knowledge/2023%E5%B9%B411%E6%9C%8813%E6%97%A5/N31%20%E4%BD%BF%E7%94%A8%E6%89%8B%E5%86%8C_Rev.1.0.pdf",
+      "local_path": "cases/n31/input/manual/N31_user_manual_rev1.0.pdf",
+      "sha256": "2c8e2c54760f9ee888a9cf2c9d490dfebabf5d2c56a1e64a390dc70c11ed2cb1",
+      "relevant_pages": [
+        {
+          "pdf_page": 12,
+          "printed_page": 7,
+          "claim": "介质类型、宽度、厚度和传感器规格"
+        },
+        {
+          "pdf_page": 14,
+          "printed_page": 9,
+          "claim": "调节进纸导轨、插入标签纸并确认自动送出一小段"
+        },
+        {
+          "pdf_page": 15,
+          "printed_page": 10,
+          "claim": "卡纸处理步骤"
+        },
+        {
+          "pdf_page": 20,
+          "printed_page": 15,
+          "claim": "走纸、自检、缝标学习和黑标学习按键操作"
+        }
+      ],
+      "rights_status": "官方公开下载；仅作为本地输入和证据引用，未确认重新分发授权，不提交Git"
+    },
+    {
+      "source_id": "N31_QUICK_GUIDE_REV1_5",
+      "type": "pdf",
+      "title": "汉印 N31 快速安装指南",
+      "revision": "Rev.1.5",
+      "url": "https://foreverfile.hprtcloud.com/knowledge/2023%E5%B9%B412%E6%9C%8821%E6%97%A5/HPRT%20N31%20%E4%BA%A7%E5%93%81%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+      "local_path": "cases/n31/input/manual/N31_quick_guide_rev1.5.pdf",
+      "sha256": "522c47a6055bd47f051b70cfdabaec72711805975c09a0a1b75bef7ec6f3c38d",
+      "relevant_pages": [
+        {
+          "pdf_page": 2,
+          "printed_page": 3,
+          "claim": "安装介质和处理卡纸图示"
+        },
+        {
+          "pdf_page": 2,
+          "printed_page": 4,
+          "claim": "电源连接和开机图示"
+        }
+      ],
+      "rights_status": "官方公开下载；仅作为本地输入和证据引用，未确认重新分发授权，不提交Git"
+    }
+  ],
+  "human_sources": [
+    {
+      "source_id": "N31_OPERATOR_VIDEO",
+      "type": "video",
+      "local_path": "cases/n31/input/video/n31_operation_full.mp4",
+      "status": "PENDING_CAPTURE"
+    },
+    {
+      "source_id": "N31_EXPERT_AUDIO",
+      "type": "audio",
+      "local_path": "cases/n31/input/audio/n31_expert_interview.m4a",
+      "status": "PENDING_CAPTURE"
+    }
+  ]
+}
