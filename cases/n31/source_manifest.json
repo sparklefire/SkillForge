@@ -3,6 +3,28 @@
   "title": "汉印 N31 电子面单打印机更换标签纸、介质学习与试印验收",
   "sources": [
     {
+      "source_id": "N31_OFFICIAL_PRODUCT_PAGE",
+      "type": "webpage",
+      "title": "汉印 N31 自进纸电子面单打印机产品页",
+      "url": "https://www.hprt.com.cn/ChanPin/121.html",
+      "accessed_at": "2026-07-14T12:23:49+08:00",
+      "local_screenshot_path": "cases/n31/input/reference/N31_official_product_page_2026-07-14.png",
+      "screenshot_sha256": "463402b5f0eb48ddda5a65531b275f1957ef75660fcca8e19aaf6b57e26b4432",
+      "screenshot_dimensions": {
+        "width": 3456,
+        "height": 26592
+      },
+      "verified_claims": [
+        "产品型号为N31自进纸电子面单打印机",
+        "打印方式为直接热敏",
+        "支持折叠纸或卷筒纸、模切或连续标签纸",
+        "介质宽度范围为50毫米至80毫米",
+        "支持出纸口、缺纸、缝标、黑标和开盖侦测",
+        "具备智能吸纸和FEED键三色灯"
+      ],
+      "rights_status": "汉印官方网站公开页面；截图仅作私有来源存档和事实核对，不提交Git，不推定获得图片或页面内容的重新分发授权"
+    },
+    {
       "source_id": "N31_MANUAL_REV1_0",
       "type": "pdf",
       "title": "汉印 N31 用户手册",
@@ -77,8 +99,11 @@
         "调节内部移动导纸夹"
       ],
       "role": "REFERENCE_ONLY",
-      "provenance_status": "PENDING_SOURCE_URL",
-      "rights_status": "来源页面和复用授权尚未回填；仅本地参考，不提交Git，不作为自行拍摄的真实主视频"
+      "related_source_ids": [
+        "N31_OFFICIAL_PRODUCT_PAGE"
+      ],
+      "provenance_status": "MODEL_PAGE_VERIFIED_VIDEO_ORIGIN_UNVERIFIED",
+      "rights_status": "官方产品页可核对型号与外观，但该页面未提供此视频；视频原始下载页面和复用授权仍待回填，仅本地参考，不提交Git，不作为自行拍摄的真实主视频"
     }
   ],
   "human_sources": [
