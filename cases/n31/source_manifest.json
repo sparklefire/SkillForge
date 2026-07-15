@@ -205,11 +205,12 @@
       "source_id": "N31_OPERATOR_VIDEO",
       "type": "video",
       "expected_local_path": "cases/n31/input/video/n31_operation_full.mp4",
-      "candidate_local_path": "cases/n31/input/video/n31_operation_full_private_review.mp4",
-      "candidate_sha256": "ed69dc8817988d20237b8b3aba79fa7ade2fd8c472bbafc3f358d3e121bc0365",
-      "status": "RECEIVED_REVIEWED_RETAKE_REQUIRED",
+      "candidate_local_path": "cases/n31/input/video/n31_operation_full_private_review_v2.mp4",
+      "candidate_sha256": "7718fc34884b3d0da2e64234ec230e739cbecac6cdb7244c8e878010a5d08466",
+      "previous_candidate_local_path": "cases/n31/input/video/n31_operation_full_private_review.mp4",
+      "status": "RECEIVED_V2_LOCAL_REDACTION_REQUIRED",
       "media": {
-        "duration_ms": 356000,
+        "duration_ms": 327341,
         "width": 1920,
         "height": 1080,
         "fps": 30,
@@ -219,29 +220,30 @@
         "audio_sample_rate": 48000
       },
       "audio_review": {
-        "integrated_lufs": -31.87,
-        "loudness_range_lu": 20.3,
-        "true_peak_dbtp": -2.56,
-        "status": "TOO_QUIET_AND_UNEVEN_FOR_FINAL_DEMO"
+        "integrated_lufs": -27.21,
+        "loudness_range_lu": 14.5,
+        "true_peak_dbtp": -4.49,
+        "status": "IMPROVED_BUT_NORMALIZATION_RECOMMENDED"
       },
       "privacy_review": {
-        "status": "FAIL_REAL_LABEL_CONTENT_READABLE",
+        "status": "FAIL_REAL_LABEL_CONTENT_READABLE_APPROX_305S_TO_END",
         "external_processing_status": "PROHIBITED",
-        "public_display_status": "PROHIBITED"
+        "public_display_status": "PROHIBITED",
+        "remediation": "LOCAL_OPAQUE_MASK_AND_FRAME_BY_FRAME_REVIEW"
       }
     },
     {
       "source_id": "N31_OPERATOR_CLOSEUPS",
       "type": "video_collection",
-      "status": "RECEIVED_REVIEWED_PARTIAL_RETAKE_REQUIRED",
+      "status": "RECEIVED_V2_PARTIAL_PASS_LOCAL_REDACTION_REQUIRED",
       "items": [
         {
           "role": "MEDIA_TYPE",
-          "local_path": "cases/n31/input/video/n31_closeup_media_type_private_review.mp4",
-          "sha256": "23f96afa8f70a9edc40f5c7e0fc9338b00826dc0ffe291f809ec719cd70d402d",
-          "duration_ms": 17933,
+          "local_path": "cases/n31/input/video/n31_closeup_media_type_private_review_v2.mp4",
+          "sha256": "93ae52858f1f42b542af61fea0760b5f02bccb7ff143b373d37c2b37929bdae6",
+          "duration_ms": 19900,
           "rotation_degrees": 0,
-          "review_status": "RETAKE_REQUIRED_REAL_LABEL_READABLE"
+          "review_status": "V2_TECHNICAL_PASS_LOCAL_REDACTION_REQUIRED"
         },
         {
           "role": "COVER_OPEN_EXTRA",
@@ -253,11 +255,11 @@
         },
         {
           "role": "GUIDES",
-          "local_path": "cases/n31/input/video/n31_closeup_guides_candidate.mp4",
-          "sha256": "ae1abe38e9c28ab74909f3ebaacfe4d94d7ad8743f4e8a8725409a06cd52d578",
-          "duration_ms": 5330,
+          "local_path": "cases/n31/input/video/n31_closeup_guides.mp4",
+          "sha256": "5343b2e177174e37ccd859368a07c45f710a11a43c51bfceca5ddd53f7c5a9cf",
+          "duration_ms": 37600,
           "rotation_degrees": 0,
-          "review_status": "RETAKE_RECOMMENDED_SHORT_AND_STATIC"
+          "review_status": "V2_PASS"
         },
         {
           "role": "REAR_FEED_PATH_EXTRA",
@@ -285,11 +287,11 @@
         },
         {
           "role": "PRINT_RESULT",
-          "local_path": "cases/n31/input/video/n31_closeup_result_private_review.mp4",
-          "sha256": "cb1b35716554599304bafeb15f62f4fa33307c32e2674550ccf9424b77551714",
-          "duration_ms": 5418,
-          "rotation_degrees": -90,
-          "review_status": "RETAKE_REQUIRED_REAL_LABEL_READABLE_SHORT_AND_PORTRAIT"
+          "local_path": "cases/n31/input/video/n31_closeup_result_private_review_v2.mp4",
+          "sha256": "08eb6e7c0320f0668bd3c960fd5d7d08c9e48eab6948b93872f554689ccba329",
+          "duration_ms": 17376,
+          "rotation_degrees": 0,
+          "review_status": "V2_TECHNICAL_PASS_LOCAL_REDACTION_REQUIRED"
         }
       ]
     },
