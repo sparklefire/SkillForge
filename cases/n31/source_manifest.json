@@ -517,6 +517,41 @@
       "final_severe_error_count": 0,
       "revision_count": 4,
       "raw_asset_download_enabled": false
+    },
+    {
+      "run_id": "DGX_GOLD_CODE_AND_WEB_SMOKE_20260716",
+      "type": "DGX_NATIVE_GOLD_VALIDATION",
+      "run_date": "2026-07-16",
+      "status": "PASSED",
+      "remote_app_directory": "/home/Developer/skillforge/app",
+      "sync_scope": "GIT_TRACKED_FILES_ONLY",
+      "sensitive_assets_uploaded": false,
+      "python_version": "3.12.3",
+      "test_result": "32 passed",
+      "gold_status": "GOLD",
+      "metrics_status": "FINAL",
+      "workflow_state": "COMPLETED",
+      "initial_severe_error_count": 5,
+      "final_severe_error_count": 0,
+      "initial_required_step_coverage": "9/10",
+      "final_required_step_coverage": "10/10",
+      "initial_evidence_coverage": "9/10",
+      "final_evidence_coverage": "10/10",
+      "revision_count": 4,
+      "web_bind_scope": "REMOTE_LOOPBACK_ONLY",
+      "checked_endpoints": [
+        "/health",
+        "/api/n31",
+        "/"
+      ],
+      "http_statuses": [
+        200,
+        200,
+        200
+      ],
+      "n31_rehearsal_available": true,
+      "docker_required": false,
+      "notes": "只同步Git跟踪代码、Gold JSON和审核记录；未上传原始录音、视频、PDF、私有面单或.env"
     }
   ],
   "generated_artifacts": [
