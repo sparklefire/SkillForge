@@ -411,6 +411,24 @@
       "n31_gold_status": "NOT_GOLD",
       "n31_metrics_status": "PROVISIONAL_ONLY",
       "raw_asset_download_enabled": false
+    },
+    {
+      "run_id": "DGX_CODE_AND_WEB_SMOKE_20260716",
+      "type": "DGX_NATIVE_CODE_ONLY_VALIDATION",
+      "run_date": "2026-07-16",
+      "status": "PASSED",
+      "remote_app_directory": "/home/Developer/skillforge/app",
+      "sync_scope": "GIT_TRACKED_FILES_ONLY",
+      "sensitive_assets_uploaded": false,
+      "python_version": "3.12.3",
+      "ffmpeg_version": "7.0.2-static",
+      "test_result": "28 passed",
+      "web_bind_scope": "REMOTE_LOOPBACK_ONLY",
+      "web_health_status": "ok",
+      "docker_required": false,
+      "n31_rehearsal_available": false,
+      "fallback_mode": "SYNTHETIC_DEMO_COMPLETED",
+      "notes": "N31视频、PDF、关键帧、Evidence Catalog和授权文件均未同步；等待明确授权后再部署N31预处理结果"
     }
   ],
   "generated_artifacts": [
