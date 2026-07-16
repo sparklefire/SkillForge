@@ -712,6 +712,33 @@
       "web_download_http_status": 200,
       "web_download_content_type": "application/pdf",
       "test_result": "36 passed"
+    },
+    {
+      "run_id": "DGX_A4_POSTER_20260717",
+      "type": "DGX_NATIVE_A4_POSTER_VALIDATION",
+      "run_date": "2026-07-17",
+      "status": "PASSED",
+      "remote_app_directory": "/home/Developer/skillforge/app",
+      "sync_scope": "GIT_TRACKED_FILES_ONLY",
+      "sensitive_assets_uploaded": false,
+      "python_version": "3.12.3",
+      "dependencies_installed_offline": {
+        "reportlab": "4.4.9",
+        "pillow": "12.2.0",
+        "charset-normalizer": "3.4.9"
+      },
+      "test_result": "36 passed",
+      "generated_page_count": 1,
+      "generated_width_pt": 595.28,
+      "generated_height_pt": 841.89,
+      "extracted_character_count": 1067,
+      "step_marker_check": "S01_AND_S13_PRESENT",
+      "web_download_http_status": 200,
+      "web_download_content_type": "application/pdf",
+      "web_download_pdf_magic_valid": true,
+      "docker_required": false,
+      "system_python_modified": false,
+      "validation_server_stopped": true
     }
   ],
   "generated_artifacts": [
