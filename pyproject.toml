@@ -25,6 +25,7 @@ dev = [
 
 [project.scripts]
 skillforge-demo = "skillforge.demo:main"
+skillforge-case-ingest = "skillforge.case_ingest:main"
 skillforge-ingest = "skillforge.ingest:main"
 skillforge-web = "skillforge.web:main"
 

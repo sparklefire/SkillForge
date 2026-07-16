@@ -333,6 +333,27 @@
       "status": "PENDING_CAPTURE"
     }
   ],
+  "processing_runs": [
+    {
+      "run_id": "N31_LOCAL_INGEST_V1",
+      "type": "MULTI_SOURCE_LOCAL_INGEST",
+      "run_date": "2026-07-16",
+      "config": "cases/n31/ingest_manifest.json",
+      "output": "cases/n31/output/ingest_local_v1",
+      "status": "INGESTED_LOCAL_ONLY",
+      "source_count": 8,
+      "video_source_count": 6,
+      "pdf_source_count": 2,
+      "video_evidence_count": 84,
+      "pdf_evidence_count": 58,
+      "evidence_count": 142,
+      "evidence_schema_validated_count": 142,
+      "unique_evidence_id_count": 142,
+      "model_calls": 0,
+      "external_processing_authorized": false,
+      "notes": "输出目录由Git忽略；保存每个视频的独立时间轴、每份PDF的原页码、关键帧和页面预览"
+    }
+  ],
   "generated_artifacts": [
     {
       "artifact_id": "N31_SKILLFORGE_TEST_LABEL",

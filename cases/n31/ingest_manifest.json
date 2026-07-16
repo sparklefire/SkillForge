@@ -1,0 +1,87 @@
+{
+  "version": 1,
+  "case_id": "n31_media_change",
+  "title": "汉印 N31 电子面单打印机更换标签纸、介质学习与试印验收",
+  "external_processing_authorized": false,
+  "frame_interval_seconds": 5.0,
+  "sources": [
+    {
+      "source_id": "N31_VIDEO_OPERATION_FULL",
+      "type": "video",
+      "role": "CONTINUOUS_OPERATION",
+      "path": "cases/n31/input/video/n31_operation_full.mp4",
+      "approved_for_local_ingest": true,
+      "privacy_status": "LOCAL_QA_PASSED",
+      "display_authorization": "PENDING",
+      "default_relevance": 0.65
+    },
+    {
+      "source_id": "N31_VIDEO_MEDIA_TYPE",
+      "type": "video",
+      "role": "MEDIA_REVERSE_AND_GAP",
+      "path": "cases/n31/input/video/n31_closeup_media_type.mp4",
+      "approved_for_local_ingest": true,
+      "privacy_status": "LOCAL_QA_PASSED",
+      "display_authorization": "PENDING",
+      "default_relevance": 0.75
+    },
+    {
+      "source_id": "N31_VIDEO_GUIDES",
+      "type": "video",
+      "role": "PAPER_GUIDE_ADJUSTMENT",
+      "path": "cases/n31/input/video/n31_closeup_guides.mp4",
+      "approved_for_local_ingest": true,
+      "privacy_status": "LOCAL_QA_PASSED",
+      "display_authorization": "PENDING",
+      "default_relevance": 0.75
+    },
+    {
+      "source_id": "N31_VIDEO_LEARNING",
+      "type": "video",
+      "role": "GAP_LABEL_LEARNING",
+      "path": "cases/n31/input/video/n31_closeup_learning.mp4",
+      "approved_for_local_ingest": true,
+      "privacy_status": "LOCAL_QA_PASSED",
+      "display_authorization": "PENDING",
+      "default_relevance": 0.7
+    },
+    {
+      "source_id": "N31_VIDEO_MEDIA_FEED",
+      "type": "video",
+      "role": "MEDIA_FEED",
+      "path": "cases/n31/input/video/n31_closeup_media_feed.mp4",
+      "approved_for_local_ingest": true,
+      "privacy_status": "LOCAL_QA_PASSED",
+      "display_authorization": "PENDING",
+      "default_relevance": 0.7
+    },
+    {
+      "source_id": "N31_VIDEO_PRINT_RESULT",
+      "type": "video",
+      "role": "PRINT_SUCCESS_CHECK",
+      "path": "cases/n31/input/video/n31_closeup_result.mp4",
+      "approved_for_local_ingest": true,
+      "privacy_status": "LOCAL_QA_PASSED",
+      "display_authorization": "PENDING",
+      "default_relevance": 0.65
+    },
+    {
+      "source_id": "N31_MANUAL_REV1_0",
+      "type": "pdf",
+      "role": "AUTHORITATIVE_USER_MANUAL",
+      "path": "cases/n31/input/manual/N31_user_manual_rev1.0.pdf",
+      "approved_for_local_ingest": true,
+      "rights_status": "LOCAL_EVIDENCE_USE_ONLY",
+      "default_relevance": 0.75
+    },
+    {
+      "source_id": "N31_QUICK_GUIDE_REV1_5",
+      "type": "pdf",
+      "role": "AUTHORITATIVE_QUICK_GUIDE",
+      "path": "cases/n31/input/manual/N31_quick_guide_rev1.5.pdf",
+      "approved_for_local_ingest": true,
+      "rights_status": "LOCAL_EVIDENCE_USE_ONLY",
+      "default_relevance": 0.7
+    }
+  ]
+}
