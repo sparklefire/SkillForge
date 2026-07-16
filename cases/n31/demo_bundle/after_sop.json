@@ -1,0 +1,387 @@
+{
+  "case_id": "n31_media_change",
+  "steps": [
+    {
+      "action": "确认设备为汉印 N31，并核对本批折叠热敏标签纸的类型和宽度属于设备支持范围。",
+      "confidence": 0.85,
+      "evidence": [
+        "E096",
+        "E001",
+        "E144"
+      ],
+      "object": "N31 打印机与折叠热敏标签纸",
+      "parameters": [
+        {
+          "evidence_ids": [
+            "E144"
+          ],
+          "name": "本批标签宽度",
+          "unit": "mm",
+          "value": 72
+        },
+        {
+          "evidence_ids": [
+            "E144"
+          ],
+          "name": "本批标签高度",
+          "unit": "mm",
+          "value": 130
+        }
+      ],
+      "prerequisites": [],
+      "required": true,
+      "status": "DRAFT",
+      "step_id": "S01",
+      "success_check": "设备型号正确，介质为折叠热敏标签纸，纸宽处于手册支持范围。",
+      "title": "核对设备和介质适配性",
+      "tools": [],
+      "warnings": [
+        "本批实物尺寸72×130毫米由实际操作者口述确认；更换其他介质时重新核对尺寸和设备适配范围。"
+      ]
+    },
+    {
+      "action": "查看相邻标签间隙和介质背面，确认存在标签缝隙且没有周期性黑标，将本批介质判定为缝标定位。",
+      "confidence": 0.85,
+      "evidence": [
+        "E096",
+        "E066",
+        "E144",
+        "E149",
+        "E153"
+      ],
+      "object": "标签纸正反面和相邻标签边界",
+      "parameters": [
+        {
+          "evidence_ids": [
+            "E096",
+            "E066"
+          ],
+          "name": "定位方式",
+          "unit": "",
+          "value": "缝标"
+        }
+      ],
+      "prerequisites": [
+        "S01"
+      ],
+      "required": true,
+      "status": "DRAFT",
+      "step_id": "S02",
+      "success_check": "能够指出标签间隙，背面未见周期性黑标，并将后续学习模式确定为缝标。",
+      "title": "判断缝标定位方式",
+      "tools": [],
+      "warnings": [
+        "不能把无黑标的缝标介质按黑标模式学习。"
+      ]
+    },
+    {
+      "action": "确认电源开关处于关闭状态，进纸通道没有残纸、卡纸或异物，标签纸平整且没有明显褶皱。",
+      "confidence": 0.85,
+      "evidence": [
+        "E009",
+        "E099",
+        "E145",
+        "E151",
+        "E152"
+      ],
+      "object": "电源开关、进纸通道和标签纸",
+      "parameters": [],
+      "prerequisites": [
+        "S02"
+      ],
+      "required": true,
+      "status": "DRAFT",
+      "step_id": "S03",
+      "success_check": "设备未通电，纸路清洁无阻塞，待装标签纸平整。",
+      "title": "检查初始状态",
+      "tools": [],
+      "warnings": [
+        "发现卡纸或褶皱介质时转入异常流程，不在标准流程中强拉。"
+      ]
+    },
+    {
+      "action": "在电源开关关闭时连接电源线，再打开电源开关并观察状态灯和设备声音。",
+      "confidence": 0.85,
+      "evidence": [
+        "E014",
+        "E142"
+      ],
+      "object": "电源线、电源开关和状态灯",
+      "parameters": [],
+      "prerequisites": [
+        "S03"
+      ],
+      "required": true,
+      "status": "DRAFT",
+      "step_id": "S04",
+      "success_check": "电源连接牢固，设备完成启动，状态灯没有异常报警。",
+      "title": "连接电源并开机",
+      "tools": [
+        "N31 原装或适配电源"
+      ],
+      "warnings": [
+        "出现异常报警、异味或异常声音时停止操作并进入检查流程。"
+      ]
+    },
+    {
+      "action": "双手操作顶盖两侧开启位置，缓慢打开顶盖，检查内部纸路、胶辊和导纸夹没有异物、残纸或明显损伤。",
+      "confidence": 0.85,
+      "evidence": [
+        "E018",
+        "E141",
+        "E145",
+        "E152"
+      ],
+      "object": "顶盖和内部纸路",
+      "parameters": [],
+      "prerequisites": [
+        "S04"
+      ],
+      "required": false,
+      "status": "DRAFT",
+      "step_id": "S05",
+      "success_check": "顶盖完全打开，内部纸路无遮挡且未见残纸或异物。",
+      "title": "打开顶盖并检查内部纸路",
+      "tools": [],
+      "warnings": [
+        "不要单侧猛拉顶盖，不要触碰或刮伤热敏打印区域。"
+      ]
+    },
+    {
+      "action": "双手对称移动左右内部导纸夹，使标签纸能够居中、平直通过且不被明显挤压。",
+      "confidence": 0.85,
+      "evidence": [
+        "E023",
+        "E069",
+        "E141",
+        "E146",
+        "E151",
+        "E152",
+        "E153"
+      ],
+      "object": "左右内部导纸夹",
+      "parameters": [],
+      "prerequisites": [
+        "S05"
+      ],
+      "required": false,
+      "status": "DRAFT",
+      "step_id": "S06",
+      "success_check": "左右导纸夹位置对称，纸张可居中通过且没有明显夹紧或大幅晃动。",
+      "title": "调节内部导纸夹",
+      "tools": [
+        "本批标签纸"
+      ],
+      "warnings": [
+        "导纸夹过紧可能挤压纸边并增加卡纸风险，过松可能造成进纸偏斜和打印位置偏移。"
+      ]
+    },
+    {
+      "action": "确认内部纸路正常后关闭顶盖，再从机器背面双手调节左右进纸导轨，使其与标签纸宽度匹配。",
+      "confidence": 0.85,
+      "evidence": [
+        "E029",
+        "E098",
+        "E074",
+        "E146",
+        "E151",
+        "E153"
+      ],
+      "object": "顶盖和后方进纸导轨",
+      "parameters": [],
+      "prerequisites": [
+        "S04"
+      ],
+      "required": true,
+      "status": "DRAFT",
+      "step_id": "S07",
+      "success_check": "顶盖闭合到位，后方左右导轨与纸宽匹配且纸张可以平直进入。",
+      "title": "关闭顶盖并调节后方进纸导轨",
+      "tools": [
+        "本批标签纸"
+      ],
+      "warnings": [
+        "顶盖未闭合到位时不要继续进纸。"
+      ]
+    },
+    {
+      "action": "从机器背面沿导轨平直插入标签纸，机器开始自动吸纸后松手，并观察出纸口是否送出一小段。",
+      "confidence": 0.85,
+      "evidence": [
+        "E034",
+        "E079",
+        "E098",
+        "E142",
+        "E147",
+        "E151",
+        "E152"
+      ],
+      "object": "标签纸、后方进纸口和前方出纸口",
+      "parameters": [],
+      "prerequisites": [
+        "S07"
+      ],
+      "required": true,
+      "status": "DRAFT",
+      "step_id": "S08",
+      "success_check": "标签纸被自动吸入，并从前方出纸口正常送出一小段。",
+      "title": "插入标签纸并确认自动吸纸",
+      "tools": [
+        "本批标签纸"
+      ],
+      "warnings": [
+        "自动吸纸时不要继续推拉或扭转标签纸。"
+      ]
+    },
+    {
+      "action": "按住走纸键，观察状态灯，在第二次闪烁后立即释放，使打印机执行缝标模式标签学习。",
+      "confidence": 0.85,
+      "evidence": [
+        "E039",
+        "E077",
+        "E104",
+        "E148",
+        "E149",
+        "E151",
+        "E153"
+      ],
+      "object": "走纸键、状态灯和标签传感器",
+      "parameters": [
+        {
+          "evidence_ids": [
+            "E104"
+          ],
+          "name": "释放时机",
+          "unit": "",
+          "value": "状态灯第二次闪烁"
+        }
+      ],
+      "prerequisites": [
+        "S08"
+      ],
+      "required": true,
+      "status": "REVISED",
+      "step_id": "S09",
+      "success_check": "第二次闪灯后已经释放走纸键，设备完成一轮介质学习且没有异常报警。",
+      "title": "执行缝标学习",
+      "tools": [],
+      "warnings": [
+        "本批为缝标介质，不要等待黑标学习对应的后续灯态。"
+      ]
+    },
+    {
+      "action": "短按走纸键后立即释放，观察设备是否只送出一张标签并停在正确边界。",
+      "confidence": 0.85,
+      "evidence": [
+        "E044",
+        "E104",
+        "E150",
+        "E151",
+        "E153",
+        "E154"
+      ],
+      "object": "走纸键和标签停止位置",
+      "parameters": [],
+      "prerequisites": [
+        "S09"
+      ],
+      "required": true,
+      "status": "REVISED",
+      "step_id": "S10",
+      "success_check": "只送出一张标签，停止位置落在标签边界附近且没有连续跳纸。",
+      "title": "执行单张走纸检查",
+      "tools": [],
+      "warnings": [
+        "出现连续跳纸或停止位置错误时停止测试，重新检查介质类型、导轨和学习模式。"
+      ]
+    },
+    {
+      "action": "按住走纸键，在状态灯第一次闪烁后释放，等待自检页完整打印。",
+      "confidence": 0.85,
+      "evidence": [
+        "E048",
+        "E104",
+        "E150",
+        "E152"
+      ],
+      "object": "走纸键、状态灯和自检页",
+      "parameters": [
+        {
+          "evidence_ids": [
+            "E104"
+          ],
+          "name": "释放时机",
+          "unit": "",
+          "value": "状态灯第一次闪烁"
+        }
+      ],
+      "prerequisites": [
+        "S10"
+      ],
+      "required": false,
+      "status": "DRAFT",
+      "step_id": "S11",
+      "success_check": "自检页完整出纸，设备没有报警或中途停止。",
+      "title": "打印自检页",
+      "tools": [],
+      "warnings": [
+        "打印过程中不要拉扯纸张。"
+      ]
+    },
+    {
+      "action": "使用已经验证的本地打印设置发送一张测试标签，等待设备自行完成，不在出纸过程中拉纸。",
+      "confidence": 0.85,
+      "evidence": [
+        "E052",
+        "E082",
+        "E150",
+        "E152",
+        "E153",
+        "E154"
+      ],
+      "object": "本地测试文件和测试标签",
+      "parameters": [],
+      "prerequisites": [
+        "S10"
+      ],
+      "required": true,
+      "status": "REVISED",
+      "step_id": "S12",
+      "success_check": "测试标签完整出纸，设备未连续跳纸、卡纸或异常停止。",
+      "title": "打印本地测试标签",
+      "tools": [
+        "本地计算机或已配置的打印终端"
+      ],
+      "warnings": [
+        "用于公开演示的画面不得暴露姓名、电话、地址、条码、二维码或唯一编号。",
+        "当前私有测试文件不得上传外部服务。"
+      ]
+    },
+    {
+      "action": "检查标签内容完整性、居中情况、偏斜、缺失、停止位置和连续跳纸现象，并记录本次换纸结果。",
+      "confidence": 0.85,
+      "evidence": [
+        "E057",
+        "E083",
+        "E151",
+        "E154"
+      ],
+      "object": "打印完成的测试标签和设备状态",
+      "parameters": [],
+      "prerequisites": [
+        "S12"
+      ],
+      "required": true,
+      "status": "DRAFT",
+      "step_id": "S13",
+      "success_check": "设备稳定吸纸；单张走纸只送出一张并停在标签边界附近；测试标签完整、基本居中；无连续跳纸、明显偏斜、卡纸或异常报警，并留下验收记录。",
+      "title": "检查打印结果并记录验收",
+      "tools": [],
+      "warnings": [
+        "验收前不要揭开实体隐私遮挡。"
+      ]
+    }
+  ],
+  "title": "汉印 N31 更换折叠标签纸、缝标学习与试印验收（Gold v1）（含受控错误的首轮草稿）",
+  "version": 2
+}

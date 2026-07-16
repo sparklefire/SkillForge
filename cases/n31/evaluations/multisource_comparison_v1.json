@@ -1,0 +1,143 @@
+{
+  "candidate_to_gold": {
+    "candidate_version": 1,
+    "expert_evidence_added": 12,
+    "gold_version": 2,
+    "parameter_evidence_gaps_after": 0,
+    "parameter_evidence_gaps_before": 2,
+    "removed_unsupported_parameters": [
+      {
+        "name": "短按参考时长",
+        "step_id": "S10",
+        "unit": "s",
+        "value": 0.5
+      }
+    ],
+    "required_flag_changes": [
+      {
+        "after": false,
+        "before": true,
+        "step_id": "S05"
+      },
+      {
+        "after": false,
+        "before": true,
+        "step_id": "S06"
+      }
+    ],
+    "verified_step_count": 13
+  },
+  "case_id": "n31_media_change",
+  "conclusions": [
+    "手册单源覆盖8/10个必要步骤，专家口述单源覆盖9/10；两种以上来源联合覆盖10/10。",
+    "所有必要步骤都有视频引用，但严格视觉复核没有把任何5秒关键帧窗口判为完整支持，说明引用存在不等于视觉证据充分。",
+    "9/10个必要步骤至少部分可见；S04开机动作在当前关键帧窗口中不可见，应改进抽帧而不是伪造支持。",
+    "Gold规则质检把5个高严重度问题修订为0，必要步骤和证据覆盖均从90%恢复到100%。",
+    "视觉模型对设备二维码和编码形状较敏感，隐私标记作为对比实验保留，不自动判定为真实泄漏。"
+  ],
+  "evaluation_basis": "OPERATOR_REVIEWED_GOLD",
+  "generated_at": "2026-07-16T16:37:46.643479+00:00",
+  "privacy_comparison": {
+    "disposition": "保留模型隐私标记作为保守复核队列，不自动覆盖既有机器检查和人工抽检结论。",
+    "local_safe_derivative_qa": "PASSED",
+    "model_flagged_step_count": 11,
+    "model_flagged_step_ids": [
+      "S01",
+      "S03",
+      "S04",
+      "S05",
+      "S06",
+      "S07",
+      "S08",
+      "S09",
+      "S10",
+      "S11",
+      "S12"
+    ]
+  },
+  "revision_comparison": {
+    "after": {
+      "conflict_count": 0,
+      "evidence_supported_required_steps": 1.0,
+      "required_step_coverage": 1.0,
+      "severe_error_count": 0
+    },
+    "before": {
+      "conflict_count": 5,
+      "evidence_supported_required_steps": 0.9,
+      "required_step_coverage": 0.9,
+      "severe_error_count": 5
+    },
+    "conflict_kinds_before": [
+      "MISSING_STEP",
+      "MISSING_PREREQUISITE",
+      "ORDER_ERROR",
+      "UNSUPPORTED_PARAMETER",
+      "UNSUPPORTED_TOOL"
+    ],
+    "revision_count": 4
+  },
+  "source_ablation": {
+    "expert_audio_only": {
+      "coverage": 0.9,
+      "required_step_count": 10,
+      "supported_required_steps": 9,
+      "unsupported_step_ids": [
+        "S04"
+      ]
+    },
+    "manual_only": {
+      "coverage": 0.8,
+      "required_step_count": 10,
+      "supported_required_steps": 8,
+      "unsupported_step_ids": [
+        "S12",
+        "S13"
+      ]
+    },
+    "multisource_any": {
+      "coverage": 1.0,
+      "required_step_count": 10,
+      "supported_required_steps": 10,
+      "unsupported_step_ids": []
+    },
+    "two_or_more_source_types": {
+      "coverage": 1.0,
+      "required_step_count": 10,
+      "supported_required_steps": 10,
+      "unsupported_step_ids": []
+    },
+    "video_observable_partial_or_better": {
+      "coverage": 0.9,
+      "required_step_count": 10,
+      "supported_required_steps": 9,
+      "unsupported_step_ids": [
+        "S04"
+      ]
+    },
+    "video_reference_presence": {
+      "coverage": 1.0,
+      "required_step_count": 10,
+      "supported_required_steps": 10,
+      "unsupported_step_ids": []
+    },
+    "video_strict_semantic_support": {
+      "coverage": 0.0,
+      "required_step_count": 10,
+      "supported_required_steps": 0,
+      "unsupported_step_ids": [
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S07",
+        "S08",
+        "S09",
+        "S10",
+        "S12",
+        "S13"
+      ]
+    }
+  },
+  "version": 1
+}

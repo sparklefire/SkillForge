@@ -15,6 +15,7 @@ from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from starlette.concurrency import run_in_threadpool
 
 from .demo import ROOT, run_demo
+from .gold_rehearsal import run_gold_rehearsal
 from .ingest import IngestionPipeline
 
 
@@ -42,6 +43,8 @@ HTML = """<!doctype html>
   <h1>匠传 SkillForge</h1>
   <p>从素材证据到 SOP，再到发现问题、引用证据和局部自动修订。</p>
   <section class="panel"><h2 id="metrics-title">闭环指标</h2><div id="basis" class="notice"></div><div id="metrics" class="grid"></div></section>
+  <section class="panel"><h2>现场演示控制</h2><button id="rerun">重新运行 Gold 质检与局部修订</button><span id="rerun-status"></span><p>只处理已审核的结构化证据，不发送原始素材，也不调用外部模型。</p></section>
+  <section class="panel" id="multisource-panel" hidden><h2>为什么需要多源证据</h2><div id="source-metrics" class="grid"></div><p id="visual-note"></p></section>
   <section class="panel"><h2>发现问题 → 展示证据</h2><div id="issues"></div></section>
   <section class="panel"><h2>修订前后对比</h2><div class="cols"><div><h3>修订前</h3><div id="before"></div></div><div><h3>修订后</h3><div id="after"></div></div></div></section>
   <section class="panel"><h2>局部修订审计</h2><div id="changes"></div></section>
@@ -56,10 +59,12 @@ function renderDemo(d){const b=d.summary.before,a=d.summary.after,isReal=d.summa
 document.querySelector('#metrics-title').textContent=isGold?'N31 真实素材 Gold 闭环':isReal?'N31 真实素材闭环彩排':'无版权模拟闭环';
 document.querySelector('#basis').textContent=isGold?'实际操作者口述审核 · Gold v1 · 最终评测指标。':isReal?'候选基准 · 非 Gold · 指标仅用于证明闭环可运行，等待操作者审核后重跑最终评测。':'明确标注的无版权模拟数据，不作为真实案例评测。';
 document.querySelector('#metrics').innerHTML=[['必要步骤',`${pct(b.required_step_coverage)} → ${pct(a.required_step_coverage)}`],['证据覆盖',`${pct(b.evidence_supported_required_steps)} → ${pct(a.evidence_supported_required_steps)}`],['严重错误',`${b.severe_error_count} → ${a.severe_error_count}`],['局部修改',d.summary.revision_count],['状态',isReal?d.summary.gold_status||'NOT_GOLD':d.summary.workflow_state]].map(x=>`<div class="metric"><span class="muted">${esc(x[0])}</span><strong>${esc(x[1])}</strong></div>`).join('');
+if(d.multisource_comparison&&d.visual_review){const s=d.multisource_comparison.source_ablation,v=d.visual_review.summary,p=d.multisource_comparison.privacy_comparison;document.querySelector('#multisource-panel').hidden=false;document.querySelector('#source-metrics').innerHTML=[['手册单源',pct(s.manual_only.coverage)],['专家口述单源',pct(s.expert_audio_only.coverage)],['两种以上来源',pct(s.two_or_more_source_types.coverage)],['视频部分可观察',pct(s.video_observable_partial_or_better.coverage)],['视觉矛盾',v.contradicted_count]].map(x=>`<div class="metric"><span class="muted">${esc(x[0])}</span><strong>${esc(x[1])}</strong></div>`).join('');document.querySelector('#visual-note').textContent=`严格视觉复核：${v.supported_count}步完整支持、${v.partial_count}步部分可见、${v.not_visible_count}步不可见、${v.contradicted_count}步矛盾。模型标记${p.model_flagged_step_count}步需隐私复核；本地安全派生QA为${p.local_safe_derivative_qa}，标记保留但不自动推翻人工检查。`}
 document.querySelector('#issues').innerHTML=d.initial_conflicts.conflicts.map(c=>`<div class="issue"><b>${esc(c.kind)}</b> · ${esc(c.message)}<div class="evidence">${c.evidence.map(e=>`${esc(e.evidence_id)}｜${esc(e.source_ref)}｜${esc(JSON.stringify(e.locator))}`).join('<br>')||'无来源内容：按规则拒绝'}</div></div>`).join('');
 const render=s=>s.steps.map(x=>`<div class="step"><b>${esc(x.step_id)} ${esc(x.title)}</b><div class="muted">${esc(x.action)}</div><div class="evidence">证据：${esc(x.evidence.join(', ')||'无')}</div></div>`).join('');document.querySelector('#before').innerHTML=render(d.before_sop);document.querySelector('#after').innerHTML=render(d.after_sop);
 document.querySelector('#changes').innerHTML=d.revision_audit.changes.map(c=>`<div class="change"><b>${esc(c.action)} · ${esc(c.path)}</b><div>${esc(c.reason)}</div><div class="evidence">证据：${esc(c.evidence_ids.join(', ')||'无依据，已删除')}</div></div>`).join('')}
 async function loadDemo(){let r=await fetch('/api/n31');if(r.ok){renderDemo(await r.json());return}r=await fetch('/api/demo');if(!r.ok){await fetch('/api/demo/run',{method:'POST'});r=await fetch('/api/demo')}renderDemo(await r.json())}
+document.querySelector('#rerun').addEventListener('click',async()=>{const s=document.querySelector('#rerun-status');s.textContent=' 运行中…';const r=await fetch('/api/n31/run',{method:'POST'});const d=await r.json();s.textContent=r.ok?` 完成：严重错误 ${d.before.severe_error_count} → ${d.after.severe_error_count}`:` 失败：${d.detail||'未知错误'}`;if(r.ok)await loadDemo()});
 document.querySelector('#upload').addEventListener('submit',async e=>{e.preventDefault();const status=document.querySelector('#status');status.textContent='处理中…';const r=await fetch('/api/ingest',{method:'POST',body:new FormData(e.target)});const d=await r.json();status.textContent=r.ok?'完成':'失败';document.querySelector('#ingest').textContent=JSON.stringify(d,null,2)});loadDemo();
 </script></body></html>"""
 
@@ -114,10 +119,18 @@ def create_app(
         n31_dir = n31_rehearsal_dir.resolve()
     else:
         gold_dir = ROOT / "cases" / "n31" / "output" / "gold_rehearsal_v1"
+        bundle_dir = ROOT / "cases" / "n31" / "demo_bundle"
         provisional_dir = ROOT / "cases" / "n31" / "output" / "rehearsal_v1"
-        n31_dir = (
-            gold_dir if (gold_dir / "summary.json").is_file() else provisional_dir
-        ).resolve()
+        configured_dir = os.getenv("SKILLFORGE_N31_DIR")
+        if configured_dir:
+            n31_dir = Path(configured_dir).expanduser().resolve()
+        elif (gold_dir / "summary.json").is_file():
+            n31_dir = gold_dir.resolve()
+        elif (bundle_dir / "summary.json").is_file():
+            n31_dir = bundle_dir.resolve()
+        else:
+            n31_dir = provisional_dir.resolve()
+    active_n31_dir = {"path": n31_dir}
     app = FastAPI(title="SkillForge", version="0.1.0")
 
     @app.get("/", response_class=HTMLResponse)
@@ -130,13 +143,15 @@ def create_app(
             "status": "ok",
             "runtime": "native-python",
             "docker_required": False,
-            "n31_rehearsal_available": (n31_dir / "summary.json").is_file(),
+            "n31_rehearsal_available": (
+                active_n31_dir["path"] / "summary.json"
+            ).is_file(),
         }
 
     @app.get("/api/n31")
     def n31_data() -> JSONResponse:
         try:
-            payload = _demo_payload(n31_dir)
+            payload = _demo_payload(active_n31_dir["path"])
         except FileNotFoundError as exc:
             raise HTTPException(status_code=404, detail="N31彩排结果尚未生成") from exc
         summary = payload["summary"]
@@ -149,7 +164,33 @@ def create_app(
             ("GOLD", "FINAL"),
         }:
             raise HTTPException(status_code=409, detail="N31彩排标记不完整")
+        if status_pair == ("GOLD", "FINAL"):
+            evaluation_dir = ROOT / "cases" / "n31" / "evaluations"
+            visual_path = evaluation_dir / "visual_sequence_review_v1.json"
+            comparison_path = evaluation_dir / "multisource_comparison_v1.json"
+            if visual_path.is_file() and comparison_path.is_file():
+                payload["visual_review"] = _read_json(visual_path)
+                payload["multisource_comparison"] = _read_json(comparison_path)
         return JSONResponse(payload)
+
+    @app.post("/api/n31/run")
+    def execute_n31_gold() -> dict[str, Any]:
+        case = ROOT / "cases" / "n31" / "gold"
+        live_dir = root / "n31_live_run"
+        try:
+            summary = run_gold_rehearsal(
+                case / "gold_sop.json",
+                case / "constraints.json",
+                case / "fault_injection.json",
+                live_dir,
+            )
+        except (FileNotFoundError, ValueError) as exc:
+            raise HTTPException(
+                status_code=500,
+                detail=f"N31 Gold现场运行失败: {str(exc)[:300]}",
+            ) from exc
+        active_n31_dir["path"] = live_dir
+        return summary
 
     @app.get("/api/demo")
     def demo_data() -> JSONResponse:

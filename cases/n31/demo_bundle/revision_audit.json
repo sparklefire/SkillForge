@@ -1,0 +1,136 @@
+{
+  "after_digest": "5032f04214fcc7aee144b6410b3da29393faededb4fc76ed51dd7f030a2e66a4",
+  "before_digest": "12ce0fae2bc3df034a18b7f2b2071d320652efa758ee17e29b2139e63d73b156",
+  "case_id": "n31_media_change",
+  "changes": [
+    {
+      "action": "INSERT",
+      "after": {
+        "action": "按住走纸键，观察状态灯，在第二次闪烁后立即释放，使打印机执行缝标模式标签学习。",
+        "confidence": 0.85,
+        "evidence": [
+          "E039",
+          "E077",
+          "E104",
+          "E148",
+          "E149",
+          "E151",
+          "E153"
+        ],
+        "object": "走纸键、状态灯和标签传感器",
+        "parameters": [
+          {
+            "evidence_ids": [
+              "E104"
+            ],
+            "name": "释放时机",
+            "unit": "",
+            "value": "状态灯第二次闪烁"
+          }
+        ],
+        "prerequisites": [
+          "S08"
+        ],
+        "required": true,
+        "status": "REVISED",
+        "step_id": "S09",
+        "success_check": "第二次闪灯后已经释放走纸键，设备完成一轮介质学习且没有异常报警。",
+        "title": "执行缝标学习",
+        "tools": [],
+        "warnings": [
+          "本批为缝标介质，不要等待黑标学习对应的后续灯态。"
+        ]
+      },
+      "before": null,
+      "conflict_id": "C001",
+      "evidence_ids": [
+        "E039",
+        "E077",
+        "E104",
+        "E148",
+        "E149",
+        "E151",
+        "E153"
+      ],
+      "path": "/steps/S09",
+      "reason": "缺少必要步骤 S09: 执行缝标学习"
+    },
+    {
+      "action": "REMOVE",
+      "after": null,
+      "before": [
+        {
+          "evidence_ids": [],
+          "name": "走纸键按压力",
+          "unit": "N",
+          "value": 20
+        }
+      ],
+      "conflict_id": "C004",
+      "evidence_ids": [],
+      "path": "/steps/S10/parameters",
+      "reason": "参数“走纸键按压力”没有有效来源依据"
+    },
+    {
+      "action": "REMOVE",
+      "after": null,
+      "before": "扭矩扳手",
+      "conflict_id": "C005",
+      "evidence_ids": [],
+      "path": "/steps/S12/tools",
+      "reason": "工具“扭矩扳手”没有来源依据"
+    },
+    {
+      "action": "REORDER",
+      "after": [
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10",
+        "S11",
+        "S12",
+        "S13"
+      ],
+      "before": [
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S08",
+        "S07",
+        "S10",
+        "S11",
+        "S12",
+        "S13",
+        "S09"
+      ],
+      "conflict_id": "C003",
+      "evidence_ids": [
+        "E029",
+        "E034",
+        "E074",
+        "E079",
+        "E098",
+        "E142",
+        "E146",
+        "E147",
+        "E151",
+        "E152",
+        "E153"
+      ],
+      "path": "/steps",
+      "reason": "步骤 S07 必须先于 S08"
+    }
+  ],
+  "completed_at": "2026-07-16T16:11:35.834272+00:00",
+  "iteration": 1,
+  "started_at": "2026-07-16T16:11:35.824570+00:00"
+}

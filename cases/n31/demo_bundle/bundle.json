@@ -1,0 +1,56 @@
+{
+  "bundle_type": "ASSET_FREE_WEB_FALLBACK",
+  "case_id": "n31_media_change",
+  "contains_credentials": false,
+  "contains_raw_media": false,
+  "files": [
+    {
+      "name": "after_sop.json",
+      "sha256": "14205751476dbdd283dccfe52c3a6fee32c2c11a5861901a2b9c20899752f871",
+      "size_bytes": 11464
+    },
+    {
+      "name": "before_sop.json",
+      "sha256": "410b91876e292d7b06c8e3bcb65676c66ec852734b792e2cbd59d54d9d9c896b",
+      "size_bytes": 10625
+    },
+    {
+      "name": "checklist.json",
+      "sha256": "3d1e1a929c1c7b798cd07d241ba808ec564fa37005dad90e02f892b8432217ea",
+      "size_bytes": 5898
+    },
+    {
+      "name": "final_conflicts.json",
+      "sha256": "17784948680713e99db81cc9e5c37b37edde423f48cbe6036db5f5557f7af815",
+      "size_bytes": 73
+    },
+    {
+      "name": "initial_conflicts.json",
+      "sha256": "b691cfd68a1f412cb55e1f857b36af91b2042b9da1930cb7f88f1c0a85f3a124",
+      "size_bytes": 19845
+    },
+    {
+      "name": "quiz.json",
+      "sha256": "50d9e3ba55529dbc557e9f795c10e0d014771143871ac07bd50ef606504209b5",
+      "size_bytes": 2140
+    },
+    {
+      "name": "revision_audit.json",
+      "sha256": "5e3c1f7e972a43285d2b42a9d5852d11ad4832ae95e5cedd32f14a0f34a4d93c",
+      "size_bytes": 3176
+    },
+    {
+      "name": "summary.json",
+      "sha256": "26260afc7994667cff3a2de79e22a23182c94e248222dde39f21b95064503361",
+      "size_bytes": 737
+    },
+    {
+      "name": "workflow.json",
+      "sha256": "ca7ed57ff88eb09a568ac2e4b8fba41bcf14ad6aa5a8ef372c868baa62e15830",
+      "size_bytes": 1684
+    }
+  ],
+  "gold_status": "GOLD",
+  "metrics_status": "FINAL",
+  "version": 1
+}

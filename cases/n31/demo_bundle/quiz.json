@@ -1,0 +1,70 @@
+{
+  "case_id": "n31_media_change",
+  "questions": [
+    {
+      "answer": true,
+      "evidence_ids": [
+        "E096",
+        "E001",
+        "E144"
+      ],
+      "explanation": "该完成判据来自 SOP S01 的已绑定证据。",
+      "prompt": "完成“核对设备和介质适配性”后，应确认：设备型号正确，介质为折叠热敏标签纸，纸宽处于手册支持范围。",
+      "question_id": "Q01",
+      "type": "TRUE_FALSE"
+    },
+    {
+      "answer": true,
+      "evidence_ids": [
+        "E096",
+        "E066",
+        "E144",
+        "E149",
+        "E153"
+      ],
+      "explanation": "该完成判据来自 SOP S02 的已绑定证据。",
+      "prompt": "完成“判断缝标定位方式”后，应确认：能够指出标签间隙，背面未见周期性黑标，并将后续学习模式确定为缝标。",
+      "question_id": "Q02",
+      "type": "TRUE_FALSE"
+    },
+    {
+      "answer": true,
+      "evidence_ids": [
+        "E009",
+        "E099",
+        "E145",
+        "E151",
+        "E152"
+      ],
+      "explanation": "该完成判据来自 SOP S03 的已绑定证据。",
+      "prompt": "完成“检查初始状态”后，应确认：设备未通电，纸路清洁无阻塞，待装标签纸平整。",
+      "question_id": "Q03",
+      "type": "TRUE_FALSE"
+    },
+    {
+      "answer": true,
+      "evidence_ids": [
+        "E014",
+        "E142"
+      ],
+      "explanation": "该完成判据来自 SOP S04 的已绑定证据。",
+      "prompt": "完成“连接电源并开机”后，应确认：电源连接牢固，设备完成启动，状态灯没有异常报警。",
+      "question_id": "Q04",
+      "type": "TRUE_FALSE"
+    },
+    {
+      "answer": true,
+      "evidence_ids": [
+        "E018",
+        "E141",
+        "E145",
+        "E152"
+      ],
+      "explanation": "该完成判据来自 SOP S05 的已绑定证据。",
+      "prompt": "完成“打开顶盖并检查内部纸路”后，应确认：顶盖完全打开，内部纸路无遮挡且未见残纸或异物。",
+      "question_id": "Q05",
+      "type": "TRUE_FALSE"
+    }
+  ],
+  "sop_version": 2
+}

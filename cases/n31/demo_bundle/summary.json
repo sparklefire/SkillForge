@@ -1,0 +1,30 @@
+{
+  "after": {
+    "conflict_count": 0,
+    "evidence_supported_required_steps": 1.0,
+    "required_step_coverage": 1.0,
+    "severe_error_count": 0
+  },
+  "before": {
+    "conflict_count": 5,
+    "evidence_supported_required_steps": 0.9,
+    "required_step_coverage": 0.9,
+    "severe_error_count": 5
+  },
+  "case_id": "n31_media_change",
+  "conflict_kinds_before": [
+    "MISSING_STEP",
+    "MISSING_PREREQUISITE",
+    "ORDER_ERROR",
+    "UNSUPPORTED_PARAMETER",
+    "UNSUPPORTED_TOOL"
+  ],
+  "evaluation_basis": "OPERATOR_REVIEWED_GOLD",
+  "external_model_calls": 0,
+  "gold_status": "GOLD",
+  "human_review_required": false,
+  "metrics_status": "FINAL",
+  "revision_count": 4,
+  "synthetic": false,
+  "workflow_state": "COMPLETED"
+}

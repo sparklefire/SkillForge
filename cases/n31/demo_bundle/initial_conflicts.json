@@ -1,0 +1,481 @@
+{
+  "case_id": "n31_media_change",
+  "conflicts": [
+    {
+      "automatic": true,
+      "conflict_id": "C001",
+      "details": {
+        "step_id": "S09"
+      },
+      "evidence": [
+        {
+          "claim": "CONTINUOUS_OPERATION 关键帧候选；等待授权后的视觉理解或人工确认动作、部件和设备状态。",
+          "classification": "MODEL_INFERENCE",
+          "confidence": 0.5,
+          "evidence_id": "E039",
+          "locator": {
+            "end_ms": 195000,
+            "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000039.jpg",
+            "start_ms": 190000
+          },
+          "relevance": 0.65,
+          "review_status": "UNREVIEWED",
+          "source_ref": "N31_VIDEO_OPERATION_FULL",
+          "source_type": "video"
+        },
+        {
+          "claim": "GAP_LABEL_LEARNING 关键帧候选；等待授权后的视觉理解或人工确认动作、部件和设备状态。",
+          "classification": "MODEL_INFERENCE",
+          "confidence": 0.5,
+          "evidence_id": "E077",
+          "locator": {
+            "end_ms": 5000,
+            "keyframe": "derived/video/N31_VIDEO_LEARNING/frames/frame_000001.jpg",
+            "start_ms": 0
+          },
+          "relevance": 0.7,
+          "review_status": "UNREVIEWED",
+          "source_ref": "N31_VIDEO_LEARNING",
+          "source_type": "video"
+        },
+        {
+          "claim": "N31 用户手册 . 走纸键： ■开机状态 下： ）短按走纸键 （约 .5s ），放开走纸键 ； ）按住 （约 .5s ），直到蓝灯或橙 灯闪烁 一次，放开走纸键 ； ）按住走纸键 （约 s ），直到蓝灯或橙 灯闪烁两次，放开走纸键后打印机会进行缝标模式标签学习 ）按住走纸键 （约 .5s ），直到蓝灯或橙灯 ，放开走纸键 打印机进行黑标模式标签学 。 ■打印机 状态下 走纸键 （约 .5s ），放开走纸键后打印机会暂停打印 打印机暂停状态下短按走纸键（约 .5s ），放开 继续 。 15",
+          "classification": "SOURCE_FACT",
+          "confidence": 0.9,
+          "evidence_id": "E104",
+          "locator": {
+            "page": 20,
+            "paragraph": "页面全文候选"
+          },
+          "relevance": 0.75,
+          "review_status": "UNREVIEWED",
+          "source_ref": "N31_MANUAL_REV1_0",
+          "source_type": "pdf"
+        },
+        {
+          "claim": "介质规格或定位方式改变，或出现停止位置错误、连续跳纸、识别失败时应重新学习；本次完整培训执行一次缝标学习，同规格补纸可按现场规则决定。",
+          "classification": "EXPERT_ADVICE",
+          "confidence": 0.95,
+          "evidence_id": "E148",
+          "locator": {
+            "end_ms": 195680,
+            "start_ms": 153840
+          },
+          "relevance": 0.95,
+          "review_status": "VERIFIED",
+          "source_ref": "N31_EXPERT_INTERVIEW",
+          "source_type": "audio"
+        },
+        {
+          "claim": "本批纸使用缝标学习；按住走纸键，在状态灯第二次闪烁后立即释放，不等待黑标学习对应的后续灯态。",
+          "classification": "EXPERT_ADVICE",
+          "confidence": 0.95,
+          "evidence_id": "E149",
+          "locator": {
+            "end_ms": 227680,
+            "start_ms": 195680
+          },
+          "relevance": 0.95,
+          "review_status": "VERIFIED",
+          "source_ref": "N31_EXPERT_INTERVIEW",
+          "source_type": "audio"
+        },
+        {
+          "claim": "异常时先停打，再依次检查装反、歪斜、褶皱和送纸位置，检查内外导轨，核对缝标/黑标及学习模式，重做学习和单张走纸，再查尺寸缩放与驱动。",
+          "classification": "EXPERT_ADVICE",
+          "confidence": 0.95,
+          "evidence_id": "E151",
+          "locator": {
+            "end_ms": 300400,
+            "start_ms": 260400
+          },
+          "relevance": 0.95,
+          "review_status": "VERIFIED",
+          "source_ref": "N31_EXPERT_INTERVIEW",
+          "source_type": "audio"
+        },
+        {
+          "claim": "新手常漏掉介质定位方式判断、内外导纸夹调整，以及装纸后的学习、单张走纸和测试打印。",
+          "classification": "EXPERT_ADVICE",
+          "confidence": 0.95,
+          "evidence_id": "E153",
+          "locator": {
+            "end_ms": 357600,
+            "start_ms": 331760
+          },
+          "relevance": 0.95,
+          "review_status": "VERIFIED",
+          "source_ref": "N31_EXPERT_INTERVIEW",
+          "source_type": "audio"
+        }
+      ],
+      "kind": "MISSING_STEP",
+      "message": "缺少必要步骤 S09: 执行缝标学习",
+      "proposed_action": "INSERT",
+      "severity": "CRITICAL",
+      "status": "OPEN",
+      "step_ids": [
+        "S09"
+      ]
+    },
+    {
+      "automatic": true,
+      "conflict_id": "C002",
+      "details": {
+        "dependent": "S10",
+        "missing": "S09"
+      },
+      "evidence": [
+        {
+          "claim": "CONTINUOUS_OPERATION 关键帧候选；等待授权后的视觉理解或人工确认动作、部件和设备状态。",
+          "classification": "MODEL_INFERENCE",
+          "confidence": 0.5,
+          "evidence_id": "E039",
+          "locator": {
+            "end_ms": 195000,
+            "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000039.jpg",
+            "start_ms": 190000
+          },
+          "relevance": 0.65,
+          "review_status": "UNREVIEWED",
+          "source_ref": "N31_VIDEO_OPERATION_FULL",
+          "source_type": "video"
+        },
+        {
+          "claim": "GAP_LABEL_LEARNING 关键帧候选；等待授权后的视觉理解或人工确认动作、部件和设备状态。",
+          "classification": "MODEL_INFERENCE",
+          "confidence": 0.5,
+          "evidence_id": "E077",
+          "locator": {
+            "end_ms": 5000,
+            "keyframe": "derived/video/N31_VIDEO_LEARNING/frames/frame_000001.jpg",
+            "start_ms": 0
+          },
+          "relevance": 0.7,
+          "review_status": "UNREVIEWED",
+          "source_ref": "N31_VIDEO_LEARNING",
+          "source_type": "video"
+        },
+        {
+          "claim": "N31 用户手册 . 走纸键： ■开机状态 下： ）短按走纸键 （约 .5s ），放开走纸键 ； ）按住 （约 .5s ），直到蓝灯或橙 灯闪烁 一次，放开走纸键 ； ）按住走纸键 （约 s ），直到蓝灯或橙 灯闪烁两次，放开走纸键后打印机会进行缝标模式标签学习 ）按住走纸键 （约 .5s ），直到蓝灯或橙灯 ，放开走纸键 打印机进行黑标模式标签学 。 ■打印机 状态下 走纸键 （约 .5s ），放开走纸键后打印机会暂停打印 打印机暂停状态下短按走纸键（约 .5s ），放开 继续 。 15",
+          "classification": "SOURCE_FACT",
+          "confidence": 0.9,
+          "evidence_id": "E104",
+          "locator": {
+            "page": 20,
+            "paragraph": "页面全文候选"
+          },
+          "relevance": 0.75,
+          "review_status": "UNREVIEWED",
+          "source_ref": "N31_MANUAL_REV1_0",
+          "source_type": "pdf"
+        },
+        {
+          "claim": "介质规格或定位方式改变，或出现停止位置错误、连续跳纸、识别失败时应重新学习；本次完整培训执行一次缝标学习，同规格补纸可按现场规则决定。",
+          "classification": "EXPERT_ADVICE",
+          "confidence": 0.95,
+          "evidence_id": "E148",
+          "locator": {
+            "end_ms": 195680,
+            "start_ms": 153840
+          },
+          "relevance": 0.95,
+          "review_status": "VERIFIED",
+          "source_ref": "N31_EXPERT_INTERVIEW",
+          "source_type": "audio"
+        },
+        {
+          "claim": "本批纸使用缝标学习；按住走纸键，在状态灯第二次闪烁后立即释放，不等待黑标学习对应的后续灯态。",
+          "classification": "EXPERT_ADVICE",
+          "confidence": 0.95,
+          "evidence_id": "E149",
+          "locator": {
+            "end_ms": 227680,
+            "start_ms": 195680
+          },
+          "relevance": 0.95,
+          "review_status": "VERIFIED",
+          "source_ref": "N31_EXPERT_INTERVIEW",
+          "source_type": "audio"
+        },
+        {
+          "claim": "异常时先停打，再依次检查装反、歪斜、褶皱和送纸位置，检查内外导轨，核对缝标/黑标及学习模式，重做学习和单张走纸，再查尺寸缩放与驱动。",
+          "classification": "EXPERT_ADVICE",
+          "confidence": 0.95,
+          "evidence_id": "E151",
+          "locator": {
+            "end_ms": 300400,
+            "start_ms": 260400
+          },
+          "relevance": 0.95,
+          "review_status": "VERIFIED",
+          "source_ref": "N31_EXPERT_INTERVIEW",
+          "source_type": "audio"
+        },
+        {
+          "claim": "新手常漏掉介质定位方式判断、内外导纸夹调整，以及装纸后的学习、单张走纸和测试打印。",
+          "classification": "EXPERT_ADVICE",
+          "confidence": 0.95,
+          "evidence_id": "E153",
+          "locator": {
+            "end_ms": 357600,
+            "start_ms": 331760
+          },
+          "relevance": 0.95,
+          "review_status": "VERIFIED",
+          "source_ref": "N31_EXPERT_INTERVIEW",
+          "source_type": "audio"
+        }
+      ],
+      "kind": "MISSING_PREREQUISITE",
+      "message": "S10 依赖不存在的步骤 S09",
+      "proposed_action": "INSERT",
+      "severity": "HIGH",
+      "status": "OPEN",
+      "step_ids": [
+        "S09",
+        "S10"
+      ]
+    },
+    {
+      "automatic": true,
+      "conflict_id": "C003",
+      "details": {
+        "after": "S08",
+        "before": "S07"
+      },
+      "evidence": [
+        {
+          "claim": "CONTINUOUS_OPERATION 关键帧候选；等待授权后的视觉理解或人工确认动作、部件和设备状态。",
+          "classification": "MODEL_INFERENCE",
+          "confidence": 0.5,
+          "evidence_id": "E029",
+          "locator": {
+            "end_ms": 145000,
+            "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000029.jpg",
+            "start_ms": 140000
+          },
+          "relevance": 0.65,
+          "review_status": "UNREVIEWED",
+          "source_ref": "N31_VIDEO_OPERATION_FULL",
+          "source_type": "video"
+        },
+        {
+          "claim": "N31 用户手册 3 安装和使用 3.1 处理 面对机器背面， 依据纸张大小，左右调节导轨间距。 将标签纸插入进纸导轨。 1.请确保标签纸送到位，标签纸将自动从出纸口送2. 9",
+          "classification": "SOURCE_FACT",
+          "confidence": 0.9,
+          "evidence_id": "E098",
+          "locator": {
+            "page": 14,
+            "paragraph": "页面全文候选"
+          },
+          "relevance": 0.75,
+          "review_status": "UNREVIEWED",
+          "source_ref": "N31_MANUAL_REV1_0",
+          "source_type": "pdf"
+        },
+        {
+          "claim": "PAPER_GUIDE_ADJUSTMENT 关键帧候选；等待授权后的视觉理解或人工确认动作、部件和设备状态。",
+          "classification": "MODEL_INFERENCE",
+          "confidence": 0.5,
+          "evidence_id": "E074",
+          "locator": {
+            "end_ms": 30000,
+            "keyframe": "derived/video/N31_VIDEO_GUIDES/frames/frame_000006.jpg",
+            "start_ms": 25000
+          },
+          "relevance": 0.75,
+          "review_status": "UNREVIEWED",
+          "source_ref": "N31_VIDEO_GUIDES",
+          "source_type": "video"
+        },
+        {
+          "claim": "左右导纸夹应对称、靠近纸边但不明显挤压，纸张能顺畅移动且没有大幅左右晃动；过紧可能卡纸，过松可能偏斜。",
+          "classification": "EXPERT_ADVICE",
+          "confidence": 0.95,
+          "evidence_id": "E146",
+          "locator": {
+            "end_ms": 129920,
+            "start_ms": 99600
+          },
+          "relevance": 0.95,
+          "review_status": "VERIFIED",
+          "source_ref": "N31_EXPERT_INTERVIEW",
+          "source_type": "audio"
+        },
+        {
+          "claim": "异常时先停打，再依次检查装反、歪斜、褶皱和送纸位置，检查内外导轨，核对缝标/黑标及学习模式，重做学习和单张走纸，再查尺寸缩放与驱动。",
+          "classification": "EXPERT_ADVICE",
+          "confidence": 0.95,
+          "evidence_id": "E151",
+          "locator": {
+            "end_ms": 300400,
+            "start_ms": 260400
+          },
+          "relevance": 0.95,
+          "review_status": "VERIFIED",
+          "source_ref": "N31_EXPERT_INTERVIEW",
+          "source_type": "audio"
+        },
+        {
+          "claim": "新手常漏掉介质定位方式判断、内外导纸夹调整，以及装纸后的学习、单张走纸和测试打印。",
+          "classification": "EXPERT_ADVICE",
+          "confidence": 0.95,
+          "evidence_id": "E153",
+          "locator": {
+            "end_ms": 357600,
+            "start_ms": 331760
+          },
+          "relevance": 0.95,
+          "review_status": "VERIFIED",
+          "source_ref": "N31_EXPERT_INTERVIEW",
+          "source_type": "audio"
+        },
+        {
+          "claim": "CONTINUOUS_OPERATION 关键帧候选；等待授权后的视觉理解或人工确认动作、部件和设备状态。",
+          "classification": "MODEL_INFERENCE",
+          "confidence": 0.5,
+          "evidence_id": "E034",
+          "locator": {
+            "end_ms": 170000,
+            "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000034.jpg",
+            "start_ms": 165000
+          },
+          "relevance": 0.65,
+          "review_status": "UNREVIEWED",
+          "source_ref": "N31_VIDEO_OPERATION_FULL",
+          "source_type": "video"
+        },
+        {
+          "claim": "MEDIA_FEED 关键帧候选；等待授权后的视觉理解或人工确认动作、部件和设备状态。",
+          "classification": "MODEL_INFERENCE",
+          "confidence": 0.5,
+          "evidence_id": "E079",
+          "locator": {
+            "end_ms": 5000,
+            "keyframe": "derived/video/N31_VIDEO_MEDIA_FEED/frames/frame_000001.jpg",
+            "start_ms": 0
+          },
+          "relevance": 0.7,
+          "review_status": "UNREVIEWED",
+          "source_ref": "N31_VIDEO_MEDIA_FEED",
+          "source_type": "video"
+        },
+        {
+          "claim": "N31 用户手册 3 安装和使用 3.1 处理 面对机器背面， 依据纸张大小，左右调节导轨间距。 将标签纸插入进纸导轨。 1.请确保标签纸送到位，标签纸将自动从出纸口送2. 9",
+          "classification": "SOURCE_FACT",
+          "confidence": 0.9,
+          "evidence_id": "E098",
+          "locator": {
+            "page": 14,
+            "paragraph": "页面全文候选"
+          },
+          "relevance": 0.75,
+          "review_status": "UNREVIEWED",
+          "source_ref": "N31_MANUAL_REV1_0",
+          "source_type": "pdf"
+        },
+        {
+          "claim": "安装介质 处理卡纸 1.面对机器背面，双手同时按住进纸导轨，依据纸张大小，左右调节导轨间距。 3.将卡住的纸张从进纸通道抽出后，将褶皱 4.将卡住的纸抽出后即可进行正常的介 的纸丢弃。 质安装。 2.将标签纸插入进纸导轨， 纸张则会自动吸入。 保修条款 一、本产品热写头片保证寿命为30KM或3个月（以先到为准），如打印头 出现创伤、刮伤、烧毁、腐蚀等不可抗力因素不在保修范围内，其余 部件保修时间为自购买之日起12个月。 充电/开机使用 二、存在以下情况之一者，不属于保修范围之内： 1.确认打印机电源开关处于关闭（O）状态。 1、未经我公司及授权维修人员许可，擅自对产品进行拆卸，或产品序 2.将电源线连接到打印机。 列号标贴被撕去及模糊不清，无法辨认； 3.将电源线另一端连接到附近的插座。 2、由于固体颗粒刮伤热敏头片，引起的打印白线，则头片不属于保修 范围； ！ 注意：请确保标签纸送到位，标签纸将自动从出纸口送出一小段。 3、其他人为引起的故障。 三、保修期内，维修时所更换的产品零配件归我公司所有； 处理卡纸2.手动向上掀起顶盖。 1.面向机器正面，双手同时向前拨动顶 四、用户负责将产",
+          "classification": "SOURCE_FACT",
+          "confidence": 0.9,
+          "evidence_id": "E142",
+          "locator": {
+            "page": 2,
+            "paragraph": "页面全文候选"
+          },
+          "relevance": 0.7,
+          "review_status": "UNREVIEWED",
+          "source_ref": "N31_QUICK_GUIDE_REV1_5",
+          "source_type": "pdf"
+        },
+        {
+          "claim": "纸张沿后方导轨平直插入，自动吸纸后松手；前方正常送出一小段、纸边平直且无报警即为送到位。",
+          "classification": "EXPERT_ADVICE",
+          "confidence": 0.95,
+          "evidence_id": "E147",
+          "locator": {
+            "end_ms": 153840,
+            "start_ms": 129920
+          },
+          "relevance": 0.95,
+          "review_status": "VERIFIED",
+          "source_ref": "N31_EXPERT_INTERVIEW",
+          "source_type": "audio"
+        },
+        {
+          "claim": "异常时先停打，再依次检查装反、歪斜、褶皱和送纸位置，检查内外导轨，核对缝标/黑标及学习模式，重做学习和单张走纸，再查尺寸缩放与驱动。",
+          "classification": "EXPERT_ADVICE",
+          "confidence": 0.95,
+          "evidence_id": "E151",
+          "locator": {
+            "end_ms": 300400,
+            "start_ms": 260400
+          },
+          "relevance": 0.95,
+          "review_status": "VERIFIED",
+          "source_ref": "N31_EXPERT_INTERVIEW",
+          "source_type": "audio"
+        },
+        {
+          "claim": "不得在进纸或打印时强推强拉扭纸，不送入褶皱破损纸，不把缝标纸按黑标学习，不让导纸夹挤压纸边，不暴力处理卡纸或用硬物刮擦胶辊、传感器和热敏区。",
+          "classification": "EXPERT_ADVICE",
+          "confidence": 0.95,
+          "evidence_id": "E152",
+          "locator": {
+            "end_ms": 331760,
+            "start_ms": 300400
+          },
+          "relevance": 0.95,
+          "review_status": "VERIFIED",
+          "source_ref": "N31_EXPERT_INTERVIEW",
+          "source_type": "audio"
+        }
+      ],
+      "kind": "ORDER_ERROR",
+      "message": "步骤 S07 必须先于 S08",
+      "proposed_action": "REORDER",
+      "severity": "HIGH",
+      "status": "OPEN",
+      "step_ids": [
+        "S07",
+        "S08"
+      ]
+    },
+    {
+      "automatic": true,
+      "conflict_id": "C004",
+      "details": {
+        "parameter_name": "走纸键按压力",
+        "step_id": "S10"
+      },
+      "evidence": [],
+      "kind": "UNSUPPORTED_PARAMETER",
+      "message": "参数“走纸键按压力”没有有效来源依据",
+      "proposed_action": "REMOVE",
+      "severity": "HIGH",
+      "status": "OPEN",
+      "step_ids": [
+        "S10"
+      ]
+    },
+    {
+      "automatic": true,
+      "conflict_id": "C005",
+      "details": {
+        "step_id": "S12",
+        "tool": "扭矩扳手"
+      },
+      "evidence": [],
+      "kind": "UNSUPPORTED_TOOL",
+      "message": "工具“扭矩扳手”没有来源依据",
+      "proposed_action": "REMOVE",
+      "severity": "HIGH",
+      "status": "OPEN",
+      "step_ids": [
+        "S12"
+      ]
+    }
+  ],
+  "iteration": 1
+}

@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/visual_review_report.schema.json",
+  "title": "SkillForge Visual Review Report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "case_id",
+    "run_id",
+    "generated_at",
+    "status",
+    "model",
+    "external_processing_authorized",
+    "model_calls",
+    "assessments",
+    "summary"
+  ],
+  "properties": {
+    "case_id": {"type": "string", "minLength": 1},
+    "run_id": {"type": "string", "minLength": 1},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "status": {"enum": ["COMPLETED", "NEEDS_REVIEW"]},
+    "model": {"type": "string", "minLength": 1},
+    "external_processing_authorized": {"const": true},
+    "model_calls": {"type": "integer", "minimum": 1},
+    "assessments": {
+      "type": "array",
+      "minItems": 8,
+      "maxItems": 15,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "step_id",
+          "title",
+          "required",
+          "model_result",
+          "frames"
+        ],
+        "properties": {
+          "step_id": {"type": "string", "pattern": "^S[0-9]{2}$"},
+          "title": {"type": "string", "minLength": 1},
+          "required": {"type": "boolean"},
+          "model_result": {
+            "$ref": "https://skillforge.local/schemas/visual_assessment.schema.json"
+          },
+          "frames": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 6,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "evidence_id",
+                "source_ref",
+                "start_ms",
+                "end_ms",
+                "keyframe"
+              ],
+              "properties": {
+                "evidence_id": {"type": "string", "pattern": "^E[0-9]{3}$"},
+                "source_ref": {"type": "string", "minLength": 1},
+                "start_ms": {"type": "integer", "minimum": 0},
+                "end_ms": {"type": "integer", "minimum": 0},
+                "keyframe": {"type": "string", "minLength": 1}
+              }
+            }
+          }
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "step_count",
+        "required_step_count",
+        "supported_count",
+        "partial_count",
+        "not_visible_count",
+        "contradicted_count",
+        "required_supported_count",
+        "strict_visual_support_rate",
+        "observable_rate",
+        "required_strict_visual_support_rate",
+        "privacy_flag_count",
+        "needs_review_step_ids"
+      ],
+      "properties": {
+        "step_count": {"type": "integer", "minimum": 8, "maximum": 15},
+        "required_step_count": {"type": "integer", "minimum": 1},
+        "supported_count": {"type": "integer", "minimum": 0},
+        "partial_count": {"type": "integer", "minimum": 0},
+        "not_visible_count": {"type": "integer", "minimum": 0},
+        "contradicted_count": {"type": "integer", "minimum": 0},
+        "required_supported_count": {"type": "integer", "minimum": 0},
+        "strict_visual_support_rate": {"type": "number", "minimum": 0, "maximum": 1},
+        "observable_rate": {"type": "number", "minimum": 0, "maximum": 1},
+        "required_strict_visual_support_rate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "privacy_flag_count": {"type": "integer", "minimum": 0},
+        "needs_review_step_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^S[0-9]{2}$"}
+        }
+      }
+    }
+  }
+}

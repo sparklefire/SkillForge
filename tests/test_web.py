@@ -65,6 +65,19 @@ def test_web_accepts_operator_reviewed_gold_result(tmp_path) -> None:
     assert response.status_code == 200
     assert response.json()["summary"]["gold_status"] == "GOLD"
     assert response.json()["summary"]["metrics_status"] == "FINAL"
+    assert (
+        response.json()["multisource_comparison"]["source_ablation"][
+            "two_or_more_source_types"
+        ]["coverage"]
+        == 1.0
+    )
+    assert response.json()["visual_review"]["summary"]["contradicted_count"] == 0
+    rerun = client.post("/api/n31/run")
+    assert rerun.status_code == 200
+    assert rerun.json()["gold_status"] == "GOLD"
+    assert rerun.json()["before"]["severe_error_count"] == 5
+    assert rerun.json()["after"]["severe_error_count"] == 0
+    assert client.get("/api/n31").json()["summary"]["metrics_status"] == "FINAL"
 
 
 def test_upload_requires_at_least_one_asset(tmp_path) -> None:

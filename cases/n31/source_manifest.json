@@ -552,6 +552,74 @@
       "n31_rehearsal_available": true,
       "docker_required": false,
       "notes": "只同步Git跟踪代码、Gold JSON和审核记录；未上传原始录音、视频、PDF、私有面单或.env"
+    },
+    {
+      "run_id": "N31_VISUAL_SEQUENCE_REVIEW_V1",
+      "type": "STEP_PLAN_GOLD_VISUAL_SEQUENCE_REVIEW",
+      "run_date": "2026-07-17",
+      "status": "NEEDS_REVIEW",
+      "model": "step-3.7-flash",
+      "input_scope": "PRIVACY_SAFE_DERIVED_KEYFRAMES_ONLY",
+      "step_count": 13,
+      "required_step_count": 10,
+      "logical_model_call_count": 13,
+      "supported_count": 0,
+      "partial_count": 12,
+      "not_visible_count": 1,
+      "contradicted_count": 0,
+      "observable_step_count": 12,
+      "observable_required_step_count": 9,
+      "privacy_flag_count": 11,
+      "output": "cases/n31/evaluations/visual_sequence_review_v1.json",
+      "notes": "严格支持要求动作和完成状态同时可见；非法或截断JSON被拒绝，成功结果通过Schema且引用位置由程序锁定"
+    },
+    {
+      "run_id": "N31_MULTISOURCE_COMPARISON_V1",
+      "type": "GOLD_SOURCE_ABLATION_AND_REVISION_COMPARISON",
+      "run_date": "2026-07-17",
+      "status": "COMPLETED",
+      "evaluation_basis": "OPERATOR_REVIEWED_GOLD",
+      "manual_only_required_coverage": "8/10",
+      "expert_audio_only_required_coverage": "9/10",
+      "video_reference_required_coverage": "10/10",
+      "video_strict_visual_required_coverage": "0/10",
+      "video_observable_required_coverage": "9/10",
+      "two_or_more_source_types_required_coverage": "10/10",
+      "initial_severe_error_count": 5,
+      "final_severe_error_count": 0,
+      "output": "cases/n31/evaluations/multisource_comparison_v1.json"
+    },
+    {
+      "run_id": "N31_DEMO_FALLBACK_LOCAL_V1",
+      "type": "NATIVE_WEB_THREE_MODE_VALIDATION",
+      "run_date": "2026-07-17",
+      "status": "PASSED",
+      "runtime": "NATIVE_PYTHON",
+      "docker_required": false,
+      "modes": [
+        "LIVE_GOLD_RECALCULATION",
+        "PREPROCESSED_LOCAL_PIPELINE",
+        "ASSET_FREE_OFFLINE_BUNDLE"
+      ],
+      "offline_bundle": "cases/n31/demo_bundle",
+      "contains_raw_media": false,
+      "contains_credentials": false,
+      "checked_endpoints": [
+        "/health",
+        "/api/n31",
+        "/api/n31/run"
+      ],
+      "http_statuses": [
+        200,
+        200,
+        200
+      ],
+      "test_result": "35 passed",
+      "gold_status": "GOLD",
+      "metrics_status": "FINAL",
+      "initial_severe_error_count": 5,
+      "final_severe_error_count": 0,
+      "revision_count": 4
     }
   ],
   "generated_artifacts": [

@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/visual_assessment.schema.json",
+  "title": "SkillForge Visual Sequence Assessment",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "step_id",
+    "verdict",
+    "observed_claim",
+    "visible_actions",
+    "missing_or_uncertain",
+    "cited_evidence_ids",
+    "confidence",
+    "privacy_observation"
+  ],
+  "properties": {
+    "step_id": {"type": "string", "pattern": "^S[0-9]{2}$"},
+    "verdict": {
+      "enum": ["SUPPORTED", "PARTIAL", "NOT_VISIBLE", "CONTRADICTED"]
+    },
+    "observed_claim": {"type": "string", "minLength": 1},
+    "visible_actions": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1}
+    },
+    "missing_or_uncertain": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1}
+    },
+    "cited_evidence_ids": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^E[0-9]{3}$"}
+    },
+    "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+    "privacy_observation": {
+      "enum": [
+        "NO_SENSITIVE_CONTENT_VISIBLE",
+        "MASKED_CONTENT_PRESENT",
+        "POTENTIAL_SENSITIVE_CONTENT",
+        "NOT_APPLICABLE"
+      ]
+    }
+  }
+}

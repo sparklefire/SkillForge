@@ -166,6 +166,10 @@ class StepPlanClient:
                     attempt=attempt,
                     error_type=type(exc).__name__,
                     error=str(exc)[:500],
+                    finish_reason=(
+                        (response.get("choices") or [{}])[0].get("finish_reason")
+                    ),
+                    content_length=len(str(self._content(response))),
                 )
                 if attempt < max_attempts:
                     working_messages.append(

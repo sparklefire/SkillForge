@@ -1,0 +1,59 @@
+{
+  "history": [
+    {
+      "from_state": "UPLOADED",
+      "reason": "载入实际操作者审核的Gold SOP",
+      "timestamp": "2026-07-16T16:11:35.798205+00:00",
+      "to_state": "INGESTING"
+    },
+    {
+      "from_state": "INGESTING",
+      "reason": "载入视频、手册和专家口述证据",
+      "timestamp": "2026-07-16T16:11:35.808969+00:00",
+      "to_state": "EXTRACTING"
+    },
+    {
+      "from_state": "EXTRACTING",
+      "reason": "载入13步Gold SOP",
+      "timestamp": "2026-07-16T16:11:35.809183+00:00",
+      "to_state": "PLANNING"
+    },
+    {
+      "from_state": "PLANNING",
+      "reason": "冻结受控错误草稿",
+      "timestamp": "2026-07-16T16:11:35.818260+00:00",
+      "to_state": "CREATING"
+    },
+    {
+      "from_state": "CREATING",
+      "reason": "执行Gold约束的确定性质检",
+      "timestamp": "2026-07-16T16:11:35.819134+00:00",
+      "to_state": "VERIFYING"
+    },
+    {
+      "from_state": "VERIFYING",
+      "reason": "引用Gold证据执行局部修订",
+      "timestamp": "2026-07-16T16:11:35.824501+00:00",
+      "to_state": "REVISING"
+    },
+    {
+      "from_state": "REVISING",
+      "reason": "重新执行Gold约束质检",
+      "timestamp": "2026-07-16T16:11:35.835613+00:00",
+      "to_state": "VERIFYING"
+    },
+    {
+      "from_state": "VERIFYING",
+      "reason": "生成Gold检查清单和测验",
+      "timestamp": "2026-07-16T16:11:35.839525+00:00",
+      "to_state": "RENDERING"
+    },
+    {
+      "from_state": "RENDERING",
+      "reason": "Gold真实案例闭环评测完成",
+      "timestamp": "2026-07-16T16:11:35.839879+00:00",
+      "to_state": "COMPLETED"
+    }
+  ],
+  "state": "COMPLETED"
+}

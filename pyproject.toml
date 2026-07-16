@@ -30,7 +30,9 @@ skillforge-candidate-sop = "skillforge.candidate_sop:main"
 skillforge-ingest = "skillforge.ingest:main"
 skillforge-expert-gold = "skillforge.expert_gold:main"
 skillforge-gold-rehearsal = "skillforge.gold_rehearsal:main"
+skillforge-multisource-eval = "skillforge.multisource_eval:main"
 skillforge-provisional-rehearsal = "skillforge.provisional_rehearsal:main"
+skillforge-visual-review = "skillforge.visual_review:main"
 skillforge-web = "skillforge.web:main"
 
 [tool.setuptools]

@@ -1,0 +1,122 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/multisource_evaluation.schema.json",
+  "title": "SkillForge Multisource Evaluation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "case_id",
+    "evaluation_basis",
+    "generated_at",
+    "source_ablation",
+    "revision_comparison",
+    "candidate_to_gold",
+    "privacy_comparison",
+    "conclusions"
+  ],
+  "properties": {
+    "version": {"type": "integer", "minimum": 1},
+    "case_id": {"type": "string", "minLength": 1},
+    "evaluation_basis": {"const": "OPERATOR_REVIEWED_GOLD"},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "source_ablation": {
+      "type": "object",
+      "additionalProperties": {"$ref": "#/$defs/coverage"}
+    },
+    "revision_comparison": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "before",
+        "after",
+        "revision_count",
+        "conflict_kinds_before"
+      ],
+      "properties": {
+        "before": {"type": "object"},
+        "after": {"type": "object"},
+        "revision_count": {"type": "integer", "minimum": 0},
+        "conflict_kinds_before": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "candidate_to_gold": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "candidate_version",
+        "gold_version",
+        "verified_step_count",
+        "required_flag_changes",
+        "parameter_evidence_gaps_before",
+        "parameter_evidence_gaps_after",
+        "removed_unsupported_parameters",
+        "expert_evidence_added"
+      ],
+      "properties": {
+        "candidate_version": {"type": "integer", "minimum": 1},
+        "gold_version": {"type": "integer", "minimum": 1},
+        "verified_step_count": {"type": "integer", "minimum": 0},
+        "required_flag_changes": {
+          "type": "array",
+          "items": {"type": "object"}
+        },
+        "parameter_evidence_gaps_before": {"type": "integer", "minimum": 0},
+        "parameter_evidence_gaps_after": {"type": "integer", "minimum": 0},
+        "removed_unsupported_parameters": {
+          "type": "array",
+          "items": {"type": "object"}
+        },
+        "expert_evidence_added": {"type": "integer", "minimum": 0}
+      }
+    },
+    "privacy_comparison": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "local_safe_derivative_qa",
+        "model_flagged_step_count",
+        "model_flagged_step_ids",
+        "disposition"
+      ],
+      "properties": {
+        "local_safe_derivative_qa": {"enum": ["PASSED", "FAILED"]},
+        "model_flagged_step_count": {"type": "integer", "minimum": 0},
+        "model_flagged_step_ids": {
+          "type": "array",
+          "items": {"type": "string", "pattern": "^S[0-9]{2}$"}
+        },
+        "disposition": {"type": "string", "minLength": 1}
+      }
+    },
+    "conclusions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "string", "minLength": 1}
+    }
+  },
+  "$defs": {
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "supported_required_steps",
+        "required_step_count",
+        "coverage",
+        "unsupported_step_ids"
+      ],
+      "properties": {
+        "supported_required_steps": {"type": "integer", "minimum": 0},
+        "required_step_count": {"type": "integer", "minimum": 1},
+        "coverage": {"type": "number", "minimum": 0, "maximum": 1},
+        "unsupported_step_ids": {
+          "type": "array",
+          "items": {"type": "string", "pattern": "^S[0-9]{2}$"}
+        }
+      }
+    }
+  }
+}

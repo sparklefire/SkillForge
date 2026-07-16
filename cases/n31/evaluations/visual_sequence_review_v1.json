@@ -1,0 +1,773 @@
+{
+  "assessments": [
+    {
+      "frames": [
+        {
+          "end_ms": 5000,
+          "evidence_id": "E001",
+          "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000001.jpg",
+          "source_ref": "N31_VIDEO_OPERATION_FULL",
+          "start_ms": 0
+        },
+        {
+          "end_ms": 10000,
+          "evidence_id": "E002",
+          "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000002.jpg",
+          "source_ref": "N31_VIDEO_OPERATION_FULL",
+          "start_ms": 5000
+        }
+      ],
+      "model_result": {
+        "cited_evidence_ids": [
+          "E001",
+          "E002"
+        ],
+        "confidence": 0.7,
+        "missing_or_uncertain": [
+          "标签纸宽度数值未显示，无法核对是否在设备支持范围"
+        ],
+        "observed_claim": "画面可见汉印N31设备及折叠热敏标签纸，设备型号和介质类型可确认，但纸宽是否在支持范围无法判断。",
+        "privacy_observation": "POTENTIAL_SENSITIVE_CONTENT",
+        "step_id": "S01",
+        "verdict": "PARTIAL",
+        "visible_actions": [
+          "设备上印有汉印HPRT品牌标识，型号为N31",
+          "标签纸为折叠式热敏纸，位于纸架中"
+        ]
+      },
+      "required": true,
+      "step_id": "S01",
+      "title": "核对设备和介质适配性"
+    },
+    {
+      "frames": [
+        {
+          "end_ms": 5000,
+          "evidence_id": "E066",
+          "keyframe": "derived/video/N31_VIDEO_MEDIA_TYPE/frames/frame_000001.jpg",
+          "source_ref": "N31_VIDEO_MEDIA_TYPE",
+          "start_ms": 0
+        },
+        {
+          "end_ms": 10000,
+          "evidence_id": "E067",
+          "keyframe": "derived/video/N31_VIDEO_MEDIA_TYPE/frames/frame_000002.jpg",
+          "source_ref": "N31_VIDEO_MEDIA_TYPE",
+          "start_ms": 5000
+        }
+      ],
+      "model_result": {
+        "cited_evidence_ids": [
+          "E066",
+          "E067"
+        ],
+        "confidence": 0.6,
+        "missing_or_uncertain": [
+          "相邻标签间隙未完全展示（手部遮挡）",
+          "无法确认标签间隙的连续性"
+        ],
+        "observed_claim": "画面可见标签背面（信息面）及部分标签边缘，未观察到周期性黑标，标签间隙因手部遮挡仅部分可见。",
+        "privacy_observation": "NO_SENSITIVE_CONTENT_VISIBLE",
+        "step_id": "S02",
+        "verdict": "PARTIAL",
+        "visible_actions": [
+          "标签背面可见且无周期性黑标",
+          "部分标签边缘/间隙可见"
+        ]
+      },
+      "required": true,
+      "step_id": "S02",
+      "title": "判断缝标定位方式"
+    },
+    {
+      "frames": [
+        {
+          "end_ms": 40000,
+          "evidence_id": "E008",
+          "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000008.jpg",
+          "source_ref": "N31_VIDEO_OPERATION_FULL",
+          "start_ms": 35000
+        },
+        {
+          "end_ms": 45000,
+          "evidence_id": "E009",
+          "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000009.jpg",
+          "source_ref": "N31_VIDEO_OPERATION_FULL",
+          "start_ms": 40000
+        },
+        {
+          "end_ms": 50000,
+          "evidence_id": "E010",
+          "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000010.jpg",
+          "source_ref": "N31_VIDEO_OPERATION_FULL",
+          "start_ms": 45000
+        }
+      ],
+      "model_result": {
+        "cited_evidence_ids": [
+          "E008",
+          "E009",
+          "E010"
+        ],
+        "confidence": 0.6,
+        "missing_or_uncertain": [
+          "电源开关是否处于关闭状态",
+          "进纸通道内是否有残纸、卡纸或异物",
+          "设备是否处于断电状态"
+        ],
+        "observed_claim": "画面可见标签纸从打印机出纸口伸出且表面平整无明显褶皱；手正在操作纸盒内部并按压打印机顶部。但电源开关状态及进纸通道内部是否有残纸或异物无法从画面确认。",
+        "privacy_observation": "POTENTIAL_SENSITIVE_CONTENT",
+        "step_id": "S03",
+        "verdict": "PARTIAL",
+        "visible_actions": [
+          "标签纸从打印机出纸口伸出且表面平整",
+          "手正在纸盒内操作",
+          "手按压在打印机顶部表面"
+        ]
+      },
+      "required": true,
+      "step_id": "S03",
+      "title": "检查初始状态"
+    },
+    {
+      "frames": [
+        {
+          "end_ms": 65000,
+          "evidence_id": "E013",
+          "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000013.jpg",
+          "source_ref": "N31_VIDEO_OPERATION_FULL",
+          "start_ms": 60000
+        },
+        {
+          "end_ms": 70000,
+          "evidence_id": "E014",
+          "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000014.jpg",
+          "source_ref": "N31_VIDEO_OPERATION_FULL",
+          "start_ms": 65000
+        },
+        {
+          "end_ms": 75000,
+          "evidence_id": "E015",
+          "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000015.jpg",
+          "source_ref": "N31_VIDEO_OPERATION_FULL",
+          "start_ms": 70000
+        }
+      ],
+      "model_result": {
+        "cited_evidence_ids": [
+          "E013",
+          "E014",
+          "E015"
+        ],
+        "confidence": 0.9,
+        "missing_or_uncertain": [
+          "未显示电源线与打印机连接的动作",
+          "未显示电源开关操作动作",
+          "未显示电源连接状态、设备状态灯及设备启动状态的视觉内容"
+        ],
+        "observed_claim": "画面可见打印机、电源线及桌面纸巾盒，未呈现连接电源线、打开电源开关及观察状态灯和设备启动状态的相关视觉内容。",
+        "privacy_observation": "POTENTIAL_SENSITIVE_CONTENT",
+        "step_id": "S04",
+        "verdict": "NOT_VISIBLE",
+        "visible_actions": [
+          "手部接触打印机外壳",
+          "桌面放置有未连接的电源线",
+          "桌面放置有盛放纸巾的纸巾盒"
+        ]
+      },
+      "required": true,
+      "step_id": "S04",
+      "title": "连接电源并开机"
+    },
+    {
+      "frames": [
+        {
+          "end_ms": 85000,
+          "evidence_id": "E017",
+          "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000017.jpg",
+          "source_ref": "N31_VIDEO_OPERATION_FULL",
+          "start_ms": 80000
+        },
+        {
+          "end_ms": 90000,
+          "evidence_id": "E018",
+          "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000018.jpg",
+          "source_ref": "N31_VIDEO_OPERATION_FULL",
+          "start_ms": 85000
+        },
+        {
+          "end_ms": 95000,
+          "evidence_id": "E019",
+          "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000019.jpg",
+          "source_ref": "N31_VIDEO_OPERATION_FULL",
+          "start_ms": 90000
+        }
+      ],
+      "model_result": {
+        "cited_evidence_ids": [
+          "E019"
+        ],
+        "confidence": 0.5,
+        "missing_or_uncertain": [
+          "顶盖未完全打开",
+          "内部纸路、胶辊和导纸夹未可见",
+          "无法确认有无异物或损伤"
+        ],
+        "observed_claim": "双手出现并开始操作打印机顶盖，顶盖尚未完全打开，内部结构未显示。",
+        "privacy_observation": "POTENTIAL_SENSITIVE_CONTENT",
+        "step_id": "S05",
+        "verdict": "PARTIAL",
+        "visible_actions": [
+          "双手操作打印机顶盖部位",
+          "打印机顶盖开始开启"
+        ]
+      },
+      "required": false,
+      "step_id": "S05",
+      "title": "打开顶盖并检查内部纸路"
+    },
+    {
+      "frames": [
+        {
+          "end_ms": 110000,
+          "evidence_id": "E022",
+          "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000022.jpg",
+          "source_ref": "N31_VIDEO_OPERATION_FULL",
+          "start_ms": 105000
+        },
+        {
+          "end_ms": 115000,
+          "evidence_id": "E023",
+          "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000023.jpg",
+          "source_ref": "N31_VIDEO_OPERATION_FULL",
+          "start_ms": 110000
+        },
+        {
+          "end_ms": 120000,
+          "evidence_id": "E024",
+          "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000024.jpg",
+          "source_ref": "N31_VIDEO_OPERATION_FULL",
+          "start_ms": 115000
+        },
+        {
+          "end_ms": 5000,
+          "evidence_id": "E069",
+          "keyframe": "derived/video/N31_VIDEO_GUIDES/frames/frame_000001.jpg",
+          "source_ref": "N31_VIDEO_GUIDES",
+          "start_ms": 0
+        },
+        {
+          "end_ms": 10000,
+          "evidence_id": "E070",
+          "keyframe": "derived/video/N31_VIDEO_GUIDES/frames/frame_000002.jpg",
+          "source_ref": "N31_VIDEO_GUIDES",
+          "start_ms": 5000
+        }
+      ],
+      "model_result": {
+        "cited_evidence_ids": [
+          "E022",
+          "E023",
+          "E024",
+          "E069",
+          "E070"
+        ],
+        "confidence": 0.4,
+        "missing_or_uncertain": [
+          "未观察到双手对称移动左右导纸夹的调节动作",
+          "未观察到标签纸在导纸夹区域居中平直通过且无明显挤压的状态",
+          "无法确认导纸夹位置是否对称"
+        ],
+        "observed_claim": "画面可见打印机内部导纸夹区域、标签纸及手部操作打印机的相关动作，但未观察到导纸夹调节完成及标签纸居中平直通过的状态。",
+        "privacy_observation": "POTENTIAL_SENSITIVE_CONTENT",
+        "step_id": "S06",
+        "verdict": "PARTIAL",
+        "visible_actions": [
+          "双手接触打印机内部导纸夹区域",
+          "左侧托盘放置有标签纸",
+          "手部执行取纸、拉出标签纸的动作"
+        ]
+      },
+      "required": false,
+      "step_id": "S06",
+      "title": "调节内部导纸夹"
+    },
+    {
+      "frames": [
+        {
+          "end_ms": 140000,
+          "evidence_id": "E028",
+          "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000028.jpg",
+          "source_ref": "N31_VIDEO_OPERATION_FULL",
+          "start_ms": 135000
+        },
+        {
+          "end_ms": 145000,
+          "evidence_id": "E029",
+          "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000029.jpg",
+          "source_ref": "N31_VIDEO_OPERATION_FULL",
+          "start_ms": 140000
+        },
+        {
+          "end_ms": 150000,
+          "evidence_id": "E030",
+          "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000030.jpg",
+          "source_ref": "N31_VIDEO_OPERATION_FULL",
+          "start_ms": 145000
+        },
+        {
+          "end_ms": 25000,
+          "evidence_id": "E073",
+          "keyframe": "derived/video/N31_VIDEO_GUIDES/frames/frame_000005.jpg",
+          "source_ref": "N31_VIDEO_GUIDES",
+          "start_ms": 20000
+        },
+        {
+          "end_ms": 30000,
+          "evidence_id": "E074",
+          "keyframe": "derived/video/N31_VIDEO_GUIDES/frames/frame_000006.jpg",
+          "source_ref": "N31_VIDEO_GUIDES",
+          "start_ms": 25000
+        },
+        {
+          "end_ms": 35000,
+          "evidence_id": "E075",
+          "keyframe": "derived/video/N31_VIDEO_GUIDES/frames/frame_000007.jpg",
+          "source_ref": "N31_VIDEO_GUIDES",
+          "start_ms": 30000
+        }
+      ],
+      "model_result": {
+        "cited_evidence_ids": [
+          "E028",
+          "E029",
+          "E030"
+        ],
+        "confidence": 0.6,
+        "missing_or_uncertain": [
+          "后方进纸导轨调节动作",
+          "关闭顶盖的动作过程"
+        ],
+        "observed_claim": "画面可见打印机顶盖已关闭且纸张正在输出；但未显示调节后方进纸导轨的动作，也未见关闭顶盖的过程。",
+        "privacy_observation": "POTENTIAL_SENSITIVE_CONTENT",
+        "step_id": "S07",
+        "verdict": "PARTIAL",
+        "visible_actions": [
+          "打印机顶盖闭合",
+          "纸张从打印机输出"
+        ]
+      },
+      "required": true,
+      "step_id": "S07",
+      "title": "关闭顶盖并调节后方进纸导轨"
+    },
+    {
+      "frames": [
+        {
+          "end_ms": 165000,
+          "evidence_id": "E033",
+          "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000033.jpg",
+          "source_ref": "N31_VIDEO_OPERATION_FULL",
+          "start_ms": 160000
+        },
+        {
+          "end_ms": 170000,
+          "evidence_id": "E034",
+          "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000034.jpg",
+          "source_ref": "N31_VIDEO_OPERATION_FULL",
+          "start_ms": 165000
+        },
+        {
+          "end_ms": 175000,
+          "evidence_id": "E035",
+          "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000035.jpg",
+          "source_ref": "N31_VIDEO_OPERATION_FULL",
+          "start_ms": 170000
+        },
+        {
+          "end_ms": 5000,
+          "evidence_id": "E079",
+          "keyframe": "derived/video/N31_VIDEO_MEDIA_FEED/frames/frame_000001.jpg",
+          "source_ref": "N31_VIDEO_MEDIA_FEED",
+          "start_ms": 0
+        },
+        {
+          "end_ms": 10000,
+          "evidence_id": "E080",
+          "keyframe": "derived/video/N31_VIDEO_MEDIA_FEED/frames/frame_000002.jpg",
+          "source_ref": "N31_VIDEO_MEDIA_FEED",
+          "start_ms": 5000
+        }
+      ],
+      "model_result": {
+        "cited_evidence_ids": [
+          "E033",
+          "E034",
+          "E035"
+        ],
+        "confidence": 0.6,
+        "missing_or_uncertain": [
+          "无法确认标签纸从机器背面沿导轨平直插入",
+          "无法确认机器开始自动吸纸后松手",
+          "无法确认出纸口是否送出一小段标签纸"
+        ],
+        "observed_claim": "画面可见《汉印HPRT》打印机及标签纸，手部正在操作打印机上部，但无法确认标签纸从背面插入、自动吸纸及送出一小段的完整动作流程。",
+        "privacy_observation": "POTENTIAL_SENSITIVE_CONTENT",
+        "step_id": "S08",
+        "verdict": "PARTIAL",
+        "visible_actions": [
+          "手部扶住并操作打印机上部",
+          "标签纸从出纸口露出",
+          "左侧可见标签纸支架"
+        ]
+      },
+      "required": true,
+      "step_id": "S08",
+      "title": "插入标签纸并确认自动吸纸"
+    },
+    {
+      "frames": [
+        {
+          "end_ms": 190000,
+          "evidence_id": "E038",
+          "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000038.jpg",
+          "source_ref": "N31_VIDEO_OPERATION_FULL",
+          "start_ms": 185000
+        },
+        {
+          "end_ms": 195000,
+          "evidence_id": "E039",
+          "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000039.jpg",
+          "source_ref": "N31_VIDEO_OPERATION_FULL",
+          "start_ms": 190000
+        },
+        {
+          "end_ms": 200000,
+          "evidence_id": "E040",
+          "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000040.jpg",
+          "source_ref": "N31_VIDEO_OPERATION_FULL",
+          "start_ms": 195000
+        },
+        {
+          "end_ms": 5000,
+          "evidence_id": "E077",
+          "keyframe": "derived/video/N31_VIDEO_LEARNING/frames/frame_000001.jpg",
+          "source_ref": "N31_VIDEO_LEARNING",
+          "start_ms": 0
+        },
+        {
+          "end_ms": 9871,
+          "evidence_id": "E078",
+          "keyframe": "derived/video/N31_VIDEO_LEARNING/frames/frame_000002.jpg",
+          "source_ref": "N31_VIDEO_LEARNING",
+          "start_ms": 5000
+        }
+      ],
+      "model_result": {
+        "cited_evidence_ids": [
+          "E038",
+          "E039",
+          "E040",
+          "E077",
+          "E078"
+        ],
+        "confidence": 0.6,
+        "missing_or_uncertain": [
+          "未显示走纸键被按住的画面",
+          "未显示状态灯闪烁过程",
+          "无法确认是否完成介质学习"
+        ],
+        "observed_claim": "画面可见打印机出纸口有标签纸输出，指示灯显示蓝色常亮或由红色切换为蓝色。",
+        "privacy_observation": "POTENTIAL_SENSITIVE_CONTENT",
+        "step_id": "S09",
+        "verdict": "PARTIAL",
+        "visible_actions": [
+          "标签纸从打印机出纸口输出",
+          "打印机指示灯呈蓝色常亮",
+          "打印机指示灯由红色变为蓝色"
+        ]
+      },
+      "required": true,
+      "step_id": "S09",
+      "title": "执行缝标学习"
+    },
+    {
+      "frames": [
+        {
+          "end_ms": 215000,
+          "evidence_id": "E043",
+          "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000043.jpg",
+          "source_ref": "N31_VIDEO_OPERATION_FULL",
+          "start_ms": 210000
+        },
+        {
+          "end_ms": 220000,
+          "evidence_id": "E044",
+          "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000044.jpg",
+          "source_ref": "N31_VIDEO_OPERATION_FULL",
+          "start_ms": 215000
+        },
+        {
+          "end_ms": 225000,
+          "evidence_id": "E045",
+          "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000045.jpg",
+          "source_ref": "N31_VIDEO_OPERATION_FULL",
+          "start_ms": 220000
+        }
+      ],
+      "model_result": {
+        "cited_evidence_ids": [
+          "E043",
+          "E044",
+          "E045"
+        ],
+        "confidence": 0.7,
+        "missing_or_uncertain": [
+          "无法确认是否仅送出一张标签（缺乏标签边界分离的明确视觉证据）",
+          "无法确认停止位置是否落在标签边界附近（缺少停止后状态帧）",
+          "无法确认是否出现连续跳纸（缺少完整出纸结果对比）"
+        ],
+        "observed_claim": "画面可见手按压走纸键及打印机出纸动作，但无法确认单张走纸的完整完成状态。",
+        "privacy_observation": "POTENTIAL_SENSITIVE_CONTENT",
+        "step_id": "S10",
+        "verdict": "PARTIAL",
+        "visible_actions": [
+          "手按压打印机走纸键（蓝色圆形按钮）",
+          "标签纸从打印机出纸口送出",
+          "打印机指示灯亮起（蓝色）"
+        ]
+      },
+      "required": true,
+      "step_id": "S10",
+      "title": "执行单张走纸检查"
+    },
+    {
+      "frames": [
+        {
+          "end_ms": 235000,
+          "evidence_id": "E047",
+          "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000047.jpg",
+          "source_ref": "N31_VIDEO_OPERATION_FULL",
+          "start_ms": 230000
+        },
+        {
+          "end_ms": 240000,
+          "evidence_id": "E048",
+          "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000048.jpg",
+          "source_ref": "N31_VIDEO_OPERATION_FULL",
+          "start_ms": 235000
+        },
+        {
+          "end_ms": 245000,
+          "evidence_id": "E049",
+          "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000049.jpg",
+          "source_ref": "N31_VIDEO_OPERATION_FULL",
+          "start_ms": 240000
+        }
+      ],
+      "model_result": {
+        "cited_evidence_ids": [
+          "E047",
+          "E048",
+          "E049"
+        ],
+        "confidence": 0.6,
+        "missing_or_uncertain": [
+          "无法确认打印内容是否为自检页",
+          "无法确认打印是否已完整结束（标签纸仍在输出中）",
+          "无法确认是否执行过按住走纸键并释放的动作",
+          "无法确认状态灯是否发生过第一次闪烁"
+        ],
+        "observed_claim": "画面可见打印机正在工作（蓝色指示灯亮），标签纸正在从打印机中逐步输出。",
+        "privacy_observation": "POTENTIAL_SENSITIVE_CONTENT",
+        "step_id": "S11",
+        "verdict": "PARTIAL",
+        "visible_actions": [
+          "打印机顶部蓝色指示灯亮起",
+          "标签纸正在从打印机出纸口输出",
+          "左侧纸架内装有空白标签纸"
+        ]
+      },
+      "required": false,
+      "step_id": "S11",
+      "title": "打印自检页"
+    },
+    {
+      "frames": [
+        {
+          "end_ms": 255000,
+          "evidence_id": "E051",
+          "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000051.jpg",
+          "source_ref": "N31_VIDEO_OPERATION_FULL",
+          "start_ms": 250000
+        },
+        {
+          "end_ms": 260000,
+          "evidence_id": "E052",
+          "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000052.jpg",
+          "source_ref": "N31_VIDEO_OPERATION_FULL",
+          "start_ms": 255000
+        },
+        {
+          "end_ms": 265000,
+          "evidence_id": "E053",
+          "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000053.jpg",
+          "source_ref": "N31_VIDEO_OPERATION_FULL",
+          "start_ms": 260000
+        },
+        {
+          "end_ms": 5000,
+          "evidence_id": "E082",
+          "keyframe": "derived/video/N31_VIDEO_PRINT_RESULT/frames/frame_000001.jpg",
+          "source_ref": "N31_VIDEO_PRINT_RESULT",
+          "start_ms": 0
+        },
+        {
+          "end_ms": 10000,
+          "evidence_id": "E083",
+          "keyframe": "derived/video/N31_VIDEO_PRINT_RESULT/frames/frame_000002.jpg",
+          "source_ref": "N31_VIDEO_PRINT_RESULT",
+          "start_ms": 5000
+        }
+      ],
+      "model_result": {
+        "cited_evidence_ids": [
+          "E051",
+          "E052",
+          "E053",
+          "E082",
+          "E083"
+        ],
+        "confidence": 0.6,
+        "missing_or_uncertain": [
+          "无法确认测试标签是否完整出纸",
+          "无法确认设备是否存在跳纸、卡纸、异常停止",
+          "无法确认出纸过程中是否存在违规拉纸动作"
+        ],
+        "observed_claim": "画面可见手按压打印机按键启动打印，打印机出纸口有纸张持续输出，打印结果画面存在大范围遮挡，最终帧可见手指按压纸张边缘，无法确认完整出纸结果及设备运行状态。",
+        "privacy_observation": "POTENTIAL_SENSITIVE_CONTENT",
+        "step_id": "S12",
+        "verdict": "PARTIAL",
+        "visible_actions": [
+          "手按压打印机操作按键",
+          "打印机出纸口有纸张持续输出",
+          "打印结果画面存在大范围遮挡仅少量纸张露出",
+          "最终出纸帧可见手指按压纸张边缘"
+        ]
+      },
+      "required": true,
+      "step_id": "S12",
+      "title": "打印本地测试标签"
+    },
+    {
+      "frames": [
+        {
+          "end_ms": 280000,
+          "evidence_id": "E056",
+          "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000056.jpg",
+          "source_ref": "N31_VIDEO_OPERATION_FULL",
+          "start_ms": 275000
+        },
+        {
+          "end_ms": 285000,
+          "evidence_id": "E057",
+          "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000057.jpg",
+          "source_ref": "N31_VIDEO_OPERATION_FULL",
+          "start_ms": 280000
+        },
+        {
+          "end_ms": 290000,
+          "evidence_id": "E058",
+          "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000058.jpg",
+          "source_ref": "N31_VIDEO_OPERATION_FULL",
+          "start_ms": 285000
+        },
+        {
+          "end_ms": 5000,
+          "evidence_id": "E082",
+          "keyframe": "derived/video/N31_VIDEO_PRINT_RESULT/frames/frame_000001.jpg",
+          "source_ref": "N31_VIDEO_PRINT_RESULT",
+          "start_ms": 0
+        },
+        {
+          "end_ms": 10000,
+          "evidence_id": "E083",
+          "keyframe": "derived/video/N31_VIDEO_PRINT_RESULT/frames/frame_000002.jpg",
+          "source_ref": "N31_VIDEO_PRINT_RESULT",
+          "start_ms": 5000
+        },
+        {
+          "end_ms": 15000,
+          "evidence_id": "E084",
+          "keyframe": "derived/video/N31_VIDEO_PRINT_RESULT/frames/frame_000003.jpg",
+          "source_ref": "N31_VIDEO_PRINT_RESULT",
+          "start_ms": 10000
+        }
+      ],
+      "model_result": {
+        "cited_evidence_ids": [
+          "E056",
+          "E057",
+          "E058",
+          "E082",
+          "E083",
+          "E084"
+        ],
+        "confidence": 0.6,
+        "missing_or_uncertain": [
+          "无法确认打印标签内容完整性",
+          "无法确认标签内容是否居中",
+          "无法确认单张走纸是否正确停在边界附近",
+          "未观察到验收记录行为（如填写记录或拍照）"
+        ],
+        "observed_claim": "画面可见打印机正在出纸，标签纸从出纸口平稳输出，设备指示灯亮起；后续帧显示手部靠近并触摸纸张。",
+        "privacy_observation": "MASKED_CONTENT_PRESENT",
+        "step_id": "S13",
+        "verdict": "PARTIAL",
+        "visible_actions": [
+          "打印机出纸口有标签纸输出",
+          "设备电源指示灯亮起",
+          "手部触摸检查纸张"
+        ]
+      },
+      "required": true,
+      "step_id": "S13",
+      "title": "检查打印结果并记录验收"
+    }
+  ],
+  "case_id": "n31_media_change",
+  "external_processing_authorized": true,
+  "generated_at": "2026-07-16T16:34:18.471157+00:00",
+  "model": "step-3.7-flash",
+  "model_calls": 13,
+  "run_id": "N31_VISUAL_SEQUENCE_REVIEW_V1",
+  "status": "NEEDS_REVIEW",
+  "summary": {
+    "contradicted_count": 0,
+    "needs_review_step_ids": [
+      "S01",
+      "S02",
+      "S03",
+      "S04",
+      "S05",
+      "S06",
+      "S07",
+      "S08",
+      "S09",
+      "S10",
+      "S11",
+      "S12",
+      "S13"
+    ],
+    "not_visible_count": 1,
+    "observable_rate": 0.9230769230769231,
+    "partial_count": 12,
+    "privacy_flag_count": 11,
+    "required_step_count": 10,
+    "required_strict_visual_support_rate": 0.0,
+    "required_supported_count": 0,
+    "step_count": 13,
+    "strict_visual_support_rate": 0.0,
+    "supported_count": 0
+  }
+}
