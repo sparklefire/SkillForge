@@ -673,6 +673,27 @@
       "arbitrary_path_download_enabled": false,
       "raw_asset_download_enabled": false,
       "test_result": "35 passed"
+    },
+    {
+      "run_id": "DGX_WEB_RESULTS_20260717",
+      "type": "DGX_NATIVE_STRUCTURED_RESULTS_VALIDATION",
+      "run_date": "2026-07-17",
+      "status": "PASSED",
+      "remote_app_directory": "/home/Developer/skillforge/app",
+      "sync_scope": "GIT_TRACKED_FILES_ONLY",
+      "sensitive_assets_uploaded": false,
+      "python_version": "3.12.3",
+      "test_result": "35 passed",
+      "web_bind_scope": "REMOTE_LOOPBACK_ONLY",
+      "checklist_item_count": 13,
+      "quiz_question_count": 5,
+      "workflow_state": "COMPLETED",
+      "allowed_download_count": 4,
+      "allowed_download_http_status": 200,
+      "unlisted_private_asset_http_status": 404,
+      "raw_asset_download_enabled": false,
+      "validation_server_stopped": true,
+      "docker_required": false
     }
   ],
   "generated_artifacts": [
