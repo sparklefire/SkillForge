@@ -1,0 +1,163 @@
+{
+  "version": 1,
+  "case_id": "n31_media_change",
+  "gold_title": "汉印 N31 更换折叠标签纸、缝标学习与试印验收（Gold v1）",
+  "source_ref": "N31_EXPERT_INTERVIEW",
+  "source_file": "cases/n31/input/audio/n31_expert_interview.m4a",
+  "review_date": "2026-07-16",
+  "reviewer_role": "参赛选手、设备实际操作者和自摄素材提供者",
+  "asr_model": "stepaudio-2.5-asr",
+  "audio_duration_ms": 389635,
+  "corrections": [
+    {"from": "N 31", "to": "N31"},
+    {"from": "N三幺", "to": "N31"},
+    {"from": "装置标签学习和适应", "to": "装纸、标签学习和试印"},
+    {"from": "72×13010mm", "to": "72×130mm"},
+    {"from": "七十二乘一百三十毫米", "to": "72×130mm"},
+    {"from": "禁止通道", "to": "进纸通道"},
+    {"from": "带装标签纸", "to": "待装标签纸"},
+    {"from": "静止偏斜", "to": "进纸偏斜"},
+    {"from": "换置培训", "to": "换纸培训"},
+    {"from": "识别到识别不到", "to": "识别不到"},
+    {"from": "凤标", "to": "缝标"},
+    {"from": "学习式呃模式学习", "to": "模式学习"},
+    {"from": "跳指", "to": "跳纸"},
+    {"from": "自动静止或打印", "to": "自动进纸或打印"},
+    {"from": "刀指甲", "to": "导纸夹"},
+    {"from": "胶滚", "to": "胶辊"},
+    {"from": "导纸架", "to": "导纸夹"},
+    {"from": "装好之后", "to": "装好纸后"}
+  ],
+  "answers": [
+    {
+      "question_id": "Q01",
+      "topic": "角色和经验",
+      "anchor_variants": ["角色和经验"],
+      "required_terms": ["N31", "实际操作者", "缝标学习", "数百张"],
+      "verified_claim": "操作者确认本人完成过N31折叠标签装入、缝标学习、单张走纸和测试面单打印，并曾连续使用约一个月、每天打印数张、累计打印数百张。",
+      "bind_step_ids": []
+    },
+    {
+      "question_id": "Q02",
+      "topic": "纸张形态和定位方式",
+      "anchor_variants": ["纸张形态和定位方式"],
+      "required_terms": ["折叠式热敏标签纸", "72×130mm", "缝隙", "没有周期性黑标"],
+      "verified_claim": "本批介质为72×130毫米折叠式热敏标签纸，相邻标签有缝隙，背面没有周期性黑标，应使用缝标定位。",
+      "bind_step_ids": ["S01", "S02"]
+    },
+    {
+      "question_id": "Q03",
+      "topic": "换纸前检查",
+      "anchor_variants": ["换纸前检查"],
+      "required_terms": ["打印任务已经完成或暂停", "进纸通道", "残纸", "强行拉扯"],
+      "verified_claim": "换纸前应确认任务完成或暂停、设备无异常、旧纸正常退出、纸路无残纸卡纸异物且新纸平整；卡纸转异常流程，不强拉。",
+      "bind_step_ids": ["S03", "S05"]
+    },
+    {
+      "question_id": "Q04",
+      "topic": "导纸夹合适状态",
+      "anchor_variants": ["导纸夹合适状态"],
+      "required_terms": ["导纸夹", "靠近纸边", "不明显挤压", "卡纸", "偏斜"],
+      "verified_claim": "左右导纸夹应对称、靠近纸边但不明显挤压，纸张能顺畅移动且没有大幅左右晃动；过紧可能卡纸，过松可能偏斜。",
+      "bind_step_ids": ["S06", "S07"]
+    },
+    {
+      "question_id": "Q05",
+      "topic": "判断纸张送到位",
+      "anchor_variants": ["判断纸张送到位"],
+      "required_terms": ["自动吸纸", "松手", "前方出纸口", "送出一小段"],
+      "verified_claim": "纸张沿后方导轨平直插入，自动吸纸后松手；前方正常送出一小段、纸边平直且无报警即为送到位。",
+      "bind_step_ids": ["S08"]
+    },
+    {
+      "question_id": "Q06",
+      "topic": "标签学习触发条件",
+      "anchor_variants": ["什么时候执行标签学习"],
+      "required_terms": ["不同规格", "不同定位方式", "停止位置错误", "连续跳纸", "重新执行标签学习", "现场规则"],
+      "verified_claim": "介质规格或定位方式改变，或出现停止位置错误、连续跳纸、识别失败时应重新学习；本次完整培训执行一次缝标学习，同规格补纸可按现场规则决定。",
+      "bind_step_ids": ["S09"]
+    },
+    {
+      "question_id": "Q07",
+      "topic": "本批学习模式",
+      "anchor_variants": ["本批使用哪种学习模式"],
+      "required_terms": ["缝标学习", "第二次闪烁", "立即释放", "黑标学习"],
+      "verified_claim": "本批纸使用缝标学习；按住走纸键，在状态灯第二次闪烁后立即释放，不等待黑标学习对应的后续灯态。",
+      "bind_step_ids": ["S02", "S09"]
+    },
+    {
+      "question_id": "Q08",
+      "topic": "换纸后的最低验证",
+      "anchor_variants": ["换纸后的最少验证"],
+      "required_terms": ["单张走纸检查", "实际测试标签打印", "自检页", "现场规则"],
+      "verified_claim": "换纸后最低要求是一次单张走纸和一次实际测试标签打印；自检页用于首次配置、规格变化或异常，同规格换纸可按现场规则决定。",
+      "bind_step_ids": ["S10", "S11", "S12"]
+    },
+    {
+      "question_id": "Q09",
+      "topic": "偏移、跳纸或识别失败排查",
+      "anchor_variants": ["偏移跳指或识别失败的排查顺序", "偏移跳纸或识别失败的排查顺序"],
+      "required_terms": ["停止继续打印", "装反", "导纸夹", "学习模式", "打印尺寸"],
+      "verified_claim": "异常时先停打，再依次检查装反、歪斜、褶皱和送纸位置，检查内外导轨，核对缝标/黑标及学习模式，重做学习和单张走纸，再查尺寸缩放与驱动。",
+      "bind_step_ids": ["S03", "S06", "S07", "S08", "S09", "S10", "S13"]
+    },
+    {
+      "question_id": "Q10",
+      "topic": "禁止和风险动作",
+      "anchor_variants": ["容易损伤机器或造成卡纸的做法"],
+      "required_terms": ["强推强拉", "褶皱", "缝标纸", "导纸夹", "胶辊"],
+      "verified_claim": "不得在进纸或打印时强推强拉扭纸，不送入褶皱破损纸，不把缝标纸按黑标学习，不让导纸夹挤压纸边，不暴力处理卡纸或用硬物刮擦胶辊、传感器和热敏区。",
+      "bind_step_ids": ["S03", "S05", "S06", "S08", "S11", "S12"]
+    },
+    {
+      "question_id": "Q11",
+      "topic": "新手常见遗漏",
+      "anchor_variants": ["新手最容易漏掉的三个点"],
+      "required_terms": ["没判断缝标还是黑标", "内部导纸夹", "后方进纸导轨", "测试打印"],
+      "verified_claim": "新手常漏掉介质定位方式判断、内外导纸夹调整，以及装纸后的学习、单张走纸和测试打印。",
+      "bind_step_ids": ["S02", "S06", "S07", "S09", "S10", "S12"]
+    },
+    {
+      "question_id": "Q12",
+      "topic": "换纸成功标准",
+      "anchor_variants": ["换纸成功标准"],
+      "required_terms": ["稳定吸纸", "只送出一张", "完整出纸", "没有连续跳纸", "唯一编号不可见"],
+      "verified_claim": "成功标准为稳定吸纸，单张走纸只送一张并停在边界附近，测试标签完整且基本居中，无连续跳纸、明显偏斜、卡纸或报警；公开演示不得显示个人信息、编码和唯一编号。",
+      "bind_step_ids": ["S10", "S12", "S13"]
+    }
+  ],
+  "step_overrides": {
+    "S01": {
+      "required": true,
+      "warnings": ["本批实物尺寸72×130毫米由实际操作者口述确认；更换其他介质时重新核对尺寸和设备适配范围。"],
+      "parameter_bindings": {
+        "本批标签宽度": "Q02",
+        "本批标签高度": "Q02"
+      }
+    },
+    "S02": {"required": true},
+    "S03": {"required": true},
+    "S04": {"required": true},
+    "S05": {"required": false},
+    "S06": {
+      "required": false,
+      "warnings": ["导纸夹过紧可能挤压纸边并增加卡纸风险，过松可能造成进纸偏斜和打印位置偏移。"]
+    },
+    "S07": {
+      "required": true,
+      "prerequisites": ["S04"]
+    },
+    "S08": {"required": true},
+    "S09": {"required": true},
+    "S10": {
+      "required": true,
+      "remove_parameters": ["短按参考时长"]
+    },
+    "S11": {"required": false},
+    "S12": {"required": true},
+    "S13": {
+      "required": true,
+      "success_check": "设备稳定吸纸；单张走纸只送出一张并停在标签边界附近；测试标签完整、基本居中；无连续跳纸、明显偏斜、卡纸或异常报警，并留下验收记录。"
+    }
+  }
+}

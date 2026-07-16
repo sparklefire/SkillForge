@@ -35,17 +35,29 @@ fi
   --catalog cases/n31/output/ingest_local_v1/evidence_catalog.json \
   --output cases/n31/output/candidate_v1 >/dev/null
 
-"$PYTHON" -m skillforge.provisional_rehearsal \
-  --candidate-sop cases/n31/output/candidate_v1/candidate_sop.json \
-  --constraints cases/n31/provisional_constraints.json \
-  --faults cases/n31/provisional_fault_injection.json \
-  --output cases/n31/output/rehearsal_v1 >/dev/null
+if [[ -f cases/n31/gold/gold_sop.json ]]; then
+  "$PYTHON" -m skillforge.gold_rehearsal \
+    --gold-sop cases/n31/gold/gold_sop.json \
+    --constraints cases/n31/gold/constraints.json \
+    --faults cases/n31/gold/fault_injection.json \
+    --output cases/n31/output/gold_rehearsal_v1 >/dev/null
+  REHEARSAL_DIR="cases/n31/output/gold_rehearsal_v1"
+else
+  "$PYTHON" -m skillforge.provisional_rehearsal \
+    --candidate-sop cases/n31/output/candidate_v1/candidate_sop.json \
+    --constraints cases/n31/provisional_constraints.json \
+    --faults cases/n31/provisional_fault_injection.json \
+    --output cases/n31/output/rehearsal_v1 >/dev/null
+  REHEARSAL_DIR="cases/n31/output/rehearsal_v1"
+fi
 
-"$PYTHON" - <<'PY'
+"$PYTHON" - "$REHEARSAL_DIR" <<'PY'
 import json
+import sys
 from pathlib import Path
 
 root = Path.cwd()
+rehearsal_dir = root / sys.argv[1]
 ingest = json.loads(
     (root / "cases/n31/output/ingest_local_v1/manifest.json").read_text(encoding="utf-8")
 )
@@ -55,7 +67,7 @@ candidate = json.loads(
     )
 )
 rehearsal = json.loads(
-    (root / "cases/n31/output/rehearsal_v1/summary.json").read_text(encoding="utf-8")
+    (rehearsal_dir / "summary.json").read_text(encoding="utf-8")
 )
 print(
     json.dumps(
@@ -74,6 +86,7 @@ print(
                 "before_severe_errors": rehearsal["before"]["severe_error_count"],
                 "after_severe_errors": rehearsal["after"]["severe_error_count"],
                 "revision_count": rehearsal["revision_count"],
+                "gold_status": rehearsal["gold_status"],
                 "metrics_status": rehearsal["metrics_status"],
             },
             "web_command": "bash scripts/start_native.sh",

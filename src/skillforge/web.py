@@ -52,9 +52,9 @@ HTML = """<!doctype html>
 <script>
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const pct=v=>`${(Number(v)*100).toFixed(0)}%`;
-function renderDemo(d){const b=d.summary.before,a=d.summary.after,isReal=d.summary.synthetic===false;
-document.querySelector('#metrics-title').textContent=isReal?'N31 真实素材闭环彩排':'无版权模拟闭环';
-document.querySelector('#basis').textContent=isReal?'候选基准 · 非 Gold · 指标仅用于证明闭环可运行，等待操作者审核后重跑最终评测。':'明确标注的无版权模拟数据，不作为真实案例评测。';
+function renderDemo(d){const b=d.summary.before,a=d.summary.after,isReal=d.summary.synthetic===false,isGold=d.summary.gold_status==='GOLD';
+document.querySelector('#metrics-title').textContent=isGold?'N31 真实素材 Gold 闭环':isReal?'N31 真实素材闭环彩排':'无版权模拟闭环';
+document.querySelector('#basis').textContent=isGold?'实际操作者口述审核 · Gold v1 · 最终评测指标。':isReal?'候选基准 · 非 Gold · 指标仅用于证明闭环可运行，等待操作者审核后重跑最终评测。':'明确标注的无版权模拟数据，不作为真实案例评测。';
 document.querySelector('#metrics').innerHTML=[['必要步骤',`${pct(b.required_step_coverage)} → ${pct(a.required_step_coverage)}`],['证据覆盖',`${pct(b.evidence_supported_required_steps)} → ${pct(a.evidence_supported_required_steps)}`],['严重错误',`${b.severe_error_count} → ${a.severe_error_count}`],['局部修改',d.summary.revision_count],['状态',isReal?d.summary.gold_status||'NOT_GOLD':d.summary.workflow_state]].map(x=>`<div class="metric"><span class="muted">${esc(x[0])}</span><strong>${esc(x[1])}</strong></div>`).join('');
 document.querySelector('#issues').innerHTML=d.initial_conflicts.conflicts.map(c=>`<div class="issue"><b>${esc(c.kind)}</b> · ${esc(c.message)}<div class="evidence">${c.evidence.map(e=>`${esc(e.evidence_id)}｜${esc(e.source_ref)}｜${esc(JSON.stringify(e.locator))}`).join('<br>')||'无来源内容：按规则拒绝'}</div></div>`).join('');
 const render=s=>s.steps.map(x=>`<div class="step"><b>${esc(x.step_id)} ${esc(x.title)}</b><div class="muted">${esc(x.action)}</div><div class="evidence">证据：${esc(x.evidence.join(', ')||'无')}</div></div>`).join('');document.querySelector('#before').innerHTML=render(d.before_sop);document.querySelector('#after').innerHTML=render(d.after_sop);
@@ -110,9 +110,14 @@ def create_app(
     root = (output_root or ROOT / "outputs").resolve()
     root.mkdir(parents=True, exist_ok=True)
     demo_dir = root / "demo_run"
-    n31_dir = (
-        n31_rehearsal_dir or ROOT / "cases" / "n31" / "output" / "rehearsal_v1"
-    ).resolve()
+    if n31_rehearsal_dir:
+        n31_dir = n31_rehearsal_dir.resolve()
+    else:
+        gold_dir = ROOT / "cases" / "n31" / "output" / "gold_rehearsal_v1"
+        provisional_dir = ROOT / "cases" / "n31" / "output" / "rehearsal_v1"
+        n31_dir = (
+            gold_dir if (gold_dir / "summary.json").is_file() else provisional_dir
+        ).resolve()
     app = FastAPI(title="SkillForge", version="0.1.0")
 
     @app.get("/", response_class=HTMLResponse)
@@ -135,11 +140,14 @@ def create_app(
         except FileNotFoundError as exc:
             raise HTTPException(status_code=404, detail="N31彩排结果尚未生成") from exc
         summary = payload["summary"]
-        if (
-            summary.get("synthetic") is not False
-            or summary.get("gold_status") != "NOT_GOLD"
-            or summary.get("metrics_status") != "PROVISIONAL_ONLY"
-        ):
+        status_pair = (
+            summary.get("gold_status"),
+            summary.get("metrics_status"),
+        )
+        if summary.get("synthetic") is not False or status_pair not in {
+            ("NOT_GOLD", "PROVISIONAL_ONLY"),
+            ("GOLD", "FINAL"),
+        }:
             raise HTTPException(status_code=409, detail="N31彩排标记不完整")
         return JSONResponse(payload)
 

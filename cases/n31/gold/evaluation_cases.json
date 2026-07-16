@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "case_id": "n31_media_change",
+  "evaluation_basis": "OPERATOR_REVIEWED_GOLD",
+  "cases": [
+    {
+      "case_id": "N31-EVAL-001",
+      "name": "遗漏缝标学习",
+      "mutation": "删除S09",
+      "expected_conflict": "MISSING_STEP",
+      "expected_severity": "CRITICAL",
+      "gold_evidence": ["E148", "E149"]
+    },
+    {
+      "case_id": "N31-EVAL-002",
+      "name": "装纸和导轨顺序错误",
+      "mutation": "交换S07与S08",
+      "expected_conflict": "ORDER_ERROR",
+      "expected_severity": "HIGH",
+      "gold_evidence": ["E146", "E147", "E151", "E153"]
+    },
+    {
+      "case_id": "N31-EVAL-003",
+      "name": "无依据工具",
+      "mutation": "向S12加入扭矩扳手",
+      "expected_conflict": "UNSUPPORTED_TOOL",
+      "expected_severity": "HIGH",
+      "gold_evidence": []
+    },
+    {
+      "case_id": "N31-EVAL-004",
+      "name": "无依据精确参数",
+      "mutation": "向S10加入走纸键按压力20N",
+      "expected_conflict": "UNSUPPORTED_PARAMETER",
+      "expected_severity": "HIGH",
+      "gold_evidence": []
+    }
+  ],
+  "success_criteria": {
+    "initial_conflicts_detected": 5,
+    "final_high_or_critical_conflicts": 0,
+    "required_step_coverage_after": 1.0,
+    "evidence_supported_required_steps_after": 1.0
+  }
+}

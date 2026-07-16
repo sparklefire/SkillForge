@@ -327,10 +327,21 @@
       ]
     },
     {
-      "source_id": "N31_EXPERT_AUDIO",
+      "source_id": "N31_EXPERT_INTERVIEW",
       "type": "audio",
       "local_path": "cases/n31/input/audio/n31_expert_interview.m4a",
-      "status": "PENDING_CAPTURE"
+      "sha256": "3c5e7296b621f3badc27b2bdd60dbab0695ec6b57865e4167e5627c78f7a775f",
+      "duration_ms": 389635,
+      "format": "m4a",
+      "codec": "aac",
+      "sample_rate": 48000,
+      "channels": 2,
+      "status": "CAPTURED_AND_TRANSCRIBED",
+      "asr_model": "stepaudio-2.5-asr",
+      "asr_output": "cases/n31/output/expert_audio_v1/manifest.json",
+      "reviewed_transcript": "cases/n31/gold/expert_transcript.json",
+      "evidence_status": "12_TIMESTAMPED_EXPERT_EVIDENCE_VERIFIED",
+      "rights_status": "参赛选手本人录制并确认用于项目处理和黑客松提交/展示；原始音频不提交Git"
     }
   ],
   "processing_runs": [
@@ -429,6 +440,83 @@
       "n31_rehearsal_available": false,
       "fallback_mode": "SYNTHETIC_DEMO_COMPLETED",
       "notes": "N31视频、PDF、关键帧、Evidence Catalog和授权文件均未同步；等待明确授权后再部署N31预处理结果"
+    },
+    {
+      "run_id": "N31_EXPERT_ASR_V1",
+      "type": "STEP_AUDIO_TIMESTAMPED_ASR",
+      "run_date": "2026-07-16",
+      "status": "COMPLETED",
+      "input": "cases/n31/input/audio/n31_expert_interview.m4a",
+      "output": "cases/n31/output/expert_audio_v1",
+      "model": "stepaudio-2.5-asr",
+      "duration_ms": 389611,
+      "event_count": 1301,
+      "raw_segment_count": 1300,
+      "text_length": 1399,
+      "question_segment_count": 12,
+      "term_check_status": "PASSED",
+      "notes": "原始逐字时间戳片段合并为12个问答证据；保留原始转写并用受控术语表生成校正版"
+    },
+    {
+      "run_id": "N31_GOLD_SOP_V1",
+      "type": "OPERATOR_AUDIO_REVIEW_AND_EVIDENCE_BINDING",
+      "run_date": "2026-07-16",
+      "status": "OPERATOR_AUDIO_VERIFIED",
+      "input_candidate": "cases/n31/output/candidate_v1/candidate_sop.json",
+      "review_plan": "cases/n31/expert_review_plan.json",
+      "output": "cases/n31/gold/gold_sop.json",
+      "step_count": 13,
+      "required_step_count": 10,
+      "conditional_step_count": 3,
+      "evidence_count": 154,
+      "expert_audio_evidence_count": 12,
+      "step_status": "VERIFIED",
+      "human_review_required": false
+    },
+    {
+      "run_id": "N31_GOLD_REHEARSAL_V1",
+      "type": "CONTROLLED_FAULT_VERIFICATION_REVISION",
+      "run_date": "2026-07-16",
+      "status": "COMPLETED",
+      "evaluation_basis": "OPERATOR_REVIEWED_GOLD",
+      "metrics_status": "FINAL",
+      "gold_status": "GOLD",
+      "initial_severe_error_count": 5,
+      "final_severe_error_count": 0,
+      "initial_required_step_coverage": "9/10",
+      "final_required_step_coverage": "10/10",
+      "initial_evidence_coverage": "9/10",
+      "final_evidence_coverage": "10/10",
+      "revision_count": 4,
+      "checklist_item_count": 13,
+      "quiz_question_count": 5,
+      "model_calls": 0,
+      "human_review_required": false
+    },
+    {
+      "run_id": "N31_WEB_GOLD_SMOKE_LOCAL_V1",
+      "type": "WEB_DEMO_SMOKE_TEST",
+      "run_date": "2026-07-16",
+      "status": "PASSED",
+      "runtime": "NATIVE_PYTHON",
+      "docker_required": false,
+      "bind_scope": "LOCAL_LOOPBACK_ONLY",
+      "checked_endpoints": [
+        "/health",
+        "/api/n31",
+        "/"
+      ],
+      "http_statuses": [
+        200,
+        200,
+        200
+      ],
+      "n31_gold_status": "GOLD",
+      "n31_metrics_status": "FINAL",
+      "initial_severe_error_count": 5,
+      "final_severe_error_count": 0,
+      "revision_count": 4,
+      "raw_asset_download_enabled": false
     }
   ],
   "generated_artifacts": [
