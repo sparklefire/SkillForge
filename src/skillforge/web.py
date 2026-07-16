@@ -34,14 +34,14 @@ HTML = """<!doctype html>
   <style>
     :root{color-scheme:dark;--bg:#07110d;--panel:#102019;--line:#294235;--text:#eef7f0;--muted:#a6b9ac;--green:#73e2a7;--amber:#ffc766;--red:#ff7b7b}
     *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 80% 0,#163327 0,transparent 38%),var(--bg);color:var(--text);font:15px/1.55 system-ui,-apple-system,"Noto Sans CJK SC",sans-serif}
-    main{max-width:1180px;margin:auto;padding:34px 20px 70px}h1{font-size:38px;margin:0 0 4px}h2{font-size:20px;margin:0 0 16px}p{color:var(--muted)}.tag{color:var(--green);letter-spacing:.14em;text-transform:uppercase;font-weight:700}.panel{background:color-mix(in srgb,var(--panel) 92%,transparent);border:1px solid var(--line);border-radius:18px;padding:20px;margin-top:18px;box-shadow:0 16px 50px #0004}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.metric{padding:15px;border:1px solid var(--line);border-radius:14px;background:#0a1712}.metric strong{display:block;font-size:28px;color:var(--green)}.cols{display:grid;grid-template-columns:1fr 1fr;gap:14px}.step,.issue,.change{border:1px solid var(--line);border-radius:12px;padding:13px;margin:9px 0;background:#0b1813}.issue{border-left:4px solid var(--red)}.change{border-left:4px solid var(--green)}.evidence{color:var(--amber);font-size:13px;margin-top:8px}.muted{color:var(--muted)}button{border:0;border-radius:10px;padding:11px 16px;background:var(--green);color:#062011;font-weight:800;cursor:pointer}input{width:100%;margin:6px 0 12px;padding:9px;border:1px solid var(--line);border-radius:8px;background:#08130f;color:var(--text)}label{display:block;color:var(--muted)}#status{margin-left:10px;color:var(--amber)}pre{white-space:pre-wrap;word-break:break-word;color:var(--muted)}@media(max-width:800px){.grid,.cols{grid-template-columns:1fr}h1{font-size:30px}}
+    main{max-width:1180px;margin:auto;padding:34px 20px 70px}h1{font-size:38px;margin:0 0 4px}h2{font-size:20px;margin:0 0 16px}p{color:var(--muted)}.tag{color:var(--green);letter-spacing:.14em;text-transform:uppercase;font-weight:700}.panel{background:color-mix(in srgb,var(--panel) 92%,transparent);border:1px solid var(--line);border-radius:18px;padding:20px;margin-top:18px;box-shadow:0 16px 50px #0004}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}.metric{padding:15px;border:1px solid var(--line);border-radius:14px;background:#0a1712}.metric strong{display:block;font-size:28px;color:var(--green)}.cols{display:grid;grid-template-columns:1fr 1fr;gap:14px}.step,.issue,.change{border:1px solid var(--line);border-radius:12px;padding:13px;margin:9px 0;background:#0b1813}.issue{border-left:4px solid var(--red)}.change{border-left:4px solid var(--green)}.evidence{color:var(--amber);font-size:13px;margin-top:8px}.muted{color:var(--muted)}.notice{padding:10px 12px;border:1px solid var(--amber);border-radius:10px;color:var(--amber);background:#251d0b;margin-bottom:14px}button{border:0;border-radius:10px;padding:11px 16px;background:var(--green);color:#062011;font-weight:800;cursor:pointer}input{width:100%;margin:6px 0 12px;padding:9px;border:1px solid var(--line);border-radius:8px;background:#08130f;color:var(--text)}label{display:block;color:var(--muted)}#status{margin-left:10px;color:var(--amber)}pre{white-space:pre-wrap;word-break:break-word;color:var(--muted)}@media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:800px){.grid,.cols{grid-template-columns:1fr}h1{font-size:30px}}
   </style>
 </head>
 <body><main>
   <div class="tag">DGX native pipeline · no Docker required</div>
   <h1>匠传 SkillForge</h1>
   <p>从素材证据到 SOP，再到发现问题、引用证据和局部自动修订。</p>
-  <section class="panel"><h2>模拟闭环指标</h2><div id="metrics" class="grid"></div></section>
+  <section class="panel"><h2 id="metrics-title">闭环指标</h2><div id="basis" class="notice"></div><div id="metrics" class="grid"></div></section>
   <section class="panel"><h2>发现问题 → 展示证据</h2><div id="issues"></div></section>
   <section class="panel"><h2>修订前后对比</h2><div class="cols"><div><h3>修订前</h3><div id="before"></div></div><div><h3>修订后</h3><div id="after"></div></div></div></section>
   <section class="panel"><h2>局部修订审计</h2><div id="changes"></div></section>
@@ -52,11 +52,14 @@ HTML = """<!doctype html>
 <script>
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const pct=v=>`${(Number(v)*100).toFixed(0)}%`;
-async function loadDemo(){const r=await fetch('/api/demo');if(!r.ok){await fetch('/api/demo/run',{method:'POST'});return loadDemo()}const d=await r.json();const b=d.summary.before,a=d.summary.after;
-document.querySelector('#metrics').innerHTML=[['必要步骤',`${pct(b.required_step_coverage)} → ${pct(a.required_step_coverage)}`],['证据覆盖',`${pct(b.evidence_supported_required_steps)} → ${pct(a.evidence_supported_required_steps)}`],['严重错误',`${b.severe_error_count} → ${a.severe_error_count}`],['工作流',d.summary.workflow_state]].map(x=>`<div class="metric"><span class="muted">${esc(x[0])}</span><strong>${esc(x[1])}</strong></div>`).join('');
-document.querySelector('#issues').innerHTML=d.initial_conflicts.conflicts.map(c=>`<div class="issue"><b>${esc(c.kind)}</b> · ${esc(c.message)}<div class="evidence">${c.evidence.map(e=>`${esc(e.evidence_id)}：${esc(e.claim)}｜${esc(JSON.stringify(e.locator))}`).join('<br>')||'无来源内容：按规则拒绝'}</div></div>`).join('');
+function renderDemo(d){const b=d.summary.before,a=d.summary.after,isReal=d.summary.synthetic===false;
+document.querySelector('#metrics-title').textContent=isReal?'N31 真实素材闭环彩排':'无版权模拟闭环';
+document.querySelector('#basis').textContent=isReal?'候选基准 · 非 Gold · 指标仅用于证明闭环可运行，等待操作者审核后重跑最终评测。':'明确标注的无版权模拟数据，不作为真实案例评测。';
+document.querySelector('#metrics').innerHTML=[['必要步骤',`${pct(b.required_step_coverage)} → ${pct(a.required_step_coverage)}`],['证据覆盖',`${pct(b.evidence_supported_required_steps)} → ${pct(a.evidence_supported_required_steps)}`],['严重错误',`${b.severe_error_count} → ${a.severe_error_count}`],['局部修改',d.summary.revision_count],['状态',isReal?d.summary.gold_status||'NOT_GOLD':d.summary.workflow_state]].map(x=>`<div class="metric"><span class="muted">${esc(x[0])}</span><strong>${esc(x[1])}</strong></div>`).join('');
+document.querySelector('#issues').innerHTML=d.initial_conflicts.conflicts.map(c=>`<div class="issue"><b>${esc(c.kind)}</b> · ${esc(c.message)}<div class="evidence">${c.evidence.map(e=>`${esc(e.evidence_id)}｜${esc(e.source_ref)}｜${esc(JSON.stringify(e.locator))}`).join('<br>')||'无来源内容：按规则拒绝'}</div></div>`).join('');
 const render=s=>s.steps.map(x=>`<div class="step"><b>${esc(x.step_id)} ${esc(x.title)}</b><div class="muted">${esc(x.action)}</div><div class="evidence">证据：${esc(x.evidence.join(', ')||'无')}</div></div>`).join('');document.querySelector('#before').innerHTML=render(d.before_sop);document.querySelector('#after').innerHTML=render(d.after_sop);
 document.querySelector('#changes').innerHTML=d.revision_audit.changes.map(c=>`<div class="change"><b>${esc(c.action)} · ${esc(c.path)}</b><div>${esc(c.reason)}</div><div class="evidence">证据：${esc(c.evidence_ids.join(', ')||'无依据，已删除')}</div></div>`).join('')}
+async function loadDemo(){let r=await fetch('/api/n31');if(r.ok){renderDemo(await r.json());return}r=await fetch('/api/demo');if(!r.ok){await fetch('/api/demo/run',{method:'POST'});r=await fetch('/api/demo')}renderDemo(await r.json())}
 document.querySelector('#upload').addEventListener('submit',async e=>{e.preventDefault();const status=document.querySelector('#status');status.textContent='处理中…';const r=await fetch('/api/ingest',{method:'POST',body:new FormData(e.target)});const d=await r.json();status.textContent=r.ok?'完成':'失败';document.querySelector('#ingest').textContent=JSON.stringify(d,null,2)});loadDemo();
 </script></body></html>"""
 
@@ -100,10 +103,16 @@ def _suffix(kind: str, upload: UploadFile) -> str:
     return suffix
 
 
-def create_app(output_root: Path | None = None) -> FastAPI:
+def create_app(
+    output_root: Path | None = None,
+    n31_rehearsal_dir: Path | None = None,
+) -> FastAPI:
     root = (output_root or ROOT / "outputs").resolve()
     root.mkdir(parents=True, exist_ok=True)
     demo_dir = root / "demo_run"
+    n31_dir = (
+        n31_rehearsal_dir or ROOT / "cases" / "n31" / "output" / "rehearsal_v1"
+    ).resolve()
     app = FastAPI(title="SkillForge", version="0.1.0")
 
     @app.get("/", response_class=HTMLResponse)
@@ -112,7 +121,27 @@ def create_app(output_root: Path | None = None) -> FastAPI:
 
     @app.get("/health")
     def health() -> dict[str, Any]:
-        return {"status": "ok", "runtime": "native-python", "docker_required": False}
+        return {
+            "status": "ok",
+            "runtime": "native-python",
+            "docker_required": False,
+            "n31_rehearsal_available": (n31_dir / "summary.json").is_file(),
+        }
+
+    @app.get("/api/n31")
+    def n31_data() -> JSONResponse:
+        try:
+            payload = _demo_payload(n31_dir)
+        except FileNotFoundError as exc:
+            raise HTTPException(status_code=404, detail="N31彩排结果尚未生成") from exc
+        summary = payload["summary"]
+        if (
+            summary.get("synthetic") is not False
+            or summary.get("gold_status") != "NOT_GOLD"
+            or summary.get("metrics_status") != "PROVISIONAL_ONLY"
+        ):
+            raise HTTPException(status_code=409, detail="N31彩排标记不完整")
+        return JSONResponse(payload)
 
     @app.get("/api/demo")
     def demo_data() -> JSONResponse:

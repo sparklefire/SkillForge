@@ -389,6 +389,28 @@
       "quiz_question_count": 5,
       "model_calls": 0,
       "human_review_required": true
+    },
+    {
+      "run_id": "N31_WEB_SMOKE_LOCAL_V1",
+      "type": "WEB_DEMO_SMOKE_TEST",
+      "run_date": "2026-07-16",
+      "status": "PASSED",
+      "runtime": "NATIVE_PYTHON",
+      "docker_required": false,
+      "bind_scope": "LOCAL_LOOPBACK_ONLY",
+      "checked_endpoints": [
+        "/health",
+        "/api/n31",
+        "/"
+      ],
+      "http_statuses": [
+        200,
+        200,
+        200
+      ],
+      "n31_gold_status": "NOT_GOLD",
+      "n31_metrics_status": "PROVISIONAL_ONLY",
+      "raw_asset_download_enabled": false
     }
   ],
   "generated_artifacts": [
