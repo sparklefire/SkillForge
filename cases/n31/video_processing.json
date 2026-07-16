@@ -1,0 +1,79 @@
+{
+  "version": 1,
+  "jobs": [
+    {
+      "job_id": "N31_OPERATION_FULL_SAFE",
+      "source": "cases/n31/input/video/n31_operation_full_private_review_v2.mp4",
+      "destination": "cases/n31/input/video/n31_operation_full.mp4",
+      "normalize_audio": true,
+      "target_lufs": -16.0,
+      "max_true_peak_dbtp": -1.5,
+      "masks": [
+        {
+          "x": 1320,
+          "y": 270,
+          "width": 600,
+          "height": 810,
+          "start_seconds": 303.0,
+          "end_seconds": 327.341
+        }
+      ]
+    },
+    {
+      "job_id": "N31_MEDIA_TYPE_SAFE",
+      "source": "cases/n31/input/video/n31_closeup_media_type_private_review_v2.mp4",
+      "destination": "cases/n31/input/video/n31_closeup_media_type.mp4",
+      "normalize_audio": true,
+      "target_lufs": -16.0,
+      "max_true_peak_dbtp": -1.5,
+      "segments": [
+        {
+          "start_seconds": 0.0,
+          "end_seconds": 7.5
+        },
+        {
+          "start_seconds": 10.0,
+          "end_seconds": 11.5
+        },
+        {
+          "start_seconds": 14.5,
+          "end_seconds": 18.5
+        }
+      ]
+    },
+    {
+      "job_id": "N31_PRINT_RESULT_SAFE",
+      "source": "cases/n31/input/video/n31_closeup_result_private_review_v2.mp4",
+      "destination": "cases/n31/input/video/n31_closeup_result.mp4",
+      "normalize_audio": true,
+      "target_lufs": -16.0,
+      "max_true_peak_dbtp": -1.5,
+      "masks": [
+        {
+          "x": 620,
+          "y": 0,
+          "width": 650,
+          "height": 230
+        },
+        {
+          "x": 620,
+          "y": 190,
+          "width": 210,
+          "height": 610
+        },
+        {
+          "x": 1060,
+          "y": 180,
+          "width": 210,
+          "height": 620
+        },
+        {
+          "x": 620,
+          "y": 620,
+          "width": 650,
+          "height": 410
+        }
+      ]
+    }
+  ]
+}

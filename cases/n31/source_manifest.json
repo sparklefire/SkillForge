@@ -208,7 +208,7 @@
       "candidate_local_path": "cases/n31/input/video/n31_operation_full_private_review_v2.mp4",
       "candidate_sha256": "7718fc34884b3d0da2e64234ec230e739cbecac6cdb7244c8e878010a5d08466",
       "previous_candidate_local_path": "cases/n31/input/video/n31_operation_full_private_review.mp4",
-      "status": "RECEIVED_V2_LOCAL_REDACTION_REQUIRED",
+      "status": "SAFE_DERIVATIVE_GENERATED_LOCAL_QA_PASS",
       "media": {
         "duration_ms": 327341,
         "width": 1920,
@@ -226,16 +226,27 @@
         "status": "IMPROVED_BUT_NORMALIZATION_RECOMMENDED"
       },
       "privacy_review": {
-        "status": "PARTIALLY_DEIDENTIFIED_DIRECT_FIELDS_COVERED_RESIDUAL_UNIQUE_IDENTIFIERS_VISIBLE_APPROX_305S_TO_END",
+        "status": "SAFE_DERIVATIVE_OPAQUE_MASK_APPLIED_BEFORE_PRINTED_LABEL_APPEARS",
         "external_processing_status": "PROHIBITED",
-        "public_display_status": "PROHIBITED",
-        "remediation": "LOCAL_OPAQUE_MASK_FOR_RESIDUAL_BARCODES_QR_AND_UNIQUE_IDENTIFIERS_THEN_FRAME_BY_FRAME_REVIEW"
+        "public_display_status": "PENDING_SIGNED_DISPLAY_AUTHORIZATION",
+        "remediation": "COMPLETED_LOCAL_ONLY",
+        "safe_derivative": {
+          "local_path": "cases/n31/input/video/n31_operation_full.mp4",
+          "sha256": "ae9c2b9b524c928a036373a0927546a972be46d0419453a953510c33f4d1510b",
+          "duration_ms": 327402,
+          "processing_config": "cases/n31/video_processing.json",
+          "machine_qa_status": "PASSED",
+          "visual_qa_status": "PASSED_AT_10_FPS_AROUND_MASK_ONSET_AND_1_FPS_TO_END",
+          "integrated_lufs": -17.49,
+          "true_peak_dbtp": -1.79,
+          "audio_sample_rate": 48000
+        }
       }
     },
     {
       "source_id": "N31_OPERATOR_CLOSEUPS",
       "type": "video_collection",
-      "status": "RECEIVED_V2_PARTIAL_PASS_LOCAL_REDACTION_REQUIRED",
+      "status": "SAFE_DERIVATIVES_COMPLETE_LOCAL_QA_PASS",
       "items": [
         {
           "role": "MEDIA_TYPE",
@@ -243,7 +254,17 @@
           "sha256": "93ae52858f1f42b542af61fea0760b5f02bccb7ff143b373d37c2b37929bdae6",
           "duration_ms": 19900,
           "rotation_degrees": 0,
-          "review_status": "V2_TECHNICAL_PASS_PARTIALLY_DEIDENTIFIED_RESIDUAL_IDENTIFIER_MASK_REQUIRED"
+          "review_status": "SAFE_DERIVATIVE_SEGMENT_SELECTION_QA_PASS",
+          "safe_derivative": {
+            "local_path": "cases/n31/input/video/n31_closeup_media_type.mp4",
+            "sha256": "b7068a0db31704aeffb564793dfd80809485f4884cb0aea82cda8a1894be8a31",
+            "duration_ms": 13000,
+            "machine_qa_status": "PASSED",
+            "visual_qa_status": "PASSED_AT_5_FPS_FULL_DURATION",
+            "integrated_lufs": -17.95,
+            "true_peak_dbtp": -2.53,
+            "audio_sample_rate": 48000
+          }
         },
         {
           "role": "COVER_OPEN_EXTRA",
@@ -291,7 +312,17 @@
           "sha256": "08eb6e7c0320f0668bd3c960fd5d7d08c9e48eab6948b93872f554689ccba329",
           "duration_ms": 17376,
           "rotation_degrees": 0,
-          "review_status": "V2_TECHNICAL_PASS_PARTIALLY_DEIDENTIFIED_RESIDUAL_IDENTIFIER_MASK_REQUIRED"
+          "review_status": "SAFE_DERIVATIVE_OPAQUE_MASK_QA_PASS",
+          "safe_derivative": {
+            "local_path": "cases/n31/input/video/n31_closeup_result.mp4",
+            "sha256": "c38bc37dd4855dc25af0defd6f0c356900dde5e44d8a774dbbb7655cf4bd2fd5",
+            "duration_ms": 17411,
+            "machine_qa_status": "PASSED",
+            "visual_qa_status": "PASSED_AT_1_FPS_FULL_DURATION_AND_FULL_RESOLUTION_SPOT_CHECK",
+            "integrated_lufs": -17.26,
+            "true_peak_dbtp": -2.44,
+            "audio_sample_rate": 48000
+          }
         }
       ]
     },
