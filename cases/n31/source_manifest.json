@@ -226,10 +226,10 @@
         "status": "IMPROVED_BUT_NORMALIZATION_RECOMMENDED"
       },
       "privacy_review": {
-        "status": "FAIL_REAL_LABEL_CONTENT_READABLE_APPROX_305S_TO_END",
+        "status": "PARTIALLY_DEIDENTIFIED_DIRECT_FIELDS_COVERED_RESIDUAL_UNIQUE_IDENTIFIERS_VISIBLE_APPROX_305S_TO_END",
         "external_processing_status": "PROHIBITED",
         "public_display_status": "PROHIBITED",
-        "remediation": "LOCAL_OPAQUE_MASK_AND_FRAME_BY_FRAME_REVIEW"
+        "remediation": "LOCAL_OPAQUE_MASK_FOR_RESIDUAL_BARCODES_QR_AND_UNIQUE_IDENTIFIERS_THEN_FRAME_BY_FRAME_REVIEW"
       }
     },
     {
@@ -243,7 +243,7 @@
           "sha256": "93ae52858f1f42b542af61fea0760b5f02bccb7ff143b373d37c2b37929bdae6",
           "duration_ms": 19900,
           "rotation_degrees": 0,
-          "review_status": "V2_TECHNICAL_PASS_LOCAL_REDACTION_REQUIRED"
+          "review_status": "V2_TECHNICAL_PASS_PARTIALLY_DEIDENTIFIED_RESIDUAL_IDENTIFIER_MASK_REQUIRED"
         },
         {
           "role": "COVER_OPEN_EXTRA",
@@ -291,7 +291,7 @@
           "sha256": "08eb6e7c0320f0668bd3c960fd5d7d08c9e48eab6948b93872f554689ccba329",
           "duration_ms": 17376,
           "rotation_degrees": 0,
-          "review_status": "V2_TECHNICAL_PASS_LOCAL_REDACTION_REQUIRED"
+          "review_status": "V2_TECHNICAL_PASS_PARTIALLY_DEIDENTIFIED_RESIDUAL_IDENTIFIER_MASK_REQUIRED"
         }
       ]
     },
