@@ -652,6 +652,27 @@
       "docker_required": false,
       "validation_server_stopped": true,
       "notes": "仅同步Git跟踪代码和无素材演示包；未上传原始录音、视频、关键帧、PDF、私有面单或.env"
+    },
+    {
+      "run_id": "N31_WEB_RESULTS_LOCAL_V1",
+      "type": "WEB_STRUCTURED_RESULTS_AND_DOWNLOAD_VALIDATION",
+      "run_date": "2026-07-17",
+      "status": "PASSED",
+      "runtime": "NATIVE_PYTHON",
+      "checklist_item_count": 13,
+      "quiz_question_count": 5,
+      "workflow_state": "COMPLETED",
+      "allowed_downloads": [
+        "FINAL_SOP",
+        "MOBILE_CHECKLIST",
+        "TRAINING_QUIZ",
+        "REVISION_AUDIT"
+      ],
+      "allowed_download_http_status": 200,
+      "unlisted_private_asset_http_status": 404,
+      "arbitrary_path_download_enabled": false,
+      "raw_asset_download_enabled": false,
+      "test_result": "35 passed"
     }
   ],
   "generated_artifacts": [

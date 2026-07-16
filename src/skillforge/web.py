@@ -25,6 +25,12 @@ ALLOWED_SUFFIXES = {
     "pdf": {".pdf"},
     "audio": {".wav", ".mp3", ".m4a", ".aac", ".ogg", ".flac"},
 }
+N31_DOWNLOADS = {
+    "final-sop": ("after_sop.json", "n31_final_sop.json"),
+    "checklist": ("checklist.json", "n31_mobile_checklist.json"),
+    "quiz": ("quiz.json", "n31_training_quiz.json"),
+    "revision-audit": ("revision_audit.json", "n31_revision_audit.json"),
+}
 
 
 HTML = """<!doctype html>
@@ -35,7 +41,7 @@ HTML = """<!doctype html>
   <style>
     :root{color-scheme:dark;--bg:#07110d;--panel:#102019;--line:#294235;--text:#eef7f0;--muted:#a6b9ac;--green:#73e2a7;--amber:#ffc766;--red:#ff7b7b}
     *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 80% 0,#163327 0,transparent 38%),var(--bg);color:var(--text);font:15px/1.55 system-ui,-apple-system,"Noto Sans CJK SC",sans-serif}
-    main{max-width:1180px;margin:auto;padding:34px 20px 70px}h1{font-size:38px;margin:0 0 4px}h2{font-size:20px;margin:0 0 16px}p{color:var(--muted)}.tag{color:var(--green);letter-spacing:.14em;text-transform:uppercase;font-weight:700}.panel{background:color-mix(in srgb,var(--panel) 92%,transparent);border:1px solid var(--line);border-radius:18px;padding:20px;margin-top:18px;box-shadow:0 16px 50px #0004}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}.metric{padding:15px;border:1px solid var(--line);border-radius:14px;background:#0a1712}.metric strong{display:block;font-size:28px;color:var(--green)}.cols{display:grid;grid-template-columns:1fr 1fr;gap:14px}.step,.issue,.change{border:1px solid var(--line);border-radius:12px;padding:13px;margin:9px 0;background:#0b1813}.issue{border-left:4px solid var(--red)}.change{border-left:4px solid var(--green)}.evidence{color:var(--amber);font-size:13px;margin-top:8px}.muted{color:var(--muted)}.notice{padding:10px 12px;border:1px solid var(--amber);border-radius:10px;color:var(--amber);background:#251d0b;margin-bottom:14px}button{border:0;border-radius:10px;padding:11px 16px;background:var(--green);color:#062011;font-weight:800;cursor:pointer}input{width:100%;margin:6px 0 12px;padding:9px;border:1px solid var(--line);border-radius:8px;background:#08130f;color:var(--text)}label{display:block;color:var(--muted)}#status{margin-left:10px;color:var(--amber)}pre{white-space:pre-wrap;word-break:break-word;color:var(--muted)}@media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:800px){.grid,.cols{grid-template-columns:1fr}h1{font-size:30px}}
+    main{max-width:1180px;margin:auto;padding:34px 20px 70px}h1{font-size:38px;margin:0 0 4px}h2{font-size:20px;margin:0 0 16px}p{color:var(--muted)}.tag{color:var(--green);letter-spacing:.14em;text-transform:uppercase;font-weight:700}.panel{background:color-mix(in srgb,var(--panel) 92%,transparent);border:1px solid var(--line);border-radius:18px;padding:20px;margin-top:18px;box-shadow:0 16px 50px #0004}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}.metric{padding:15px;border:1px solid var(--line);border-radius:14px;background:#0a1712}.metric strong{display:block;font-size:28px;color:var(--green)}.cols{display:grid;grid-template-columns:1fr 1fr;gap:14px}.step,.issue,.change,.result{border:1px solid var(--line);border-radius:12px;padding:13px;margin:9px 0;background:#0b1813}.issue{border-left:4px solid var(--red)}.change,.result{border-left:4px solid var(--green)}.evidence{color:var(--amber);font-size:13px;margin-top:8px}.muted{color:var(--muted)}.notice{padding:10px 12px;border:1px solid var(--amber);border-radius:10px;color:var(--amber);background:#251d0b;margin-bottom:14px}.downloads{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:14px}.download{display:inline-block;border:1px solid var(--green);border-radius:9px;padding:8px 12px;color:var(--green);text-decoration:none;font-weight:700}button{border:0;border-radius:10px;padding:11px 16px;background:var(--green);color:#062011;font-weight:800;cursor:pointer}input{width:100%;margin:6px 0 12px;padding:9px;border:1px solid var(--line);border-radius:8px;background:#08130f;color:var(--text)}label{display:block;color:var(--muted)}#status{margin-left:10px;color:var(--amber)}pre{white-space:pre-wrap;word-break:break-word;color:var(--muted)}@media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:800px){.grid,.cols{grid-template-columns:1fr}h1{font-size:30px}}
   </style>
 </head>
 <body><main>
@@ -48,6 +54,7 @@ HTML = """<!doctype html>
   <section class="panel"><h2>发现问题 → 展示证据</h2><div id="issues"></div></section>
   <section class="panel"><h2>修订前后对比</h2><div class="cols"><div><h3>修订前</h3><div id="before"></div></div><div><h3>修订后</h3><div id="after"></div></div></div></section>
   <section class="panel"><h2>局部修订审计</h2><div id="changes"></div></section>
+  <section class="panel" id="results-panel" hidden><h2>培训成果</h2><div class="downloads" id="n31-downloads"><a class="download" href="/api/n31/artifacts/final-sop">下载最终 SOP</a><a class="download" href="/api/n31/artifacts/checklist">下载手机检查清单</a><a class="download" href="/api/n31/artifacts/quiz">下载培训测验</a><a class="download" href="/api/n31/artifacts/revision-audit">下载修订记录</a></div><div class="cols"><div><h3>手机端检查清单</h3><div id="checklist"></div></div><div><h3>培训测验</h3><div id="quiz"></div></div></div></section>
   <section class="panel"><h2>上传素材并原生预处理</h2><p>上传内容只写入被 Git 忽略的本地输出目录。本页面不会自动把原始素材发送给外部模型。</p>
     <form id="upload"><label>操作视频<input type="file" name="video" accept="video/*"></label><label>设备 PDF<input type="file" name="pdf" accept="application/pdf"></label><label>专家录音<input type="file" name="audio" accept="audio/*"></label><label><input style="width:auto" type="checkbox" name="transcribe" value="true">调用 StepAudio ASR</label><label><input style="width:auto" type="checkbox" name="analyze_visuals" value="true">调用 Step 3.7 分析关键帧</label><label><input style="width:auto" type="checkbox" name="plan_sop" value="true">根据证据规划 SOP</label><label><input style="width:auto" type="checkbox" name="external_processing_authorized" value="true">已确认允许把选定派生内容发送给外部 API</label><button>开始处理</button><span id="status"></span></form><pre id="ingest"></pre>
   </section>
@@ -62,7 +69,8 @@ document.querySelector('#metrics').innerHTML=[['必要步骤',`${pct(b.required_
 if(d.multisource_comparison&&d.visual_review){const s=d.multisource_comparison.source_ablation,v=d.visual_review.summary,p=d.multisource_comparison.privacy_comparison;document.querySelector('#multisource-panel').hidden=false;document.querySelector('#source-metrics').innerHTML=[['手册单源',pct(s.manual_only.coverage)],['专家口述单源',pct(s.expert_audio_only.coverage)],['两种以上来源',pct(s.two_or_more_source_types.coverage)],['视频部分可观察',pct(s.video_observable_partial_or_better.coverage)],['视觉矛盾',v.contradicted_count]].map(x=>`<div class="metric"><span class="muted">${esc(x[0])}</span><strong>${esc(x[1])}</strong></div>`).join('');document.querySelector('#visual-note').textContent=`严格视觉复核：${v.supported_count}步完整支持、${v.partial_count}步部分可见、${v.not_visible_count}步不可见、${v.contradicted_count}步矛盾。模型标记${p.model_flagged_step_count}步需隐私复核；本地安全派生QA为${p.local_safe_derivative_qa}，标记保留但不自动推翻人工检查。`}
 document.querySelector('#issues').innerHTML=d.initial_conflicts.conflicts.map(c=>`<div class="issue"><b>${esc(c.kind)}</b> · ${esc(c.message)}<div class="evidence">${c.evidence.map(e=>`${esc(e.evidence_id)}｜${esc(e.source_ref)}｜${esc(JSON.stringify(e.locator))}`).join('<br>')||'无来源内容：按规则拒绝'}</div></div>`).join('');
 const render=s=>s.steps.map(x=>`<div class="step"><b>${esc(x.step_id)} ${esc(x.title)}</b><div class="muted">${esc(x.action)}</div><div class="evidence">证据：${esc(x.evidence.join(', ')||'无')}</div></div>`).join('');document.querySelector('#before').innerHTML=render(d.before_sop);document.querySelector('#after').innerHTML=render(d.after_sop);
-document.querySelector('#changes').innerHTML=d.revision_audit.changes.map(c=>`<div class="change"><b>${esc(c.action)} · ${esc(c.path)}</b><div>${esc(c.reason)}</div><div class="evidence">证据：${esc(c.evidence_ids.join(', ')||'无依据，已删除')}</div></div>`).join('')}
+document.querySelector('#changes').innerHTML=d.revision_audit.changes.map(c=>`<div class="change"><b>${esc(c.action)} · ${esc(c.path)}</b><div>${esc(c.reason)}</div><div class="evidence">证据：${esc(c.evidence_ids.join(', ')||'无依据，已删除')}</div></div>`).join('');
+if(d.checklist&&d.quiz){document.querySelector('#results-panel').hidden=false;document.querySelector('#n31-downloads').hidden=d.summary.synthetic!==false;document.querySelector('#checklist').innerHTML=d.checklist.items.map(x=>`<div class="result"><b>□ ${esc(x.step_id)} ${esc(x.title)}</b><div>${esc(x.check)}</div><div class="evidence">证据：${esc(x.evidence_ids.join(', '))}</div></div>`).join('');document.querySelector('#quiz').innerHTML=d.quiz.questions.map(x=>`<div class="result"><b>${esc(x.question_id)} ${esc(x.prompt)}</b><div>答案：${esc(x.answer===true?'正确':x.answer===false?'错误':x.answer)}</div><div class="muted">${esc(x.explanation)}</div><div class="evidence">证据：${esc(x.evidence_ids.join(', '))}</div></div>`).join('')}}
 async function loadDemo(){let r=await fetch('/api/n31');if(r.ok){renderDemo(await r.json());return}r=await fetch('/api/demo');if(!r.ok){await fetch('/api/demo/run',{method:'POST'});r=await fetch('/api/demo')}renderDemo(await r.json())}
 document.querySelector('#rerun').addEventListener('click',async()=>{const s=document.querySelector('#rerun-status');s.textContent=' 运行中…';const r=await fetch('/api/n31/run',{method:'POST'});const d=await r.json();s.textContent=r.ok?` 完成：严重错误 ${d.before.severe_error_count} → ${d.after.severe_error_count}`:` 失败：${d.detail||'未知错误'}`;if(r.ok)await loadDemo()});
 document.querySelector('#upload').addEventListener('submit',async e=>{e.preventDefault();const status=document.querySelector('#status');status.textContent='处理中…';const r=await fetch('/api/ingest',{method:'POST',body:new FormData(e.target)});const d=await r.json();status.textContent=r.ok?'完成':'失败';document.querySelector('#ingest').textContent=JSON.stringify(d,null,2)});loadDemo();
@@ -85,7 +93,12 @@ def _demo_payload(directory: Path) -> dict[str, Any]:
     missing = [name for name in names if not (directory / f"{name}.json").is_file()]
     if missing:
         raise FileNotFoundError(", ".join(missing))
-    return {name: _read_json(directory / f"{name}.json") for name in names}
+    payload = {name: _read_json(directory / f"{name}.json") for name in names}
+    for name in ("checklist", "quiz", "workflow"):
+        path = directory / f"{name}.json"
+        if path.is_file():
+            payload[name] = _read_json(path)
+    return payload
 
 
 async def _save_upload(upload: UploadFile, path: Path) -> None:
@@ -191,6 +204,21 @@ def create_app(
             ) from exc
         active_n31_dir["path"] = live_dir
         return summary
+
+    @app.get("/api/n31/artifacts/{artifact_name}")
+    def download_n31_artifact(artifact_name: str) -> FileResponse:
+        selected = N31_DOWNLOADS.get(artifact_name)
+        if selected is None:
+            raise HTTPException(status_code=404)
+        source_name, download_name = selected
+        path = active_n31_dir["path"] / source_name
+        if not path.is_file():
+            raise HTTPException(status_code=404)
+        return FileResponse(
+            path,
+            media_type="application/json",
+            filename=download_name,
+        )
 
     @app.get("/api/demo")
     def demo_data() -> JSONResponse:

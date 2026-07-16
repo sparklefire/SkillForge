@@ -46,20 +46,7 @@ def test_web_prefers_explicitly_labelled_n31_rehearsal(tmp_path) -> None:
 
 
 def test_web_accepts_operator_reviewed_gold_result(tmp_path) -> None:
-    n31_dir = tmp_path / "n31-gold"
-    run_demo(ROOT / "cases" / "demo_case" / "synthetic", n31_dir)
-    summary_path = n31_dir / "summary.json"
-    summary = json.loads(summary_path.read_text(encoding="utf-8"))
-    summary.update(
-        {
-            "synthetic": False,
-            "gold_status": "GOLD",
-            "metrics_status": "FINAL",
-            "evaluation_basis": "OPERATOR_REVIEWED_GOLD",
-            "human_review_required": False,
-        }
-    )
-    summary_path.write_text(json.dumps(summary), encoding="utf-8")
+    n31_dir = ROOT / "cases" / "n31" / "demo_bundle"
     client = TestClient(create_app(tmp_path / "web", n31_dir))
     response = client.get("/api/n31")
     assert response.status_code == 200
@@ -72,12 +59,21 @@ def test_web_accepts_operator_reviewed_gold_result(tmp_path) -> None:
         == 1.0
     )
     assert response.json()["visual_review"]["summary"]["contradicted_count"] == 0
+    assert len(response.json()["checklist"]["items"]) == 13
+    assert len(response.json()["quiz"]["questions"]) == 5
+    checklist = client.get("/api/n31/artifacts/checklist")
+    assert checklist.status_code == 200
+    assert checklist.json()["case_id"] == "n31_media_change"
+    assert "attachment" in checklist.headers["content-disposition"]
+    assert client.get("/api/n31/artifacts/private-video").status_code == 404
     rerun = client.post("/api/n31/run")
     assert rerun.status_code == 200
     assert rerun.json()["gold_status"] == "GOLD"
     assert rerun.json()["before"]["severe_error_count"] == 5
     assert rerun.json()["after"]["severe_error_count"] == 0
-    assert client.get("/api/n31").json()["summary"]["metrics_status"] == "FINAL"
+    active = client.get("/api/n31").json()
+    assert active["summary"]["metrics_status"] == "FINAL"
+    assert len(active["checklist"]["items"]) == 13
 
 
 def test_upload_requires_at_least_one_asset(tmp_path) -> None:
