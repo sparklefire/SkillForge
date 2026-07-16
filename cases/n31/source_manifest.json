@@ -620,6 +620,38 @@
       "initial_severe_error_count": 5,
       "final_severe_error_count": 0,
       "revision_count": 4
+    },
+    {
+      "run_id": "DGX_VISUAL_EVAL_AND_DEMO_FALLBACK_20260717",
+      "type": "DGX_NATIVE_ASSET_FREE_VALIDATION",
+      "run_date": "2026-07-17",
+      "status": "PASSED",
+      "remote_app_directory": "/home/Developer/skillforge/app",
+      "sync_scope": "GIT_TRACKED_FILES_ONLY",
+      "sensitive_assets_uploaded": false,
+      "python_version": "3.12.3",
+      "test_result": "35 passed",
+      "web_bind_scope": "REMOTE_LOOPBACK_ONLY",
+      "checked_endpoints": [
+        "/health",
+        "/api/n31",
+        "/api/n31/run"
+      ],
+      "http_statuses": [
+        200,
+        200,
+        200
+      ],
+      "gold_status": "GOLD",
+      "metrics_status": "FINAL",
+      "initial_severe_error_count": 5,
+      "final_severe_error_count": 0,
+      "revision_count": 4,
+      "visual_contradicted_count": 0,
+      "two_or_more_source_types_required_coverage": "10/10",
+      "docker_required": false,
+      "validation_server_stopped": true,
+      "notes": "仅同步Git跟踪代码和无素材演示包；未上传原始录音、视频、关键帧、PDF、私有面单或.env"
     }
   ],
   "generated_artifacts": [
