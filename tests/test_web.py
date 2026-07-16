@@ -65,6 +65,10 @@ def test_web_accepts_operator_reviewed_gold_result(tmp_path) -> None:
     assert checklist.status_code == 200
     assert checklist.json()["case_id"] == "n31_media_change"
     assert "attachment" in checklist.headers["content-disposition"]
+    poster = client.get("/api/n31/artifacts/poster")
+    assert poster.status_code == 200
+    assert poster.headers["content-type"] == "application/pdf"
+    assert poster.content.startswith(b"%PDF-")
     assert client.get("/api/n31/artifacts/private-video").status_code == 404
     rerun = client.post("/api/n31/run")
     assert rerun.status_code == 200

@@ -26,10 +26,19 @@ ALLOWED_SUFFIXES = {
     "audio": {".wav", ".mp3", ".m4a", ".aac", ".ogg", ".flac"},
 }
 N31_DOWNLOADS = {
-    "final-sop": ("after_sop.json", "n31_final_sop.json"),
-    "checklist": ("checklist.json", "n31_mobile_checklist.json"),
-    "quiz": ("quiz.json", "n31_training_quiz.json"),
-    "revision-audit": ("revision_audit.json", "n31_revision_audit.json"),
+    "final-sop": ("active", "after_sop.json", "n31_final_sop.json"),
+    "checklist": ("active", "checklist.json", "n31_mobile_checklist.json"),
+    "quiz": ("active", "quiz.json", "n31_training_quiz.json"),
+    "revision-audit": (
+        "active",
+        "revision_audit.json",
+        "n31_revision_audit.json",
+    ),
+    "poster": (
+        "project",
+        "output/pdf/n31_a4_training_poster.pdf",
+        "n31_a4_training_poster.pdf",
+    ),
 }
 
 
@@ -54,7 +63,7 @@ HTML = """<!doctype html>
   <section class="panel"><h2>发现问题 → 展示证据</h2><div id="issues"></div></section>
   <section class="panel"><h2>修订前后对比</h2><div class="cols"><div><h3>修订前</h3><div id="before"></div></div><div><h3>修订后</h3><div id="after"></div></div></div></section>
   <section class="panel"><h2>局部修订审计</h2><div id="changes"></div></section>
-  <section class="panel" id="results-panel" hidden><h2>培训成果</h2><div class="downloads" id="n31-downloads"><a class="download" href="/api/n31/artifacts/final-sop">下载最终 SOP</a><a class="download" href="/api/n31/artifacts/checklist">下载手机检查清单</a><a class="download" href="/api/n31/artifacts/quiz">下载培训测验</a><a class="download" href="/api/n31/artifacts/revision-audit">下载修订记录</a></div><div class="cols"><div><h3>手机端检查清单</h3><div id="checklist"></div></div><div><h3>培训测验</h3><div id="quiz"></div></div></div></section>
+  <section class="panel" id="results-panel" hidden><h2>培训成果</h2><div class="downloads" id="n31-downloads"><a class="download" href="/api/n31/artifacts/final-sop">下载最终 SOP</a><a class="download" href="/api/n31/artifacts/checklist">下载手机检查清单</a><a class="download" href="/api/n31/artifacts/quiz">下载培训测验</a><a class="download" href="/api/n31/artifacts/poster">下载 A4 培训海报</a><a class="download" href="/api/n31/artifacts/revision-audit">下载修订记录</a></div><div class="cols"><div><h3>手机端检查清单</h3><div id="checklist"></div></div><div><h3>培训测验</h3><div id="quiz"></div></div></div></section>
   <section class="panel"><h2>上传素材并原生预处理</h2><p>上传内容只写入被 Git 忽略的本地输出目录。本页面不会自动把原始素材发送给外部模型。</p>
     <form id="upload"><label>操作视频<input type="file" name="video" accept="video/*"></label><label>设备 PDF<input type="file" name="pdf" accept="application/pdf"></label><label>专家录音<input type="file" name="audio" accept="audio/*"></label><label><input style="width:auto" type="checkbox" name="transcribe" value="true">调用 StepAudio ASR</label><label><input style="width:auto" type="checkbox" name="analyze_visuals" value="true">调用 Step 3.7 分析关键帧</label><label><input style="width:auto" type="checkbox" name="plan_sop" value="true">根据证据规划 SOP</label><label><input style="width:auto" type="checkbox" name="external_processing_authorized" value="true">已确认允许把选定派生内容发送给外部 API</label><button>开始处理</button><span id="status"></span></form><pre id="ingest"></pre>
   </section>
@@ -210,13 +219,18 @@ def create_app(
         selected = N31_DOWNLOADS.get(artifact_name)
         if selected is None:
             raise HTTPException(status_code=404)
-        source_name, download_name = selected
-        path = active_n31_dir["path"] / source_name
+        scope, source_name, download_name = selected
+        base = ROOT if scope == "project" else active_n31_dir["path"]
+        path = base / source_name
         if not path.is_file():
             raise HTTPException(status_code=404)
         return FileResponse(
             path,
-            media_type="application/json",
+            media_type=(
+                "application/pdf"
+                if path.suffix.lower() == ".pdf"
+                else "application/json"
+            ),
             filename=download_name,
         )
 

@@ -694,6 +694,24 @@
       "raw_asset_download_enabled": false,
       "validation_server_stopped": true,
       "docker_required": false
+    },
+    {
+      "run_id": "N31_A4_POSTER_LOCAL_V1",
+      "type": "GOLD_SOP_TO_A4_TRAINING_POSTER",
+      "run_date": "2026-07-17",
+      "status": "PASSED",
+      "input": "cases/n31/gold/gold_sop.json",
+      "output": "output/pdf/n31_a4_training_poster.pdf",
+      "page_count": 1,
+      "page_size": "A4",
+      "render_dpi": 150,
+      "render_visual_qa": "PASSED",
+      "text_block_count": 40,
+      "out_of_bounds_text_block_count": 0,
+      "deterministic_generation": true,
+      "web_download_http_status": 200,
+      "web_download_content_type": "application/pdf",
+      "test_result": "36 passed"
     }
   ],
   "generated_artifacts": [
@@ -714,6 +732,25 @@
       "privacy_status": "SYNTHETIC_NO_REAL_CUSTOMER_DATA",
       "usage_status": "NOT_SELECTED_FOR_CURRENT_CAPTURE_OPTIONAL_FALLBACK",
       "print_instruction": "按实际大小或100%打印，不缩放"
+    },
+    {
+      "artifact_id": "N31_A4_TRAINING_POSTER_V1",
+      "type": "pdf",
+      "title": "汉印N31更换折叠标签纸、缝标学习与试印验收A4培训海报",
+      "local_path": "output/pdf/n31_a4_training_poster.pdf",
+      "generator": "src/skillforge/poster.py",
+      "sha256": "d87dd874dc332d8057f0a1106b5b42085f6127f87ddeaa8f4b8a79eee08a8fba",
+      "size_bytes": 130442,
+      "pages": 1,
+      "page_geometry": {
+        "width_pt": 595.276,
+        "height_pt": 841.89,
+        "format": "A4"
+      },
+      "privacy_status": "GOLD_STRUCTURED_CONTENT_NO_RAW_MEDIA",
+      "usage_status": "READY_FOR_DEMO_AND_PRINT",
+      "visual_qa": "PASSED_AT_150_DPI",
+      "print_instruction": "A4纵向，实际大小或100%打印"
     }
   ]
 }
