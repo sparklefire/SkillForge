@@ -26,7 +26,9 @@ dev = [
 [project.scripts]
 skillforge-demo = "skillforge.demo:main"
 skillforge-case-ingest = "skillforge.case_ingest:main"
+skillforge-candidate-sop = "skillforge.candidate_sop:main"
 skillforge-ingest = "skillforge.ingest:main"
+skillforge-provisional-rehearsal = "skillforge.provisional_rehearsal:main"
 skillforge-web = "skillforge.web:main"
 
 [tool.setuptools]

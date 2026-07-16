@@ -1,0 +1,90 @@
+{
+  "evaluation_basis": "CANDIDATE_NOT_GOLD",
+  "required_step_ids": [
+    "S01",
+    "S02",
+    "S03",
+    "S04",
+    "S05",
+    "S06",
+    "S07",
+    "S08",
+    "S09",
+    "S10",
+    "S12",
+    "S13"
+  ],
+  "expected_order": [
+    "S01",
+    "S02",
+    "S03",
+    "S04",
+    "S05",
+    "S06",
+    "S07",
+    "S08",
+    "S09",
+    "S10",
+    "S11",
+    "S12",
+    "S13"
+  ],
+  "order_rules": [
+    {
+      "before": "S01",
+      "after": "S02"
+    },
+    {
+      "before": "S02",
+      "after": "S03"
+    },
+    {
+      "before": "S03",
+      "after": "S04"
+    },
+    {
+      "before": "S04",
+      "after": "S05"
+    },
+    {
+      "before": "S05",
+      "after": "S06"
+    },
+    {
+      "before": "S06",
+      "after": "S07"
+    },
+    {
+      "before": "S07",
+      "after": "S08"
+    },
+    {
+      "before": "S08",
+      "after": "S09"
+    },
+    {
+      "before": "S09",
+      "after": "S10"
+    },
+    {
+      "before": "S10",
+      "after": "S12"
+    },
+    {
+      "before": "S12",
+      "after": "S13"
+    }
+  ],
+  "allowed_tools": [
+    "N31 原装或适配电源",
+    "本批标签纸",
+    "本地计算机或已配置的打印终端"
+  ],
+  "allowed_parameters": [
+    "本批标签宽度",
+    "本批标签高度",
+    "定位方式",
+    "释放时机",
+    "短按参考时长"
+  ]
+}

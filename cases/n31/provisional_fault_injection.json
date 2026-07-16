@@ -1,0 +1,22 @@
+{
+  "controlled_rehearsal": true,
+  "evaluation_basis": "CANDIDATE_NOT_GOLD",
+  "remove_step_id": "S09",
+  "swap_step_ids": [
+    "S07",
+    "S08"
+  ],
+  "unsupported_tool": {
+    "step_id": "S12",
+    "tool": "扭矩扳手"
+  },
+  "unsupported_parameter": {
+    "step_id": "S10",
+    "parameter": {
+      "name": "走纸键按压力",
+      "value": 20,
+      "unit": "N",
+      "evidence_ids": []
+    }
+  }
+}

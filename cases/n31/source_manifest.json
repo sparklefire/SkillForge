@@ -352,6 +352,43 @@
       "model_calls": 0,
       "external_processing_authorized": false,
       "notes": "输出目录由Git忽略；保存每个视频的独立时间轴、每份PDF的原页码、关键帧和页面预览"
+    },
+    {
+      "run_id": "N31_CANDIDATE_SOP_V1",
+      "type": "DETERMINISTIC_EVIDENCE_ALIGNMENT",
+      "run_date": "2026-07-16",
+      "config": "cases/n31/candidate_sop_plan.json",
+      "input": "cases/n31/output/ingest_local_v1/evidence_catalog.json",
+      "output": "cases/n31/output/candidate_v1",
+      "status": "HUMAN_REVIEW_REQUIRED",
+      "gold_status": "NOT_GOLD",
+      "step_count": 13,
+      "distinct_step_evidence_reference_count": 25,
+      "unknown_evidence_reference_count": 0,
+      "parameter_evidence_gap_count": 2,
+      "model_calls": 0,
+      "notes": "生成Schema有效候选SOP、人工审核队列和带PDF页码/视频时间点的审核表"
+    },
+    {
+      "run_id": "N31_PROVISIONAL_REHEARSAL_V1",
+      "type": "CONTROLLED_FAULT_VERIFICATION_REVISION",
+      "run_date": "2026-07-16",
+      "constraints": "cases/n31/provisional_constraints.json",
+      "fault_spec": "cases/n31/provisional_fault_injection.json",
+      "output": "cases/n31/output/rehearsal_v1",
+      "status": "COMPLETED",
+      "evaluation_basis": "CANDIDATE_NOT_GOLD",
+      "metrics_status": "PROVISIONAL_ONLY",
+      "gold_status": "NOT_GOLD",
+      "initial_severe_error_count": 7,
+      "final_severe_error_count": 0,
+      "initial_required_step_coverage": "11/12",
+      "final_required_step_coverage": "12/12",
+      "revision_count": 6,
+      "checklist_item_count": 13,
+      "quiz_question_count": 5,
+      "model_calls": 0,
+      "human_review_required": true
     }
   ],
   "generated_artifacts": [
