@@ -1,0 +1,107 @@
+{
+  "case_id": "n31_media_change",
+  "checks": [
+    {
+      "check_id": "THREE_MINUTE_TIMELINE",
+      "details": [
+        "7个阶段连续覆盖0至180秒"
+      ],
+      "status": "PASSED"
+    },
+    {
+      "check_id": "REQUIRED_ARTIFACTS",
+      "items": [
+        {
+          "artifact_id": "DEMO_BUNDLE",
+          "detail": "1629 bytes · sha256=0df4b90f612bef4e9d1db72c0887d2a74891d01c06da8c99b40f434c1d3f90b7",
+          "path": "cases/n31/demo_bundle/bundle.json",
+          "status": "PASSED"
+        },
+        {
+          "artifact_id": "GOLD_SOP",
+          "detail": "99953 bytes · sha256=a8f111a52f496f93e9934cedd493630d73732ad73e6e4e79832f0133c31c6f8a",
+          "path": "cases/n31/gold/gold_sop.json",
+          "status": "PASSED"
+        },
+        {
+          "artifact_id": "MULTISOURCE_EVAL",
+          "detail": "3859 bytes · sha256=f0adc9b6dbfd1f34d1e3e57ec3588d60b96562bea5b6b167fd05408040aac7af",
+          "path": "cases/n31/evaluations/multisource_comparison_v1.json",
+          "status": "PASSED"
+        },
+        {
+          "artifact_id": "DGX_VISUAL",
+          "detail": "17979 bytes · sha256=b475c03d34b4a5db8c423b97f72fdfc11d1d5e99e28c699ed2cac6fc912ab9fb",
+          "path": "cases/n31/evaluations/dgx_visual_compute_v1.json",
+          "status": "PASSED"
+        },
+        {
+          "artifact_id": "POSTER",
+          "detail": "130442 bytes · sha256=d87dd874dc332d8057f0a1106b5b42085f6127f87ddeaa8f4b8a79eee08a8fba",
+          "path": "output/pdf/n31_a4_training_poster.pdf",
+          "status": "PASSED"
+        },
+        {
+          "artifact_id": "TRAINING_VIDEO",
+          "detail": "35194451 bytes · sha256=61ec74826befc89889a6025a9acdb217adbd32af589a9c1f4bb4be1958ff695f",
+          "path": "output/video/n31_training_video_v1.mp4",
+          "status": "PASSED"
+        },
+        {
+          "artifact_id": "TRAINING_VIDEO_MANIFEST",
+          "detail": "3677 bytes · sha256=457dc6d3c4baecde0643d75bf3e3b62f7cc9b2b2787100a44aeaf653e8632a3a",
+          "path": "output/video/n31_training_video_manifest_v1.json",
+          "status": "PASSED"
+        },
+        {
+          "artifact_id": "TRAINING_VIDEO_EVIDENCE",
+          "detail": "20726 bytes · sha256=c0e826a98f650282f908a182e4620ce440bcc9017bc467d6310d711bb9895f52",
+          "path": "output/video/n31_training_video_evidence_pack_v1.json",
+          "status": "PASSED"
+        },
+        {
+          "artifact_id": "PITCH_DECK",
+          "detail": "1464192 bytes · sha256=5178e64c947b5965f82f98acfb0d13bb304e14d7cf7c0ac5c3d63609c2d73c66",
+          "path": "output/presentation/SkillForge_三分钟路演_v1.pptx",
+          "status": "PASSED"
+        }
+      ],
+      "status": "PASSED"
+    },
+    {
+      "assertions": {
+        "coverage_90_to_100": true,
+        "dgx_cuda_native": true,
+        "errors_5_to_0": true,
+        "gold_final": true,
+        "multisource_100": true,
+        "revision_count_4": true,
+        "video_manifest_bound": true
+      },
+      "check_id": "PITCH_CLAIMS",
+      "status": "PASSED"
+    },
+    {
+      "assertions": {
+        "entry_script": true,
+        "health": true,
+        "live_rerun": true,
+        "mode_priority": true,
+        "offline_bundle_safe": true,
+        "offline_payload": true
+      },
+      "check_id": "DEMO_FALLBACKS",
+      "status": "PASSED"
+    }
+  ],
+  "contains_credentials": false,
+  "contains_raw_media": false,
+  "generated_at": "2026-07-17T03:59:30.487193+00:00",
+  "pending_human_gates": [
+    "TRAINING_VIDEO_FULL_WATCH",
+    "FINAL_STAGE_REHEARSAL"
+  ],
+  "status": "READY_WITH_HUMAN_GATES",
+  "total_duration_ms": 180000,
+  "version": 1
+}

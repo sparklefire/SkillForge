@@ -1,0 +1,158 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/pitch_runbook.schema.json",
+  "title": "SkillForge Three Minute Pitch Runbook",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "case_id",
+    "title",
+    "total_duration_ms",
+    "required_phase_order",
+    "segments",
+    "demo_modes",
+    "required_artifacts",
+    "human_gates"
+  ],
+  "properties": {
+    "version": {"const": 1},
+    "case_id": {"const": "n31_media_change"},
+    "title": {"type": "string", "minLength": 1},
+    "total_duration_ms": {"const": 180000},
+    "required_phase_order": {
+      "const": [
+        "PROBLEM",
+        "INPUTS",
+        "LOCAL_EXTRACTION",
+        "VERIFY_AND_REVISE",
+        "OUTPUTS",
+        "METRICS",
+        "PLATFORM_VALUE"
+      ]
+    },
+    "segments": {
+      "type": "array",
+      "minItems": 7,
+      "maxItems": 7,
+      "items": {"$ref": "#/$defs/segment"}
+    },
+    "demo_modes": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {"$ref": "#/$defs/demoMode"}
+    },
+    "required_artifacts": {
+      "type": "array",
+      "minItems": 8,
+      "items": {"$ref": "#/$defs/artifact"}
+    },
+    "human_gates": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/humanGate"}
+    }
+  },
+  "$defs": {
+    "segment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "phase",
+        "label",
+        "start_ms",
+        "end_ms",
+        "surface",
+        "speaker_script",
+        "operator_action",
+        "proof_points",
+        "fallback"
+      ],
+      "properties": {
+        "phase": {
+          "enum": [
+            "PROBLEM",
+            "INPUTS",
+            "LOCAL_EXTRACTION",
+            "VERIFY_AND_REVISE",
+            "OUTPUTS",
+            "METRICS",
+            "PLATFORM_VALUE"
+          ]
+        },
+        "label": {"type": "string", "minLength": 1},
+        "start_ms": {"type": "integer", "minimum": 0, "maximum": 179999},
+        "end_ms": {"type": "integer", "minimum": 1, "maximum": 180000},
+        "surface": {"enum": ["PPT", "WEB", "VIDEO"]},
+        "speaker_script": {"type": "string", "minLength": 1},
+        "operator_action": {"type": "string", "minLength": 1},
+        "proof_points": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "fallback": {"type": "string", "minLength": 1}
+      }
+    },
+    "demoMode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "priority", "command", "data_policy", "expected"],
+      "properties": {
+        "mode": {"enum": ["LIVE", "PREPROCESSED", "OFFLINE"]},
+        "priority": {"type": "integer", "minimum": 1, "maximum": 3},
+        "command": {"type": "string", "pattern": "^bash scripts/run_demo_mode\\.sh (live|preprocessed|offline)$"},
+        "data_policy": {"type": "string", "minLength": 1},
+        "expected": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["gold_status", "metrics_status", "before_errors", "after_errors", "revision_count"],
+          "properties": {
+            "gold_status": {"const": "GOLD"},
+            "metrics_status": {"const": "FINAL"},
+            "before_errors": {"const": 5},
+            "after_errors": {"const": 0},
+            "revision_count": {"const": 4}
+          }
+        }
+      }
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["artifact_id", "path", "kind", "required"],
+      "properties": {
+        "artifact_id": {"type": "string", "pattern": "^[A-Z0-9_]+$"},
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "not": {"pattern": "(^/|(^|/)\\.\\.(/|$))"}
+        },
+        "kind": {"enum": ["JSON", "PDF", "MP4", "PPTX"]},
+        "required": {"const": true}
+      }
+    },
+    "humanGate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["gate_id", "label", "status", "blocking_for_submission", "evidence_path"],
+      "properties": {
+        "gate_id": {"type": "string", "pattern": "^[A-Z0-9_]+$"},
+        "label": {"type": "string", "minLength": 1},
+        "status": {"enum": ["PENDING", "PASSED"]},
+        "blocking_for_submission": {"type": "boolean"},
+        "evidence_path": {
+          "anyOf": [
+            {"type": "null"},
+            {
+              "type": "string",
+              "minLength": 1,
+              "not": {"pattern": "(^/|(^|/)\\.\\.(/|$))"}
+            }
+          ]
+        }
+      }
+    }
+  }
+}

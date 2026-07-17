@@ -1,0 +1,261 @@
+"""Validate the reproducible three-minute N31 pitch package."""
+
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import zipfile
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any
+
+from fastapi.testclient import TestClient
+
+from .contracts import validate_document
+from .demo import ROOT
+from .web import create_app
+
+
+PHASE_ORDER = [
+    "PROBLEM",
+    "INPUTS",
+    "LOCAL_EXTRACTION",
+    "VERIFY_AND_REVISE",
+    "OUTPUTS",
+    "METRICS",
+    "PLATFORM_VALUE",
+]
+MODE_ORDER = ["LIVE", "PREPROCESSED", "OFFLINE"]
+
+
+def _read_json(path: Path) -> dict[str, Any]:
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def _write_json(path: Path, payload: Any) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+
+
+def _sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _check_timeline(runbook: dict[str, Any]) -> dict[str, Any]:
+    segments = runbook["segments"]
+    phase_order = [segment["phase"] for segment in segments]
+    errors: list[str] = []
+    if phase_order != PHASE_ORDER:
+        errors.append("路演阶段顺序不符合冻结顺序")
+    cursor = 0
+    for segment in segments:
+        if segment["start_ms"] != cursor:
+            errors.append(f"{segment['phase']} 与上一段不连续")
+        if segment["end_ms"] <= segment["start_ms"]:
+            errors.append(f"{segment['phase']} 时长必须大于0")
+        cursor = segment["end_ms"]
+    if cursor != runbook["total_duration_ms"] or cursor != 180_000:
+        errors.append("路演总时长必须精确为180秒")
+    return {
+        "check_id": "THREE_MINUTE_TIMELINE",
+        "status": "PASSED" if not errors else "FAILED",
+        "details": errors or ["7个阶段连续覆盖0至180秒"],
+    }
+
+
+def _check_artifact(path: Path, kind: str) -> tuple[bool, str]:
+    if not path.is_file() or path.stat().st_size == 0:
+        return False, "文件不存在或为空"
+    try:
+        if kind == "JSON":
+            _read_json(path)
+        elif kind == "PDF":
+            if not path.read_bytes()[:5] == b"%PDF-":
+                return False, "不是有效PDF文件头"
+        elif kind == "MP4":
+            if b"ftyp" not in path.read_bytes()[:64]:
+                return False, "不是有效MP4文件头"
+        elif kind == "PPTX":
+            with zipfile.ZipFile(path) as archive:
+                names = set(archive.namelist())
+                if "ppt/presentation.xml" not in names:
+                    return False, "PPTX缺少presentation.xml"
+    except (OSError, ValueError, json.JSONDecodeError, zipfile.BadZipFile) as exc:
+        return False, f"读取失败: {exc.__class__.__name__}"
+    return True, f"{path.stat().st_size} bytes · sha256={_sha256(path)}"
+
+
+def _check_artifacts(runbook: dict[str, Any], root: Path) -> dict[str, Any]:
+    items = []
+    passed = True
+    for artifact in runbook["required_artifacts"]:
+        path = (root / artifact["path"]).resolve()
+        within_root = path == root or root in path.parents
+        ok, detail = (
+            _check_artifact(path, artifact["kind"])
+            if within_root
+            else (False, "路径越出项目根目录")
+        )
+        passed &= ok
+        items.append(
+            {
+                "artifact_id": artifact["artifact_id"],
+                "path": artifact["path"],
+                "status": "PASSED" if ok else "FAILED",
+                "detail": detail,
+            }
+        )
+    return {
+        "check_id": "REQUIRED_ARTIFACTS",
+        "status": "PASSED" if passed else "FAILED",
+        "items": items,
+    }
+
+
+def _check_metrics(root: Path) -> dict[str, Any]:
+    summary = _read_json(root / "cases/n31/demo_bundle/summary.json")
+    multisource = _read_json(
+        root / "cases/n31/evaluations/multisource_comparison_v1.json"
+    )
+    dgx = validate_document(
+        _read_json(root / "cases/n31/evaluations/dgx_visual_compute_v1.json"),
+        "dgx_visual_compute.schema.json",
+    )
+    manifest_path = root / "output/video/n31_training_video_manifest_v1.json"
+    manifest = validate_document(
+        _read_json(manifest_path), "training_video_manifest.schema.json"
+    )
+    video_path = root / "output/video/n31_training_video_v1.mp4"
+    assertions = {
+        "gold_final": summary.get("gold_status") == "GOLD"
+        and summary.get("metrics_status") == "FINAL",
+        "errors_5_to_0": summary.get("before", {}).get("severe_error_count") == 5
+        and summary.get("after", {}).get("severe_error_count") == 0,
+        "revision_count_4": summary.get("revision_count") == 4,
+        "coverage_90_to_100": summary.get("before", {}).get(
+            "required_step_coverage"
+        )
+        == 0.9
+        and summary.get("after", {}).get("required_step_coverage") == 1.0,
+        "multisource_100": multisource["source_ablation"][
+            "two_or_more_source_types"
+        ]["coverage"]
+        == 1.0,
+        "dgx_cuda_native": dgx["actual_gpu_compute"] is True
+        and dgx["summary"]["processed_video_count"] == 6
+        and dgx["summary"]["sampled_frame_count"] == 420
+        and dgx["summary"]["selected_frame_count"] == 50,
+        "video_manifest_bound": video_path.is_file()
+        and manifest["output"]["sha256"] == _sha256(video_path)
+        and manifest["coverage"]["covered_gold_step_count"]
+        == manifest["coverage"]["gold_step_count"]
+        == 13,
+    }
+    return {
+        "check_id": "PITCH_CLAIMS",
+        "status": "PASSED" if all(assertions.values()) else "FAILED",
+        "assertions": assertions,
+    }
+
+
+def _check_demo_modes(runbook: dict[str, Any], root: Path) -> dict[str, Any]:
+    ordered_modes = [
+        item["mode"]
+        for item in sorted(
+            runbook["demo_modes"], key=lambda item: item["priority"]
+        )
+    ]
+    client = TestClient(
+        create_app(root / "outputs/pitch_web_check", root / "cases/n31/demo_bundle")
+    )
+    health = client.get("/health")
+    payload = client.get("/api/n31")
+    rerun = client.post("/api/n31/run")
+    offline_bundle = _read_json(root / "cases/n31/demo_bundle/bundle.json")
+    assertions = {
+        "mode_priority": ordered_modes == MODE_ORDER,
+        "health": health.status_code == 200
+        and health.json().get("runtime") == "native-python"
+        and health.json().get("docker_required") is False,
+        "offline_bundle_safe": offline_bundle.get("contains_raw_media") is False
+        and offline_bundle.get("contains_credentials") is False,
+        "offline_payload": payload.status_code == 200
+        and payload.json()["summary"].get("gold_status") == "GOLD",
+        "live_rerun": rerun.status_code == 200
+        and rerun.json().get("before", {}).get("severe_error_count") == 5
+        and rerun.json().get("after", {}).get("severe_error_count") == 0
+        and rerun.json().get("revision_count") == 4,
+        "entry_script": (root / "scripts/run_demo_mode.sh").is_file(),
+    }
+    return {
+        "check_id": "DEMO_FALLBACKS",
+        "status": "PASSED" if all(assertions.values()) else "FAILED",
+        "assertions": assertions,
+    }
+
+
+def build_readiness(
+    runbook_path: Path,
+    *,
+    root: Path = ROOT,
+) -> dict[str, Any]:
+    root = root.resolve()
+    runbook = validate_document(_read_json(runbook_path), "pitch_runbook.schema.json")
+    checks = [
+        _check_timeline(runbook),
+        _check_artifacts(runbook, root),
+        _check_metrics(root),
+        _check_demo_modes(runbook, root),
+    ]
+    checks_passed = all(check["status"] == "PASSED" for check in checks)
+    pending_gates = [
+        gate["gate_id"] for gate in runbook["human_gates"] if gate["status"] != "PASSED"
+    ]
+    if not checks_passed:
+        status = "NOT_READY"
+    elif pending_gates:
+        status = "READY_WITH_HUMAN_GATES"
+    else:
+        status = "READY_FOR_SUBMISSION"
+    return {
+        "version": 1,
+        "case_id": runbook["case_id"],
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "status": status,
+        "total_duration_ms": runbook["total_duration_ms"],
+        "checks": checks,
+        "pending_human_gates": pending_gates,
+        "contains_credentials": False,
+        "contains_raw_media": False,
+    }
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--runbook",
+        type=Path,
+        default=ROOT / "cases/n31/pitch_runbook.json",
+    )
+    parser.add_argument(
+        "--output",
+        type=Path,
+        default=ROOT / "output/presentation/n31_pitch_readiness_v1.json",
+    )
+    args = parser.parse_args()
+    readiness = build_readiness(args.runbook)
+    _write_json(args.output, readiness)
+    print(json.dumps(readiness, ensure_ascii=False, indent=2, sort_keys=True))
+    return 0 if readiness["status"] != "NOT_READY" else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
