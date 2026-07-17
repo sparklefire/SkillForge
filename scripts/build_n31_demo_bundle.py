@@ -29,6 +29,14 @@ OPTIONAL = (
     "semantic_review",
     "selective_rebuild",
 )
+OPTIONAL_SCHEMAS = {
+    "sop_views": "sop_views.schema.json",
+    "checklist": "mobile_checklist.schema.json",
+    "quiz": "training_quiz.schema.json",
+    "grounding_gate": "grounding_gate_report.schema.json",
+    "semantic_review": "semantic_review_report.schema.json",
+    "selective_rebuild": "selective_rebuild_report.schema.json",
+}
 
 
 def _read(path: Path) -> Any:
@@ -56,6 +64,23 @@ def _compact_sop(payload: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def _validate_optional(name: str, payload: dict[str, Any]) -> dict[str, Any]:
+    schema = OPTIONAL_SCHEMAS.get(name)
+    if schema is None:
+        return payload
+    document = validate_document(payload, schema)
+    if name == "grounding_gate" and document["status"] != "PASSED":
+        raise ValueError("只允许发布通过复检的确定性门禁报告")
+    if name == "semantic_review" and document["summary"]["automatic_gold_changes"] != 0:
+        raise ValueError("语义复核不得自动修改Gold")
+    if name == "selective_rebuild" and (
+        document["status"] != "PASSED"
+        or not all(document["verification"].values())
+    ):
+        raise ValueError("只允许发布通过边界验证的选择性重建报告")
+    return document
+
+
 def build_bundle(
     source: Path,
     output: Path,
@@ -75,32 +100,17 @@ def build_bundle(
         payload = _read(path)
         if name in {"before_sop", "after_sop"}:
             payload = _compact_sop(payload)
+        elif name in OPTIONAL_SCHEMAS:
+            payload = _validate_optional(name, payload)
         _write(output / f"{name}.json", payload)
     if grounding_gate is not None:
-        gate = validate_document(
-            _read(grounding_gate),
-            "grounding_gate_report.schema.json",
-        )
-        if gate["status"] != "PASSED":
-            raise ValueError("只允许发布通过复检的确定性门禁报告")
+        gate = _validate_optional("grounding_gate", _read(grounding_gate))
         _write(output / "grounding_gate.json", gate)
     if semantic_review is not None:
-        review = validate_document(
-            _read(semantic_review),
-            "semantic_review_report.schema.json",
-        )
-        if review["summary"]["automatic_gold_changes"] != 0:
-            raise ValueError("语义复核不得自动修改Gold")
+        review = _validate_optional("semantic_review", _read(semantic_review))
         _write(output / "semantic_review.json", review)
     if selective_rebuild is not None:
-        rebuild = validate_document(
-            _read(selective_rebuild),
-            "selective_rebuild_report.schema.json",
-        )
-        if rebuild["status"] != "PASSED" or not all(
-            rebuild["verification"].values()
-        ):
-            raise ValueError("只允许发布通过边界验证的选择性重建报告")
+        rebuild = _validate_optional("selective_rebuild", _read(selective_rebuild))
         _write(output / "selective_rebuild.json", rebuild)
     summary = _read(output / "summary.json")
     if (

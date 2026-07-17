@@ -1,5 +1,8 @@
 import json
+import shutil
 from pathlib import Path
+
+import pytest
 
 from scripts.build_n31_demo_bundle import build_bundle
 from skillforge.contracts import validate_document
@@ -53,3 +56,15 @@ def test_builds_asset_free_gold_bundle(tmp_path) -> None:
     assert selective["status"] == "PASSED"
     assert selective["summary"]["quiz_question_count"] == 1
     assert selective["summary"]["video_scene_count"] == 7
+
+
+def test_rejects_stale_optional_artifact_before_publication(tmp_path) -> None:
+    source = tmp_path / "source"
+    shutil.copytree(ROOT / "cases/n31/demo_bundle", source)
+    checklist_path = source / "checklist.json"
+    checklist = json.loads(checklist_path.read_text(encoding="utf-8"))
+    checklist.pop("artifact_type")
+    checklist_path.write_text(json.dumps(checklist), encoding="utf-8")
+
+    with pytest.raises(ValueError, match="artifact_type"):
+        build_bundle(source, tmp_path / "output")
