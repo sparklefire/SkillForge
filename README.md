@@ -59,7 +59,21 @@ python3 scripts/verify_step_plan.py
 bash scripts/check_dgx.sh
 ```
 
-两个脚本都从本地 `.env` 读取配置，不输出密钥。
+以上两个检查脚本从本地 `.env` 读取所需配置，不输出密钥。
+
+安装只监听 DGX 回环地址的用户级离线演示服务，并通过 SSH 隧道访问：
+
+```bash
+# 在 DGX 的 ~/skillforge/app 中执行
+bash scripts/manage_dgx_demo_service.sh install
+bash scripts/manage_dgx_demo_service.sh restart-test
+
+# 在本机项目目录执行
+bash scripts/dgx_demo_tunnel.sh --smoke
+bash scripts/dgx_demo_tunnel.sh
+```
+
+用户服务启用失败自动重启，SSH 隧道默认映射到本机 `127.0.0.1:17860`。服务不开放公网端口、不需要 Docker；完整说明见 [DGX 用户级演示服务](./deploy/systemd/README.md)。
 
 ## 运行 P0 模拟闭环
 
@@ -231,7 +245,7 @@ P0 能力只有五项：
 - 已从 Gold SOP 生成单页A4培训海报，150 dpi渲染检查无裁切、重叠、乱码或越界文字。
 - 已从6段自摄安全派生视频重剪15镜头、80秒、1080p横屏培训成片；13/13 Gold步骤、10/10必要步骤和30次证据引用均通过程序校验，StepAudio旁白响度为-16.18 LUFS。
 - DGX已用原生CUDA实际处理6段自摄安全派生视频的420帧，筛出50个场景候选时间点；Web展示GPU指标和5步Agent决策/工具轨迹，外部API仍未获准处理这些视频。
-- 本机和DGX Python 3.12当前均通过49项自动测试；DGX成片SHA-256、视频证据包、路演PPT和Web Range播放均与本机复验一致。
+- 本机和DGX Python 3.12当前均通过51项自动测试；DGX成片SHA-256、视频证据包、路演PPT、用户服务和Web Range播放均与本机复验一致。
 - 赛事公开要求对齐审计未发现方向性偏离；2–5人团队资格和官方评分/提交/API细则仍待参赛者从报名材料或训练营讲义确认。
 - DGX服务监听与进程重启后的回环访问已经验证；公网入口请求未到达应用，现场暂使用SSH端口转发、离线包和录屏兜底。
 - 尚待完成培训视频最终人工观看、连续动作语义合并，以及三分钟最终有声演示。

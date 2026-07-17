@@ -1,0 +1,22 @@
+[Unit]
+Description=SkillForge offline N31 demo
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/skillforge/app
+Environment=SKILLFORGE_HOST=127.0.0.1
+Environment=SKILLFORGE_PORT=7860
+Environment=SKILLFORGE_SKIP_DOTENV=1
+Environment=PYTHONDONTWRITEBYTECODE=1
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/usr/bin/bash %h/skillforge/app/scripts/run_demo_mode.sh offline
+Restart=on-failure
+RestartSec=2s
+TimeoutStopSec=20s
+NoNewPrivileges=true
+PrivateTmp=true
+UMask=0077
+
+[Install]
+WantedBy=default.target
