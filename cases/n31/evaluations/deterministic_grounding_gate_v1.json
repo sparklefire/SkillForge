@@ -1,0 +1,206 @@
+{
+  "case_id": "n31_media_change",
+  "data_policy": {
+    "contains_absolute_paths": false,
+    "contains_credentials": false,
+    "contains_raw_media": false,
+    "external_model_calls": 0
+  },
+  "model_calls": 0,
+  "report_id": "DETERMINISTIC_GROUNDING_GATE_V1",
+  "scenarios": [
+    {
+      "after_value": [],
+      "before_value": [
+        "本批标签纸"
+      ],
+      "detected_conflict_ids": [
+        "C001"
+      ],
+      "detected_conflict_kinds": [
+        "UNSUPPORTED_TOOL"
+      ],
+      "expected_conflict_kind": "UNSUPPORTED_TOOL",
+      "mutation_field": "tools",
+      "mutation_summary": "向S01加入全局允许、但仅在其他步骤有依据的工具“本批标签纸”",
+      "proposed_actions": [
+        "REMOVE"
+      ],
+      "reference_evidence_ids": [
+        "E001",
+        "E096",
+        "E144"
+      ],
+      "reference_value": [],
+      "rejection_reason": "工具“本批标签纸”没有来源依据",
+      "residual_conflict_count": 0,
+      "restored": true,
+      "revision_actions": [
+        "REMOVE"
+      ],
+      "scenario_id": "CROSS_STEP_ALLOWED_TOOL",
+      "status": "PASSED",
+      "target_step_id": "S01"
+    },
+    {
+      "after_value": [
+        {
+          "evidence_ids": [
+            "E144"
+          ],
+          "name": "本批标签宽度",
+          "unit": "mm",
+          "value": 72
+        },
+        {
+          "evidence_ids": [
+            "E144"
+          ],
+          "name": "本批标签高度",
+          "unit": "mm",
+          "value": 130
+        }
+      ],
+      "before_value": [
+        {
+          "evidence_ids": [
+            "E144"
+          ],
+          "name": "本批标签宽度",
+          "unit": "mm",
+          "value": 999
+        },
+        {
+          "evidence_ids": [
+            "E144"
+          ],
+          "name": "本批标签高度",
+          "unit": "mm",
+          "value": 130
+        }
+      ],
+      "detected_conflict_ids": [
+        "C001"
+      ],
+      "detected_conflict_kinds": [
+        "UNSUPPORTED_PARAMETER"
+      ],
+      "expected_conflict_kind": "UNSUPPORTED_PARAMETER",
+      "mutation_field": "parameters",
+      "mutation_summary": "保留参数名和Evidence，但把标签宽度从72毫米篡改为999毫米",
+      "proposed_actions": [
+        "REPLACE"
+      ],
+      "reference_evidence_ids": [
+        "E001",
+        "E096",
+        "E144"
+      ],
+      "reference_value": [
+        {
+          "evidence_ids": [
+            "E144"
+          ],
+          "name": "本批标签宽度",
+          "unit": "mm",
+          "value": 72
+        },
+        {
+          "evidence_ids": [
+            "E144"
+          ],
+          "name": "本批标签高度",
+          "unit": "mm",
+          "value": 130
+        }
+      ],
+      "rejection_reason": "参数“本批标签宽度”没有有效来源依据",
+      "residual_conflict_count": 0,
+      "restored": true,
+      "revision_actions": [
+        "REPLACE"
+      ],
+      "scenario_id": "ALLOWED_PARAMETER_WRONG_VALUE",
+      "status": "PASSED",
+      "target_step_id": "S01"
+    },
+    {
+      "after_value": [
+        "本批实物尺寸72×130毫米由实际操作者口述确认；更换其他介质时重新核对尺寸和设备适配范围。"
+      ],
+      "before_value": [
+        "本批实物尺寸72×130毫米由实际操作者口述确认；更换其他介质时重新核对尺寸和设备适配范围。",
+        "操作时佩戴护目镜可避免所有风险。"
+      ],
+      "detected_conflict_ids": [
+        "C001"
+      ],
+      "detected_conflict_kinds": [
+        "UNSUPPORTED_SAFETY_CLAIM"
+      ],
+      "expected_conflict_kind": "UNSUPPORTED_SAFETY_CLAIM",
+      "mutation_field": "warnings",
+      "mutation_summary": "加入当前步骤来源中不存在的安全提示",
+      "proposed_actions": [
+        "REMOVE"
+      ],
+      "reference_evidence_ids": [
+        "E001",
+        "E096",
+        "E144"
+      ],
+      "reference_value": [
+        "本批实物尺寸72×130毫米由实际操作者口述确认；更换其他介质时重新核对尺寸和设备适配范围。"
+      ],
+      "rejection_reason": "风险或安全提示“操作时佩戴护目镜可避免所有风险。”没有当前步骤来源依据",
+      "residual_conflict_count": 0,
+      "restored": true,
+      "revision_actions": [
+        "REMOVE"
+      ],
+      "scenario_id": "UNGROUNDED_WARNING",
+      "status": "PASSED",
+      "target_step_id": "S01"
+    },
+    {
+      "after_value": "设备型号正确，介质为折叠热敏标签纸，纸宽处于手册支持范围。",
+      "before_value": "设备型号正确，介质为折叠热敏标签纸，纸宽处于手册支持范围。 完成以上检查即可保证100%安全。",
+      "detected_conflict_ids": [
+        "C001"
+      ],
+      "detected_conflict_kinds": [
+        "UNSUPPORTED_SAFETY_CLAIM"
+      ],
+      "expected_conflict_kind": "UNSUPPORTED_SAFETY_CLAIM",
+      "mutation_field": "success_check",
+      "mutation_summary": "在完成标志中加入无来源的100%安全承诺",
+      "proposed_actions": [
+        "REPLACE"
+      ],
+      "reference_evidence_ids": [
+        "E001",
+        "E096",
+        "E144"
+      ],
+      "reference_value": "设备型号正确，介质为折叠热敏标签纸，纸宽处于手册支持范围。",
+      "rejection_reason": "success_check 含无来源绝对安全承诺",
+      "residual_conflict_count": 0,
+      "restored": true,
+      "revision_actions": [
+        "REPLACE"
+      ],
+      "scenario_id": "ABSOLUTE_SAFETY_PROMISE",
+      "status": "PASSED",
+      "target_step_id": "S01"
+    }
+  ],
+  "status": "PASSED",
+  "summary": {
+    "detected_count": 4,
+    "passed_count": 4,
+    "residual_conflict_count": 0,
+    "revised_count": 4,
+    "scenario_count": 4
+  },
+  "version": 1
+}

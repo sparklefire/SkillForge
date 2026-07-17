@@ -50,6 +50,10 @@ def test_web_prefers_explicitly_labelled_n31_rehearsal(tmp_path) -> None:
 def test_web_accepts_operator_reviewed_gold_result(tmp_path) -> None:
     n31_dir = ROOT / "cases" / "n31" / "demo_bundle"
     client = TestClient(create_app(tmp_path / "web", n31_dir))
+    home = client.get("/")
+    assert home.status_code == 200
+    assert "无来源内容拒绝门禁" in home.text
+    assert "/api/n31/artifacts/grounding-gate" in home.text
     response = client.get("/api/n31")
     assert response.status_code == 200
     assert response.json()["summary"]["gold_status"] == "GOLD"
@@ -95,6 +99,15 @@ def test_web_accepts_operator_reviewed_gold_result(tmp_path) -> None:
         "AUTO_VERIFY": 6,
         "VERIFIER_QUEUE": 6,
         "HUMAN_REVIEW_REQUIRED": 1,
+    }
+    grounding_gate = response.json()["grounding_gate"]
+    assert grounding_gate["status"] == "PASSED"
+    assert grounding_gate["summary"] == {
+        "scenario_count": 4,
+        "passed_count": 4,
+        "detected_count": 4,
+        "revised_count": 4,
+        "residual_conflict_count": 0,
     }
     assert len(response.json()["checklist"]["items"]) == 13
     assert set(response.json()["sop_views"]["views"]) == {
@@ -178,6 +191,9 @@ def test_web_accepts_operator_reviewed_gold_result(tmp_path) -> None:
     candidate_download = client.get("/api/n31/artifacts/source-candidates")
     assert candidate_download.status_code == 200
     assert candidate_download.json()["summary"]["coarse_candidate_count"] == 8
+    grounding_download = client.get("/api/n31/artifacts/grounding-gate")
+    assert grounding_download.status_code == 200
+    assert grounding_download.json()["report_id"] == "DETERMINISTIC_GROUNDING_GATE_V1"
     assert client.get("/api/n31/artifacts/private-video").status_code == 404
     rerun = client.post("/api/n31/run")
     assert rerun.status_code == 200

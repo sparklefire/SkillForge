@@ -141,6 +141,12 @@ def _check_metrics(root: Path) -> dict[str, Any]:
         _read_json(root / "cases/n31/evaluations/source_candidate_synthesis_v1.json"),
         "source_candidate_synthesis.schema.json",
     )
+    grounding_gate = validate_document(
+        _read_json(
+            root / "cases/n31/evaluations/deterministic_grounding_gate_v1.json"
+        ),
+        "grounding_gate_report.schema.json",
+    )
     sop_views = validate_document(
         _read_json(root / "cases/n31/demo_bundle/sop_views.json"),
         "sop_views.schema.json",
@@ -243,6 +249,31 @@ def _check_metrics(root: Path) -> dict[str, Any]:
             == "HUMAN_REVIEW_REQUIRED"
             and item["confidence_assessment"]["observation_ids"] == ["NO001"]
             for item in source_candidates["ordered_steps"]
+        ),
+        "grounding_gate_closed": grounding_gate["status"] == "PASSED"
+        and grounding_gate["model_calls"] == 0
+        and grounding_gate["summary"]
+        == {
+            "scenario_count": 4,
+            "passed_count": 4,
+            "detected_count": 4,
+            "revised_count": 4,
+            "residual_conflict_count": 0,
+        }
+        and [item["scenario_id"] for item in grounding_gate["scenarios"]]
+        == [
+            "CROSS_STEP_ALLOWED_TOOL",
+            "ALLOWED_PARAMETER_WRONG_VALUE",
+            "UNGROUNDED_WARNING",
+            "ABSOLUTE_SAFETY_PROMISE",
+        ]
+        and all(
+            item["status"] == "PASSED"
+            and item["detected_conflict_ids"]
+            and item["reference_evidence_ids"]
+            and item["restored"] is True
+            and item["residual_conflict_count"] == 0
+            for item in grounding_gate["scenarios"]
         ),
         "training_package_traceable": set(sop_views["views"])
         == {"concise", "detailed", "evidence"}

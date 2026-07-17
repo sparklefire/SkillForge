@@ -34,6 +34,7 @@
               "ORDER_ERROR",
               "UNSUPPORTED_TOOL",
               "UNSUPPORTED_PARAMETER",
+              "UNSUPPORTED_SAFETY_CLAIM",
               "MISSING_EVIDENCE",
               "INVALID_EVIDENCE"
             ]
@@ -51,7 +52,7 @@
             }
           },
           "details": {"type": "object"},
-          "proposed_action": {"enum": ["INSERT", "REORDER", "REMOVE", "REVIEW"]},
+          "proposed_action": {"enum": ["INSERT", "REORDER", "REMOVE", "REPLACE", "REVIEW"]},
           "automatic": {"type": "boolean"},
           "status": {"enum": ["OPEN", "RESOLVED", "NEEDS_REVIEW"]}
         }

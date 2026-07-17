@@ -11,7 +11,13 @@ ROOT = Path(__file__).resolve().parents[1]
 def test_builds_asset_free_gold_bundle(tmp_path) -> None:
     source = ROOT / "cases/n31/demo_bundle"
     output = tmp_path / "bundle"
-    manifest = build_bundle(source, output)
+    manifest = build_bundle(
+        source,
+        output,
+        grounding_gate=(
+            ROOT / "cases/n31/evaluations/deterministic_grounding_gate_v1.json"
+        ),
+    )
     assert manifest["gold_status"] == "GOLD"
     assert manifest["metrics_status"] == "FINAL"
     assert manifest["contains_raw_media"] is False
@@ -27,3 +33,8 @@ def test_builds_asset_free_gold_bundle(tmp_path) -> None:
     quiz = json.loads((output / "quiz.json").read_text(encoding="utf-8"))
     validate_document(quiz, "training_quiz.schema.json")
     assert quiz["coverage"]["category_count"] == 5
+    grounding_gate = json.loads(
+        (output / "grounding_gate.json").read_text(encoding="utf-8")
+    )
+    validate_document(grounding_gate, "grounding_gate_report.schema.json")
+    assert grounding_gate["summary"]["residual_conflict_count"] == 0

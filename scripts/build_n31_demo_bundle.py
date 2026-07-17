@@ -9,6 +9,8 @@ import json
 from pathlib import Path
 from typing import Any
 
+from skillforge.contracts import validate_document
+
 
 REQUIRED = (
     "summary",
@@ -18,7 +20,7 @@ REQUIRED = (
     "final_conflicts",
     "revision_audit",
 )
-OPTIONAL = ("sop_views", "checklist", "quiz", "workflow")
+OPTIONAL = ("sop_views", "checklist", "quiz", "workflow", "grounding_gate")
 
 
 def _read(path: Path) -> Any:
@@ -46,7 +48,12 @@ def _compact_sop(payload: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def build_bundle(source: Path, output: Path) -> dict[str, Any]:
+def build_bundle(
+    source: Path,
+    output: Path,
+    *,
+    grounding_gate: Path | None = None,
+) -> dict[str, Any]:
     missing = [name for name in REQUIRED if not (source / f"{name}.json").is_file()]
     if missing:
         raise FileNotFoundError(f"缺少Gold演示输出: {missing}")
@@ -59,6 +66,14 @@ def build_bundle(source: Path, output: Path) -> dict[str, Any]:
         if name in {"before_sop", "after_sop"}:
             payload = _compact_sop(payload)
         _write(output / f"{name}.json", payload)
+    if grounding_gate is not None:
+        gate = validate_document(
+            _read(grounding_gate),
+            "grounding_gate_report.schema.json",
+        )
+        if gate["status"] != "PASSED":
+            raise ValueError("只允许发布通过复检的确定性门禁报告")
+        _write(output / "grounding_gate.json", gate)
     summary = _read(output / "summary.json")
     if (
         summary.get("gold_status") != "GOLD"
@@ -100,10 +115,19 @@ def main() -> int:
         type=Path,
         default=Path("cases/n31/demo_bundle"),
     )
+    parser.add_argument(
+        "--grounding-gate",
+        type=Path,
+        default=Path("cases/n31/evaluations/deterministic_grounding_gate_v1.json"),
+    )
     args = parser.parse_args()
     print(
         json.dumps(
-            build_bundle(args.source, args.output),
+            build_bundle(
+                args.source,
+                args.output,
+                grounding_gate=args.grounding_gate,
+            ),
             ensure_ascii=False,
             indent=2,
             sort_keys=True,

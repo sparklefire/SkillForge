@@ -108,7 +108,7 @@ bash scripts/check_native.sh
 bash scripts/start_native.sh
 ```
 
-Web 默认监听 `0.0.0.0:7860`。页面包含上传预处理、三来源候选合并、质检问题与证据、修订前后对比、局部修订审计、手机检查清单、培训测验、连续动作候选窗口、PDF结构验证和80秒培训视频，并可下载最终 SOP、候选合并报告、检查清单、测验、A4海报、培训视频、视频生成清单、视频证据包、连续动作候选窗口、PDF结构报告和修订记录。下载白名单不包含原始素材。ASR 默认关闭；只有同时勾选外部处理授权时，规范化音频才会发送给 StepAudio。
+Web 默认监听 `0.0.0.0:7860`。页面包含上传预处理、三来源候选合并、质检问题与证据、修订前后对比、局部修订审计、无来源内容拒绝门禁、手机检查清单、培训测验、连续动作候选窗口、PDF结构验证和80秒培训视频，并可下载最终 SOP、候选合并报告、门禁报告、检查清单、测验、A4海报、培训视频、视频生成清单、视频证据包、连续动作候选窗口、PDF结构报告和修订记录。下载白名单不包含原始素材。ASR 默认关闭；只有同时勾选外部处理授权时，规范化音频才会发送给 StepAudio。
 
 关键帧视觉理解和 SOP 规划同样默认关闭。只有勾选对应能力并确认外部处理授权时，关键帧或 Evidence Catalog 才会发送给 Step Plan；原始 PDF 和原始视频不会由上传接口自动外发。
 
@@ -134,6 +134,14 @@ bash scripts/build_n31_source_candidates.sh
 ```
 
 该阶段不读取 Gold 步骤文本，也不调用外部模型；它只读取真实 Evidence Catalog、审核后的来源候选和候选语义规范。33条候选经过Schema与来源交叉检查后合成为13步无环依赖图，8条过粗候选拆成18个片段，8条过细候选进入合并。每步置信度由证据分类权威性、审核状态、多源佐证和负面观察共同计算，并给出可复核分解。当前6步为高、6步为中、1步为低；S04因视频复核为不可见，只保留手册支持并以 `0.691 / LOW / HUMAN_REVIEW_REQUIRED` 进入人工确认，不把时间邻近误写成视觉事实。成功路径无需独立复位，异常回退则逐步记录。
+
+单独重建确定性无来源内容门禁报告：
+
+```bash
+bash scripts/build_n31_grounding_gate.sh
+```
+
+该门禁对跨步骤工具、合法参数名但错误数值、无来源安全提示和“100%安全”承诺分别执行独立篡改，要求每项都被检出、引用当前步骤Evidence边界、完成局部恢复并在复检后保持0个残留冲突。全过程只处理公开结构化Gold，不读取原始媒体、不访问凭证，也不调用外部模型。
 
 当仓库中存在 `cases/n31/gold/gold_sop.json` 时，`run_n31_local.sh` 会自动改用实际操作者审核的 Gold 约束，页面显示 `GOLD / FINAL`。重新执行专家录音ASR、术语核对、Gold固化和最终评测使用：
 
@@ -191,7 +199,7 @@ bash scripts/run_demo_mode.sh offline
 bash scripts/check_pitch.sh
 ```
 
-验收器检查180秒时间轴、Gold指标、DGX报告、PPT、海报、培训视频、证据包和三种演示兜底。当前状态为 `READY_WITH_HUMAN_GATES`：自动检查通过，但完整观看、真人彩排、最终录屏、团队资格和官方规则五项门禁仍待参赛者确认。正式材料见 [三分钟路演脚本](./docs/三分钟路演脚本.md)、[现场演示与录屏操作单](./docs/现场演示与录屏操作单.md) 和 [8页路演PPT](./output/presentation/SkillForge_三分钟路演_v1.pptx)。
+验收器检查180秒时间轴、Gold指标、四场景无来源内容门禁、DGX报告、PPT、海报、培训视频、证据包和三种演示兜底。当前状态为 `READY_WITH_HUMAN_GATES`：自动检查通过，但完整观看、真人彩排、最终录屏、团队资格和官方规则五项门禁仍待参赛者确认。正式材料见 [三分钟路演脚本](./docs/三分钟路演脚本.md)、[现场演示与录屏操作单](./docs/现场演示与录屏操作单.md) 和 [8页路演PPT](./output/presentation/SkillForge_三分钟路演_v1.pptx)。
 
 可复现运行时基准：
 
@@ -209,7 +217,7 @@ bash scripts/run_runtime_benchmark.sh dgx
 bash scripts/check_submission.sh
 ```
 
-预检会运行全量测试并核对项目身份、9份说明文档、14项成果、Git工作树、跟踪文件边界、`.env`忽略与600权限、本地密钥值泄漏和成果绝对路径。报告写入被Git忽略的 `outputs/submission/submission_preflight_latest.json`，不会记录密钥值。只有 `READY_FOR_SUBMISSION` 返回0；`NOT_READY`返回1，`DEVELOPMENT_CHECK`或 `READY_WITH_HUMAN_GATES` 返回2。开发中可显式使用 `--allow-dirty`，但不能得到正式提交结论。
+预检会运行全量测试并核对项目身份、9份说明文档、15项成果、Git工作树、跟踪文件边界、`.env`忽略与600权限、本地密钥值泄漏和成果绝对路径。报告写入被Git忽略的 `outputs/submission/submission_preflight_latest.json`，不会记录密钥值。只有 `READY_FOR_SUBMISSION` 返回0；`NOT_READY`返回1，`DEVELOPMENT_CHECK`或 `READY_WITH_HUMAN_GATES` 返回2。开发中可显式使用 `--allow-dirty`，但不能得到正式提交结论。
 
 从 Gold SOP 重新生成一页式 A4 培训海报：
 

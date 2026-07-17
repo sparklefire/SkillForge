@@ -13,7 +13,7 @@
       "items": [
         {
           "artifact_id": "DEMO_BUNDLE",
-          "detail": "1629 bytes · sha256=0df4b90f612bef4e9d1db72c0887d2a74891d01c06da8c99b40f434c1d3f90b7",
+          "detail": "1945 bytes · sha256=8bab2bf1375c50c8512dbafa63707e781180f93845cacee39aee586d662b736d",
           "path": "cases/n31/demo_bundle/bundle.json",
           "status": "PASSED"
         },
@@ -21,6 +21,12 @@
           "artifact_id": "GOLD_SOP",
           "detail": "99953 bytes · sha256=a8f111a52f496f93e9934cedd493630d73732ad73e6e4e79832f0133c31c6f8a",
           "path": "cases/n31/gold/gold_sop.json",
+          "status": "PASSED"
+        },
+        {
+          "artifact_id": "SOP_VIEWS",
+          "detail": "90630 bytes · sha256=7c18ecbf1be02bbfd91cd245335343b515fcedf3261e8571263a698ae0036397",
+          "path": "cases/n31/demo_bundle/sop_views.json",
           "status": "PASSED"
         },
         {
@@ -51,6 +57,12 @@
           "artifact_id": "SOURCE_CANDIDATES",
           "detail": "68264 bytes · sha256=28708602befa289bb6a8ce97436b43384a2569a3de79c1b104011815d3c68ec3",
           "path": "cases/n31/evaluations/source_candidate_synthesis_v1.json",
+          "status": "PASSED"
+        },
+        {
+          "artifact_id": "GROUNDING_GATE",
+          "detail": "5821 bytes · sha256=469a6c83f1fa22cb1616a8a12f5aee36fc61813350028d3e77abd430621ab1c1",
+          "path": "cases/n31/evaluations/deterministic_grounding_gate_v1.json",
           "status": "PASSED"
         },
         {
@@ -94,15 +106,19 @@
     },
     {
       "assertions": {
+        "checklist_previews_public": true,
         "coverage_90_to_100": true,
         "dgx_cuda_native": true,
         "errors_5_to_0": true,
         "gold_final": true,
+        "grounding_gate_closed": true,
         "multisource_100": true,
         "pdf_structure_grounded": true,
         "revision_count_4": true,
         "source_candidates_grounded": true,
         "temporal_windows_bounded": true,
+        "training_package_traceable": true,
+        "training_quiz_grounded": true,
         "video_manifest_bound": true
       },
       "check_id": "PITCH_CLAIMS",
@@ -140,7 +156,7 @@
   ],
   "contains_credentials": false,
   "contains_raw_media": false,
-  "generated_at": "2026-07-17T06:51:09.308752+00:00",
+  "generated_at": "2026-07-17T08:04:27.566837+00:00",
   "pending_human_gates": [
     "TRAINING_VIDEO_FULL_WATCH",
     "FINAL_STAGE_REHEARSAL",

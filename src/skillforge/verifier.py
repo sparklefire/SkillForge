@@ -7,6 +7,20 @@ from typing import Any
 from .contracts import ContractValidationError, validate_document
 
 
+UNSUPPORTED_SAFETY_PROMISE_PATTERNS = (
+    "100%安全",
+    "绝对安全",
+    "保证安全",
+    "完全无风险",
+    "无任何风险",
+    "零风险",
+    "绝不会发生",
+    "100% safe",
+    "guaranteed safe",
+    "zero risk",
+)
+
+
 def _evidence_ids(step: dict[str, Any]) -> set[str]:
     return set(step.get("evidence", []))
 
@@ -105,35 +119,124 @@ def verify_sop(
     allowed_tools = set(constraints["allowed_tools"])
     allowed_parameters = set(constraints["allowed_parameters"])
     for step in current_steps:
+        reference_step = reference.get(step["step_id"])
+        reference_tools = set(reference_step["tools"]) if reference_step else set()
         for tool in step["tools"]:
-            if tool not in allowed_tools:
+            if tool not in allowed_tools or tool not in reference_tools:
                 add(
                     "UNSUPPORTED_TOOL",
                     "HIGH",
                     [step["step_id"]],
                     f"工具“{tool}”没有来源依据",
-                    [],
-                    {"step_id": step["step_id"], "tool": tool},
+                    resolve(reference_step) if reference_step else [],
+                    {
+                        "step_id": step["step_id"],
+                        "tool": tool,
+                        "globally_allowed": tool in allowed_tools,
+                        "supported_in_step": tool in reference_tools,
+                        "reference_tools": sorted(reference_tools),
+                    },
                     "REMOVE",
                     True,
                 )
         available_evidence = _evidence_ids(step)
-        for parameter in step["parameters"]:
+        reference_parameters = reference_step["parameters"] if reference_step else []
+        for parameter_index, parameter in enumerate(step["parameters"]):
             evidence_ids = set(parameter["evidence_ids"])
+            reference_name_match = next(
+                (
+                    item
+                    for item in reference_parameters
+                    if item["name"] == parameter["name"]
+                ),
+                None,
+            )
+            reference_parameter = next(
+                (
+                    item
+                    for item in reference_parameters
+                    if item["name"] == parameter["name"]
+                    and item["value"] == parameter["value"]
+                    and item["unit"] == parameter["unit"]
+                    and set(item["evidence_ids"]) == evidence_ids
+                ),
+                None,
+            )
             if (
                 parameter["name"] not in allowed_parameters
                 or not evidence_ids
                 or not evidence_ids.issubset(available_evidence)
+                or reference_parameter is None
             ):
                 add(
                     "UNSUPPORTED_PARAMETER",
                     "HIGH",
                     [step["step_id"]],
                     f"参数“{parameter['name']}”没有有效来源依据",
-                    [],
-                    {"step_id": step["step_id"], "parameter_name": parameter["name"]},
+                    (
+                        resolve(reference_step)
+                        if reference_step and reference_name_match is not None
+                        else []
+                    ),
+                    {
+                        "step_id": step["step_id"],
+                        "parameter_index": parameter_index,
+                        "parameter_name": parameter["name"],
+                        "parameter": parameter,
+                        "globally_allowed": parameter["name"] in allowed_parameters,
+                        "matches_reference": reference_parameter is not None,
+                        "reference_parameter": reference_name_match,
+                    },
+                    "REPLACE" if reference_name_match is not None else "REMOVE",
+                    True,
+                )
+
+        reference_warnings = set(reference_step["warnings"]) if reference_step else set()
+        for warning_index, warning in enumerate(step["warnings"]):
+            if warning not in reference_warnings:
+                add(
+                    "UNSUPPORTED_SAFETY_CLAIM",
+                    "HIGH",
+                    [step["step_id"]],
+                    f"风险或安全提示“{warning}”没有当前步骤来源依据",
+                    resolve(reference_step) if reference_step else [],
+                    {
+                        "step_id": step["step_id"],
+                        "field": "warnings",
+                        "warning_index": warning_index,
+                        "claim": warning,
+                        "reference_warnings": sorted(reference_warnings),
+                    },
                     "REMOVE",
                     True,
+                )
+
+        for field in ("title", "action", "success_check"):
+            value = step[field]
+            reference_value = reference_step[field] if reference_step else ""
+            matched_patterns = [
+                pattern
+                for pattern in UNSUPPORTED_SAFETY_PROMISE_PATTERNS
+                if pattern.lower() in value.lower()
+                and pattern.lower() not in reference_value.lower()
+            ]
+            if matched_patterns:
+                can_restore = reference_step is not None
+                add(
+                    "UNSUPPORTED_SAFETY_CLAIM",
+                    "HIGH",
+                    [step["step_id"]],
+                    f"{field} 含无来源绝对安全承诺",
+                    resolve(reference_step) if reference_step else [],
+                    {
+                        "step_id": step["step_id"],
+                        "field": field,
+                        "claim": value,
+                        "matched_patterns": matched_patterns,
+                        "reference_value": reference_value,
+                    },
+                    "REPLACE" if can_restore else "REVIEW",
+                    can_restore,
                 )
 
         if step["required"] and not step["evidence"]:

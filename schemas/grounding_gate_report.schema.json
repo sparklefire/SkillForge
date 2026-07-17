@@ -1,0 +1,136 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/grounding_gate_report.schema.json",
+  "title": "SkillForge Deterministic Grounding Gate Report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "case_id",
+    "report_id",
+    "status",
+    "model_calls",
+    "scenarios",
+    "summary",
+    "data_policy"
+  ],
+  "properties": {
+    "version": {"const": 1},
+    "case_id": {"const": "n31_media_change"},
+    "report_id": {"const": "DETERMINISTIC_GROUNDING_GATE_V1"},
+    "status": {"enum": ["PASSED", "FAILED"]},
+    "model_calls": {"const": 0},
+    "scenarios": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {"$ref": "#/$defs/scenario"}
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scenario_count",
+        "passed_count",
+        "detected_count",
+        "revised_count",
+        "residual_conflict_count"
+      ],
+      "properties": {
+        "scenario_count": {"const": 4},
+        "passed_count": {"type": "integer", "minimum": 0, "maximum": 4},
+        "detected_count": {"type": "integer", "minimum": 0, "maximum": 4},
+        "revised_count": {"type": "integer", "minimum": 0, "maximum": 4},
+        "residual_conflict_count": {"type": "integer", "minimum": 0}
+      }
+    },
+    "data_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "external_model_calls",
+        "contains_raw_media",
+        "contains_credentials",
+        "contains_absolute_paths"
+      ],
+      "properties": {
+        "external_model_calls": {"const": 0},
+        "contains_raw_media": {"const": false},
+        "contains_credentials": {"const": false},
+        "contains_absolute_paths": {"const": false}
+      }
+    }
+  },
+  "$defs": {
+    "scenario": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scenario_id",
+        "status",
+        "target_step_id",
+        "mutation_field",
+        "mutation_summary",
+        "expected_conflict_kind",
+        "detected_conflict_ids",
+        "detected_conflict_kinds",
+        "rejection_reason",
+        "proposed_actions",
+        "revision_actions",
+        "reference_evidence_ids",
+        "before_value",
+        "after_value",
+        "reference_value",
+        "residual_conflict_count",
+        "restored"
+      ],
+      "properties": {
+        "scenario_id": {
+          "enum": [
+            "CROSS_STEP_ALLOWED_TOOL",
+            "ALLOWED_PARAMETER_WRONG_VALUE",
+            "UNGROUNDED_WARNING",
+            "ABSOLUTE_SAFETY_PROMISE"
+          ]
+        },
+        "status": {"enum": ["PASSED", "FAILED"]},
+        "target_step_id": {"pattern": "^S[0-9]{2}$"},
+        "mutation_field": {"enum": ["tools", "parameters", "warnings", "success_check"]},
+        "mutation_summary": {"type": "string", "minLength": 1},
+        "expected_conflict_kind": {
+          "enum": ["UNSUPPORTED_TOOL", "UNSUPPORTED_PARAMETER", "UNSUPPORTED_SAFETY_CLAIM"]
+        },
+        "detected_conflict_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^C[0-9]{3}$"}
+        },
+        "detected_conflict_kinds": {
+          "type": "array",
+          "items": {
+            "enum": ["UNSUPPORTED_TOOL", "UNSUPPORTED_PARAMETER", "UNSUPPORTED_SAFETY_CLAIM"]
+          }
+        },
+        "rejection_reason": {"type": "string", "minLength": 1},
+        "proposed_actions": {
+          "type": "array",
+          "items": {"enum": ["REMOVE", "REPLACE"]}
+        },
+        "revision_actions": {
+          "type": "array",
+          "items": {"enum": ["REMOVE", "REPLACE"]}
+        },
+        "reference_evidence_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^E[0-9]{3}$"}
+        },
+        "before_value": {},
+        "after_value": {},
+        "reference_value": {},
+        "residual_conflict_count": {"type": "integer", "minimum": 0},
+        "restored": {"type": "boolean"}
+      }
+    }
+  }
+}

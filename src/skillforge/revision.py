@@ -74,30 +74,107 @@ def revise_sop(
                         "before": tool,
                         "after": None,
                         "reason": conflict["message"],
-                        "evidence_ids": [],
+                        "evidence_ids": evidence_ids(conflict),
                     }
                 )
         elif conflict["kind"] == "UNSUPPORTED_PARAMETER":
             step_id = conflict["details"]["step_id"]
             name = conflict["details"]["parameter_name"]
             step = next(item for item in revised["steps"] if item["step_id"] == step_id)
-            removed = [item for item in step["parameters"] if item["name"] == name]
-            if removed:
-                step["parameters"] = [
-                    item for item in step["parameters"] if item["name"] != name
-                ]
+            invalid_parameter = conflict["details"].get("parameter")
+            parameter_index = conflict["details"].get("parameter_index")
+            reference_step = reference.get(step_id)
+            reference_parameter = copy.deepcopy(
+                conflict["details"].get("reference_parameter")
+            )
+            if reference_parameter is None and reference_step is not None:
+                reference_parameter = next(
+                    (
+                        copy.deepcopy(item)
+                        for item in reference_step["parameters"]
+                        if item["name"] == name
+                    ),
+                    None,
+                )
+            actual_index = None
+            if (
+                isinstance(parameter_index, int)
+                and 0 <= parameter_index < len(step["parameters"])
+                and step["parameters"][parameter_index] == invalid_parameter
+            ):
+                actual_index = parameter_index
+            else:
+                actual_index = next(
+                    (
+                        index
+                        for index, item in enumerate(step["parameters"])
+                        if item == invalid_parameter
+                    ),
+                    None,
+                )
+            if actual_index is not None:
+                before = copy.deepcopy(step["parameters"][actual_index])
+                if reference_parameter is None:
+                    step["parameters"].pop(actual_index)
+                    action = "REMOVE"
+                    after = None
+                else:
+                    step["parameters"][actual_index] = reference_parameter
+                    action = "REPLACE"
+                    after = reference_parameter
                 step["status"] = "REVISED"
                 changes.append(
                     {
                         "conflict_id": conflict["conflict_id"],
-                        "action": "REMOVE",
-                        "path": f"/steps/{step_id}/parameters",
-                        "before": removed,
-                        "after": None,
+                        "action": action,
+                        "path": f"/steps/{step_id}/parameters/{actual_index}",
+                        "before": before,
+                        "after": after,
                         "reason": conflict["message"],
-                        "evidence_ids": [],
+                        "evidence_ids": (
+                            list(reference_parameter["evidence_ids"])
+                            if reference_parameter
+                            else []
+                        ),
                     }
                 )
+        elif conflict["kind"] == "UNSUPPORTED_SAFETY_CLAIM":
+            step_id = conflict["details"]["step_id"]
+            field = conflict["details"]["field"]
+            step = next(item for item in revised["steps"] if item["step_id"] == step_id)
+            if field == "warnings":
+                claim = conflict["details"]["claim"]
+                if claim not in step["warnings"]:
+                    continue
+                step["warnings"].remove(claim)
+                before = claim
+                after = None
+                action = "REMOVE"
+                path = f"/steps/{step_id}/warnings"
+                source_ids: list[str] = evidence_ids(conflict)
+            else:
+                if step_id not in reference:
+                    continue
+                before = step[field]
+                after = reference[step_id][field]
+                if before == after:
+                    continue
+                step[field] = after
+                action = "REPLACE"
+                path = f"/steps/{step_id}/{field}"
+                source_ids = evidence_ids(conflict)
+            step["status"] = "REVISED"
+            changes.append(
+                {
+                    "conflict_id": conflict["conflict_id"],
+                    "action": action,
+                    "path": path,
+                    "before": before,
+                    "after": after,
+                    "reason": conflict["message"],
+                    "evidence_ids": source_ids,
+                }
+            )
 
     if any(item["kind"] == "ORDER_ERROR" and item["automatic"] for item in report["conflicts"]):
         order = {step_id: index for index, step_id in enumerate(constraints["expected_order"])}

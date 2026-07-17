@@ -99,3 +99,11 @@ def test_pitch_requires_traceable_training_package() -> None:
 def test_pitch_requires_five_grounded_quiz_categories() -> None:
     result = _check_metrics(ROOT)
     assert result["assertions"]["training_quiz_grounded"] is True
+
+
+def test_pitch_requires_closed_deterministic_grounding_gate() -> None:
+    artifact_ids = {item["artifact_id"] for item in _runbook()["required_artifacts"]}
+    assert "GROUNDING_GATE" in artifact_ids
+    result = _check_metrics(ROOT)
+    assert result["status"] == "PASSED"
+    assert result["assertions"]["grounding_gate_closed"] is True
