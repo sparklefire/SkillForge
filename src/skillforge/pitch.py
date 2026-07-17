@@ -129,6 +129,10 @@ def _check_metrics(root: Path) -> dict[str, Any]:
         _read_json(root / "cases/n31/evaluations/dgx_visual_compute_v1.json"),
         "dgx_visual_compute.schema.json",
     )
+    temporal = validate_document(
+        _read_json(root / "cases/n31/evaluations/temporal_action_windows_v1.json"),
+        "temporal_action_windows.schema.json",
+    )
     manifest_path = root / "output/video/n31_training_video_manifest_v1.json"
     manifest = validate_document(
         _read_json(manifest_path), "training_video_manifest.schema.json"
@@ -153,6 +157,22 @@ def _check_metrics(root: Path) -> dict[str, Any]:
         and dgx["summary"]["processed_video_count"] == 6
         and dgx["summary"]["sampled_frame_count"] == 420
         and dgx["summary"]["selected_frame_count"] == 50,
+        "temporal_windows_bounded": temporal["semantic_claim_scope"]
+        == "GOLD_ALIGNED_CANDIDATE_WINDOW_ONLY"
+        and temporal["model_calls"] == 0
+        and temporal["summary"]["step_count"] == 13
+        and temporal["summary"]["window_count"] == 19
+        and temporal["summary"]["source_count"] == 6
+        and temporal["summary"]["selected_frame_reference_count"] == 51
+        and temporal["summary"]["window_with_dgx_candidate_count"] == 12
+        and temporal["summary"]["unique_dgx_candidate_count"] == 41
+        and any(
+            item["step_id"] == "S04"
+            and item["visual_verdict"] == "NOT_VISIBLE"
+            and item["start_ms"] == 60_000
+            and item["end_ms"] == 75_000
+            for item in temporal["windows"]
+        ),
         "video_manifest_bound": video_path.is_file()
         and manifest["output"]["sha256"] == _sha256(video_path)
         and manifest["coverage"]["covered_gold_step_count"]

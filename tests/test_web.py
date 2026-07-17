@@ -71,6 +71,12 @@ def test_web_accepts_operator_reviewed_gold_result(tmp_path) -> None:
         dgx = response.json()["dgx_visual_compute"]
         assert dgx["actual_gpu_compute"] is True
         assert dgx["semantic_claim_scope"] == "CANDIDATE_SELECTION_ONLY"
+    temporal = response.json()["temporal_action_windows"]
+    assert temporal["semantic_claim_scope"] == "GOLD_ALIGNED_CANDIDATE_WINDOW_ONLY"
+    assert temporal["summary"]["step_count"] == 13
+    assert temporal["summary"]["window_count"] == 19
+    s04 = next(item for item in temporal["windows"] if item["step_id"] == "S04")
+    assert s04["visual_verdict"] == "NOT_VISIBLE"
     assert len(response.json()["checklist"]["items"]) == 13
     assert len(response.json()["quiz"]["questions"]) == 5
     checklist = client.get("/api/n31/artifacts/checklist")
@@ -94,6 +100,9 @@ def test_web_accepts_operator_reviewed_gold_result(tmp_path) -> None:
     assert evidence_pack.status_code == 200
     assert evidence_pack.json()["artifact_type"] == "TRAINING_VIDEO_EVIDENCE_PACK"
     assert evidence_pack.json()["contains_raw_media"] is False
+    temporal_download = client.get("/api/n31/artifacts/temporal-windows")
+    assert temporal_download.status_code == 200
+    assert temporal_download.json()["summary"]["window_count"] == 19
     assert client.get("/api/n31/artifacts/private-video").status_code == 404
     rerun = client.post("/api/n31/run")
     assert rerun.status_code == 200

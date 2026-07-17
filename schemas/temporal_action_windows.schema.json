@@ -1,0 +1,162 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/temporal_action_windows.schema.json",
+  "title": "SkillForge Temporal Action Windows",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "case_id",
+    "report_id",
+    "generated_at",
+    "status",
+    "semantic_claim_scope",
+    "model_calls",
+    "upstream_visual_model",
+    "upstream_visual_model_calls",
+    "input_bindings",
+    "configuration",
+    "windows",
+    "summary",
+    "data_policy"
+  ],
+  "properties": {
+    "version": {"const": 1},
+    "case_id": {"const": "n31_media_change"},
+    "report_id": {"const": "N31_TEMPORAL_ACTION_WINDOWS_V1"},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "status": {"const": "COMPLETED"},
+    "semantic_claim_scope": {"const": "GOLD_ALIGNED_CANDIDATE_WINDOW_ONLY"},
+    "model_calls": {"const": 0},
+    "upstream_visual_model": {"type": "string", "minLength": 1},
+    "upstream_visual_model_calls": {"type": "integer", "minimum": 1},
+    "input_bindings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["gold_sop_sha256", "visual_review_sha256", "dgx_visual_sha256"],
+      "properties": {
+        "gold_sop_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "visual_review_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "dgx_visual_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "configuration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["merge_gap_ms", "candidate_padding_ms"],
+      "properties": {
+        "merge_gap_ms": {"type": "integer", "minimum": 0, "maximum": 10000},
+        "candidate_padding_ms": {"type": "integer", "minimum": 0, "maximum": 10000}
+      }
+    },
+    "windows": {
+      "type": "array",
+      "minItems": 8,
+      "items": {"$ref": "#/$defs/window"}
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "step_count",
+        "required_step_count",
+        "window_count",
+        "source_count",
+        "source_ids",
+        "multi_source_step_count",
+        "selected_frame_reference_count",
+        "window_with_dgx_candidate_count",
+        "unique_dgx_candidate_count",
+        "supported_step_count",
+        "partial_step_count",
+        "not_visible_step_count",
+        "contradicted_step_count"
+      ],
+      "properties": {
+        "step_count": {"type": "integer", "minimum": 8, "maximum": 15},
+        "required_step_count": {"type": "integer", "minimum": 1},
+        "window_count": {"type": "integer", "minimum": 8},
+        "source_count": {"type": "integer", "minimum": 1},
+        "source_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "multi_source_step_count": {"type": "integer", "minimum": 0},
+        "selected_frame_reference_count": {"type": "integer", "minimum": 1},
+        "window_with_dgx_candidate_count": {"type": "integer", "minimum": 0},
+        "unique_dgx_candidate_count": {"type": "integer", "minimum": 0},
+        "supported_step_count": {"type": "integer", "minimum": 0},
+        "partial_step_count": {"type": "integer", "minimum": 0},
+        "not_visible_step_count": {"type": "integer", "minimum": 0},
+        "contradicted_step_count": {"type": "integer", "minimum": 0}
+      }
+    },
+    "data_policy": {
+      "const": {
+        "contains_raw_media": false,
+        "contains_credentials": false,
+        "contains_absolute_paths": false,
+        "external_model_calls_for_window_generation": 0
+      }
+    }
+  },
+  "$defs": {
+    "window": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "window_id",
+        "step_id",
+        "title",
+        "required",
+        "source_ref",
+        "start_ms",
+        "end_ms",
+        "duration_ms",
+        "evidence_ids",
+        "selected_frame_count",
+        "dgx_candidate_timestamps_ms",
+        "dgx_candidate_count",
+        "visual_verdict",
+        "visual_confidence",
+        "privacy_observation"
+      ],
+      "properties": {
+        "window_id": {"type": "string", "pattern": "^S[0-9]{2}-W[0-9]{2}$"},
+        "step_id": {"type": "string", "pattern": "^S[0-9]{2}$"},
+        "title": {"type": "string", "minLength": 1},
+        "required": {"type": "boolean"},
+        "source_ref": {"type": "string", "minLength": 1},
+        "start_ms": {"type": "integer", "minimum": 0},
+        "end_ms": {"type": "integer", "minimum": 1},
+        "duration_ms": {"type": "integer", "minimum": 1},
+        "evidence_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^E[0-9]{3}$"}
+        },
+        "selected_frame_count": {"type": "integer", "minimum": 1},
+        "dgx_candidate_timestamps_ms": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "integer", "minimum": 0}
+        },
+        "dgx_candidate_count": {"type": "integer", "minimum": 0},
+        "visual_verdict": {
+          "enum": ["SUPPORTED", "PARTIAL", "NOT_VISIBLE", "CONTRADICTED"]
+        },
+        "visual_confidence": {"type": "number", "minimum": 0, "maximum": 1},
+        "privacy_observation": {
+          "enum": [
+            "NO_SENSITIVE_CONTENT_VISIBLE",
+            "MASKED_CONTENT_PRESENT",
+            "POTENTIAL_SENSITIVE_CONTENT"
+          ]
+        }
+      }
+    }
+  }
+}

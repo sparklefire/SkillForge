@@ -146,6 +146,7 @@
     {"artifact_id": "GOLD_SOP", "path": "cases/n31/gold/gold_sop.json", "kind": "JSON", "required": true},
     {"artifact_id": "MULTISOURCE_EVAL", "path": "cases/n31/evaluations/multisource_comparison_v1.json", "kind": "JSON", "required": true},
     {"artifact_id": "DGX_VISUAL", "path": "cases/n31/evaluations/dgx_visual_compute_v1.json", "kind": "JSON", "required": true},
+    {"artifact_id": "TEMPORAL_WINDOWS", "path": "cases/n31/evaluations/temporal_action_windows_v1.json", "kind": "JSON", "required": true},
     {"artifact_id": "RUNTIME_BENCHMARK", "path": "output/evaluation/runtime_benchmark_dgx.json", "kind": "JSON", "required": true},
     {"artifact_id": "POSTER", "path": "output/pdf/n31_a4_training_poster.pdf", "kind": "PDF", "required": true},
     {"artifact_id": "TRAINING_VIDEO", "path": "output/video/n31_training_video_v1.mp4", "kind": "MP4", "required": true},
