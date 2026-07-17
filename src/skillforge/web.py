@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import os
 import re
 import uuid
@@ -40,6 +41,21 @@ N31_DOWNLOADS = {
         "output/pdf/n31_a4_training_poster.pdf",
         "n31_a4_training_poster.pdf",
     ),
+    "training-video": (
+        "project",
+        "output/video/n31_training_video_v1.mp4",
+        "n31_training_video_v1.mp4",
+    ),
+    "training-video-manifest": (
+        "project",
+        "output/video/n31_training_video_manifest_v1.json",
+        "n31_training_video_manifest_v1.json",
+    ),
+    "training-video-evidence": (
+        "project",
+        "output/video/n31_training_video_evidence_pack_v1.json",
+        "n31_training_video_evidence_pack_v1.json",
+    ),
 }
 
 
@@ -65,7 +81,7 @@ HTML = """<!doctype html>
   <section class="panel"><h2>发现问题 → 展示证据</h2><div id="issues"></div></section>
   <section class="panel"><h2>修订前后对比</h2><div class="cols"><div><h3>修订前</h3><div id="before"></div></div><div><h3>修订后</h3><div id="after"></div></div></div></section>
   <section class="panel"><h2>局部修订审计</h2><div id="changes"></div></section>
-  <section class="panel" id="results-panel" hidden><h2>培训成果</h2><div class="downloads" id="n31-downloads"><a class="download" href="/api/n31/artifacts/final-sop">下载最终 SOP</a><a class="download" href="/api/n31/artifacts/checklist">下载手机检查清单</a><a class="download" href="/api/n31/artifacts/quiz">下载培训测验</a><a class="download" href="/api/n31/artifacts/poster">下载 A4 培训海报</a><a class="download" href="/api/n31/artifacts/revision-audit">下载修订记录</a></div><div class="cols"><div><h3>手机端检查清单</h3><div id="checklist"></div></div><div><h3>培训测验</h3><div id="quiz"></div></div></div></section>
+  <section class="panel" id="results-panel" hidden><h2>培训成果</h2><div id="training-video-card" hidden><h3>80秒横屏培训视频</h3><div id="training-video-notice" class="notice"></div><div id="training-video-metrics" class="grid"></div><video controls preload="metadata" style="width:100%;margin:14px 0;border-radius:12px;background:#000" src="/api/n31/media/training-video"></video></div><div class="downloads" id="n31-downloads"><a class="download" href="/api/n31/artifacts/final-sop">下载最终 SOP</a><a class="download" href="/api/n31/artifacts/checklist">下载手机检查清单</a><a class="download" href="/api/n31/artifacts/quiz">下载培训测验</a><a class="download" href="/api/n31/artifacts/poster">下载 A4 培训海报</a><a class="download" href="/api/n31/artifacts/training-video">下载80秒培训视频</a><a class="download" href="/api/n31/artifacts/training-video-manifest">下载视频生成清单</a><a class="download" href="/api/n31/artifacts/training-video-evidence">下载视频证据包</a><a class="download" href="/api/n31/artifacts/revision-audit">下载修订记录</a></div><div class="cols"><div><h3>手机端检查清单</h3><div id="checklist"></div></div><div><h3>培训测验</h3><div id="quiz"></div></div></div></section>
   <section class="panel"><h2>上传素材并原生预处理</h2><p>上传内容只写入被 Git 忽略的本地输出目录。本页面不会自动把原始素材发送给外部模型。</p>
     <form id="upload"><label>操作视频<input type="file" name="video" accept="video/*"></label><label>设备 PDF<input type="file" name="pdf" accept="application/pdf"></label><label>专家录音<input type="file" name="audio" accept="audio/*"></label><label><input style="width:auto" type="checkbox" name="transcribe" value="true">调用 StepAudio ASR</label><label><input style="width:auto" type="checkbox" name="analyze_visuals" value="true">调用 Step 3.7 分析关键帧</label><label><input style="width:auto" type="checkbox" name="plan_sop" value="true">根据证据规划 SOP</label><label><input style="width:auto" type="checkbox" name="external_processing_authorized" value="true">已确认允许把选定派生内容发送给外部 API</label><button>开始处理</button><span id="status"></span></form><pre id="ingest"></pre>
   </section>
@@ -79,6 +95,7 @@ document.querySelector('#basis').textContent=isGold?'实际操作者口述审核
 document.querySelector('#metrics').innerHTML=[['必要步骤',`${pct(b.required_step_coverage)} → ${pct(a.required_step_coverage)}`],['证据覆盖',`${pct(b.evidence_supported_required_steps)} → ${pct(a.evidence_supported_required_steps)}`],['严重错误',`${b.severe_error_count} → ${a.severe_error_count}`],['局部修改',d.summary.revision_count],['状态',isReal?d.summary.gold_status||'NOT_GOLD':d.summary.workflow_state]].map(x=>`<div class="metric"><span class="muted">${esc(x[0])}</span><strong>${esc(x[1])}</strong></div>`).join('');
 if(d.dgx_visual_compute){const g=d.dgx_visual_compute,s=g.summary;document.querySelector('#dgx-panel').hidden=false;document.querySelector('#dgx-metrics').innerHTML=[['GPU',g.gpu.device_name],['本地视频',s.processed_video_count],['GPU处理帧',s.sampled_frame_count],['候选帧',s.selected_frame_count],['CUDA核耗时',`${Number(s.gpu_kernel_ms).toFixed(1)}ms`]].map(x=>`<div class="metric"><span class="muted">${esc(x[0])}</span><strong>${esc(x[1])}</strong></div>`).join('');document.querySelector('#agent-trace').innerHTML=g.agent_trace.map(x=>`<div class="change"><b>${esc(x.event_id)} · ${esc(x.agent)} · ${esc(x.action)}</b><div>${esc(x.decision)}</div><div class="evidence">工具：${esc(x.tool)}｜结果：${esc(x.outcome)}</div></div>`).join('')}
 if(d.multisource_comparison&&d.visual_review){const s=d.multisource_comparison.source_ablation,v=d.visual_review.summary,p=d.multisource_comparison.privacy_comparison;document.querySelector('#multisource-panel').hidden=false;document.querySelector('#source-metrics').innerHTML=[['手册单源',pct(s.manual_only.coverage)],['专家口述单源',pct(s.expert_audio_only.coverage)],['两种以上来源',pct(s.two_or_more_source_types.coverage)],['视频部分可观察',pct(s.video_observable_partial_or_better.coverage)],['视觉矛盾',v.contradicted_count]].map(x=>`<div class="metric"><span class="muted">${esc(x[0])}</span><strong>${esc(x[1])}</strong></div>`).join('');document.querySelector('#visual-note').textContent=`严格视觉复核：${v.supported_count}步完整支持、${v.partial_count}步部分可见、${v.not_visible_count}步不可见、${v.contradicted_count}步矛盾。模型标记${p.model_flagged_step_count}步需隐私复核；本地安全派生QA为${p.local_safe_derivative_qa}，标记保留但不自动推翻人工检查。`}
+if(d.training_video){const t=d.training_video,o=t.output,c=t.coverage;document.querySelector('#training-video-card').hidden=false;document.querySelector('#training-video-notice').textContent=t.final_human_review_required?'自动检查与AI辅助抽帧检查已通过；最终提交前仍需参赛者完整观看并确认旁白节奏。':'参赛者已完成最终观看确认。';document.querySelector('#training-video-metrics').innerHTML=[['时长',`${(o.duration_ms/1000).toFixed(0)}秒`],['Gold步骤',`${c.covered_gold_step_count}/${c.gold_step_count}`],['必要步骤',`${c.covered_required_step_count}/${c.required_step_count}`],['证据引用',c.evidence_reference_count],['状态',t.status]].map(x=>`<div class="metric"><span class="muted">${esc(x[0])}</span><strong>${esc(x[1])}</strong></div>`).join('')}
 document.querySelector('#issues').innerHTML=d.initial_conflicts.conflicts.map(c=>`<div class="issue"><b>${esc(c.kind)}</b> · ${esc(c.message)}<div class="evidence">${c.evidence.map(e=>`${esc(e.evidence_id)}｜${esc(e.source_ref)}｜${esc(JSON.stringify(e.locator))}`).join('<br>')||'无来源内容：按规则拒绝'}</div></div>`).join('');
 const render=s=>s.steps.map(x=>`<div class="step"><b>${esc(x.step_id)} ${esc(x.title)}</b><div class="muted">${esc(x.action)}</div><div class="evidence">证据：${esc(x.evidence.join(', ')||'无')}</div></div>`).join('');document.querySelector('#before').innerHTML=render(d.before_sop);document.querySelector('#after').innerHTML=render(d.after_sop);
 document.querySelector('#changes').innerHTML=d.revision_audit.changes.map(c=>`<div class="change"><b>${esc(c.action)} · ${esc(c.path)}</b><div>${esc(c.reason)}</div><div class="evidence">证据：${esc(c.evidence_ids.join(', ')||'无依据，已删除')}</div></div>`).join('');
@@ -91,6 +108,52 @@ document.querySelector('#upload').addEventListener('submit',async e=>{e.preventD
 
 def _read_json(path: Path) -> Any:
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def _sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _artifact_media_type(path: Path) -> str:
+    return {
+        ".json": "application/json",
+        ".mp4": "video/mp4",
+        ".pdf": "application/pdf",
+    }.get(path.suffix.lower(), "application/octet-stream")
+
+
+def _training_video_manifest() -> dict[str, Any] | None:
+    manifest_path = ROOT / "output/video/n31_training_video_manifest_v1.json"
+    video_path = ROOT / "output/video/n31_training_video_v1.mp4"
+    if not manifest_path.is_file() and not video_path.is_file():
+        return None
+    if not manifest_path.is_file() or not video_path.is_file():
+        raise ValueError("培训视频和证据清单必须同时存在")
+    manifest = validate_document(
+        _read_json(manifest_path), "training_video_manifest.schema.json"
+    )
+    output = manifest["output"]
+    if output["filename"] != video_path.name:
+        raise ValueError("培训视频文件名与证据清单不一致")
+    if output["bytes"] != video_path.stat().st_size or output["sha256"] != _sha256(
+        video_path
+    ):
+        raise ValueError("培训视频大小或SHA-256与证据清单不一致")
+    evidence_pack_path = ROOT / "output/video" / manifest["evidence_pack"]["filename"]
+    if not evidence_pack_path.is_file():
+        raise ValueError("培训视频证据包不存在")
+    if manifest["evidence_pack"]["sha256"] != _sha256(evidence_pack_path):
+        raise ValueError("培训视频证据包SHA-256与生成清单不一致")
+    evidence_pack = validate_document(
+        _read_json(evidence_pack_path), "training_video_evidence_pack.schema.json"
+    )
+    if evidence_pack["training_video_sha256"] != output["sha256"]:
+        raise ValueError("培训视频证据包未绑定当前成片")
+    return manifest
 
 
 def _demo_payload(directory: Path) -> dict[str, Any]:
@@ -164,6 +227,7 @@ def create_app(
 
     @app.get("/health")
     def health() -> dict[str, Any]:
+        training_video = _training_video_manifest()
         return {
             "status": "ok",
             "runtime": "native-python",
@@ -171,6 +235,10 @@ def create_app(
             "n31_rehearsal_available": (
                 active_n31_dir["path"] / "summary.json"
             ).is_file(),
+            "training_video_available": training_video is not None,
+            "training_video_status": (
+                training_video["status"] if training_video else None
+            ),
         }
 
     @app.get("/api/n31")
@@ -201,6 +269,14 @@ def create_app(
                 dgx_visual = _read_json(dgx_visual_path)
                 validate_document(dgx_visual, "dgx_visual_compute.schema.json")
                 payload["dgx_visual_compute"] = dgx_visual
+            try:
+                training_video = _training_video_manifest()
+            except ValueError as exc:
+                raise HTTPException(
+                    status_code=409, detail=f"培训视频证据校验失败: {exc}"
+                ) from exc
+            if training_video:
+                payload["training_video"] = training_video
         return JSONResponse(payload)
 
     @app.post("/api/n31/run")
@@ -234,12 +310,24 @@ def create_app(
             raise HTTPException(status_code=404)
         return FileResponse(
             path,
-            media_type=(
-                "application/pdf"
-                if path.suffix.lower() == ".pdf"
-                else "application/json"
-            ),
+            media_type=_artifact_media_type(path),
             filename=download_name,
+        )
+
+    @app.get("/api/n31/media/training-video")
+    def stream_n31_training_video() -> FileResponse:
+        path = ROOT / "output/video/n31_training_video_v1.mp4"
+        try:
+            manifest = _training_video_manifest()
+        except ValueError as exc:
+            raise HTTPException(status_code=409, detail=str(exc)) from exc
+        if manifest is None or not path.is_file():
+            raise HTTPException(status_code=404)
+        return FileResponse(
+            path,
+            media_type="video/mp4",
+            filename=path.name,
+            content_disposition_type="inline",
         )
 
     @app.get("/api/demo")

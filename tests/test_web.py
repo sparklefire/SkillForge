@@ -3,7 +3,7 @@ from fastapi.testclient import TestClient
 import json
 
 from skillforge.demo import ROOT, run_demo
-from skillforge.web import create_app
+from skillforge.web import _artifact_media_type, create_app
 
 
 def test_native_web_health_and_demo(tmp_path) -> None:
@@ -15,6 +15,8 @@ def test_native_web_health_and_demo(tmp_path) -> None:
         "runtime": "native-python",
         "docker_required": False,
         "n31_rehearsal_available": False,
+        "training_video_available": True,
+        "training_video_status": "READY_FOR_HUMAN_REVIEW",
     }
     assert client.get("/api/demo").status_code == 404
     result = client.post("/api/demo/run")
@@ -59,6 +61,11 @@ def test_web_accepts_operator_reviewed_gold_result(tmp_path) -> None:
         == 1.0
     )
     assert response.json()["visual_review"]["summary"]["contradicted_count"] == 0
+    training_video = response.json()["training_video"]
+    assert training_video["status"] == "READY_FOR_HUMAN_REVIEW"
+    assert training_video["output"]["duration_ms"] == 80_000
+    assert training_video["coverage"]["covered_gold_step_count"] == 13
+    assert training_video["final_human_review_required"] is True
     dgx_path = ROOT / "cases/n31/evaluations/dgx_visual_compute_v1.json"
     if dgx_path.is_file():
         dgx = response.json()["dgx_visual_compute"]
@@ -74,6 +81,19 @@ def test_web_accepts_operator_reviewed_gold_result(tmp_path) -> None:
     assert poster.status_code == 200
     assert poster.headers["content-type"] == "application/pdf"
     assert poster.content.startswith(b"%PDF-")
+    video = client.get(
+        "/api/n31/media/training-video", headers={"Range": "bytes=0-31"}
+    )
+    assert video.status_code == 206
+    assert video.headers["content-type"] == "video/mp4"
+    assert b"ftyp" in video.content
+    manifest = client.get("/api/n31/artifacts/training-video-manifest")
+    assert manifest.status_code == 200
+    assert manifest.json()["output"]["duration_ms"] == 80_000
+    evidence_pack = client.get("/api/n31/artifacts/training-video-evidence")
+    assert evidence_pack.status_code == 200
+    assert evidence_pack.json()["artifact_type"] == "TRAINING_VIDEO_EVIDENCE_PACK"
+    assert evidence_pack.json()["contains_raw_media"] is False
     assert client.get("/api/n31/artifacts/private-video").status_code == 404
     rerun = client.post("/api/n31/run")
     assert rerun.status_code == 200
@@ -83,6 +103,13 @@ def test_web_accepts_operator_reviewed_gold_result(tmp_path) -> None:
     active = client.get("/api/n31").json()
     assert active["summary"]["metrics_status"] == "FINAL"
     assert len(active["checklist"]["items"]) == 13
+
+
+def test_artifact_media_type_is_explicit() -> None:
+    assert _artifact_media_type(ROOT / "artifact.json") == "application/json"
+    assert _artifact_media_type(ROOT / "artifact.pdf") == "application/pdf"
+    assert _artifact_media_type(ROOT / "artifact.mp4") == "video/mp4"
+    assert _artifact_media_type(ROOT / "artifact.bin") == "application/octet-stream"
 
 
 def test_upload_requires_at_least_one_asset(tmp_path) -> None:

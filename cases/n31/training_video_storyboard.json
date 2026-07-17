@@ -1,0 +1,208 @@
+{
+  "version": 1,
+  "case_id": "n31_media_change",
+  "title": "汉印 N31 折叠标签纸更换、缝标学习与试印",
+  "target_duration_seconds": 80,
+  "width": 1920,
+  "height": 1080,
+  "fps": 30,
+  "source_policy": {
+    "accepted_privacy_status": "LOCAL_QA_PASSED",
+    "third_party_reference_allowed": false,
+    "raw_media_sent_to_tts": false
+  },
+  "tts": {
+    "model": "stepaudio-2.5-tts",
+    "voice": "zhixingjiejie",
+    "instruction": "清晰、专业、沉稳的中文培训解说，语速适中，步骤编号略作强调，避免夸张情绪",
+    "sample_rate": 48000
+  },
+  "scenes": [
+    {
+      "scene_id": "V00",
+      "kind": "INTRO",
+      "step_ids": [],
+      "source_id": "N31_VIDEO_OPERATION_FULL",
+      "start_ms": 10000,
+      "end_ms": 16000,
+      "title": "80秒完成 N31 换纸、学习与试印",
+      "narration": "用八十秒，完成汉印N31折叠标签纸的更换、缝标学习和试印验收。",
+      "evidence_ids": [],
+      "conditional": false
+    },
+    {
+      "scene_id": "V01",
+      "kind": "STEP",
+      "step_ids": ["S01"],
+      "source_id": "N31_VIDEO_OPERATION_FULL",
+      "start_ms": 0,
+      "end_ms": 5000,
+      "title": "S01 核对设备与介质",
+      "narration": "先确认设备型号、折叠热敏纸和纸宽都符合要求。",
+      "evidence_ids": ["E001", "E096", "E144"],
+      "conditional": false
+    },
+    {
+      "scene_id": "V02",
+      "kind": "STEP",
+      "step_ids": ["S02"],
+      "source_id": "N31_VIDEO_MEDIA_TYPE",
+      "start_ms": 0,
+      "end_ms": 5000,
+      "title": "S02 判断缝标定位",
+      "narration": "检查标签间有缝隙、背面没有黑标，选择缝标学习。",
+      "evidence_ids": ["E066", "E096", "E149"],
+      "conditional": false
+    },
+    {
+      "scene_id": "V03",
+      "kind": "STEP",
+      "step_ids": ["S03"],
+      "source_id": "N31_VIDEO_OPERATION_FULL",
+      "start_ms": 40000,
+      "end_ms": 45000,
+      "title": "S03 检查初始状态",
+      "narration": "关机检查纸路，确认没有残纸、异物或明显褶皱。",
+      "evidence_ids": ["E009", "E145"],
+      "conditional": false
+    },
+    {
+      "scene_id": "V04",
+      "kind": "STEP",
+      "step_ids": ["S04"],
+      "source_id": "N31_VIDEO_OPERATION_FULL",
+      "start_ms": 65000,
+      "end_ms": 70000,
+      "title": "S04 连接电源并开机｜接电见手册P2",
+      "narration": "在开关关闭时接好电源，再开机确认状态灯正常。",
+      "evidence_ids": ["E014", "E142"],
+      "conditional": false
+    },
+    {
+      "scene_id": "V05",
+      "kind": "STEP",
+      "step_ids": ["S05"],
+      "source_id": "N31_VIDEO_OPERATION_FULL",
+      "start_ms": 85000,
+      "end_ms": 90000,
+      "title": "S05 检查内部纸路｜按需",
+      "narration": "需要清理时，打开顶盖，检查胶辊和内部纸路。",
+      "evidence_ids": ["E018", "E141"],
+      "conditional": true
+    },
+    {
+      "scene_id": "V06",
+      "kind": "STEP",
+      "step_ids": ["S06"],
+      "source_id": "N31_VIDEO_GUIDES",
+      "start_ms": 0,
+      "end_ms": 5000,
+      "title": "S06 调节内部导纸夹｜按需",
+      "narration": "双手对称调节内部导纸夹，纸张居中但不要夹紧。",
+      "evidence_ids": ["E069", "E146"],
+      "conditional": true
+    },
+    {
+      "scene_id": "V07",
+      "kind": "STEP",
+      "step_ids": ["S07"],
+      "source_id": "N31_VIDEO_GUIDES",
+      "start_ms": 25000,
+      "end_ms": 30000,
+      "title": "S07 调节后方进纸导轨",
+      "narration": "合上顶盖，再从背面调整进纸导轨匹配纸宽。",
+      "evidence_ids": ["E074", "E098"],
+      "conditional": false
+    },
+    {
+      "scene_id": "V08",
+      "kind": "STEP",
+      "step_ids": ["S08"],
+      "source_id": "N31_VIDEO_MEDIA_FEED",
+      "start_ms": 0,
+      "end_ms": 5000,
+      "title": "S08 插入标签纸",
+      "narration": "沿导轨平直插入标签纸，自动吸纸后立即松手。",
+      "evidence_ids": ["E079", "E098"],
+      "conditional": false
+    },
+    {
+      "scene_id": "V09",
+      "kind": "STEP",
+      "step_ids": ["S09"],
+      "source_id": "N31_VIDEO_LEARNING",
+      "start_ms": 0,
+      "end_ms": 7000,
+      "title": "S09 执行缝标学习",
+      "narration": "按住走纸键，在状态灯第二次闪烁后立即释放，执行缝标学习。",
+      "evidence_ids": ["E077", "E104", "E148"],
+      "conditional": false
+    },
+    {
+      "scene_id": "V10",
+      "kind": "STEP",
+      "step_ids": ["S10"],
+      "source_id": "N31_VIDEO_OPERATION_FULL",
+      "start_ms": 215000,
+      "end_ms": 220000,
+      "title": "S10 单张走纸检查",
+      "narration": "短按走纸键，只送出一张并停在标签边界附近。",
+      "evidence_ids": ["E044", "E104", "E150"],
+      "conditional": false
+    },
+    {
+      "scene_id": "V11",
+      "kind": "STEP",
+      "step_ids": ["S11"],
+      "source_id": "N31_VIDEO_OPERATION_FULL",
+      "start_ms": 235000,
+      "end_ms": 240000,
+      "title": "S11 打印自检页｜按需",
+      "narration": "需要自检时，在第一次闪灯后释放走纸键，等待完整打印。",
+      "evidence_ids": ["E048", "E104"],
+      "conditional": true,
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 1280,
+        "height": 720
+      }
+    },
+    {
+      "scene_id": "V12",
+      "kind": "STEP",
+      "step_ids": ["S12"],
+      "source_id": "N31_VIDEO_PRINT_RESULT",
+      "start_ms": 0,
+      "end_ms": 5000,
+      "title": "S12 打印本地测试标签",
+      "narration": "发送已验证的本地测试标签，出纸过程中不要拉纸。",
+      "evidence_ids": ["E082", "E150"],
+      "conditional": false
+    },
+    {
+      "scene_id": "V13",
+      "kind": "STEP",
+      "step_ids": ["S13"],
+      "source_id": "N31_VIDEO_PRINT_RESULT",
+      "start_ms": 5000,
+      "end_ms": 10000,
+      "title": "S13 检查结果并记录",
+      "narration": "检查内容完整、基本居中，无跳纸、偏斜、卡纸或报警。",
+      "evidence_ids": ["E083", "E154"],
+      "conditional": false
+    },
+    {
+      "scene_id": "V14",
+      "kind": "OUTRO",
+      "step_ids": [],
+      "source_id": "N31_VIDEO_PRINT_RESULT",
+      "start_ms": 10000,
+      "end_ms": 17000,
+      "title": "验收完成",
+      "narration": "记录验收结果。若连续跳纸，先重做介质学习，再检查导轨和纸张。",
+      "evidence_ids": [],
+      "conditional": false
+    }
+  ]
+}

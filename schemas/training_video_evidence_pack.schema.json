@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/training_video_evidence_pack.schema.json",
+  "title": "SkillForge Training Video Evidence Pack",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "case_id",
+    "artifact_type",
+    "generated_at",
+    "training_video_sha256",
+    "contains_raw_media",
+    "contains_credentials",
+    "scenes",
+    "evidence"
+  ],
+  "properties": {
+    "version": {"const": 1},
+    "case_id": {"type": "string", "minLength": 1},
+    "artifact_type": {"const": "TRAINING_VIDEO_EVIDENCE_PACK"},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "training_video_sha256": {"$ref": "#/$defs/sha256"},
+    "contains_raw_media": {"const": false},
+    "contains_credentials": {"const": false},
+    "scenes": {
+      "type": "array",
+      "minItems": 10,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "scene_id",
+          "kind",
+          "step_ids",
+          "source_id",
+          "start_ms",
+          "end_ms",
+          "conditional",
+          "evidence_ids"
+        ],
+        "properties": {
+          "scene_id": {"type": "string", "minLength": 1},
+          "kind": {"enum": ["INTRO", "STEP", "OUTRO"]},
+          "step_ids": {
+            "type": "array",
+            "items": {"type": "string", "pattern": "^S[0-9]{2}$"},
+            "uniqueItems": true
+          },
+          "source_id": {"type": "string", "minLength": 1},
+          "start_ms": {"type": "integer", "minimum": 0},
+          "end_ms": {"type": "integer", "minimum": 1},
+          "conditional": {"type": "boolean"},
+          "evidence_ids": {
+            "type": "array",
+            "items": {"type": "string", "pattern": "^E[0-9]{3}$"},
+            "uniqueItems": true
+          }
+        }
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "https://skillforge.local/schemas/evidence.schema.json"
+      }
+    }
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+  }
+}

@@ -11,6 +11,7 @@ requires-python = ">=3.11"
 dependencies = [
   "fastapi>=0.115,<1",
   "jsonschema>=4.23,<5",
+  "pillow>=12.2,<13",
   "pymupdf>=1.24,<2",
   "python-multipart>=0.0.18,<1",
   "reportlab>=4.4,<5",
@@ -33,6 +34,7 @@ skillforge-expert-gold = "skillforge.expert_gold:main"
 skillforge-gold-rehearsal = "skillforge.gold_rehearsal:main"
 skillforge-multisource-eval = "skillforge.multisource_eval:main"
 skillforge-poster = "skillforge.poster:main"
+skillforge-training-video = "skillforge.training_video:main"
 skillforge-provisional-rehearsal = "skillforge.provisional_rehearsal:main"
 skillforge-visual-review = "skillforge.visual_review:main"
 skillforge-web = "skillforge.web:main"

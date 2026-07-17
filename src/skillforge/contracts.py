@@ -31,6 +31,8 @@ def load_schema(name: str) -> dict[str, Any]:
 def schema_registry() -> Registry:
     resources = []
     for path in sorted(SCHEMA_DIR.glob("*.schema.json")):
+        if path.name.startswith("._"):
+            continue
         contents = json.loads(path.read_text(encoding="utf-8"))
         schema_id = contents.get("$id")
         if schema_id:

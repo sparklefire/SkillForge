@@ -1,0 +1,196 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/training_video_manifest.schema.json",
+  "title": "SkillForge Training Video Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "case_id",
+    "generated_at",
+    "status",
+    "storyboard_sha256",
+    "output",
+    "narration",
+    "evidence_pack",
+    "source_policy",
+    "coverage",
+    "sources",
+    "automated_qa",
+    "visual_review",
+    "final_human_review_required"
+  ],
+  "properties": {
+    "version": {"const": 1},
+    "case_id": {"type": "string", "minLength": 1},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "status": {"enum": ["READY_FOR_HUMAN_REVIEW", "FINAL_APPROVED"]},
+    "storyboard_sha256": {"$ref": "#/$defs/sha256"},
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "filename",
+        "sha256",
+        "bytes",
+        "duration_ms",
+        "width",
+        "height",
+        "fps",
+        "video_codec",
+        "audio_codec",
+        "audio_sample_rate"
+      ],
+      "properties": {
+        "filename": {"const": "n31_training_video_v1.mp4"},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "bytes": {"type": "integer", "minimum": 1},
+        "duration_ms": {"type": "integer", "minimum": 60000, "maximum": 90000},
+        "width": {"const": 1920},
+        "height": {"const": 1080},
+        "fps": {"type": "number", "minimum": 29, "maximum": 31},
+        "video_codec": {"const": "h264"},
+        "audio_codec": {"const": "aac"},
+        "audio_sample_rate": {"const": 48000}
+      }
+    },
+    "narration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "model",
+        "voice",
+        "text_sha256",
+        "source_audio_sha256",
+        "source_duration_ms",
+        "tempo_ratio",
+        "text_only_external_processing"
+      ],
+      "properties": {
+        "model": {"const": "stepaudio-2.5-tts"},
+        "voice": {"type": "string", "minLength": 1},
+        "text_sha256": {"$ref": "#/$defs/sha256"},
+        "source_audio_sha256": {"$ref": "#/$defs/sha256"},
+        "source_duration_ms": {"type": "integer", "minimum": 1},
+        "tempo_ratio": {"type": "number", "minimum": 1, "maximum": 1.35},
+        "text_only_external_processing": {"const": true}
+      }
+    },
+    "evidence_pack": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "filename",
+        "sha256",
+        "evidence_count",
+        "scene_count",
+        "contains_raw_media"
+      ],
+      "properties": {
+        "filename": {"const": "n31_training_video_evidence_pack_v1.json"},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "evidence_count": {"type": "integer", "minimum": 1},
+        "scene_count": {"type": "integer", "minimum": 10},
+        "contains_raw_media": {"const": false}
+      }
+    },
+    "source_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "accepted_privacy_status",
+        "processed_source_count",
+        "third_party_reference_processed",
+        "raw_video_sent_external",
+        "manual_sent_external",
+        "private_label_sent_external"
+      ],
+      "properties": {
+        "accepted_privacy_status": {"const": "LOCAL_QA_PASSED"},
+        "processed_source_count": {"type": "integer", "minimum": 1},
+        "third_party_reference_processed": {"const": false},
+        "raw_video_sent_external": {"const": false},
+        "manual_sent_external": {"const": false},
+        "private_label_sent_external": {"const": false}
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scene_count",
+        "gold_step_count",
+        "covered_gold_step_count",
+        "required_step_count",
+        "covered_required_step_count",
+        "evidence_reference_count"
+      ],
+      "properties": {
+        "scene_count": {"type": "integer", "minimum": 10},
+        "gold_step_count": {"type": "integer", "minimum": 8, "maximum": 15},
+        "covered_gold_step_count": {"type": "integer", "minimum": 8, "maximum": 15},
+        "required_step_count": {"type": "integer", "minimum": 1},
+        "covered_required_step_count": {"type": "integer", "minimum": 1},
+        "evidence_reference_count": {"type": "integer", "minimum": 1}
+      }
+    },
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source_id", "sha256", "privacy_status"],
+        "properties": {
+          "source_id": {"type": "string", "minLength": 1},
+          "sha256": {"$ref": "#/$defs/sha256"},
+          "privacy_status": {"const": "LOCAL_QA_PASSED"}
+        }
+      }
+    },
+    "automated_qa": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "duration_passed",
+        "dimensions_passed",
+        "fps_passed",
+        "audio_passed",
+        "step_coverage_passed",
+        "evidence_boundary_passed",
+        "source_privacy_gate_passed",
+        "integrated_lufs",
+        "true_peak_dbtp"
+      ],
+      "properties": {
+        "duration_passed": {"const": true},
+        "dimensions_passed": {"const": true},
+        "fps_passed": {"const": true},
+        "audio_passed": {"const": true},
+        "step_coverage_passed": {"const": true},
+        "evidence_boundary_passed": {"const": true},
+        "source_privacy_gate_passed": {"const": true},
+        "integrated_lufs": {"type": "number", "minimum": -20, "maximum": -12},
+        "true_peak_dbtp": {"type": "number", "maximum": -0.5}
+      }
+    },
+    "visual_review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "reviewer_type", "reviewed_at", "contact_sheet_sha256", "notes"],
+      "properties": {
+        "status": {"enum": ["PENDING", "PASSED", "FAILED"]},
+        "reviewer_type": {"enum": ["PENDING", "AI_ASSISTED_CONTACT_SHEET", "HUMAN"]},
+        "reviewed_at": {"type": ["string", "null"], "format": "date-time"},
+        "contact_sheet_sha256": {
+          "anyOf": [{"$ref": "#/$defs/sha256"}, {"type": "null"}]
+        },
+        "notes": {"type": "string"}
+      }
+    },
+    "final_human_review_required": {"type": "boolean"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+  }
+}

@@ -1,0 +1,102 @@
+{
+  "version": 1,
+  "case_id": "n31_media_change",
+  "generated_at": "2026-07-17T03:07:06.087021+00:00",
+  "status": "READY_FOR_HUMAN_REVIEW",
+  "storyboard_sha256": "79f52242d24311200bbb4754050266ff169fcee9dd7d48f05b59b7de5de465f4",
+  "output": {
+    "filename": "n31_training_video_v1.mp4",
+    "sha256": "61ec74826befc89889a6025a9acdb217adbd32af589a9c1f4bb4be1958ff695f",
+    "bytes": 35194451,
+    "duration_ms": 80000,
+    "width": 1920,
+    "height": 1080,
+    "fps": 30.0,
+    "video_codec": "h264",
+    "audio_codec": "aac",
+    "audio_sample_rate": 48000
+  },
+  "narration": {
+    "model": "stepaudio-2.5-tts",
+    "voice": "zhixingjiejie",
+    "text_sha256": "882e5596f839fd5d1690b52a5196bf3cec469325951406988e4c247afc85ada1",
+    "source_audio_sha256": "c2427c00c8ecf18ba814050c34b51e578ad920b81a29f47aad8acad8e24c8e03",
+    "source_duration_ms": 85560,
+    "tempo_ratio": 1.0695,
+    "text_only_external_processing": true
+  },
+  "evidence_pack": {
+    "filename": "n31_training_video_evidence_pack_v1.json",
+    "sha256": "c0e826a98f650282f908a182e4620ce440bcc9017bc467d6310d711bb9895f52",
+    "evidence_count": 25,
+    "scene_count": 15,
+    "contains_raw_media": false
+  },
+  "source_policy": {
+    "accepted_privacy_status": "LOCAL_QA_PASSED",
+    "processed_source_count": 6,
+    "third_party_reference_processed": false,
+    "raw_video_sent_external": false,
+    "manual_sent_external": false,
+    "private_label_sent_external": false
+  },
+  "coverage": {
+    "scene_count": 15,
+    "gold_step_count": 13,
+    "covered_gold_step_count": 13,
+    "required_step_count": 10,
+    "covered_required_step_count": 10,
+    "evidence_reference_count": 30
+  },
+  "sources": [
+    {
+      "source_id": "N31_VIDEO_GUIDES",
+      "sha256": "5343b2e177174e37ccd859368a07c45f710a11a43c51bfceca5ddd53f7c5a9cf",
+      "privacy_status": "LOCAL_QA_PASSED"
+    },
+    {
+      "source_id": "N31_VIDEO_LEARNING",
+      "sha256": "efccdc08963c11df93ef518146ea5dfcc9900848847edb0c8beb0a661c260741",
+      "privacy_status": "LOCAL_QA_PASSED"
+    },
+    {
+      "source_id": "N31_VIDEO_MEDIA_FEED",
+      "sha256": "f6e19429d6d69a09b33f8d8bc9c77b0655ae171e279f61506e45bbb7fc211888",
+      "privacy_status": "LOCAL_QA_PASSED"
+    },
+    {
+      "source_id": "N31_VIDEO_MEDIA_TYPE",
+      "sha256": "b7068a0db31704aeffb564793dfd80809485f4884cb0aea82cda8a1894be8a31",
+      "privacy_status": "LOCAL_QA_PASSED"
+    },
+    {
+      "source_id": "N31_VIDEO_OPERATION_FULL",
+      "sha256": "ae9c2b9b524c928a036373a0927546a972be46d0419453a953510c33f4d1510b",
+      "privacy_status": "LOCAL_QA_PASSED"
+    },
+    {
+      "source_id": "N31_VIDEO_PRINT_RESULT",
+      "sha256": "c38bc37dd4855dc25af0defd6f0c356900dde5e44d8a774dbbb7655cf4bd2fd5",
+      "privacy_status": "LOCAL_QA_PASSED"
+    }
+  ],
+  "automated_qa": {
+    "duration_passed": true,
+    "dimensions_passed": true,
+    "fps_passed": true,
+    "audio_passed": true,
+    "step_coverage_passed": true,
+    "evidence_boundary_passed": true,
+    "source_privacy_gate_passed": true,
+    "integrated_lufs": -16.18,
+    "true_peak_dbtp": -1.43
+  },
+  "visual_review": {
+    "status": "PASSED",
+    "reviewer_type": "AI_ASSISTED_CONTACT_SHEET",
+    "reviewed_at": "2026-07-17T03:07:29.572653+00:00",
+    "contact_sheet_sha256": "75f5f6e00b8893bb4654cb713a9e40523f47d2dd4c4f3afd7fef6968c5df5f7b",
+    "notes": "CRF 22成片与前次复核的SHA-256保持一致；16帧联系表哈希也保持一致。字幕安全区、设备可辨识、S11裁切和S12-S13遮挡有效；S04仅展示设备状态并明确标注接电见手册P2。最终提交前仍需参赛者完整观看并确认旁白节奏。"
+  },
+  "final_human_review_required": true
+}
