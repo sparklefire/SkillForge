@@ -14,4 +14,5 @@ if [[ ! -f "$ROOT/cases/n31/gold/gold_sop.json" ]]; then
 fi
 
 cd "$ROOT"
-exec "$PYTHON" -m skillforge.training_video "$@"
+"$PYTHON" -m skillforge.training_video "$@"
+"$PYTHON" scripts/build_checklist_thumbnails.py >/dev/null

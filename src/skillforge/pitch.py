@@ -149,6 +149,10 @@ def _check_metrics(root: Path) -> dict[str, Any]:
         _read_json(root / "cases/n31/demo_bundle/checklist.json"),
         "mobile_checklist.schema.json",
     )
+    checklist_thumbnails = validate_document(
+        _read_json(root / "output/checklist_thumbnails/manifest.json"),
+        "checklist_thumbnail_manifest.schema.json",
+    )
     manifest_path = root / "output/video/n31_training_video_manifest_v1.json"
     manifest = validate_document(
         _read_json(manifest_path), "training_video_manifest.schema.json"
@@ -251,6 +255,22 @@ def _check_metrics(root: Path) -> dict[str, Any]:
             item for item in checklist["items"] if item["step_id"] == "S04"
         )["keyframe"]["visual_status"]
         == "NOT_VISIBLE",
+        "checklist_previews_public": len(checklist_thumbnails["items"]) == 13
+        and checklist_thumbnails["source_video"]["sha256"] == _sha256(video_path)
+        and all(
+            (root / item["preview_path"]).is_file()
+            and (root / item["preview_path"]).stat().st_size == item["bytes"]
+            and _sha256(root / item["preview_path"]) == item["sha256"]
+            for item in checklist_thumbnails["items"]
+        )
+        and {
+            item["step_id"]: item["preview_path"]
+            for item in checklist_thumbnails["items"]
+        }
+        == {
+            item["step_id"]: item["keyframe"]["preview_path"]
+            for item in checklist["items"]
+        },
         "video_manifest_bound": video_path.is_file()
         and manifest["output"]["sha256"] == _sha256(video_path)
         and manifest["coverage"]["covered_gold_step_count"]

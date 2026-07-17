@@ -58,6 +58,7 @@
         "end_ms": 5000,
         "evidence_id": "E001",
         "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000001.jpg",
+        "preview_path": "output/checklist_thumbnails/S01.jpg",
         "source_ref": "N31_VIDEO_OPERATION_FULL",
         "start_ms": 0,
         "visual_status": "PARTIAL"
@@ -151,6 +152,7 @@
         "end_ms": 5000,
         "evidence_id": "E066",
         "keyframe": "derived/video/N31_VIDEO_MEDIA_TYPE/frames/frame_000001.jpg",
+        "preview_path": "output/checklist_thumbnails/S02.jpg",
         "source_ref": "N31_VIDEO_MEDIA_TYPE",
         "start_ms": 0,
         "visual_status": "PARTIAL"
@@ -244,6 +246,7 @@
         "end_ms": 40000,
         "evidence_id": "E008",
         "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000008.jpg",
+        "preview_path": "output/checklist_thumbnails/S03.jpg",
         "source_ref": "N31_VIDEO_OPERATION_FULL",
         "start_ms": 35000,
         "visual_status": "PARTIAL"
@@ -298,6 +301,7 @@
         "end_ms": 65000,
         "evidence_id": "E013",
         "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000013.jpg",
+        "preview_path": "output/checklist_thumbnails/S04.jpg",
         "source_ref": "N31_VIDEO_OPERATION_FULL",
         "start_ms": 60000,
         "visual_status": "NOT_VISIBLE"
@@ -378,6 +382,7 @@
         "end_ms": 85000,
         "evidence_id": "E017",
         "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000017.jpg",
+        "preview_path": "output/checklist_thumbnails/S05.jpg",
         "source_ref": "N31_VIDEO_OPERATION_FULL",
         "start_ms": 80000,
         "visual_status": "PARTIAL"
@@ -498,6 +503,7 @@
         "end_ms": 110000,
         "evidence_id": "E022",
         "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000022.jpg",
+        "preview_path": "output/checklist_thumbnails/S06.jpg",
         "source_ref": "N31_VIDEO_OPERATION_FULL",
         "start_ms": 105000,
         "visual_status": "PARTIAL"
@@ -605,6 +611,7 @@
         "end_ms": 140000,
         "evidence_id": "E028",
         "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000028.jpg",
+        "preview_path": "output/checklist_thumbnails/S07.jpg",
         "source_ref": "N31_VIDEO_OPERATION_FULL",
         "start_ms": 135000,
         "visual_status": "PARTIAL"
@@ -725,6 +732,7 @@
         "end_ms": 165000,
         "evidence_id": "E033",
         "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000033.jpg",
+        "preview_path": "output/checklist_thumbnails/S08.jpg",
         "source_ref": "N31_VIDEO_OPERATION_FULL",
         "start_ms": 160000,
         "visual_status": "PARTIAL"
@@ -845,6 +853,7 @@
         "end_ms": 190000,
         "evidence_id": "E038",
         "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000038.jpg",
+        "preview_path": "output/checklist_thumbnails/S09.jpg",
         "source_ref": "N31_VIDEO_OPERATION_FULL",
         "start_ms": 185000,
         "visual_status": "PARTIAL"
@@ -951,6 +960,7 @@
         "end_ms": 215000,
         "evidence_id": "E043",
         "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000043.jpg",
+        "preview_path": "output/checklist_thumbnails/S10.jpg",
         "source_ref": "N31_VIDEO_OPERATION_FULL",
         "start_ms": 210000,
         "visual_status": "PARTIAL"
@@ -1031,6 +1041,7 @@
         "end_ms": 235000,
         "evidence_id": "E047",
         "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000047.jpg",
+        "preview_path": "output/checklist_thumbnails/S11.jpg",
         "source_ref": "N31_VIDEO_OPERATION_FULL",
         "start_ms": 230000,
         "visual_status": "PARTIAL"
@@ -1138,6 +1149,7 @@
         "end_ms": 255000,
         "evidence_id": "E051",
         "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000051.jpg",
+        "preview_path": "output/checklist_thumbnails/S12.jpg",
         "source_ref": "N31_VIDEO_OPERATION_FULL",
         "start_ms": 250000,
         "visual_status": "PARTIAL"
@@ -1220,6 +1232,7 @@
         "end_ms": 280000,
         "evidence_id": "E056",
         "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000056.jpg",
+        "preview_path": "output/checklist_thumbnails/S13.jpg",
         "source_ref": "N31_VIDEO_OPERATION_FULL",
         "start_ms": 275000,
         "visual_status": "PARTIAL"

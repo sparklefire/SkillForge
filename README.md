@@ -225,7 +225,7 @@ bash scripts/check_submission.sh
 bash scripts/run_n31_training_video.sh
 ```
 
-成片输出为 `output/video/n31_training_video_v1.mp4`。同目录的生成清单记录视频与旁白哈希、技术参数、来源门禁、覆盖率和检查状态；独立证据包把15个镜头绑定到25条去重 Evidence 及其 PDF 页码、视频或录音时间点，不嵌入原始媒体。旁白只向 StepAudio TTS 发送371字文本，未发送视频、手册、录音或面单。当前成片已通过自动检查和AI辅助联系表复核，状态仍为 `READY_FOR_HUMAN_REVIEW`，参赛者完整观看确认前不得标记为最终批准。
+成片输出为 `output/video/n31_training_video_v1.mp4`。同目录的生成清单记录视频与旁白哈希、技术参数、来源门禁、覆盖率和检查状态；独立证据包把15个镜头绑定到25条去重 Evidence 及其 PDF 页码、视频或录音时间点，不嵌入原始媒体。脚本还会从这份已审核成片生成13张640像素宽的手机清单安全预览及哈希清单，因此DGX离线模式无需携带私有派生帧。旁白只向 StepAudio TTS 发送371字文本，未发送视频、手册、录音或面单。当前成片已通过自动检查和AI辅助联系表复核，状态仍为 `READY_FOR_HUMAN_REVIEW`，参赛者完整观看确认前不得标记为最终批准。
 
 ## 当前目录
 

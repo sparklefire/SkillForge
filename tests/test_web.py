@@ -132,6 +132,14 @@ def test_web_accepts_operator_reviewed_gold_result(tmp_path) -> None:
     assert persisted.status_code == 200
     assert persisted.json()["items"][0]["completed"] is True
     assert client.get("/api/n31/checklist/keyframes/E999").status_code == 404
+    preview = client.get("/api/n31/checklist/previews/S01")
+    assert preview.status_code == 200
+    assert preview.headers["content-type"] == "image/jpeg"
+    assert preview.content.startswith(b"\xff\xd8")
+    assert client.get("/api/n31/checklist/previews/S99").status_code == 404
+    thumbnail_manifest = client.get("/api/n31/artifacts/checklist-thumbnails")
+    assert thumbnail_manifest.status_code == 200
+    assert len(thumbnail_manifest.json()["items"]) == 13
     poster = client.get("/api/n31/artifacts/poster")
     assert poster.status_code == 200
     assert poster.headers["content-type"] == "application/pdf"

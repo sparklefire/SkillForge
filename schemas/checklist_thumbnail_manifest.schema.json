@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/checklist_thumbnail_manifest.schema.json",
+  "title": "SkillForge Checklist Thumbnail Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["artifact_type", "version", "case_id", "source_video", "items", "data_policy"],
+  "properties": {
+    "artifact_type": {"const": "CHECKLIST_THUMBNAIL_MANIFEST"},
+    "version": {"const": 1},
+    "case_id": {"type": "string", "minLength": 1},
+    "source_video": {"$ref": "#/$defs/file"},
+    "items": {
+      "type": "array", "minItems": 8, "maxItems": 15,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["step_id", "scene_id", "timestamp_ms", "preview_path", "bytes", "sha256"],
+        "properties": {
+          "step_id": {"type": "string", "pattern": "^S[0-9]{2}$"},
+          "scene_id": {"type": "string", "pattern": "^V[0-9]{2}$"},
+          "timestamp_ms": {"type": "integer", "minimum": 0, "maximum": 90000},
+          "preview_path": {"type": "string", "pattern": "^output/checklist_thumbnails/S[0-9]{2}\\.jpg$"},
+          "bytes": {"type": "integer", "minimum": 1},
+          "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+        }
+      }
+    },
+    "data_policy": {
+      "type": "object", "additionalProperties": false,
+      "required": ["derived_from_approved_training_video", "contains_credentials", "contains_raw_media", "contains_absolute_paths"],
+      "properties": {
+        "derived_from_approved_training_video": {"const": true},
+        "contains_credentials": {"const": false},
+        "contains_raw_media": {"const": false},
+        "contains_absolute_paths": {"const": false}
+      }
+    }
+  },
+  "$defs": {
+    "file": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "bytes", "sha256"],
+      "properties": {
+        "path": {"const": "output/video/n31_training_video_v1.mp4"},
+        "bytes": {"type": "integer", "minimum": 1},
+        "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+      }
+    }
+  }
+}

@@ -126,6 +126,8 @@ def _keyframe(
     step: dict[str, Any],
     catalog: dict[str, dict[str, Any]],
     assessment: dict[str, Any] | None,
+    *,
+    preview_path: str | None,
 ) -> dict[str, Any] | None:
     if assessment and assessment.get("frames"):
         frame = assessment["frames"][0]
@@ -136,6 +138,7 @@ def _keyframe(
             "end_ms": frame["end_ms"],
             "keyframe": frame["keyframe"],
             "visual_status": assessment["model_result"]["verdict"],
+            "preview_path": preview_path,
         }
     for evidence_id in step["evidence"]:
         evidence = catalog[evidence_id]
@@ -148,6 +151,7 @@ def _keyframe(
                 "end_ms": locator["end_ms"],
                 "keyframe": locator["keyframe"],
                 "visual_status": "UNREVIEWED",
+                "preview_path": preview_path,
             }
     return None
 
@@ -182,7 +186,14 @@ def create_checklist(
                 "warnings": step["warnings"],
                 "risk_level": "WARNING" if step["warnings"] else "NORMAL",
                 "keyframe": _keyframe(
-                    step, catalog, assessments.get(step["step_id"])
+                    step,
+                    catalog,
+                    assessments.get(step["step_id"]),
+                    preview_path=(
+                        f"output/checklist_thumbnails/{step['step_id']}.jpg"
+                        if sop["case_id"] == "n31_media_change"
+                        else None
+                    ),
                 ),
                 "evidence_ids": list(step["evidence"]),
                 "evidence_details": _evidence_details(step["evidence"], catalog),

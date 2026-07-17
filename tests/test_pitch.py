@@ -93,3 +93,4 @@ def test_pitch_requires_traceable_training_package() -> None:
     assert "SOP_VIEWS" in artifact_ids
     result = _check_metrics(ROOT)
     assert result["assertions"]["training_package_traceable"] is True
+    assert result["assertions"]["checklist_previews_public"] is True

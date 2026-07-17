@@ -32,6 +32,11 @@ N31_DOWNLOADS = {
     "final-sop": ("active", "after_sop.json", "n31_final_sop.json"),
     "sop-views": ("active", "sop_views.json", "n31_sop_views.json"),
     "checklist": ("active", "checklist.json", "n31_mobile_checklist.json"),
+    "checklist-thumbnails": (
+        "project",
+        "output/checklist_thumbnails/manifest.json",
+        "n31_checklist_thumbnail_manifest.json",
+    ),
     "quiz": ("active", "quiz.json", "n31_training_quiz.json"),
     "revision-audit": (
         "active",
@@ -113,7 +118,7 @@ let activeDemo=null,checklistIndex=0,checklistSession=null,sopView='concise';
 const locator=e=>e.locator.page?`PDF第${e.locator.page}页${e.locator.paragraph?' · '+e.locator.paragraph:''}`:`${(e.locator.start_ms/1000).toFixed(1)}–${(e.locator.end_ms/1000).toFixed(1)}秒`;
 function renderSopView(){if(!activeDemo?.sop_views)return;const v=activeDemo.sop_views.views[sopView];document.querySelector('#sop-view').innerHTML=`<p>${esc(v.description)}</p>`+v.steps.map(x=>`<div class="step"><b>${esc(x.step_id)} ${esc(x.title)}</b><div>${esc(x.action)}</div><div class="muted">原因：${esc(x.reason)}</div><div>完成标志：${esc(x.completion_marker)}</div><div class="warning-list">${x.risks.map(r=>`风险：${esc(r)}`).join('<br>')||'风险：无额外提示'}</div><div class="evidence">来源：${x.sources.map(s=>`${esc(s.source_type)} · ${esc(s.source_ref)}`).join('；')}</div>${x.evidence_details?`<details><summary>展开证据</summary>${x.evidence_details.map(e=>`<div>${esc(e.evidence_id)} · ${esc(e.classification)} · ${esc(e.review_status)} · ${esc(locator(e))}</div>`).join('')}</details>`:''}</div>`).join('');document.querySelectorAll('.sop-tab').forEach(b=>b.classList.toggle('secondary',b.dataset.view!==sopView))}
 async function ensureChecklistSession(){if(checklistSession)return checklistSession;const r=await fetch('/api/n31/checklist/sessions',{method:'POST'});const d=await r.json();if(!r.ok)throw new Error(d.detail||'无法创建完成记录');checklistSession=d;return d}
-function renderChecklist(){if(!activeDemo?.checklist)return;const items=activeDemo.checklist.items,item=items[checklistIndex],state=checklistSession?.items.find(x=>x.step_id===item.step_id),done=state?.completed??item.completed,k=item.keyframe,interactive=activeDemo.summary.synthetic===false;document.querySelector('#checklist-progress').textContent=`第 ${checklistIndex+1}/${items.length} 步 · 已完成 ${checklistSession?.progress.completed_items||0}/${items.length} · ${checklistSession?.status||'NOT_STARTED'}`;document.querySelector('#checklist').innerHTML=`<div class="result"><b>${esc(item.step_id)} ${esc(item.title)}</b><div>${esc(item.action)}</div>${k?`<img src="/api/n31/checklist/keyframes/${esc(k.evidence_id)}" alt="${esc(item.step_id)}关键帧" onerror="this.style.display='none'"><div class="evidence">关键帧：${esc(k.evidence_id)} · ${(k.start_ms/1000).toFixed(1)}–${(k.end_ms/1000).toFixed(1)}秒 · 视觉状态 ${esc(k.visual_status)}</div>`:''}${k?.visual_status==='NOT_VISIBLE'?'<div class="notice">该画面不能证明本步动作，仅用于定位人工复核；本步依据手册和其他已审核来源。</div>':''}<div>完成标志：${esc(item.check)}</div><div class="warning-list">${item.warnings.map(w=>`风险：${esc(w)}`).join('<br>')}</div><details><summary>展开 ${item.evidence_details.length} 条证据</summary>${item.evidence_details.map(e=>`<div>${esc(e.evidence_id)} · ${esc(e.source_type)} · ${esc(e.classification)} · ${esc(e.review_status)} · ${esc(locator(e))}</div>`).join('')}</details><label><input id="step-completed" style="width:auto" type="checkbox" ${done?'checked':''} ${interactive?'':'disabled'}> 已完成并记录本步</label></div>`;document.querySelector('#check-prev').disabled=checklistIndex===0;document.querySelector('#check-next').disabled=checklistIndex===items.length-1;document.querySelector('#feedback-submit').disabled=!interactive;const box=document.querySelector('#step-completed');if(interactive)box.addEventListener('change',async()=>{const status=document.querySelector('#checklist-status');status.textContent=' 保存中…';try{const session=await ensureChecklistSession();const r=await fetch(`/api/n31/checklist/sessions/${session.session_id}/items/${item.step_id}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({completed:box.checked})});const d=await r.json();if(!r.ok)throw new Error(d.detail||'保存失败');checklistSession=d;status.textContent=' 已保存';renderChecklist()}catch(e){box.checked=!box.checked;status.textContent=` ${e.message}`}})}
+function renderChecklist(){if(!activeDemo?.checklist)return;const items=activeDemo.checklist.items,item=items[checklistIndex],state=checklistSession?.items.find(x=>x.step_id===item.step_id),done=state?.completed??item.completed,k=item.keyframe,interactive=activeDemo.summary.synthetic===false;document.querySelector('#checklist-progress').textContent=`第 ${checklistIndex+1}/${items.length} 步 · 已完成 ${checklistSession?.progress.completed_items||0}/${items.length} · ${checklistSession?.status||'NOT_STARTED'}`;document.querySelector('#checklist').innerHTML=`<div class="result"><b>${esc(item.step_id)} ${esc(item.title)}</b><div>${esc(item.action)}</div>${k?`<img src="/api/n31/checklist/previews/${esc(item.step_id)}" alt="${esc(item.step_id)}安全训练预览" onerror="this.style.display='none'"><div class="evidence">安全训练预览来自已审核80秒成片；Evidence定位：${esc(k.evidence_id)} · ${(k.start_ms/1000).toFixed(1)}–${(k.end_ms/1000).toFixed(1)}秒 · 视觉状态 ${esc(k.visual_status)}</div>`:''}${k?.visual_status==='NOT_VISIBLE'?'<div class="notice">该画面不能证明本步动作，仅用于定位人工复核；本步依据手册和其他已审核来源。</div>':''}<div>完成标志：${esc(item.check)}</div><div class="warning-list">${item.warnings.map(w=>`风险：${esc(w)}`).join('<br>')}</div><details><summary>展开 ${item.evidence_details.length} 条证据</summary>${item.evidence_details.map(e=>`<div>${esc(e.evidence_id)} · ${esc(e.source_type)} · ${esc(e.classification)} · ${esc(e.review_status)} · ${esc(locator(e))}</div>`).join('')}</details><label><input id="step-completed" style="width:auto" type="checkbox" ${done?'checked':''} ${interactive?'':'disabled'}> 已完成并记录本步</label></div>`;document.querySelector('#check-prev').disabled=checklistIndex===0;document.querySelector('#check-next').disabled=checklistIndex===items.length-1;document.querySelector('#feedback-submit').disabled=!interactive;const box=document.querySelector('#step-completed');if(interactive)box.addEventListener('change',async()=>{const status=document.querySelector('#checklist-status');status.textContent=' 保存中…';try{const session=await ensureChecklistSession();const r=await fetch(`/api/n31/checklist/sessions/${session.session_id}/items/${item.step_id}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({completed:box.checked})});const d=await r.json();if(!r.ok)throw new Error(d.detail||'保存失败');checklistSession=d;status.textContent=' 已保存';renderChecklist()}catch(e){box.checked=!box.checked;status.textContent=` ${e.message}`}})}
 function renderDemo(d){activeDemo=d;const b=d.summary.before,a=d.summary.after,isReal=d.summary.synthetic===false,isGold=d.summary.gold_status==='GOLD';
 document.querySelector('#metrics-title').textContent=isGold?'N31 真实素材 Gold 闭环':isReal?'N31 真实素材闭环彩排':'无版权模拟闭环';
 document.querySelector('#basis').textContent=isGold?'实际操作者口述审核 · Gold v1 · 最终评测指标。':isReal?'候选基准 · 非 Gold · 指标仅用于证明闭环可运行，等待操作者审核后重跑最终评测。':'明确标注的无版权模拟数据，不作为真实案例评测。';
@@ -182,6 +187,33 @@ def _training_video_manifest() -> dict[str, Any] | None:
     )
     if evidence_pack["training_video_sha256"] != output["sha256"]:
         raise ValueError("培训视频证据包未绑定当前成片")
+    return manifest
+
+
+def _checklist_thumbnail_manifest() -> dict[str, Any]:
+    manifest_path = ROOT / "output/checklist_thumbnails/manifest.json"
+    if not manifest_path.is_file():
+        raise FileNotFoundError(manifest_path)
+    manifest = validate_document(
+        _read_json(manifest_path), "checklist_thumbnail_manifest.schema.json"
+    )
+    video_path = ROOT / manifest["source_video"]["path"]
+    if (
+        not video_path.is_file()
+        or video_path.stat().st_size != manifest["source_video"]["bytes"]
+        or _sha256(video_path) != manifest["source_video"]["sha256"]
+    ):
+        raise ValueError("检查清单预览未绑定当前培训视频")
+    allowed_root = (ROOT / "output/checklist_thumbnails").resolve()
+    for item in manifest["items"]:
+        path = (ROOT / item["preview_path"]).resolve()
+        if (
+            allowed_root not in path.parents
+            or not path.is_file()
+            or path.stat().st_size != item["bytes"]
+            or _sha256(path) != item["sha256"]
+        ):
+            raise ValueError(f"检查清单预览校验失败: {item['step_id']}")
     return manifest
 
 
@@ -436,6 +468,28 @@ def create_app(
         return FileResponse(
             candidate,
             media_type="image/jpeg" if candidate.suffix.lower() != ".png" else "image/png",
+            content_disposition_type="inline",
+        )
+
+    @app.get("/api/n31/checklist/previews/{step_id}")
+    def checklist_preview(step_id: str) -> FileResponse:
+        if not re.fullmatch(r"S[0-9]{2}", step_id):
+            raise HTTPException(status_code=404)
+        try:
+            manifest = _checklist_thumbnail_manifest()
+        except FileNotFoundError as exc:
+            raise HTTPException(status_code=404) from exc
+        except ValueError as exc:
+            raise HTTPException(status_code=409, detail=str(exc)) from exc
+        item = next(
+            (candidate for candidate in manifest["items"] if candidate["step_id"] == step_id),
+            None,
+        )
+        if item is None:
+            raise HTTPException(status_code=404)
+        return FileResponse(
+            ROOT / item["preview_path"],
+            media_type="image/jpeg",
             content_disposition_type="inline",
         )
 

@@ -1,3 +1,4 @@
+import hashlib
 import json
 import stat
 from pathlib import Path
@@ -22,6 +23,23 @@ def _visual_review() -> dict:
             encoding="utf-8"
         )
     )
+
+
+def test_public_checklist_thumbnails_are_bound_to_training_video() -> None:
+    manifest = json.loads(
+        (ROOT / "output/checklist_thumbnails/manifest.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    validate_document(manifest, "checklist_thumbnail_manifest.schema.json")
+    assert len(manifest["items"]) == 13
+    assert manifest["source_video"]["sha256"] == hashlib.sha256(
+        (ROOT / manifest["source_video"]["path"]).read_bytes()
+    ).hexdigest()
+    for item in manifest["items"]:
+        path = ROOT / item["preview_path"]
+        assert path.read_bytes().startswith(b"\xff\xd8")
+        assert hashlib.sha256(path.read_bytes()).hexdigest() == item["sha256"]
 
 
 def test_creates_three_traceable_sop_views() -> None:
@@ -55,6 +73,7 @@ def test_checklist_preserves_not_visible_visual_boundary() -> None:
     s04 = next(item for item in checklist["items"] if item["step_id"] == "S04")
     assert s04["keyframe"]["visual_status"] == "NOT_VISIBLE"
     assert s04["keyframe"]["evidence_id"] == "E013"
+    assert s04["keyframe"]["preview_path"].endswith("/S04.jpg")
     assert len(s04["evidence_details"]) == len(s04["evidence_ids"])
 
 
