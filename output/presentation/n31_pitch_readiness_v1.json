@@ -179,6 +179,7 @@
         "offline_payload": true,
         "operator_review_controls": true,
         "safety_conflict_human_gate": true,
+        "stage_resource_metrics_recorded": true,
         "video_preview_configured": true,
         "workflow_checkpoint_safe": true
       },
@@ -188,7 +189,7 @@
   ],
   "contains_credentials": false,
   "contains_raw_media": false,
-  "generated_at": "2026-07-17T17:15:26.088593+00:00",
+  "generated_at": "2026-07-17T17:36:29.913614+00:00",
   "pending_human_gates": [
     "TRAINING_VIDEO_FULL_WATCH",
     "FINAL_STAGE_REHEARSAL",

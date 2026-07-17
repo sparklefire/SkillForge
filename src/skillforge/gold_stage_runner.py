@@ -5,8 +5,11 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import resource
 import shutil
+import sys
 import tempfile
+import time
 import uuid
 from collections.abc import Callable
 from datetime import UTC, datetime
@@ -106,6 +109,35 @@ def _output_record(path: Path) -> dict[str, Any]:
         "name": path.name,
         "sha256": _sha256(path),
         "size_bytes": path.stat().st_size,
+    }
+
+
+def _peak_rss_bytes(usage: resource.struct_rusage) -> int:
+    raw = max(1, int(usage.ru_maxrss))
+    return raw if sys.platform == "darwin" else raw * 1024
+
+
+def _resource_metrics(
+    perf_started_ns: int,
+    usage_before: resource.struct_rusage,
+    paths: list[Path],
+) -> dict[str, Any]:
+    usage_after = resource.getrusage(resource.RUSAGE_SELF)
+    return {
+        "elapsed_ms": round(
+            max(0, time.perf_counter_ns() - perf_started_ns) / 1_000_000,
+            3,
+        ),
+        "cpu_user_seconds": round(
+            max(0.0, usage_after.ru_utime - usage_before.ru_utime), 6
+        ),
+        "cpu_system_seconds": round(
+            max(0.0, usage_after.ru_stime - usage_before.ru_stime), 6
+        ),
+        "process_peak_rss_bytes": _peak_rss_bytes(usage_after),
+        "output_bytes": sum(path.stat().st_size for path in paths if path.is_file()),
+        "resource_scope": "PROCESS_CUMULATIVE_PEAK_AND_STAGE_DELTAS",
+        "external_model_calls": 0,
     }
 
 
@@ -250,22 +282,46 @@ class GoldStageExecutor:
         records: list[dict[str, Any]] = []
         start_index = STAGES.index(start_stage)
         current_stage = start_stage
+        current_started_at = _now()
+        current_perf_started = time.perf_counter_ns()
+        current_usage_before = resource.getrusage(resource.RUSAGE_SELF)
         try:
             for index, stage in enumerate(STAGES):
                 current_stage = stage
                 started_at = _now()
+                current_started_at = started_at
+                current_perf_started = time.perf_counter_ns()
+                current_usage_before = resource.getrusage(resource.RUSAGE_SELF)
                 if index < start_index:
                     if source_dir is None or source is None:
                         raise ValueError("完整运行不能跳过上游阶段")
                     outputs = self._reuse_stage(stage, source_dir, source, staging)
-                    records.append(self._record(stage, "REUSED", started_at, outputs))
+                    records.append(
+                        self._record(
+                            stage,
+                            "REUSED",
+                            started_at,
+                            outputs,
+                            current_perf_started,
+                            current_usage_before,
+                        )
+                    )
                     continue
                 if not (source_dir is not None and index == start_index):
                     workflow.transition(WORKFLOW_STATE[stage], f"执行 {stage.value} 产物阶段")
                 if self.stage_hook is not None:
                     self.stage_hook(stage, staging)
                 outputs = self._build_stage(stage, staging, workflow)
-                records.append(self._record(stage, "REBUILT", started_at, outputs))
+                records.append(
+                    self._record(
+                        stage,
+                        "REBUILT",
+                        started_at,
+                        outputs,
+                        current_perf_started,
+                        current_usage_before,
+                    )
+                )
 
             workflow.transition(WorkflowState.COMPLETED, "Gold阶段产物已原子发布")
             workflow.write_checkpoint(staging / "workflow.json")
@@ -302,14 +358,20 @@ class GoldStageExecutor:
                 "workflow_state": WORKFLOW_STATE[current_stage].value,
                 "execution": "REBUILT",
                 "status": "FAILED",
-                "started_at": _now(),
+                "started_at": current_started_at,
                 "completed_at": _now(),
                 "outputs": [],
+                "metrics": _resource_metrics(
+                    current_perf_started,
+                    current_usage_before,
+                    [],
+                ),
                 "error": error,
             }
             if records and records[-1]["stage_id"] == current_stage.value:
                 failed_record["started_at"] = records[-1]["started_at"]
                 failed_record["outputs"] = records[-1]["outputs"]
+                failed_record["metrics"] = records[-1]["metrics"]
                 records[-1] = failed_record
             else:
                 records.append(failed_record)
@@ -338,6 +400,8 @@ class GoldStageExecutor:
         execution: str,
         started_at: str,
         paths: list[Path],
+        perf_started_ns: int,
+        usage_before: resource.struct_rusage,
     ) -> dict[str, Any]:
         return {
             "stage_id": stage.value,
@@ -347,6 +411,7 @@ class GoldStageExecutor:
             "started_at": started_at,
             "completed_at": _now(),
             "outputs": [_output_record(path) for path in paths],
+            "metrics": _resource_metrics(perf_started_ns, usage_before, paths),
             "error": None,
         }
 

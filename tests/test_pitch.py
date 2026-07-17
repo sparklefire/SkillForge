@@ -148,6 +148,7 @@ def test_pitch_requires_safe_evidence_navigation_and_operator_review() -> None:
     assert result["assertions"]["operator_review_controls"] is True
     assert result["assertions"]["workflow_checkpoint_safe"] is True
     assert result["assertions"]["artifact_stage_rerun"] is True
+    assert result["assertions"]["stage_resource_metrics_recorded"] is True
     assert result["assertions"]["conflict_decision_auditable"] is True
     assert result["assertions"]["safety_conflict_human_gate"] is True
     assert result["assertions"]["asr_correction_auditable"] is True

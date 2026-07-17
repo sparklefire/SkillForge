@@ -74,6 +74,7 @@
             "uniqueItems": true,
             "items": {"$ref": "#/$defs/output"}
           },
+          "metrics": {"$ref": "#/$defs/metrics"},
           "error": {
             "oneOf": [
               {"type": "null"},
@@ -161,6 +162,28 @@
         },
         "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
         "size_bytes": {"type": "integer", "minimum": 1}
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "elapsed_ms",
+        "cpu_user_seconds",
+        "cpu_system_seconds",
+        "process_peak_rss_bytes",
+        "output_bytes",
+        "resource_scope",
+        "external_model_calls"
+      ],
+      "properties": {
+        "elapsed_ms": {"type": "number", "minimum": 0},
+        "cpu_user_seconds": {"type": "number", "minimum": 0},
+        "cpu_system_seconds": {"type": "number", "minimum": 0},
+        "process_peak_rss_bytes": {"type": "integer", "minimum": 1},
+        "output_bytes": {"type": "integer", "minimum": 0},
+        "resource_scope": {"const": "PROCESS_CUMULATIVE_PEAK_AND_STAGE_DELTAS"},
+        "external_model_calls": {"const": 0}
       }
     }
   }

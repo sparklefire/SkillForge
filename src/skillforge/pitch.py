@@ -901,6 +901,20 @@ def _check_demo_modes(runbook: dict[str, Any], root: Path) -> dict[str, Any]:
             "contains_credentials": False,
             "contains_absolute_paths": False,
         },
+        "stage_resource_metrics_recorded": stage_after.status_code == 200
+        and len(after_manifest.get("stages", [])) == 8
+        and all(
+            stage.get("metrics", {}).get("elapsed_ms", -1) >= 0
+            and stage.get("metrics", {}).get("cpu_user_seconds", -1) >= 0
+            and stage.get("metrics", {}).get("cpu_system_seconds", -1) >= 0
+            and stage.get("metrics", {}).get("process_peak_rss_bytes", 0) > 0
+            and stage.get("metrics", {}).get("output_bytes")
+            == sum(item["size_bytes"] for item in stage.get("outputs", []))
+            and stage.get("metrics", {}).get("resource_scope")
+            == "PROCESS_CUMULATIVE_PEAK_AND_STAGE_DELTAS"
+            and stage.get("metrics", {}).get("external_model_calls") == 0
+            for stage in after_manifest.get("stages", [])
+        ),
         "evidence_locator_safe": evidence.status_code == 200
         and evidence.json().get("evidence_id") == "E144"
         and evidence.json().get("navigation", {}).get("kind") == "AUDIO_TIME"

@@ -5,6 +5,7 @@ from pathlib import Path
 import pytest
 
 from skillforge.demo import ROOT
+from skillforge.contracts import validate_document
 from skillforge.gold_stage_runner import (
     STAGES,
     GoldStage,
@@ -43,6 +44,18 @@ def test_full_gold_stage_run_is_hash_bound_and_atomically_published(tmp_path) ->
         "contains_credentials": False,
         "contains_absolute_paths": False,
     }
+    assert all(
+        stage["metrics"]["elapsed_ms"] >= 0
+        and stage["metrics"]["cpu_user_seconds"] >= 0
+        and stage["metrics"]["cpu_system_seconds"] >= 0
+        and stage["metrics"]["process_peak_rss_bytes"] > 0
+        and stage["metrics"]["output_bytes"]
+        == sum(item["size_bytes"] for item in stage["outputs"])
+        and stage["metrics"]["resource_scope"]
+        == "PROCESS_CUMULATIVE_PEAK_AND_STAGE_DELTAS"
+        and stage["metrics"]["external_model_calls"] == 0
+        for stage in manifest["stages"]
+    )
     assert json.loads((directory / "summary.json").read_text())["after"]["severe_error_count"] == 0
     assert stat.S_IMODE(store_root.stat().st_mode) == 0o700
     assert stat.S_IMODE((store_root / "current.json").stat().st_mode) == 0o600
@@ -54,6 +67,11 @@ def test_full_gold_stage_run_is_hash_bound_and_atomically_published(tmp_path) ->
     serialized = json.dumps(manifest, ensure_ascii=False)
     assert str(ROOT) not in serialized
     assert "Authorization" not in serialized
+
+    legacy = json.loads(json.dumps(manifest))
+    for stage in legacy["stages"]:
+        stage.pop("metrics")
+    validate_document(legacy, "gold_stage_run.schema.json")
 
 
 def test_render_rerun_reuses_verified_upstream_and_rebuilds_only_rendering(tmp_path) -> None:
@@ -106,6 +124,10 @@ def test_render_failure_keeps_current_release_and_can_be_retried(tmp_path) -> No
     failed = json.loads((failed_dirs[0] / "stage_run.json").read_text())
     assert failed["status"] == "FAILED"
     assert failed["failure"]["stage_id"] == "RENDERING"
+    failed_stage = failed["stages"][-1]
+    assert failed_stage["metrics"]["elapsed_ms"] >= 0
+    assert failed_stage["metrics"]["process_peak_rss_bytes"] > 0
+    assert failed_stage["metrics"]["external_model_calls"] == 0
     assert json.loads((failed_dirs[0] / "workflow.json").read_text())["last_failure"]["retryable"] is True
 
     recovered = good_executor.rerun(GoldStage.RENDERING)

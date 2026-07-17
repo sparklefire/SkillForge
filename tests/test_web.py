@@ -429,6 +429,12 @@ def test_web_accepts_operator_reviewed_gold_result(tmp_path) -> None:
     assert active["summary"]["metrics_status"] == "FINAL"
     assert len(active["checklist"]["items"]) == 13
     assert active["stage_run"]["start_stage"] == "RENDERING"
+    assert all(
+        stage["metrics"]["process_peak_rss_bytes"] > 0
+        and stage["metrics"]["output_bytes"]
+        == sum(item["size_bytes"] for item in stage["outputs"])
+        for stage in active["stage_run"]["stages"]
+    )
 
 
 def test_artifact_media_type_is_explicit() -> None:
