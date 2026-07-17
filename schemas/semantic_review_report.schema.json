@@ -1,0 +1,148 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/semantic_review_report.schema.json",
+  "title": "SkillForge Semantic Review Report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "case_id",
+    "report_id",
+    "generated_at",
+    "status",
+    "model",
+    "reasoning_effort",
+    "model_calls",
+    "external_processing_authorized",
+    "review_scope",
+    "assessments",
+    "findings",
+    "summary",
+    "guardrails",
+    "data_policy"
+  ],
+  "properties": {
+    "version": {"const": 1},
+    "case_id": {"const": "n31_media_change"},
+    "report_id": {"const": "N31_SEMANTIC_REVIEW_V1"},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "status": {"enum": ["COMPLETED", "NEEDS_REVIEW"]},
+    "model": {"type": "string", "minLength": 1},
+    "reasoning_effort": {"const": "high"},
+    "model_calls": {"type": "integer", "minimum": 1, "maximum": 12},
+    "external_processing_authorized": {"const": true},
+    "review_scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "step_count",
+        "evidence_count",
+        "dimensions",
+        "structured_sop_sent",
+        "evidence_claims_sent",
+        "raw_media_sent",
+        "full_transcript_sent",
+        "manual_pages_sent",
+        "local_paths_sent",
+        "credentials_sent"
+      ],
+      "properties": {
+        "step_count": {"type": "integer", "minimum": 8, "maximum": 15},
+        "evidence_count": {"type": "integer", "minimum": 1},
+        "dimensions": {
+          "const": [
+            "SOURCE_DISTORTION",
+            "SOURCE_CONFLICT",
+            "ORDERING_RISK",
+            "EXCEPTION_OMISSION"
+          ]
+        },
+        "structured_sop_sent": {"const": true},
+        "evidence_claims_sent": {"const": true},
+        "raw_media_sent": {"const": false},
+        "full_transcript_sent": {"const": false},
+        "manual_pages_sent": {"const": false},
+        "local_paths_sent": {"const": false},
+        "credentials_sent": {"const": false}
+      }
+    },
+    "assessments": {
+      "type": "array",
+      "minItems": 8,
+      "maxItems": 15,
+      "items": {
+        "$ref": "https://skillforge.local/schemas/semantic_review_response.schema.json#/$defs/assessment"
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "$ref": "https://skillforge.local/schemas/semantic_review_response.schema.json#/$defs/finding"
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "step_count",
+        "supported_count",
+        "partial_count",
+        "conflict_count",
+        "needs_review_count",
+        "finding_count",
+        "high_severity_count",
+        "finding_kind_counts",
+        "human_review_finding_ids",
+        "automatic_gold_changes"
+      ],
+      "properties": {
+        "step_count": {"type": "integer", "minimum": 8, "maximum": 15},
+        "supported_count": {"type": "integer", "minimum": 0},
+        "partial_count": {"type": "integer", "minimum": 0},
+        "conflict_count": {"type": "integer", "minimum": 0},
+        "needs_review_count": {"type": "integer", "minimum": 0},
+        "finding_count": {"type": "integer", "minimum": 0},
+        "high_severity_count": {"type": "integer", "minimum": 0},
+        "finding_kind_counts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "SOURCE_DISTORTION",
+            "SOURCE_CONFLICT",
+            "ORDERING_RISK",
+            "EXCEPTION_OMISSION"
+          ],
+          "properties": {
+            "SOURCE_DISTORTION": {"type": "integer", "minimum": 0},
+            "SOURCE_CONFLICT": {"type": "integer", "minimum": 0},
+            "ORDERING_RISK": {"type": "integer", "minimum": 0},
+            "EXCEPTION_OMISSION": {"type": "integer", "minimum": 0}
+          }
+        },
+        "human_review_finding_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^SF[0-9]{3}$"}
+        },
+        "automatic_gold_changes": {"const": 0}
+      }
+    },
+    "guardrails": {
+      "const": {
+        "model_output_classification": "MODEL_INFERENCE",
+        "may_override_gold": false,
+        "automatic_gold_changes": 0,
+        "unknown_evidence_rejected": true,
+        "complete_step_coverage_enforced": true
+      }
+    },
+    "data_policy": {
+      "const": {
+        "contains_raw_media": false,
+        "contains_credentials": false,
+        "contains_absolute_paths": false,
+        "safe_structured_derivative_only": true
+      }
+    }
+  }
+}

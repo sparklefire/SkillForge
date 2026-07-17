@@ -199,7 +199,7 @@ bash scripts/run_demo_mode.sh offline
 bash scripts/check_pitch.sh
 ```
 
-验收器检查180秒时间轴、Gold指标、四场景无来源内容门禁、DGX报告、PPT、海报、培训视频、证据包和三种演示兜底。当前状态为 `READY_WITH_HUMAN_GATES`：自动检查通过，但完整观看、真人彩排、最终录屏、团队资格和官方规则五项门禁仍待参赛者确认。正式材料见 [三分钟路演脚本](./docs/三分钟路演脚本.md)、[现场演示与录屏操作单](./docs/现场演示与录屏操作单.md) 和 [8页路演PPT](./output/presentation/SkillForge_三分钟路演_v1.pptx)。
+验收器检查180秒时间轴、Gold指标、四场景无来源内容门禁、高推理语义复核、选择性重建边界、DGX报告、PPT、海报、培训视频、证据包和三种演示兜底。当前状态为 `READY_WITH_HUMAN_GATES`：自动检查通过，但完整观看、真人彩排、最终录屏、团队资格和官方规则五项门禁仍待参赛者确认。正式材料见 [三分钟路演脚本](./docs/三分钟路演脚本.md)、[现场演示与录屏操作单](./docs/现场演示与录屏操作单.md) 和 [8页路演PPT](./output/presentation/SkillForge_三分钟路演_v1.pptx)。
 
 可复现运行时基准：
 
@@ -217,7 +217,23 @@ bash scripts/run_runtime_benchmark.sh dgx
 bash scripts/check_submission.sh
 ```
 
-预检会运行全量测试并核对项目身份、9份说明文档、15项成果、Git工作树、跟踪文件边界、`.env`忽略与600权限、本地密钥值泄漏和成果绝对路径。报告写入被Git忽略的 `outputs/submission/submission_preflight_latest.json`，不会记录密钥值。只有 `READY_FOR_SUBMISSION` 返回0；`NOT_READY`返回1，`DEVELOPMENT_CHECK`或 `READY_WITH_HUMAN_GATES` 返回2。开发中可显式使用 `--allow-dirty`，但不能得到正式提交结论。
+预检会运行全量测试并核对项目身份、9份说明文档、17项成果、Git工作树、跟踪文件边界、`.env`忽略与600权限、本地密钥值泄漏和成果绝对路径。报告写入被Git忽略的 `outputs/submission/submission_preflight_latest.json`，不会记录密钥值。只有 `READY_FOR_SUBMISSION` 返回0；`NOT_READY`返回1，`DEVELOPMENT_CHECK`或 `READY_WITH_HUMAN_GATES` 返回2。开发中可显式使用 `--allow-dirty`，但不能得到正式提交结论。
+
+受证据约束的高推理语义复核需要显式确认允许发送结构化Gold步骤和Evidence陈述；它不会发送原始媒体、完整转写、手册页面、本地路径或凭证：
+
+```bash
+bash scripts/run_n31_semantic_review.sh
+```
+
+语义报告只作为 `MODEL_INFERENCE`，不能自动覆盖Gold。当前冻结报告使用 `step-3.7-flash / high` 复核13步和36条Evidence陈述，13步均为 `SUPPORTED`，发现项0，自动Gold修改0。
+
+从Revision Audit确定性生成选择性重建边界：
+
+```bash
+bash scripts/build_n31_selective_rebuild.sh
+```
+
+当前N31受控错误只失效S07–S13、Q02和V07–V13；其余6个步骤、4道题和8个视频镜头保持不变。A4海报是固定单页原子成果，步骤插入或顺序变化时整页重建。该阶段外部模型调用为0。
 
 从 Gold SOP 重新生成一页式 A4 培训海报：
 
@@ -299,10 +315,10 @@ P0 能力只有五项：
 - 已从 Gold SOP 生成单页A4培训海报，150 dpi渲染检查无裁切、重叠、乱码或越界文字。
 - 已从6段自摄安全派生视频重剪15镜头、80秒、1080p横屏培训成片；13/13 Gold步骤、10/10必要步骤和30次证据引用均通过程序校验，StepAudio旁白响度为-16.18 LUFS。
 - DGX已用原生CUDA实际处理6段自摄安全派生视频的420帧，筛出50个场景候选时间点；Web展示GPU指标和5步Agent决策/工具轨迹，外部API仍未获准处理这些视频。
-- 本机与DGX当前均通过72项自动测试；DGX成片SHA-256、视频证据包、连续动作候选窗口、PDF结构报告、路演PPT、运行时基准、用户服务和Web Range播放均与本机复验一致。
+- 本机当前通过105项自动测试；DGX上一批96项基线已通过，新增语义复核与选择性重建正在本批复验。成片SHA-256、视频证据包、连续动作候选窗口、PDF结构报告、路演PPT、运行时基准、用户服务和Web Range播放均保持原验证边界。
 - 赛事公开要求对齐审计未发现方向性偏离；2–5人团队资格和官方评分/提交/API细则仍待参赛者从报名材料或训练营讲义确认。
 - DGX服务监听与进程重启后的回环访问已经验证；公网入口请求未到达应用，现场暂使用SSH端口转发、离线包和录屏兜底。
-- 提交预检已自动覆盖代码、12项成果、文档和敏感边界；尚待培训视频最终人工观看、180秒彩排、有声录屏、团队资格和官方规则确认。无Gold引导的通用动作发现仍属于可选增强，不在当前P0能力声明内。
+- 提交预检已自动覆盖代码、17项成果、文档和敏感边界；尚待培训视频最终人工观看、180秒彩排、有声录屏、团队资格和官方规则确认。无Gold引导的通用动作发现仍属于可选增强，不在当前P0能力声明内。
 
 ## 冻结的 P0 运行路线
 

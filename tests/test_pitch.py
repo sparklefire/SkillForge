@@ -107,3 +107,19 @@ def test_pitch_requires_closed_deterministic_grounding_gate() -> None:
     result = _check_metrics(ROOT)
     assert result["status"] == "PASSED"
     assert result["assertions"]["grounding_gate_closed"] is True
+
+
+def test_pitch_requires_safe_high_reasoning_semantic_review() -> None:
+    artifact_ids = {item["artifact_id"] for item in _runbook()["required_artifacts"]}
+    assert "SEMANTIC_REVIEW" in artifact_ids
+    result = _check_metrics(ROOT)
+    assert result["status"] == "PASSED"
+    assert result["assertions"]["semantic_review_grounded"] is True
+
+
+def test_pitch_requires_bounded_selective_rebuild() -> None:
+    artifact_ids = {item["artifact_id"] for item in _runbook()["required_artifacts"]}
+    assert "SELECTIVE_REBUILD" in artifact_ids
+    result = _check_metrics(ROOT)
+    assert result["status"] == "PASSED"
+    assert result["assertions"]["selective_rebuild_bounded"] is True

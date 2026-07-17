@@ -83,6 +83,16 @@ N31_DOWNLOADS = {
         "cases/n31/evaluations/deterministic_grounding_gate_v1.json",
         "n31_deterministic_grounding_gate_v1.json",
     ),
+    "semantic-review": (
+        "project",
+        "cases/n31/evaluations/semantic_review_v1.json",
+        "n31_semantic_review_v1.json",
+    ),
+    "selective-rebuild": (
+        "project",
+        "cases/n31/evaluations/selective_rebuild_v1.json",
+        "n31_selective_rebuild_v1.json",
+    ),
 }
 
 
@@ -109,10 +119,12 @@ HTML = """<!doctype html>
   <section class="panel" id="candidate-panel" hidden><h2>三类来源候选 → 规范步骤</h2><div id="candidate-metrics" class="grid"></div><p id="candidate-note"></p><div id="candidate-groups"></div></section>
   <section class="panel" id="multisource-panel" hidden><h2>为什么需要多源证据</h2><div id="source-metrics" class="grid"></div><p id="visual-note"></p></section>
   <section class="panel" id="grounding-panel" hidden><h2>无来源内容拒绝门禁</h2><div id="grounding-metrics" class="grid"></div><p>四个独立篡改场景均执行：发现问题 → 展示当前步骤Evidence边界 → 局部修订 → 重新质检。</p><div id="grounding-scenarios"></div></section>
+  <section class="panel" id="semantic-panel" hidden><h2>高推理语义质检</h2><div id="semantic-metrics" class="grid"></div><p id="semantic-note"></p><div id="semantic-assessments"></div></section>
+  <section class="panel" id="selective-panel" hidden><h2>受影响范围与选择性重建</h2><div id="selective-metrics" class="grid"></div><p id="selective-note"></p><div id="selective-plans"></div></section>
   <section class="panel"><h2>发现问题 → 展示证据</h2><div id="issues"></div></section>
   <section class="panel"><h2>修订前后对比</h2><div class="cols"><div><h3>修订前</h3><div id="before"></div></div><div><h3>修订后</h3><div id="after"></div></div></div></section>
   <section class="panel"><h2>局部修订审计</h2><div id="changes"></div></section>
-  <section class="panel" id="results-panel" hidden><h2>培训成果</h2><div id="training-video-card" hidden><h3>80秒横屏培训视频</h3><div id="training-video-notice" class="notice"></div><div id="training-video-metrics" class="grid"></div><video controls preload="metadata" style="width:100%;margin:14px 0;border-radius:12px;background:#000" src="/api/n31/media/training-video"></video></div><div class="downloads" id="n31-downloads"><a class="download" href="/api/n31/artifacts/final-sop">下载最终 SOP</a><a class="download" href="/api/n31/artifacts/sop-views">下载三种 SOP 视图</a><a class="download" href="/api/n31/artifacts/checklist">下载手机检查清单</a><a class="download" href="/api/n31/artifacts/quiz">下载培训测验</a><a class="download" href="/api/n31/artifacts/poster">下载 A4 培训海报</a><a class="download" href="/api/n31/artifacts/training-video">下载80秒培训视频</a><a class="download" href="/api/n31/artifacts/training-video-manifest">下载视频生成清单</a><a class="download" href="/api/n31/artifacts/training-video-evidence">下载视频证据包</a><a class="download" href="/api/n31/artifacts/temporal-windows">下载连续动作窗口</a><a class="download" href="/api/n31/artifacts/pdf-structure">下载手册结构报告</a><a class="download" href="/api/n31/artifacts/source-candidates">下载候选合并报告</a><a class="download" href="/api/n31/artifacts/grounding-gate">下载无来源内容门禁报告</a><a class="download" href="/api/n31/artifacts/revision-audit">下载修订记录</a></div><div id="sop-views-card"><h3>三种 SOP 阅读视图</h3><div class="controls"><button class="sop-tab" data-view="concise">简洁版</button><button class="sop-tab secondary" data-view="detailed">详细版</button><button class="sop-tab secondary" data-view="evidence">带证据版</button></div><div id="sop-view"></div></div><div class="cols"><div><h3>手机端检查清单</h3><div id="checklist-progress" class="notice"></div><div id="checklist" class="check-card"></div><div class="controls"><button id="check-prev" class="secondary">上一步</button><button id="check-next" class="secondary">下一步</button></div><label>问题类型<select id="feedback-category"><option value="STEP_BLOCKED">步骤受阻</option><option value="CONTENT_ERROR">内容错误</option><option value="EVIDENCE_ISSUE">证据问题</option><option value="OTHER">其他</option></select></label><label>问题反馈<textarea id="feedback-comment" maxlength="500" placeholder="描述现场问题；记录只保存在本机，不进入Git"></textarea></label><button id="feedback-submit">提交本步反馈</button><span id="checklist-status"></span></div><div><h3>培训测验</h3><div id="quiz"></div></div></div></section>
+  <section class="panel" id="results-panel" hidden><h2>培训成果</h2><div id="training-video-card" hidden><h3>80秒横屏培训视频</h3><div id="training-video-notice" class="notice"></div><div id="training-video-metrics" class="grid"></div><video controls preload="metadata" style="width:100%;margin:14px 0;border-radius:12px;background:#000" src="/api/n31/media/training-video"></video></div><div class="downloads" id="n31-downloads"><a class="download" href="/api/n31/artifacts/final-sop">下载最终 SOP</a><a class="download" href="/api/n31/artifacts/sop-views">下载三种 SOP 视图</a><a class="download" href="/api/n31/artifacts/checklist">下载手机检查清单</a><a class="download" href="/api/n31/artifacts/quiz">下载培训测验</a><a class="download" href="/api/n31/artifacts/poster">下载 A4 培训海报</a><a class="download" href="/api/n31/artifacts/training-video">下载80秒培训视频</a><a class="download" href="/api/n31/artifacts/training-video-manifest">下载视频生成清单</a><a class="download" href="/api/n31/artifacts/training-video-evidence">下载视频证据包</a><a class="download" href="/api/n31/artifacts/temporal-windows">下载连续动作窗口</a><a class="download" href="/api/n31/artifacts/pdf-structure">下载手册结构报告</a><a class="download" href="/api/n31/artifacts/source-candidates">下载候选合并报告</a><a class="download" href="/api/n31/artifacts/grounding-gate">下载无来源内容门禁报告</a><a class="download" href="/api/n31/artifacts/semantic-review">下载语义质检报告</a><a class="download" href="/api/n31/artifacts/selective-rebuild">下载选择性重建报告</a><a class="download" href="/api/n31/artifacts/revision-audit">下载修订记录</a></div><div id="sop-views-card"><h3>三种 SOP 阅读视图</h3><div class="controls"><button class="sop-tab" data-view="concise">简洁版</button><button class="sop-tab secondary" data-view="detailed">详细版</button><button class="sop-tab secondary" data-view="evidence">带证据版</button></div><div id="sop-view"></div></div><div class="cols"><div><h3>手机端检查清单</h3><div id="checklist-progress" class="notice"></div><div id="checklist" class="check-card"></div><div class="controls"><button id="check-prev" class="secondary">上一步</button><button id="check-next" class="secondary">下一步</button></div><label>问题类型<select id="feedback-category"><option value="STEP_BLOCKED">步骤受阻</option><option value="CONTENT_ERROR">内容错误</option><option value="EVIDENCE_ISSUE">证据问题</option><option value="OTHER">其他</option></select></label><label>问题反馈<textarea id="feedback-comment" maxlength="500" placeholder="描述现场问题；记录只保存在本机，不进入Git"></textarea></label><button id="feedback-submit">提交本步反馈</button><span id="checklist-status"></span></div><div><h3>培训测验</h3><div id="quiz"></div></div></div></section>
   <section class="panel"><h2>上传素材并原生预处理</h2><p>上传内容只写入被 Git 忽略的本地输出目录。本页面不会自动把原始素材发送给外部模型。</p>
     <form id="upload"><label>操作视频<input type="file" name="video" accept="video/*"></label><label>设备 PDF<input type="file" name="pdf" accept="application/pdf"></label><label>专家录音<input type="file" name="audio" accept="audio/*"></label><label><input style="width:auto" type="checkbox" name="transcribe" value="true">调用 StepAudio ASR</label><label><input style="width:auto" type="checkbox" name="analyze_visuals" value="true">调用 Step 3.7 分析关键帧</label><label><input style="width:auto" type="checkbox" name="plan_sop" value="true">根据证据规划 SOP</label><label><input style="width:auto" type="checkbox" name="external_processing_authorized" value="true">已确认允许把选定派生内容发送给外部 API</label><button>开始处理</button><span id="status"></span></form><pre id="ingest"></pre>
   </section>
@@ -136,6 +148,8 @@ if(d.pdf_structure){const p=d.pdf_structure,s=p.summary;document.querySelector('
 if(d.source_candidate_synthesis){const c=d.source_candidate_synthesis,s=c.summary,byStep=Object.fromEntries(c.ordered_steps.map(x=>[x.step_id,x]));document.querySelector('#candidate-panel').hidden=false;document.querySelector('#candidate-metrics').innerHTML=[['视频候选',s.source_candidate_counts.video],['手册候选',s.source_candidate_counts.pdf],['口述候选',s.source_candidate_counts.audio],['合并步骤',s.ordered_step_count],['多源步骤',s.multi_source_step_count],['人工复核',s.review_route_counts.HUMAN_REVIEW_REQUIRED],['粗/细粒度',`${s.coarse_candidate_count}/${s.fine_candidate_count}`]].map(x=>`<div class="metric"><span class="muted">${esc(x[0])}</span><strong>${esc(x[1])}</strong></div>`).join('');document.querySelector('#candidate-note').textContent='候选先按视频、手册和口述分别保存，再按来源权威性、多源佐证和负面观察计算置信度，随后拆分过粗动作、合并同义或过细动作并校验依赖。S04视频不可见，因此自动进入人工复核。';document.querySelector('#candidate-groups').innerHTML=c.merge_groups.slice(0,8).map(g=>{const a=byStep[g.step_id].confidence_assessment;return `<div class="change"><b>${esc(g.step_id)} · ${esc(g.operations.join(' + '))}</b><div>${esc(g.rationale)}</div><div>置信度 ${esc(a.score)} · ${esc(a.band)} · ${esc(a.route)}</div><div class="evidence">来源：${esc(g.source_types.join('、'))}｜候选：${esc(g.candidate_ids.join(', '))}｜Evidence：${esc(g.evidence_ids.join(', '))}</div></div>`}).join('')}
 if(d.multisource_comparison&&d.visual_review){const s=d.multisource_comparison.source_ablation,v=d.visual_review.summary,p=d.multisource_comparison.privacy_comparison;document.querySelector('#multisource-panel').hidden=false;document.querySelector('#source-metrics').innerHTML=[['手册单源',pct(s.manual_only.coverage)],['专家口述单源',pct(s.expert_audio_only.coverage)],['两种以上来源',pct(s.two_or_more_source_types.coverage)],['视频部分可观察',pct(s.video_observable_partial_or_better.coverage)],['视觉矛盾',v.contradicted_count]].map(x=>`<div class="metric"><span class="muted">${esc(x[0])}</span><strong>${esc(x[1])}</strong></div>`).join('');document.querySelector('#visual-note').textContent=`严格视觉复核：${v.supported_count}步完整支持、${v.partial_count}步部分可见、${v.not_visible_count}步不可见、${v.contradicted_count}步矛盾。模型标记${p.model_flagged_step_count}步需隐私复核；本地安全派生QA为${p.local_safe_derivative_qa}，标记保留但不自动推翻人工检查。`}
 if(d.grounding_gate){const g=d.grounding_gate,s=g.summary;document.querySelector('#grounding-panel').hidden=false;document.querySelector('#grounding-metrics').innerHTML=[['篡改场景',s.scenario_count],['成功检出',s.detected_count],['局部恢复',s.revised_count],['残留冲突',s.residual_conflict_count],['外部模型调用',g.model_calls]].map(x=>`<div class="metric"><span class="muted">${esc(x[0])}</span><strong>${esc(x[1])}</strong></div>`).join('');document.querySelector('#grounding-scenarios').innerHTML=g.scenarios.map(x=>`<div class="issue"><b>${esc(x.scenario_id)} · ${esc(x.expected_conflict_kind)}</b><div>${esc(x.mutation_summary)}</div><div>${esc(x.rejection_reason)}</div><div class="evidence">Evidence边界：${esc(x.reference_evidence_ids.join(', '))}</div><details><summary>查看修订前后</summary><div>修订前：${esc(JSON.stringify(x.before_value))}</div><div>修订后：${esc(JSON.stringify(x.after_value))}</div><div>动作：${esc(x.revision_actions.join(', '))}｜复检残留：${esc(x.residual_conflict_count)}</div></details></div>`).join('')}
+if(d.semantic_review){const r=d.semantic_review,s=r.summary;document.querySelector('#semantic-panel').hidden=false;document.querySelector('#semantic-metrics').innerHTML=[['复核步骤',s.step_count],['证据支持',s.supported_count],['语义问题',s.finding_count],['高严重度',s.high_severity_count],['模型调用',r.model_calls]].map(x=>`<div class="metric"><span class="muted">${esc(x[0])}</span><strong>${esc(x[1])}</strong></div>`).join('');document.querySelector('#semantic-note').textContent=`${r.model} · ${r.reasoning_effort}推理；检查曲解来源、来源冲突、顺序风险和异常遗漏。只发送${r.review_scope.evidence_count}条结构化Evidence陈述，不发送原始媒体、完整转写、手册页面、本地路径或凭证；模型不能自动覆盖Gold。`;document.querySelector('#semantic-assessments').innerHTML=r.assessments.map(x=>`<div class="change"><b>${esc(x.step_id)} · ${esc(x.verdict)} · 置信度${esc(x.confidence)}</b><div>${esc(x.rationale)}</div><div class="evidence">Evidence：${esc(x.evidence_ids.join(', '))}</div>${x.risk_notes.length?`<div class="warning-list">${esc(x.risk_notes.join('；'))}</div>`:''}</div>`).join('')}
+if(d.selective_rebuild){const r=d.selective_rebuild,s=r.summary;document.querySelector('#selective-panel').hidden=false;document.querySelector('#selective-metrics').innerHTML=[['受影响步骤',s.affected_step_count],['内容变化',s.content_changed_step_count],['重建测验题',s.quiz_question_count],['重渲染镜头',s.video_scene_count],['外部模型调用',r.data_policy.external_model_calls]].map(x=>`<div class="metric"><span class="muted">${esc(x[0])}</span><strong>${esc(x[1])}</strong></div>`).join('');document.querySelector('#selective-note').textContent='Revision Audit已精确重放为After SOP；4道未变化测验题和8个无关视频镜头逐对象保留，A4因固定单页布局只在依赖变化时整页重建。';document.querySelector('#selective-plans').innerHTML=r.artifact_plans.map(x=>`<div class="change"><b>${esc(x.artifact_type)} · ${esc(x.action)} · ${esc(x.scope)}</b><div>${esc(x.reason)}</div><div class="evidence">重建单元：${esc(x.units.join(', ')||'无')}｜保持不变：${esc(x.unchanged_unit_count)}</div></div>`).join('')}
 if(d.training_video){const t=d.training_video,o=t.output,c=t.coverage;document.querySelector('#training-video-card').hidden=false;document.querySelector('#training-video-notice').textContent=t.final_human_review_required?'自动检查与AI辅助抽帧检查已通过；最终提交前仍需参赛者完整观看并确认旁白节奏。':'参赛者已完成最终观看确认。';document.querySelector('#training-video-metrics').innerHTML=[['时长',`${(o.duration_ms/1000).toFixed(0)}秒`],['Gold步骤',`${c.covered_gold_step_count}/${c.gold_step_count}`],['必要步骤',`${c.covered_required_step_count}/${c.required_step_count}`],['证据引用',c.evidence_reference_count],['状态',t.status]].map(x=>`<div class="metric"><span class="muted">${esc(x[0])}</span><strong>${esc(x[1])}</strong></div>`).join('')}
 document.querySelector('#issues').innerHTML=d.initial_conflicts.conflicts.map(c=>`<div class="issue"><b>${esc(c.kind)}</b> · ${esc(c.message)}<div class="evidence">${c.evidence.map(e=>`${esc(e.evidence_id)}｜${esc(e.source_ref)}｜${esc(JSON.stringify(e.locator))}`).join('<br>')||'无来源内容：按规则拒绝'}</div></div>`).join('');
 const render=s=>s.steps.map(x=>`<div class="step"><b>${esc(x.step_id)} ${esc(x.title)}</b><div class="muted">${esc(x.action)}</div><div class="evidence">证据：${esc(x.evidence.join(', ')||'无')}</div></div>`).join('');document.querySelector('#before').innerHTML=render(d.before_sop);document.querySelector('#after').innerHTML=render(d.after_sop);
@@ -238,7 +252,15 @@ def _demo_payload(directory: Path) -> dict[str, Any]:
     if missing:
         raise FileNotFoundError(", ".join(missing))
     payload = {name: _read_json(directory / f"{name}.json") for name in names}
-    for name in ("sop_views", "checklist", "quiz", "workflow", "grounding_gate"):
+    for name in (
+        "sop_views",
+        "checklist",
+        "quiz",
+        "workflow",
+        "grounding_gate",
+        "semantic_review",
+        "selective_rebuild",
+    ):
         path = directory / f"{name}.json"
         if path.is_file():
             document = _read_json(path)
@@ -246,6 +268,10 @@ def _demo_payload(directory: Path) -> dict[str, Any]:
                 validate_document(document, "training_quiz.schema.json")
             elif name == "grounding_gate":
                 validate_document(document, "grounding_gate_report.schema.json")
+            elif name == "semantic_review":
+                validate_document(document, "semantic_review_report.schema.json")
+            elif name == "selective_rebuild":
+                validate_document(document, "selective_rebuild_report.schema.json")
             payload[name] = document
     return payload
 
@@ -341,6 +367,8 @@ def create_app(
             pdf_structure_path = evaluation_dir / "pdf_structure_v1.json"
             source_candidates_path = evaluation_dir / "source_candidate_synthesis_v1.json"
             grounding_gate_path = evaluation_dir / "deterministic_grounding_gate_v1.json"
+            semantic_review_path = evaluation_dir / "semantic_review_v1.json"
+            selective_rebuild_path = evaluation_dir / "selective_rebuild_v1.json"
             if visual_path.is_file() and comparison_path.is_file():
                 payload["visual_review"] = _read_json(visual_path)
                 payload["multisource_comparison"] = _read_json(comparison_path)
@@ -370,6 +398,20 @@ def create_app(
                     "grounding_gate_report.schema.json",
                 )
                 payload["grounding_gate"] = grounding_gate
+            if semantic_review_path.is_file():
+                semantic_review = _read_json(semantic_review_path)
+                validate_document(
+                    semantic_review,
+                    "semantic_review_report.schema.json",
+                )
+                payload["semantic_review"] = semantic_review
+            if selective_rebuild_path.is_file():
+                selective_rebuild = _read_json(selective_rebuild_path)
+                validate_document(
+                    selective_rebuild,
+                    "selective_rebuild_report.schema.json",
+                )
+                payload["selective_rebuild"] = selective_rebuild
             try:
                 training_video = _training_video_manifest()
             except ValueError as exc:

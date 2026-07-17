@@ -1,0 +1,234 @@
+{
+  "affected_steps": [
+    {
+      "after_position": 7,
+      "before_position": 8,
+      "change_types": [
+        "REORDER"
+      ],
+      "conflict_ids": [
+        "C003"
+      ],
+      "content_changed": false,
+      "position_changed": true,
+      "step_id": "S07"
+    },
+    {
+      "after_position": 8,
+      "before_position": 7,
+      "change_types": [
+        "REORDER"
+      ],
+      "conflict_ids": [
+        "C003"
+      ],
+      "content_changed": false,
+      "position_changed": true,
+      "step_id": "S08"
+    },
+    {
+      "after_position": 9,
+      "before_position": null,
+      "change_types": [
+        "INSERT",
+        "REORDER"
+      ],
+      "conflict_ids": [
+        "C001",
+        "C003"
+      ],
+      "content_changed": true,
+      "position_changed": true,
+      "step_id": "S09"
+    },
+    {
+      "after_position": 10,
+      "before_position": 9,
+      "change_types": [
+        "REORDER",
+        "REMOVE"
+      ],
+      "conflict_ids": [
+        "C003",
+        "C004"
+      ],
+      "content_changed": true,
+      "position_changed": true,
+      "step_id": "S10"
+    },
+    {
+      "after_position": 11,
+      "before_position": 10,
+      "change_types": [
+        "REORDER"
+      ],
+      "conflict_ids": [
+        "C003"
+      ],
+      "content_changed": false,
+      "position_changed": true,
+      "step_id": "S11"
+    },
+    {
+      "after_position": 12,
+      "before_position": 11,
+      "change_types": [
+        "REORDER",
+        "REMOVE"
+      ],
+      "conflict_ids": [
+        "C003",
+        "C005"
+      ],
+      "content_changed": true,
+      "position_changed": true,
+      "step_id": "S12"
+    },
+    {
+      "after_position": 13,
+      "before_position": 12,
+      "change_types": [
+        "REORDER"
+      ],
+      "conflict_ids": [
+        "C003"
+      ],
+      "content_changed": false,
+      "position_changed": true,
+      "step_id": "S13"
+    }
+  ],
+  "artifact_plans": [
+    {
+      "action": "REBUILD",
+      "artifact_type": "FINAL_SOP",
+      "reason": "按Revision Audit重放插入、字段删除与顺序调整；未受影响步骤保持逐对象相同。",
+      "scope": "STEP_PATCH",
+      "unchanged_unit_count": 6,
+      "units": [
+        "S07",
+        "S08",
+        "S09",
+        "S10",
+        "S11",
+        "S12",
+        "S13"
+      ]
+    },
+    {
+      "action": "REBUILD",
+      "artifact_type": "SOP_VIEWS",
+      "reason": "三个阅读深度只失效受影响步骤；其余步骤视图无需重算。",
+      "scope": "STEP_ONLY",
+      "unchanged_unit_count": 18,
+      "units": [
+        "concise:S07",
+        "concise:S08",
+        "concise:S09",
+        "concise:S10",
+        "concise:S11",
+        "concise:S12",
+        "concise:S13",
+        "detailed:S07",
+        "detailed:S08",
+        "detailed:S09",
+        "detailed:S10",
+        "detailed:S11",
+        "detailed:S12",
+        "detailed:S13",
+        "evidence:S07",
+        "evidence:S08",
+        "evidence:S09",
+        "evidence:S10",
+        "evidence:S11",
+        "evidence:S12",
+        "evidence:S13"
+      ]
+    },
+    {
+      "action": "REBUILD",
+      "artifact_type": "MOBILE_CHECKLIST",
+      "reason": "步骤内容或屏幕序号发生变化的检查卡重建，其他检查卡保持不变。",
+      "scope": "STEP_ONLY",
+      "unchanged_unit_count": 6,
+      "units": [
+        "S07",
+        "S08",
+        "S09",
+        "S10",
+        "S11",
+        "S12",
+        "S13"
+      ]
+    },
+    {
+      "action": "REBUILD",
+      "artifact_type": "TRAINING_QUIZ",
+      "reason": "对修订前后确定性生成结果逐题比较，只替换内容实际变化的题目。",
+      "scope": "QUESTION_ONLY",
+      "unchanged_unit_count": 4,
+      "units": [
+        "Q02"
+      ]
+    },
+    {
+      "action": "REBUILD",
+      "artifact_type": "A4_POSTER",
+      "reason": "A4是固定单页原子成果；步骤插入、顺序或海报可见字段变化时整页重建。",
+      "scope": "WHOLE_ARTIFACT",
+      "unchanged_unit_count": 0,
+      "units": [
+        "n31_a4_training_poster"
+      ]
+    },
+    {
+      "action": "REBUILD",
+      "artifact_type": "TRAINING_VIDEO",
+      "reason": "只重渲染绑定受影响步骤的场景；片头、片尾和无关步骤场景复用现有片段。",
+      "scope": "SCENE_ONLY",
+      "unchanged_unit_count": 8,
+      "units": [
+        "V07",
+        "V08",
+        "V09",
+        "V10",
+        "V11",
+        "V12",
+        "V13"
+      ]
+    }
+  ],
+  "case_id": "n31_media_change",
+  "data_policy": {
+    "contains_absolute_paths": false,
+    "contains_credentials": false,
+    "contains_raw_media": false,
+    "external_model_calls": 0
+  },
+  "report_id": "N31_SELECTIVE_REBUILD_V1",
+  "source_bindings": {
+    "after_sop_sha256": "1274a8575eaad45dbaae5484aff7ee0c69e700622e4142b7fc0cc5d4331e642f",
+    "before_sop_sha256": "e88c0c839ac88906ab27c7e29ece3050eb93db10014906126b8ac3598529a9de",
+    "revision_audit_sha256": "703d689dbd547e04039bfa1cc0fea6991003cae04482d501270ac82577332469",
+    "storyboard_sha256": "b10d5439848ad16b3dad1034cf32eca743019804320c4c0e0c0c46d460cd109e"
+  },
+  "status": "PASSED",
+  "summary": {
+    "affected_step_count": 7,
+    "content_changed_step_count": 3,
+    "position_changed_step_count": 7,
+    "quiz_question_count": 1,
+    "rebuild_artifact_count": 6,
+    "skipped_artifact_count": 0,
+    "video_scene_count": 7,
+    "whole_artifact_count": 1
+  },
+  "verification": {
+    "no_unaffected_video_scene_selected": true,
+    "poster_dependency_declared": true,
+    "quiz_unchanged_questions_identical": true,
+    "sop_patch_reproduces_after": true,
+    "video_scene_ids_exist": true
+  },
+  "version": 1
+}

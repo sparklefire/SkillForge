@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/semantic_review_response.schema.json",
+  "title": "SkillForge Semantic Review Model Response",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["case_id", "assessments", "findings"],
+  "properties": {
+    "case_id": {"type": "string", "minLength": 1},
+    "assessments": {
+      "type": "array",
+      "minItems": 8,
+      "maxItems": 15,
+      "items": {"$ref": "#/$defs/assessment"}
+    },
+    "findings": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/finding"}
+    }
+  },
+  "$defs": {
+    "assessment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "step_id",
+        "verdict",
+        "reviewed_dimensions",
+        "evidence_ids",
+        "rationale",
+        "risk_notes",
+        "confidence"
+      ],
+      "properties": {
+        "step_id": {"type": "string", "pattern": "^S[0-9]{2}$"},
+        "verdict": {"enum": ["SUPPORTED", "PARTIAL", "CONFLICT", "NEEDS_REVIEW"]},
+        "reviewed_dimensions": {
+          "const": [
+            "SOURCE_DISTORTION",
+            "SOURCE_CONFLICT",
+            "ORDERING_RISK",
+            "EXCEPTION_OMISSION"
+          ]
+        },
+        "evidence_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^E[0-9]{3}$"}
+        },
+        "rationale": {"type": "string", "minLength": 1},
+        "risk_notes": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1}
+        },
+        "confidence": {"type": "number", "minimum": 0, "maximum": 1}
+      }
+    },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "finding_id",
+        "kind",
+        "severity",
+        "step_ids",
+        "evidence_ids",
+        "description",
+        "recommended_action",
+        "automatic"
+      ],
+      "properties": {
+        "finding_id": {"type": "string", "pattern": "^SF[0-9]{3}$"},
+        "kind": {
+          "enum": [
+            "SOURCE_DISTORTION",
+            "SOURCE_CONFLICT",
+            "ORDERING_RISK",
+            "EXCEPTION_OMISSION"
+          ]
+        },
+        "severity": {"enum": ["LOW", "MEDIUM", "HIGH", "CRITICAL"]},
+        "step_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^S[0-9]{2}$"}
+        },
+        "evidence_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^E[0-9]{3}$"}
+        },
+        "description": {"type": "string", "minLength": 1},
+        "recommended_action": {
+          "enum": ["HUMAN_REVIEW", "REVISE", "DETERMINISTIC_RECHECK"]
+        },
+        "automatic": {"const": false}
+      }
+    }
+  }
+}

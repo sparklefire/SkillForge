@@ -121,6 +121,10 @@ def _check_artifacts(runbook: dict[str, Any], root: Path) -> dict[str, Any]:
 
 
 def _check_metrics(root: Path) -> dict[str, Any]:
+    gold = validate_document(
+        _read_json(root / "cases/n31/gold/gold_sop.json"),
+        "sop.schema.json",
+    )
     summary = _read_json(root / "cases/n31/demo_bundle/summary.json")
     multisource = _read_json(
         root / "cases/n31/evaluations/multisource_comparison_v1.json"
@@ -146,6 +150,14 @@ def _check_metrics(root: Path) -> dict[str, Any]:
             root / "cases/n31/evaluations/deterministic_grounding_gate_v1.json"
         ),
         "grounding_gate_report.schema.json",
+    )
+    semantic_review = validate_document(
+        _read_json(root / "cases/n31/evaluations/semantic_review_v1.json"),
+        "semantic_review_report.schema.json",
+    )
+    selective_rebuild = validate_document(
+        _read_json(root / "cases/n31/evaluations/selective_rebuild_v1.json"),
+        "selective_rebuild_report.schema.json",
     )
     sop_views = validate_document(
         _read_json(root / "cases/n31/demo_bundle/sop_views.json"),
@@ -275,6 +287,101 @@ def _check_metrics(root: Path) -> dict[str, Any]:
             and item["residual_conflict_count"] == 0
             for item in grounding_gate["scenarios"]
         ),
+        "semantic_review_grounded": semantic_review["status"] == "COMPLETED"
+        and semantic_review["model"] == "step-3.7-flash"
+        and semantic_review["reasoning_effort"] == "high"
+        and semantic_review["model_calls"] >= 1
+        and semantic_review["review_scope"]
+        == {
+            "step_count": 13,
+            "evidence_count": 36,
+            "dimensions": [
+                "SOURCE_DISTORTION",
+                "SOURCE_CONFLICT",
+                "ORDERING_RISK",
+                "EXCEPTION_OMISSION",
+            ],
+            "structured_sop_sent": True,
+            "evidence_claims_sent": True,
+            "raw_media_sent": False,
+            "full_transcript_sent": False,
+            "manual_pages_sent": False,
+            "local_paths_sent": False,
+            "credentials_sent": False,
+        }
+        and semantic_review["summary"]
+        == {
+            "step_count": 13,
+            "supported_count": 13,
+            "partial_count": 0,
+            "conflict_count": 0,
+            "needs_review_count": 0,
+            "finding_count": 0,
+            "high_severity_count": 0,
+            "finding_kind_counts": {
+                "SOURCE_DISTORTION": 0,
+                "SOURCE_CONFLICT": 0,
+                "ORDERING_RISK": 0,
+                "EXCEPTION_OMISSION": 0,
+            },
+            "human_review_finding_ids": [],
+            "automatic_gold_changes": 0,
+        }
+        and semantic_review["guardrails"]["may_override_gold"] is False
+        and semantic_review["guardrails"]["model_output_classification"]
+        == "MODEL_INFERENCE"
+        and {
+            item["step_id"] for item in semantic_review["assessments"]
+        }
+        == {item["step_id"] for item in gold["steps"]}
+        and all(
+            set(assessment["evidence_ids"])
+            <= set(
+                next(
+                    step
+                    for step in gold["steps"]
+                    if step["step_id"] == assessment["step_id"]
+                )["evidence"]
+            )
+            for assessment in semantic_review["assessments"]
+        ),
+        "selective_rebuild_bounded": selective_rebuild["status"] == "PASSED"
+        and selective_rebuild["summary"]
+        == {
+            "affected_step_count": 7,
+            "content_changed_step_count": 3,
+            "position_changed_step_count": 7,
+            "rebuild_artifact_count": 6,
+            "skipped_artifact_count": 0,
+            "quiz_question_count": 1,
+            "video_scene_count": 7,
+            "whole_artifact_count": 1,
+        }
+        and selective_rebuild["verification"]
+        == {
+            "sop_patch_reproduces_after": True,
+            "quiz_unchanged_questions_identical": True,
+            "video_scene_ids_exist": True,
+            "no_unaffected_video_scene_selected": True,
+            "poster_dependency_declared": True,
+        }
+        and selective_rebuild["data_policy"]
+        == {
+            "external_model_calls": 0,
+            "contains_raw_media": False,
+            "contains_credentials": False,
+            "contains_absolute_paths": False,
+        }
+        and {
+            plan["artifact_type"]: plan["units"]
+            for plan in selective_rebuild["artifact_plans"]
+        }["TRAINING_QUIZ"]
+        == ["Q02"]
+        and {
+            plan["artifact_type"]: plan["units"]
+            for plan in selective_rebuild["artifact_plans"]
+        }["TRAINING_VIDEO"]
+        == ["V07", "V08", "V09", "V10", "V11", "V12", "V13"],
         "training_package_traceable": set(sop_views["views"])
         == {"concise", "detailed", "evidence"}
         and all(len(view["steps"]) == 13 for view in sop_views["views"].values())

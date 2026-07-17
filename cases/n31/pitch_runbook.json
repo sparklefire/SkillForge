@@ -62,11 +62,12 @@
       "start_ms": 70000,
       "end_ms": 110000,
       "surface": "WEB",
-      "speaker_script": "现场演示使用操作者审核Gold构造的受控错误集，确保每次都能复现。Verifier发现缺步骤、顺序错误、无依据工具和参数等5个严重问题；点击重跑后，它引用证据，只执行插入、重排和删除等4处局部修改，再次质检降到0。",
+      "speaker_script": "现场演示使用操作者审核Gold构造的受控错误集，确保每次都能复现。Verifier发现缺步骤、顺序错误、无依据工具和参数等5个严重问题；它引用证据执行4处局部修改，再质检降到0，并只失效7个步骤、1道题和7个视频镜头。",
       "operator_action": "点击“重新运行 Gold 质检与局部修订”，随后依次指向问题证据、修订前后和局部修订审计。",
       "proof_points": [
         "严重错误5→0",
         "4项局部修订，不整包重写",
+        "选择性重建只触及7个步骤、1道题和7个镜头；其余单元保持相同",
         "页面展示Evidence ID与PDF页码或视频/录音时间点"
       ],
       "fallback": "若现场重算失败，切换offline模式并展示已冻结的Gold前后对比和审计记录。"
@@ -151,6 +152,8 @@
     {"artifact_id": "PDF_STRUCTURE", "path": "cases/n31/evaluations/pdf_structure_v1.json", "kind": "JSON", "required": true},
     {"artifact_id": "SOURCE_CANDIDATES", "path": "cases/n31/evaluations/source_candidate_synthesis_v1.json", "kind": "JSON", "required": true},
     {"artifact_id": "GROUNDING_GATE", "path": "cases/n31/evaluations/deterministic_grounding_gate_v1.json", "kind": "JSON", "required": true},
+    {"artifact_id": "SEMANTIC_REVIEW", "path": "cases/n31/evaluations/semantic_review_v1.json", "kind": "JSON", "required": true},
+    {"artifact_id": "SELECTIVE_REBUILD", "path": "cases/n31/evaluations/selective_rebuild_v1.json", "kind": "JSON", "required": true},
     {"artifact_id": "RUNTIME_BENCHMARK", "path": "output/evaluation/runtime_benchmark_dgx.json", "kind": "JSON", "required": true},
     {"artifact_id": "POSTER", "path": "output/pdf/n31_a4_training_poster.pdf", "kind": "PDF", "required": true},
     {"artifact_id": "TRAINING_VIDEO", "path": "output/video/n31_training_video_v1.mp4", "kind": "MP4", "required": true},

@@ -1,0 +1,322 @@
+{
+  "assessments": [
+    {
+      "confidence": 0.9,
+      "evidence_ids": [
+        "E096",
+        "E001",
+        "E144"
+      ],
+      "rationale": "步骤要求确认设备为汉印N31并核对折叠热敏标签纸尺寸在设备支持范围，与E144所述本批介质为72×130毫米折叠热敏标签纸、E096所述N31支持折叠纸规格的描述一致，无来源扭曲；所引证据无实质冲突；作为流程首步无前置顺序矛盾；未遗漏介质适配性相关的异常处理要求。",
+      "reviewed_dimensions": [
+        "SOURCE_DISTORTION",
+        "SOURCE_CONFLICT",
+        "ORDERING_RISK",
+        "EXCEPTION_OMISSION"
+      ],
+      "risk_notes": [],
+      "step_id": "S01",
+      "verdict": "SUPPORTED"
+    },
+    {
+      "confidence": 0.9,
+      "evidence_ids": [
+        "E096",
+        "E066",
+        "E144",
+        "E149",
+        "E153"
+      ],
+      "rationale": "步骤要求通过标签间隙和背面黑标判定定位方式为缝标，与E144所述本批介质有缝隙无黑标应使用缝标定位、E149所述使用缝标学习的描述一致，无来源扭曲；所引证据无实质冲突；前置依赖S01符合顺序规则；未遗漏缝标定位判定的异常处理要求。",
+      "reviewed_dimensions": [
+        "SOURCE_DISTORTION",
+        "SOURCE_CONFLICT",
+        "ORDERING_RISK",
+        "EXCEPTION_OMISSION"
+      ],
+      "risk_notes": [],
+      "step_id": "S02",
+      "verdict": "SUPPORTED"
+    },
+    {
+      "confidence": 0.9,
+      "evidence_ids": [
+        "E009",
+        "E099",
+        "E145",
+        "E151",
+        "E152"
+      ],
+      "rationale": "步骤要求确认电源关闭、纸路无残纸卡纸异物、标签纸平整，与E145所述换纸前需确认电源关闭、纸路清洁、新纸平整的描述一致，无来源扭曲；所引证据无实质冲突；前置依赖S02符合顺序规则；未遗漏卡纸、褶皱介质转异常流程的要求。",
+      "reviewed_dimensions": [
+        "SOURCE_DISTORTION",
+        "SOURCE_CONFLICT",
+        "ORDERING_RISK",
+        "EXCEPTION_OMISSION"
+      ],
+      "risk_notes": [],
+      "step_id": "S03",
+      "verdict": "SUPPORTED"
+    },
+    {
+      "confidence": 0.9,
+      "evidence_ids": [
+        "E014",
+        "E142"
+      ],
+      "rationale": "步骤要求在电源关闭时连接电源线再开机并观察状态，与E142所述确认电源开关关闭后连接电源线、再开机的操作流程一致，无来源扭曲；所引证据无实质冲突；前置依赖S03符合顺序规则；未遗漏异常报警、异味、异响的停止检查要求。",
+      "reviewed_dimensions": [
+        "SOURCE_DISTORTION",
+        "SOURCE_CONFLICT",
+        "ORDERING_RISK",
+        "EXCEPTION_OMISSION"
+      ],
+      "risk_notes": [],
+      "step_id": "S04",
+      "verdict": "SUPPORTED"
+    },
+    {
+      "confidence": 0.9,
+      "evidence_ids": [
+        "E018",
+        "E141",
+        "E145",
+        "E152"
+      ],
+      "rationale": "步骤要求双手打开顶盖并检查内部纸路、胶辊、导纸夹无异常，与E141所述顶盖开启方式、E145所述检查内部纸路的要求一致，无来源扭曲；所引证据无实质冲突；前置依赖S04符合顺序规则；未遗漏单侧猛拉、刮伤热敏区的风险提示。",
+      "reviewed_dimensions": [
+        "SOURCE_DISTORTION",
+        "SOURCE_CONFLICT",
+        "ORDERING_RISK",
+        "EXCEPTION_OMISSION"
+      ],
+      "risk_notes": [],
+      "step_id": "S05",
+      "verdict": "SUPPORTED"
+    },
+    {
+      "confidence": 0.9,
+      "evidence_ids": [
+        "E023",
+        "E069",
+        "E141",
+        "E146",
+        "E151",
+        "E152",
+        "E153"
+      ],
+      "rationale": "步骤要求双手对称调节导纸夹使标签居中平直通过不挤压，与E146所述导纸夹对称、靠近纸边不挤压的要求一致，无来源扭曲；所引证据无实质冲突；前置依赖S05符合顺序规则；未遗漏导纸夹过紧、过松的风险提示。",
+      "reviewed_dimensions": [
+        "SOURCE_DISTORTION",
+        "SOURCE_CONFLICT",
+        "ORDERING_RISK",
+        "EXCEPTION_OMISSION"
+      ],
+      "risk_notes": [],
+      "step_id": "S06",
+      "verdict": "SUPPORTED"
+    },
+    {
+      "confidence": 0.9,
+      "evidence_ids": [
+        "E029",
+        "E098",
+        "E074",
+        "E146",
+        "E151",
+        "E153"
+      ],
+      "rationale": "步骤要求关闭顶盖后调节后方进纸导轨与纸宽匹配，与E098所述调节后方进纸导轨的要求、E146所述导轨与纸张匹配的要求一致，无来源扭曲；所引证据无实质冲突；前置依赖S04符合S04在S07之前的顺序规则，且S06完成后也可执行该步骤，无顺序矛盾；未遗漏顶盖未闭合到位禁止进纸的风险提示。",
+      "reviewed_dimensions": [
+        "SOURCE_DISTORTION",
+        "SOURCE_CONFLICT",
+        "ORDERING_RISK",
+        "EXCEPTION_OMISSION"
+      ],
+      "risk_notes": [],
+      "step_id": "S07",
+      "verdict": "SUPPORTED"
+    },
+    {
+      "confidence": 0.9,
+      "evidence_ids": [
+        "E034",
+        "E079",
+        "E098",
+        "E142",
+        "E147",
+        "E151",
+        "E152"
+      ],
+      "rationale": "步骤要求沿导轨平直插入标签纸，自动吸纸后松手并观察出纸口送出小段，与E142所述标签纸自动吸纸后送出小段即送到位、E147所述沿导轨插入后自动吸纸松手的要求一致，无来源扭曲；所引证据无实质冲突；前置依赖S07符合顺序规则；未遗漏自动吸纸时禁止推拉扭转标签纸的要求。",
+      "reviewed_dimensions": [
+        "SOURCE_DISTORTION",
+        "SOURCE_CONFLICT",
+        "ORDERING_RISK",
+        "EXCEPTION_OMISSION"
+      ],
+      "risk_notes": [],
+      "step_id": "S08",
+      "verdict": "SUPPORTED"
+    },
+    {
+      "confidence": 0.9,
+      "evidence_ids": [
+        "E039",
+        "E077",
+        "E104",
+        "E148",
+        "E149",
+        "E151",
+        "E153"
+      ],
+      "rationale": "步骤要求按住走纸键至状态灯第二次闪烁后释放执行缝标学习，与E104所述闪烁两次释放为缝标学习的操作说明、E149所述第二次闪烁后释放不等待黑标后续灯态的要求一致，无来源扭曲；所引证据无实质冲突；前置依赖S08符合顺序规则；未遗漏缝标介质禁止按黑标学习的要求。",
+      "reviewed_dimensions": [
+        "SOURCE_DISTORTION",
+        "SOURCE_CONFLICT",
+        "ORDERING_RISK",
+        "EXCEPTION_OMISSION"
+      ],
+      "risk_notes": [],
+      "step_id": "S09",
+      "verdict": "SUPPORTED"
+    },
+    {
+      "confidence": 0.9,
+      "evidence_ids": [
+        "E044",
+        "E104",
+        "E150",
+        "E151",
+        "E153",
+        "E154"
+      ],
+      "rationale": "步骤要求短按走纸键后观察是否只送一张并停在正确边界，与E150所述换纸后需执行单张走纸检查、E154所述单张走纸只送一张停在边界附近为成功标准的要求一致，无来源扭曲；所引证据无实质冲突；前置依赖S09符合顺序规则；未遗漏连续跳纸、停止位置错误时停止测试重新检查的要求。",
+      "reviewed_dimensions": [
+        "SOURCE_DISTORTION",
+        "SOURCE_CONFLICT",
+        "ORDERING_RISK",
+        "EXCEPTION_OMISSION"
+      ],
+      "risk_notes": [],
+      "step_id": "S10",
+      "verdict": "SUPPORTED"
+    },
+    {
+      "confidence": 0.9,
+      "evidence_ids": [
+        "E048",
+        "E104",
+        "E150",
+        "E152"
+      ],
+      "rationale": "步骤要求按住走纸键至状态灯第一次闪烁后释放打印自检页，与E104所述闪烁一次释放为打印自检页的操作说明一致，无来源扭曲；所引证据无实质冲突；前置依赖S10符合顺序规则；未遗漏打印过程中禁止拉扯纸张的要求。",
+      "reviewed_dimensions": [
+        "SOURCE_DISTORTION",
+        "SOURCE_CONFLICT",
+        "ORDERING_RISK",
+        "EXCEPTION_OMISSION"
+      ],
+      "risk_notes": [],
+      "step_id": "S11",
+      "verdict": "SUPPORTED"
+    },
+    {
+      "confidence": 0.9,
+      "evidence_ids": [
+        "E052",
+        "E082",
+        "E150",
+        "E152",
+        "E153",
+        "E154"
+      ],
+      "rationale": "步骤要求使用已验证的本地打印设置发送测试标签并等待完成不拉纸，与E150所述需执行实际测试标签打印、E154所述测试标签完整出纸为成功标准的要求一致，无来源扭曲；所引证据无实质冲突；前置依赖S10符合顺序规则；未遗漏公开演示禁止暴露隐私、私有文件禁止上传外部的要求。",
+      "reviewed_dimensions": [
+        "SOURCE_DISTORTION",
+        "SOURCE_CONFLICT",
+        "ORDERING_RISK",
+        "EXCEPTION_OMISSION"
+      ],
+      "risk_notes": [],
+      "step_id": "S12",
+      "verdict": "SUPPORTED"
+    },
+    {
+      "confidence": 0.9,
+      "evidence_ids": [
+        "E057",
+        "E083",
+        "E151",
+        "E154"
+      ],
+      "rationale": "步骤要求检查打印结果并记录验收，与E154所述验收需检查标签完整性、居中、偏斜、跳纸等要求、E151所述异常检查项的要求一致，无来源扭曲；所引证据无实质冲突；前置依赖S12符合顺序规则；未遗漏验收前禁止揭开隐私遮挡的要求。",
+      "reviewed_dimensions": [
+        "SOURCE_DISTORTION",
+        "SOURCE_CONFLICT",
+        "ORDERING_RISK",
+        "EXCEPTION_OMISSION"
+      ],
+      "risk_notes": [],
+      "step_id": "S13",
+      "verdict": "SUPPORTED"
+    }
+  ],
+  "case_id": "n31_media_change",
+  "data_policy": {
+    "contains_absolute_paths": false,
+    "contains_credentials": false,
+    "contains_raw_media": false,
+    "safe_structured_derivative_only": true
+  },
+  "external_processing_authorized": true,
+  "findings": [],
+  "generated_at": "2026-07-17T08:34:30.336930+00:00",
+  "guardrails": {
+    "automatic_gold_changes": 0,
+    "complete_step_coverage_enforced": true,
+    "may_override_gold": false,
+    "model_output_classification": "MODEL_INFERENCE",
+    "unknown_evidence_rejected": true
+  },
+  "model": "step-3.7-flash",
+  "model_calls": 5,
+  "reasoning_effort": "high",
+  "report_id": "N31_SEMANTIC_REVIEW_V1",
+  "review_scope": {
+    "credentials_sent": false,
+    "dimensions": [
+      "SOURCE_DISTORTION",
+      "SOURCE_CONFLICT",
+      "ORDERING_RISK",
+      "EXCEPTION_OMISSION"
+    ],
+    "evidence_claims_sent": true,
+    "evidence_count": 36,
+    "full_transcript_sent": false,
+    "local_paths_sent": false,
+    "manual_pages_sent": false,
+    "raw_media_sent": false,
+    "step_count": 13,
+    "structured_sop_sent": true
+  },
+  "status": "COMPLETED",
+  "summary": {
+    "automatic_gold_changes": 0,
+    "conflict_count": 0,
+    "finding_count": 0,
+    "finding_kind_counts": {
+      "EXCEPTION_OMISSION": 0,
+      "ORDERING_RISK": 0,
+      "SOURCE_CONFLICT": 0,
+      "SOURCE_DISTORTION": 0
+    },
+    "high_severity_count": 0,
+    "human_review_finding_ids": [],
+    "needs_review_count": 0,
+    "partial_count": 0,
+    "step_count": 13,
+    "supported_count": 13
+  },
+  "version": 1
+}

@@ -20,7 +20,15 @@ REQUIRED = (
     "final_conflicts",
     "revision_audit",
 )
-OPTIONAL = ("sop_views", "checklist", "quiz", "workflow", "grounding_gate")
+OPTIONAL = (
+    "sop_views",
+    "checklist",
+    "quiz",
+    "workflow",
+    "grounding_gate",
+    "semantic_review",
+    "selective_rebuild",
+)
 
 
 def _read(path: Path) -> Any:
@@ -53,6 +61,8 @@ def build_bundle(
     output: Path,
     *,
     grounding_gate: Path | None = None,
+    semantic_review: Path | None = None,
+    selective_rebuild: Path | None = None,
 ) -> dict[str, Any]:
     missing = [name for name in REQUIRED if not (source / f"{name}.json").is_file()]
     if missing:
@@ -74,6 +84,24 @@ def build_bundle(
         if gate["status"] != "PASSED":
             raise ValueError("只允许发布通过复检的确定性门禁报告")
         _write(output / "grounding_gate.json", gate)
+    if semantic_review is not None:
+        review = validate_document(
+            _read(semantic_review),
+            "semantic_review_report.schema.json",
+        )
+        if review["summary"]["automatic_gold_changes"] != 0:
+            raise ValueError("语义复核不得自动修改Gold")
+        _write(output / "semantic_review.json", review)
+    if selective_rebuild is not None:
+        rebuild = validate_document(
+            _read(selective_rebuild),
+            "selective_rebuild_report.schema.json",
+        )
+        if rebuild["status"] != "PASSED" or not all(
+            rebuild["verification"].values()
+        ):
+            raise ValueError("只允许发布通过边界验证的选择性重建报告")
+        _write(output / "selective_rebuild.json", rebuild)
     summary = _read(output / "summary.json")
     if (
         summary.get("gold_status") != "GOLD"
@@ -120,6 +148,16 @@ def main() -> int:
         type=Path,
         default=Path("cases/n31/evaluations/deterministic_grounding_gate_v1.json"),
     )
+    parser.add_argument(
+        "--semantic-review",
+        type=Path,
+        default=Path("cases/n31/evaluations/semantic_review_v1.json"),
+    )
+    parser.add_argument(
+        "--selective-rebuild",
+        type=Path,
+        default=Path("cases/n31/evaluations/selective_rebuild_v1.json"),
+    )
     args = parser.parse_args()
     print(
         json.dumps(
@@ -127,6 +165,8 @@ def main() -> int:
                 args.source,
                 args.output,
                 grounding_gate=args.grounding_gate,
+                semantic_review=args.semantic_review,
+                selective_rebuild=args.selective_rebuild,
             ),
             ensure_ascii=False,
             indent=2,

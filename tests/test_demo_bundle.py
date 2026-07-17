@@ -17,6 +17,8 @@ def test_builds_asset_free_gold_bundle(tmp_path) -> None:
         grounding_gate=(
             ROOT / "cases/n31/evaluations/deterministic_grounding_gate_v1.json"
         ),
+        semantic_review=ROOT / "cases/n31/evaluations/semantic_review_v1.json",
+        selective_rebuild=ROOT / "cases/n31/evaluations/selective_rebuild_v1.json",
     )
     assert manifest["gold_status"] == "GOLD"
     assert manifest["metrics_status"] == "FINAL"
@@ -38,3 +40,16 @@ def test_builds_asset_free_gold_bundle(tmp_path) -> None:
     )
     validate_document(grounding_gate, "grounding_gate_report.schema.json")
     assert grounding_gate["summary"]["residual_conflict_count"] == 0
+    semantic_review = json.loads(
+        (output / "semantic_review.json").read_text(encoding="utf-8")
+    )
+    validate_document(semantic_review, "semantic_review_report.schema.json")
+    assert semantic_review["summary"]["step_count"] == 13
+    assert semantic_review["summary"]["automatic_gold_changes"] == 0
+    selective = json.loads(
+        (output / "selective_rebuild.json").read_text(encoding="utf-8")
+    )
+    validate_document(selective, "selective_rebuild_report.schema.json")
+    assert selective["status"] == "PASSED"
+    assert selective["summary"]["quiz_question_count"] == 1
+    assert selective["summary"]["video_scene_count"] == 7

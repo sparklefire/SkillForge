@@ -54,6 +54,7 @@ class StepPlanClient:
         self.logger = logger or StructuredLogger()
         self.timeout_seconds = timeout_seconds
         self.transport = transport or self._curl_transport
+        self.call_count = 0
 
     def _curl_transport(self, payload: dict[str, Any]) -> dict[str, Any]:
         if not self.api_key:
@@ -145,6 +146,7 @@ class StepPlanClient:
                 attempt=attempt,
                 message_count=len(working_messages),
             )
+            self.call_count += 1
             response = self.transport(payload)
             try:
                 document = parse_and_validate(self._content(response), schema_name)

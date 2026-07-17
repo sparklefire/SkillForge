@@ -54,6 +54,10 @@ def test_web_accepts_operator_reviewed_gold_result(tmp_path) -> None:
     assert home.status_code == 200
     assert "无来源内容拒绝门禁" in home.text
     assert "/api/n31/artifacts/grounding-gate" in home.text
+    assert "高推理语义质检" in home.text
+    assert "/api/n31/artifacts/semantic-review" in home.text
+    assert "受影响范围与选择性重建" in home.text
+    assert "/api/n31/artifacts/selective-rebuild" in home.text
     response = client.get("/api/n31")
     assert response.status_code == 200
     assert response.json()["summary"]["gold_status"] == "GOLD"
@@ -109,6 +113,20 @@ def test_web_accepts_operator_reviewed_gold_result(tmp_path) -> None:
         "revised_count": 4,
         "residual_conflict_count": 0,
     }
+    semantic_review = response.json()["semantic_review"]
+    assert semantic_review["status"] == "COMPLETED"
+    assert semantic_review["model"] == "step-3.7-flash"
+    assert semantic_review["reasoning_effort"] == "high"
+    assert semantic_review["summary"]["supported_count"] == 13
+    assert semantic_review["summary"]["finding_count"] == 0
+    assert semantic_review["summary"]["automatic_gold_changes"] == 0
+    assert semantic_review["review_scope"]["raw_media_sent"] is False
+    selective = response.json()["selective_rebuild"]
+    assert selective["status"] == "PASSED"
+    assert selective["summary"]["affected_step_count"] == 7
+    assert selective["summary"]["quiz_question_count"] == 1
+    assert selective["summary"]["video_scene_count"] == 7
+    assert all(selective["verification"].values())
     assert len(response.json()["checklist"]["items"]) == 13
     assert set(response.json()["sop_views"]["views"]) == {
         "concise",
@@ -194,6 +212,12 @@ def test_web_accepts_operator_reviewed_gold_result(tmp_path) -> None:
     grounding_download = client.get("/api/n31/artifacts/grounding-gate")
     assert grounding_download.status_code == 200
     assert grounding_download.json()["report_id"] == "DETERMINISTIC_GROUNDING_GATE_V1"
+    semantic_download = client.get("/api/n31/artifacts/semantic-review")
+    assert semantic_download.status_code == 200
+    assert semantic_download.json()["report_id"] == "N31_SEMANTIC_REVIEW_V1"
+    selective_download = client.get("/api/n31/artifacts/selective-rebuild")
+    assert selective_download.status_code == 200
+    assert selective_download.json()["report_id"] == "N31_SELECTIVE_REBUILD_V1"
     assert client.get("/api/n31/artifacts/private-video").status_code == 404
     rerun = client.post("/api/n31/run")
     assert rerun.status_code == 200

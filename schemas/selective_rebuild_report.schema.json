@@ -1,0 +1,150 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/selective_rebuild_report.schema.json",
+  "title": "SkillForge Selective Rebuild Report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "case_id",
+    "report_id",
+    "status",
+    "source_bindings",
+    "affected_steps",
+    "artifact_plans",
+    "summary",
+    "verification",
+    "data_policy"
+  ],
+  "properties": {
+    "version": {"const": 1},
+    "case_id": {"const": "n31_media_change"},
+    "report_id": {"const": "N31_SELECTIVE_REBUILD_V1"},
+    "status": {"enum": ["PASSED", "FAILED"]},
+    "source_bindings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["before_sop_sha256", "after_sop_sha256", "revision_audit_sha256", "storyboard_sha256"],
+      "properties": {
+        "before_sop_sha256": {"$ref": "#/$defs/sha256"},
+        "after_sop_sha256": {"$ref": "#/$defs/sha256"},
+        "revision_audit_sha256": {"$ref": "#/$defs/sha256"},
+        "storyboard_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "affected_steps": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/affected_step"}
+    },
+    "artifact_plans": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "items": {"$ref": "#/$defs/artifact_plan"}
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "affected_step_count",
+        "content_changed_step_count",
+        "position_changed_step_count",
+        "rebuild_artifact_count",
+        "skipped_artifact_count",
+        "quiz_question_count",
+        "video_scene_count",
+        "whole_artifact_count"
+      ],
+      "properties": {
+        "affected_step_count": {"type": "integer", "minimum": 1},
+        "content_changed_step_count": {"type": "integer", "minimum": 0},
+        "position_changed_step_count": {"type": "integer", "minimum": 0},
+        "rebuild_artifact_count": {"type": "integer", "minimum": 0, "maximum": 6},
+        "skipped_artifact_count": {"type": "integer", "minimum": 0, "maximum": 6},
+        "quiz_question_count": {"type": "integer", "minimum": 0},
+        "video_scene_count": {"type": "integer", "minimum": 0},
+        "whole_artifact_count": {"type": "integer", "minimum": 0}
+      }
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sop_patch_reproduces_after",
+        "quiz_unchanged_questions_identical",
+        "video_scene_ids_exist",
+        "no_unaffected_video_scene_selected",
+        "poster_dependency_declared"
+      ],
+      "properties": {
+        "sop_patch_reproduces_after": {"type": "boolean"},
+        "quiz_unchanged_questions_identical": {"type": "boolean"},
+        "video_scene_ids_exist": {"type": "boolean"},
+        "no_unaffected_video_scene_selected": {"type": "boolean"},
+        "poster_dependency_declared": {"type": "boolean"}
+      }
+    },
+    "data_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["external_model_calls", "contains_raw_media", "contains_credentials", "contains_absolute_paths"],
+      "properties": {
+        "external_model_calls": {"const": 0},
+        "contains_raw_media": {"const": false},
+        "contains_credentials": {"const": false},
+        "contains_absolute_paths": {"const": false}
+      }
+    }
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "affected_step": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "step_id",
+        "change_types",
+        "conflict_ids",
+        "before_position",
+        "after_position",
+        "content_changed",
+        "position_changed"
+      ],
+      "properties": {
+        "step_id": {"type": "string", "pattern": "^S[0-9]{2}$"},
+        "change_types": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"enum": ["INSERT", "REORDER", "REMOVE", "REPLACE"]}
+        },
+        "conflict_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^C[0-9]{3}$"}
+        },
+        "before_position": {"type": ["integer", "null"], "minimum": 1},
+        "after_position": {"type": ["integer", "null"], "minimum": 1},
+        "content_changed": {"type": "boolean"},
+        "position_changed": {"type": "boolean"}
+      }
+    },
+    "artifact_plan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["artifact_type", "action", "scope", "units", "unchanged_unit_count", "reason"],
+      "properties": {
+        "artifact_type": {
+          "enum": ["FINAL_SOP", "SOP_VIEWS", "MOBILE_CHECKLIST", "TRAINING_QUIZ", "A4_POSTER", "TRAINING_VIDEO"]
+        },
+        "action": {"enum": ["REBUILD", "SKIP"]},
+        "scope": {"enum": ["STEP_PATCH", "STEP_ONLY", "QUESTION_ONLY", "WHOLE_ARTIFACT", "SCENE_ONLY", "NONE"]},
+        "units": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "unchanged_unit_count": {"type": "integer", "minimum": 0},
+        "reason": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

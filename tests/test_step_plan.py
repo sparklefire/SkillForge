@@ -29,4 +29,5 @@ def test_invalid_json_is_retried_and_validated() -> None:
     )
     assert result == valid_evidence
     assert len(calls) == 2
+    assert client.call_count == 2
     assert "JSON Schema" in calls[1]["messages"][-1]["content"]

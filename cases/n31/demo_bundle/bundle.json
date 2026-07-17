@@ -45,6 +45,16 @@
       "size_bytes": 3176
     },
     {
+      "name": "selective_rebuild.json",
+      "sha256": "c3876fffc5072f042a87e420eaacfe99bcdf858a9f85f1174fcc1059aee4a279",
+      "size_bytes": 5669
+    },
+    {
+      "name": "semantic_review.json",
+      "sha256": "7cc4676d14bc12aec676e7f34ec126edc8c88e52abeb7df128eaf41ffed04b6f",
+      "size_bytes": 11170
+    },
+    {
       "name": "sop_views.json",
       "sha256": "7c18ecbf1be02bbfd91cd245335343b515fcedf3261e8571263a698ae0036397",
       "size_bytes": 90630
