@@ -78,3 +78,11 @@ def test_pitch_requires_grounded_pdf_structure_report() -> None:
     result = _check_metrics(ROOT)
     assert result["status"] == "PASSED"
     assert result["assertions"]["pdf_structure_grounded"] is True
+
+
+def test_pitch_requires_grounded_source_candidate_synthesis() -> None:
+    artifact_ids = {item["artifact_id"] for item in _runbook()["required_artifacts"]}
+    assert "SOURCE_CANDIDATES" in artifact_ids
+    result = _check_metrics(ROOT)
+    assert result["status"] == "PASSED"
+    assert result["assertions"]["source_candidates_grounded"] is True

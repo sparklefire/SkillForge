@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/source_candidate_plan.schema.json",
+  "title": "SkillForge Source-separated Step Candidate Plan",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "case_id",
+    "extraction_mode",
+    "uses_gold_step_text",
+    "candidates",
+    "phase_applicability"
+  ],
+  "properties": {
+    "version": {"const": 1},
+    "case_id": {"type": "string", "minLength": 1},
+    "extraction_mode": {
+      "enum": ["MODEL_EXTRACTED", "REVIEWED_SOURCE_PROJECTION"]
+    },
+    "uses_gold_step_text": {"const": false},
+    "candidates": {
+      "type": "array",
+      "minItems": 3,
+      "items": {"$ref": "#/$defs/candidate"}
+    },
+    "phase_applicability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["PREPARATION", "EXECUTION", "VERIFICATION", "RESET"],
+      "properties": {
+        "PREPARATION": {"$ref": "#/$defs/phaseApplicability"},
+        "EXECUTION": {"$ref": "#/$defs/phaseApplicability"},
+        "VERIFICATION": {"$ref": "#/$defs/phaseApplicability"},
+        "RESET": {"$ref": "#/$defs/phaseApplicability"}
+      }
+    }
+  },
+  "$defs": {
+    "phaseApplicability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "reason"],
+      "properties": {
+        "status": {"enum": ["APPLICABLE", "NOT_APPLICABLE"]},
+        "reason": {"type": "string", "minLength": 1}
+      }
+    },
+    "candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "candidate_id",
+        "source_type",
+        "source_ref",
+        "raw_claim",
+        "proposed_action",
+        "object",
+        "phase",
+        "granularity",
+        "semantic_keys",
+        "evidence_ids",
+        "confidence",
+        "support_status"
+      ],
+      "properties": {
+        "candidate_id": {"type": "string", "pattern": "^SC[0-9]{3}$"},
+        "source_type": {"enum": ["video", "pdf", "audio"]},
+        "source_ref": {"type": "string", "minLength": 1},
+        "raw_claim": {"type": "string", "minLength": 1},
+        "proposed_action": {"type": "string", "minLength": 1},
+        "object": {"type": "string", "minLength": 1},
+        "phase": {
+          "enum": ["PREPARATION", "EXECUTION", "VERIFICATION", "RESET"]
+        },
+        "granularity": {"enum": ["ATOMIC", "TOO_FINE", "TOO_COARSE"]},
+        "semantic_keys": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]+$"}
+        },
+        "evidence_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^E[0-9]{3}$"}
+        },
+        "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+        "support_status": {"enum": ["SUPPORTED", "PARTIAL"]}
+      }
+    }
+  }
+}

@@ -137,6 +137,10 @@ def _check_metrics(root: Path) -> dict[str, Any]:
         _read_json(root / "cases/n31/evaluations/pdf_structure_v1.json"),
         "pdf_structure_report.schema.json",
     )
+    source_candidates = validate_document(
+        _read_json(root / "cases/n31/evaluations/source_candidate_synthesis_v1.json"),
+        "source_candidate_synthesis.schema.json",
+    )
     manifest_path = root / "output/video/n31_training_video_manifest_v1.json"
     manifest = validate_document(
         _read_json(manifest_path), "training_video_manifest.schema.json"
@@ -201,6 +205,25 @@ def _check_metrics(root: Path) -> dict[str, Any]:
             "Q02": ("PASSED", "N31_MANUAL_REV1_0", 20),
             "Q03": ("PASSED", "N31_MANUAL_REV1_0", 20),
         },
+        "source_candidates_grounded": source_candidates["status"] == "NEEDS_REVIEW"
+        and source_candidates["uses_gold_step_text"] is False
+        and source_candidates["data_policy"]["external_model_calls"] == 0
+        and source_candidates["summary"]["source_candidate_counts"]
+        == {"video": 18, "pdf": 7, "audio": 8}
+        and source_candidates["summary"]["ordered_step_count"] == 13
+        and source_candidates["summary"]["coarse_candidate_count"] == 8
+        and source_candidates["summary"]["fine_candidate_count"] == 8
+        and source_candidates["summary"]["coarse_split_group_count"] == 10
+        and source_candidates["summary"]["fine_merge_group_count"] == 4
+        and source_candidates["summary"]["synonym_merge_group_count"] == 12
+        and source_candidates["summary"]["multi_source_step_count"] == 12
+        and source_candidates["summary"]["graph_acyclic"] is True
+        and any(
+            item["step_id"] == "S04"
+            and item["source_types"] == ["pdf"]
+            and "E014" not in item["evidence_ids"]
+            for item in source_candidates["ordered_steps"]
+        ),
         "video_manifest_bound": video_path.is_file()
         and manifest["output"]["sha256"] == _sha256(video_path)
         and manifest["coverage"]["covered_gold_step_count"]

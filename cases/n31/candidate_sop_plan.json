@@ -7,6 +7,15 @@
     {
       "step_id": "S01",
       "title": "核对设备和介质适配性",
+      "semantic_key": "CHECK_DEVICE_MEDIA_COMPATIBILITY",
+      "phase": "PREPARATION",
+      "irreversible": false,
+      "recovery": {
+        "mode": "NOT_REQUIRED",
+        "target_step_id": null,
+        "action": "尚未改变设备或介质状态，无需复位。",
+        "evidence_ids": []
+      },
       "action": "确认设备为汉印 N31，并核对本批折叠热敏标签纸的类型和宽度属于设备支持范围。",
       "object": "N31 打印机与折叠热敏标签纸",
       "prerequisites": [],
@@ -16,13 +25,15 @@
           "name": "本批标签宽度",
           "value": 72,
           "unit": "mm",
-          "evidence_selectors": []
+          "evidence_selectors": [],
+          "synthesis_evidence_ids": ["E144"]
         },
         {
           "name": "本批标签高度",
           "value": 130,
           "unit": "mm",
-          "evidence_selectors": []
+          "evidence_selectors": [],
+          "synthesis_evidence_ids": ["E144"]
         }
       ],
       "warnings": [
@@ -49,6 +60,15 @@
     {
       "step_id": "S02",
       "title": "判断缝标定位方式",
+      "semantic_key": "IDENTIFY_GAP_MEDIA",
+      "phase": "PREPARATION",
+      "irreversible": false,
+      "recovery": {
+        "mode": "RETURN_TO_STEP",
+        "target_step_id": "S01",
+        "action": "若定位方式无法确认，返回介质核对并重新检查相邻标签边界和整段背面。",
+        "evidence_ids": ["E144", "E149"]
+      },
       "action": "查看相邻标签间隙和介质背面，确认存在标签缝隙且没有周期性黑标，将本批介质判定为缝标定位。",
       "object": "标签纸正反面和相邻标签边界",
       "prerequisites": [
@@ -95,6 +115,15 @@
     {
       "step_id": "S03",
       "title": "检查初始状态",
+      "semantic_key": "CHECK_INITIAL_STATE",
+      "phase": "PREPARATION",
+      "irreversible": false,
+      "recovery": {
+        "mode": "STOP_AND_REVIEW",
+        "target_step_id": null,
+        "action": "发现残纸、卡纸、异物或褶皱时停止标准换纸流程，转入异常处理，不强行拉扯。",
+        "evidence_ids": ["E145", "E152"]
+      },
       "action": "确认电源开关处于关闭状态，进纸通道没有残纸、卡纸或异物，标签纸平整且没有明显褶皱。",
       "object": "电源开关、进纸通道和标签纸",
       "prerequisites": [
@@ -126,6 +155,15 @@
     {
       "step_id": "S04",
       "title": "连接电源并开机",
+      "semantic_key": "POWER_ON_DEVICE",
+      "phase": "EXECUTION",
+      "irreversible": false,
+      "recovery": {
+        "mode": "STOP_AND_REVIEW",
+        "target_step_id": null,
+        "action": "若开机后状态异常，关闭电源并检查电源连接，不继续送纸或打印。",
+        "evidence_ids": ["E142"]
+      },
       "action": "在电源开关关闭时连接电源线，再打开电源开关并观察状态灯和设备声音。",
       "object": "电源线、电源开关和状态灯",
       "prerequisites": [
@@ -158,6 +196,15 @@
     {
       "step_id": "S05",
       "title": "打开顶盖并检查内部纸路",
+      "semantic_key": "INSPECT_INTERNAL_PATH",
+      "phase": "EXECUTION",
+      "irreversible": false,
+      "recovery": {
+        "mode": "RETURN_TO_STEP",
+        "target_step_id": "S04",
+        "action": "发现内部异常时停止操作；无需继续检查时关闭顶盖并保持设备空闲。",
+        "evidence_ids": ["E141", "E145", "E152"]
+      },
       "action": "双手操作顶盖两侧开启位置，缓慢打开顶盖，检查内部纸路、胶辊和导纸夹没有异物、残纸或明显损伤。",
       "object": "顶盖和内部纸路",
       "prerequisites": [
@@ -189,6 +236,15 @@
     {
       "step_id": "S06",
       "title": "调节内部导纸夹",
+      "semantic_key": "ADJUST_INTERNAL_GUIDES",
+      "phase": "EXECUTION",
+      "irreversible": false,
+      "recovery": {
+        "mode": "RETRY_CURRENT",
+        "target_step_id": null,
+        "action": "导纸夹过紧或过松时重新对称调节，直到靠近纸边但不挤压。",
+        "evidence_ids": ["E146"]
+      },
       "action": "双手对称移动左右内部导纸夹，使标签纸能够居中、平直通过且不被明显挤压。",
       "object": "左右内部导纸夹",
       "prerequisites": [
@@ -225,10 +281,19 @@
     {
       "step_id": "S07",
       "title": "关闭顶盖并调节后方进纸导轨",
+      "semantic_key": "CLOSE_COVER_ADJUST_REAR_GUIDES",
+      "phase": "EXECUTION",
+      "irreversible": false,
+      "recovery": {
+        "mode": "RETRY_CURRENT",
+        "target_step_id": null,
+        "action": "纸张无法居中平直通过时重新对称调节后方导轨，避免过紧或过松。",
+        "evidence_ids": ["E146", "E151"]
+      },
       "action": "确认内部纸路正常后关闭顶盖，再从机器背面双手调节左右进纸导轨，使其与标签纸宽度匹配。",
       "object": "顶盖和后方进纸导轨",
       "prerequisites": [
-        "S06"
+        "S04"
       ],
       "tools": [
         "本批标签纸"
@@ -261,6 +326,15 @@
     {
       "step_id": "S08",
       "title": "插入标签纸并确认自动吸纸",
+      "semantic_key": "INSERT_MEDIA_CONFIRM_AUTO_FEED",
+      "phase": "EXECUTION",
+      "irreversible": false,
+      "recovery": {
+        "mode": "RETURN_TO_STEP",
+        "target_step_id": "S07",
+        "action": "未自动吸纸、纸边歪斜或设备报警时停止推拉，退出介质并重新核对导轨后再送纸。",
+        "evidence_ids": ["E147", "E151", "E152"]
+      },
       "action": "从机器背面沿导轨平直插入标签纸，机器开始自动吸纸后松手，并观察出纸口是否送出一小段。",
       "object": "标签纸、后方进纸口和前方出纸口",
       "prerequisites": [
@@ -301,6 +375,15 @@
     {
       "step_id": "S09",
       "title": "执行缝标学习",
+      "semantic_key": "RUN_GAP_CALIBRATION",
+      "phase": "EXECUTION",
+      "irreversible": false,
+      "recovery": {
+        "mode": "RETRY_CURRENT",
+        "target_step_id": null,
+        "action": "学习模式或停止位置错误时，重新确认缝标定位并再次执行缝标学习。",
+        "evidence_ids": ["E149", "E151"]
+      },
       "action": "按住走纸键，观察状态灯，在第二次闪烁后立即释放，使打印机执行缝标模式标签学习。",
       "object": "走纸键、状态灯和标签传感器",
       "prerequisites": [
@@ -348,6 +431,15 @@
     {
       "step_id": "S10",
       "title": "执行单张走纸检查",
+      "semantic_key": "VERIFY_SINGLE_LABEL_FEED",
+      "phase": "VERIFICATION",
+      "irreversible": false,
+      "recovery": {
+        "mode": "RETURN_TO_STEP",
+        "target_step_id": "S08",
+        "action": "出现连续跳纸、偏斜或停止位置错误时停止继续打印，检查送纸和导轨后重新学习。",
+        "evidence_ids": ["E151", "E154"]
+      },
       "action": "短按走纸键后立即释放，观察设备是否只送出一张标签并停在正确边界。",
       "object": "走纸键和标签停止位置",
       "prerequisites": [
@@ -390,6 +482,15 @@
     {
       "step_id": "S11",
       "title": "打印自检页",
+      "semantic_key": "PRINT_SELF_TEST",
+      "phase": "VERIFICATION",
+      "irreversible": true,
+      "recovery": {
+        "mode": "RETURN_TO_STEP",
+        "target_step_id": "S09",
+        "action": "自检异常时不重复消耗标签，先核对介质学习和驱动设置，再按需重试。",
+        "evidence_ids": ["E150", "E151"]
+      },
       "action": "按住走纸键，在状态灯第一次闪烁后释放，等待自检页完整打印。",
       "object": "走纸键、状态灯和自检页",
       "prerequisites": [
@@ -433,6 +534,15 @@
     {
       "step_id": "S12",
       "title": "打印本地测试标签",
+      "semantic_key": "PRINT_LOCAL_TEST_LABEL",
+      "phase": "VERIFICATION",
+      "irreversible": true,
+      "recovery": {
+        "mode": "RETURN_TO_STEP",
+        "target_step_id": "S10",
+        "action": "测试标签异常时停止继续打印；已消耗标签不可恢复，返回走纸检查并核对尺寸缩放和驱动设置。",
+        "evidence_ids": ["E150", "E151", "E154"]
+      },
       "action": "使用已经验证的本地打印设置发送一张测试标签，等待设备自行完成，不在出纸过程中拉纸。",
       "object": "本地测试文件和测试标签",
       "prerequisites": [
@@ -467,6 +577,15 @@
     {
       "step_id": "S13",
       "title": "检查打印结果并记录验收",
+      "semantic_key": "INSPECT_AND_RECORD_RESULT",
+      "phase": "VERIFICATION",
+      "irreversible": false,
+      "recovery": {
+        "mode": "RETURN_TO_STEP",
+        "target_step_id": "S10",
+        "action": "验收不通过时记录异常并返回单张走纸检查，按偏移、跳纸或识别失败顺序排查。",
+        "evidence_ids": ["E151", "E154"]
+      },
       "action": "检查标签内容完整性、居中情况、偏斜、缺失、停止位置和连续跳纸现象，并记录本次换纸结果。",
       "object": "打印完成的测试标签和设备状态",
       "prerequisites": [

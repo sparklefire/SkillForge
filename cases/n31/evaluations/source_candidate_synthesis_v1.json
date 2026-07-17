@@ -1,0 +1,1739 @@
+{
+  "case_id": "n31_media_change",
+  "data_policy": {
+    "contains_absolute_paths": false,
+    "contains_credentials": false,
+    "contains_raw_media": false,
+    "external_model_calls": 0
+  },
+  "extraction_mode": "REVIEWED_SOURCE_PROJECTION",
+  "merge_groups": [
+    {
+      "candidate_ids": [
+        "SC001",
+        "SC019",
+        "SC026"
+      ],
+      "candidate_part_ids": [
+        "SC001-P01",
+        "SC019-P01",
+        "SC026-P01"
+      ],
+      "evidence_ids": [
+        "E001",
+        "E096",
+        "E144"
+      ],
+      "group_id": "MG01",
+      "operations": [
+        "COARSE_SPLIT",
+        "SYNONYM_MERGE"
+      ],
+      "phase": "PREPARATION",
+      "rationale": "将跨多个完成目标的粗粒度候选拆分；归一不同来源的同义表述并合并证据。",
+      "semantic_key": "CHECK_DEVICE_MEDIA_COMPATIBILITY",
+      "source_types": [
+        "audio",
+        "pdf",
+        "video"
+      ],
+      "step_id": "S01"
+    },
+    {
+      "candidate_ids": [
+        "SC002",
+        "SC019",
+        "SC026"
+      ],
+      "candidate_part_ids": [
+        "SC002-P01",
+        "SC019-P02",
+        "SC026-P02"
+      ],
+      "evidence_ids": [
+        "E066",
+        "E096",
+        "E144"
+      ],
+      "group_id": "MG02",
+      "operations": [
+        "COARSE_SPLIT",
+        "SYNONYM_MERGE"
+      ],
+      "phase": "PREPARATION",
+      "rationale": "将跨多个完成目标的粗粒度候选拆分；归一不同来源的同义表述并合并证据。",
+      "semantic_key": "IDENTIFY_GAP_MEDIA",
+      "source_types": [
+        "audio",
+        "pdf",
+        "video"
+      ],
+      "step_id": "S02"
+    },
+    {
+      "candidate_ids": [
+        "SC003",
+        "SC020",
+        "SC027"
+      ],
+      "candidate_part_ids": [
+        "SC003-P01",
+        "SC020-P01",
+        "SC027-P01"
+      ],
+      "evidence_ids": [
+        "E009",
+        "E099",
+        "E145"
+      ],
+      "group_id": "MG03",
+      "operations": [
+        "SYNONYM_MERGE"
+      ],
+      "phase": "PREPARATION",
+      "rationale": "归一不同来源的同义表述并合并证据。",
+      "semantic_key": "CHECK_INITIAL_STATE",
+      "source_types": [
+        "audio",
+        "pdf",
+        "video"
+      ],
+      "step_id": "S03"
+    },
+    {
+      "candidate_ids": [
+        "SC021"
+      ],
+      "candidate_part_ids": [
+        "SC021-P01"
+      ],
+      "evidence_ids": [
+        "E142"
+      ],
+      "group_id": "MG04",
+      "operations": [
+        "KEEP"
+      ],
+      "phase": "EXECUTION",
+      "rationale": "保留单一原子候选。",
+      "semantic_key": "POWER_ON_DEVICE",
+      "source_types": [
+        "pdf"
+      ],
+      "step_id": "S04"
+    },
+    {
+      "candidate_ids": [
+        "SC004",
+        "SC022",
+        "SC028"
+      ],
+      "candidate_part_ids": [
+        "SC004-P01",
+        "SC022-P01",
+        "SC028-P01"
+      ],
+      "evidence_ids": [
+        "E018",
+        "E141",
+        "E145"
+      ],
+      "group_id": "MG05",
+      "operations": [
+        "COARSE_SPLIT",
+        "SYNONYM_MERGE"
+      ],
+      "phase": "EXECUTION",
+      "rationale": "将跨多个完成目标的粗粒度候选拆分；归一不同来源的同义表述并合并证据。",
+      "semantic_key": "INSPECT_INTERNAL_PATH",
+      "source_types": [
+        "audio",
+        "pdf",
+        "video"
+      ],
+      "step_id": "S05"
+    },
+    {
+      "candidate_ids": [
+        "SC005",
+        "SC006",
+        "SC022",
+        "SC029"
+      ],
+      "candidate_part_ids": [
+        "SC005-P01",
+        "SC006-P01",
+        "SC022-P02",
+        "SC029-P01"
+      ],
+      "evidence_ids": [
+        "E023",
+        "E069",
+        "E141",
+        "E146"
+      ],
+      "group_id": "MG06",
+      "operations": [
+        "COARSE_SPLIT",
+        "FINE_GRAIN_MERGE",
+        "SYNONYM_MERGE"
+      ],
+      "phase": "EXECUTION",
+      "rationale": "将跨多个完成目标的粗粒度候选拆分；把同一完成目标下的过细动作合并；归一不同来源的同义表述并合并证据。",
+      "semantic_key": "ADJUST_INTERNAL_GUIDES",
+      "source_types": [
+        "audio",
+        "pdf",
+        "video"
+      ],
+      "step_id": "S06"
+    },
+    {
+      "candidate_ids": [
+        "SC007",
+        "SC008",
+        "SC023",
+        "SC029"
+      ],
+      "candidate_part_ids": [
+        "SC007-P01",
+        "SC008-P01",
+        "SC023-P01",
+        "SC029-P02"
+      ],
+      "evidence_ids": [
+        "E029",
+        "E074",
+        "E098",
+        "E146"
+      ],
+      "group_id": "MG07",
+      "operations": [
+        "COARSE_SPLIT",
+        "FINE_GRAIN_MERGE",
+        "SYNONYM_MERGE"
+      ],
+      "phase": "EXECUTION",
+      "rationale": "将跨多个完成目标的粗粒度候选拆分；把同一完成目标下的过细动作合并；归一不同来源的同义表述并合并证据。",
+      "semantic_key": "CLOSE_COVER_ADJUST_REAR_GUIDES",
+      "source_types": [
+        "audio",
+        "pdf",
+        "video"
+      ],
+      "step_id": "S07"
+    },
+    {
+      "candidate_ids": [
+        "SC009",
+        "SC010",
+        "SC023",
+        "SC030"
+      ],
+      "candidate_part_ids": [
+        "SC009-P01",
+        "SC010-P01",
+        "SC023-P02",
+        "SC030-P01"
+      ],
+      "evidence_ids": [
+        "E034",
+        "E079",
+        "E098",
+        "E147"
+      ],
+      "group_id": "MG08",
+      "operations": [
+        "COARSE_SPLIT",
+        "FINE_GRAIN_MERGE",
+        "SYNONYM_MERGE"
+      ],
+      "phase": "EXECUTION",
+      "rationale": "将跨多个完成目标的粗粒度候选拆分；把同一完成目标下的过细动作合并；归一不同来源的同义表述并合并证据。",
+      "semantic_key": "INSERT_MEDIA_CONFIRM_AUTO_FEED",
+      "source_types": [
+        "audio",
+        "pdf",
+        "video"
+      ],
+      "step_id": "S08"
+    },
+    {
+      "candidate_ids": [
+        "SC011",
+        "SC012",
+        "SC024",
+        "SC031"
+      ],
+      "candidate_part_ids": [
+        "SC011-P01",
+        "SC012-P01",
+        "SC024-P01",
+        "SC031-P01"
+      ],
+      "evidence_ids": [
+        "E039",
+        "E077",
+        "E104",
+        "E148",
+        "E149"
+      ],
+      "group_id": "MG09",
+      "operations": [
+        "SYNONYM_MERGE"
+      ],
+      "phase": "EXECUTION",
+      "rationale": "归一不同来源的同义表述并合并证据。",
+      "semantic_key": "RUN_GAP_CALIBRATION",
+      "source_types": [
+        "audio",
+        "pdf",
+        "video"
+      ],
+      "step_id": "S09"
+    },
+    {
+      "candidate_ids": [
+        "SC013",
+        "SC025",
+        "SC032",
+        "SC033"
+      ],
+      "candidate_part_ids": [
+        "SC013-P01",
+        "SC025-P01",
+        "SC032-P01",
+        "SC033-P01"
+      ],
+      "evidence_ids": [
+        "E044",
+        "E104",
+        "E150",
+        "E154"
+      ],
+      "group_id": "MG10",
+      "operations": [
+        "COARSE_SPLIT",
+        "SYNONYM_MERGE"
+      ],
+      "phase": "VERIFICATION",
+      "rationale": "将跨多个完成目标的粗粒度候选拆分；归一不同来源的同义表述并合并证据。",
+      "semantic_key": "VERIFY_SINGLE_LABEL_FEED",
+      "source_types": [
+        "audio",
+        "pdf",
+        "video"
+      ],
+      "step_id": "S10"
+    },
+    {
+      "candidate_ids": [
+        "SC014",
+        "SC025",
+        "SC032"
+      ],
+      "candidate_part_ids": [
+        "SC014-P01",
+        "SC025-P02",
+        "SC032-P02"
+      ],
+      "evidence_ids": [
+        "E048",
+        "E104",
+        "E150"
+      ],
+      "group_id": "MG11",
+      "operations": [
+        "COARSE_SPLIT",
+        "SYNONYM_MERGE"
+      ],
+      "phase": "VERIFICATION",
+      "rationale": "将跨多个完成目标的粗粒度候选拆分；归一不同来源的同义表述并合并证据。",
+      "semantic_key": "PRINT_SELF_TEST",
+      "source_types": [
+        "audio",
+        "pdf",
+        "video"
+      ],
+      "step_id": "S11"
+    },
+    {
+      "candidate_ids": [
+        "SC015",
+        "SC016",
+        "SC032",
+        "SC033"
+      ],
+      "candidate_part_ids": [
+        "SC015-P01",
+        "SC016-P01",
+        "SC032-P03",
+        "SC033-P02"
+      ],
+      "evidence_ids": [
+        "E052",
+        "E082",
+        "E150",
+        "E154"
+      ],
+      "group_id": "MG12",
+      "operations": [
+        "COARSE_SPLIT",
+        "SYNONYM_MERGE"
+      ],
+      "phase": "VERIFICATION",
+      "rationale": "将跨多个完成目标的粗粒度候选拆分；归一不同来源的同义表述并合并证据。",
+      "semantic_key": "PRINT_LOCAL_TEST_LABEL",
+      "source_types": [
+        "audio",
+        "video"
+      ],
+      "step_id": "S12"
+    },
+    {
+      "candidate_ids": [
+        "SC017",
+        "SC018",
+        "SC033"
+      ],
+      "candidate_part_ids": [
+        "SC017-P01",
+        "SC018-P01",
+        "SC033-P03"
+      ],
+      "evidence_ids": [
+        "E057",
+        "E083",
+        "E154"
+      ],
+      "group_id": "MG13",
+      "operations": [
+        "COARSE_SPLIT",
+        "FINE_GRAIN_MERGE",
+        "SYNONYM_MERGE"
+      ],
+      "phase": "VERIFICATION",
+      "rationale": "将跨多个完成目标的粗粒度候选拆分；把同一完成目标下的过细动作合并；归一不同来源的同义表述并合并证据。",
+      "semantic_key": "INSPECT_AND_RECORD_RESULT",
+      "source_types": [
+        "audio",
+        "video"
+      ],
+      "step_id": "S13"
+    }
+  ],
+  "ordered_steps": [
+    {
+      "action": "确认设备为汉印 N31，并核对本批折叠热敏标签纸的类型和宽度属于设备支持范围。",
+      "candidate_ids": [
+        "SC001",
+        "SC019",
+        "SC026"
+      ],
+      "confidence": 0.912,
+      "evidence_ids": [
+        "E001",
+        "E096",
+        "E144"
+      ],
+      "irreversible": false,
+      "object": "N31 打印机与折叠热敏标签纸",
+      "parameters": [
+        {
+          "evidence_ids": [
+            "E144"
+          ],
+          "name": "本批标签宽度",
+          "unit": "mm",
+          "value": 72
+        },
+        {
+          "evidence_ids": [
+            "E144"
+          ],
+          "name": "本批标签高度",
+          "unit": "mm",
+          "value": 130
+        }
+      ],
+      "phase": "PREPARATION",
+      "prerequisites": [],
+      "recovery": {
+        "action": "尚未改变设备或介质状态，无需复位。",
+        "evidence_ids": [],
+        "mode": "NOT_REQUIRED",
+        "target_step_id": null
+      },
+      "required": true,
+      "semantic_key": "CHECK_DEVICE_MEDIA_COMPATIBILITY",
+      "source_types": [
+        "audio",
+        "pdf",
+        "video"
+      ],
+      "status": "NEEDS_REVIEW",
+      "step_id": "S01",
+      "success_check": "设备型号正确，介质为折叠热敏标签纸，纸宽处于手册支持范围。",
+      "title": "核对设备和介质适配性",
+      "tools": [],
+      "warnings": [
+        "本批标签的精确尺寸来自用户实物记录，尚待专家口述或人工签字转为可验证证据。"
+      ]
+    },
+    {
+      "action": "查看相邻标签间隙和介质背面，确认存在标签缝隙且没有周期性黑标，将本批介质判定为缝标定位。",
+      "candidate_ids": [
+        "SC002",
+        "SC019",
+        "SC026"
+      ],
+      "confidence": 0.917,
+      "evidence_ids": [
+        "E066",
+        "E096",
+        "E144"
+      ],
+      "irreversible": false,
+      "object": "标签纸正反面和相邻标签边界",
+      "parameters": [
+        {
+          "evidence_ids": [
+            "E096",
+            "E066"
+          ],
+          "name": "定位方式",
+          "unit": "",
+          "value": "缝标"
+        }
+      ],
+      "phase": "PREPARATION",
+      "prerequisites": [
+        "S01"
+      ],
+      "recovery": {
+        "action": "若定位方式无法确认，返回介质核对并重新检查相邻标签边界和整段背面。",
+        "evidence_ids": [
+          "E144",
+          "E149"
+        ],
+        "mode": "RETURN_TO_STEP",
+        "target_step_id": "S01"
+      },
+      "required": true,
+      "semantic_key": "IDENTIFY_GAP_MEDIA",
+      "source_types": [
+        "audio",
+        "pdf",
+        "video"
+      ],
+      "status": "NEEDS_REVIEW",
+      "step_id": "S02",
+      "success_check": "能够指出标签间隙，背面未见周期性黑标，并将后续学习模式确定为缝标。",
+      "title": "判断缝标定位方式",
+      "tools": [],
+      "warnings": [
+        "不能把无黑标的缝标介质按黑标模式学习。"
+      ]
+    },
+    {
+      "action": "确认电源开关处于关闭状态，进纸通道没有残纸、卡纸或异物，标签纸平整且没有明显褶皱。",
+      "candidate_ids": [
+        "SC003",
+        "SC020",
+        "SC027"
+      ],
+      "confidence": 0.862,
+      "evidence_ids": [
+        "E009",
+        "E099",
+        "E145"
+      ],
+      "irreversible": false,
+      "object": "电源开关、进纸通道和标签纸",
+      "parameters": [],
+      "phase": "PREPARATION",
+      "prerequisites": [
+        "S02"
+      ],
+      "recovery": {
+        "action": "发现残纸、卡纸、异物或褶皱时停止标准换纸流程，转入异常处理，不强行拉扯。",
+        "evidence_ids": [
+          "E145",
+          "E152"
+        ],
+        "mode": "STOP_AND_REVIEW",
+        "target_step_id": null
+      },
+      "required": true,
+      "semantic_key": "CHECK_INITIAL_STATE",
+      "source_types": [
+        "audio",
+        "pdf",
+        "video"
+      ],
+      "status": "NEEDS_REVIEW",
+      "step_id": "S03",
+      "success_check": "设备未通电，纸路清洁无阻塞，待装标签纸平整。",
+      "title": "检查初始状态",
+      "tools": [],
+      "warnings": [
+        "发现卡纸或褶皱介质时转入异常流程，不在标准流程中强拉。"
+      ]
+    },
+    {
+      "action": "在电源开关关闭时连接电源线，再打开电源开关并观察状态灯和设备声音。",
+      "candidate_ids": [
+        "SC021"
+      ],
+      "confidence": 0.94,
+      "evidence_ids": [
+        "E142"
+      ],
+      "irreversible": false,
+      "object": "电源线、电源开关和状态灯",
+      "parameters": [],
+      "phase": "EXECUTION",
+      "prerequisites": [
+        "S03"
+      ],
+      "recovery": {
+        "action": "若开机后状态异常，关闭电源并检查电源连接，不继续送纸或打印。",
+        "evidence_ids": [
+          "E142"
+        ],
+        "mode": "STOP_AND_REVIEW",
+        "target_step_id": null
+      },
+      "required": true,
+      "semantic_key": "POWER_ON_DEVICE",
+      "source_types": [
+        "pdf"
+      ],
+      "status": "NEEDS_REVIEW",
+      "step_id": "S04",
+      "success_check": "电源连接牢固，设备完成启动，状态灯没有异常报警。",
+      "title": "连接电源并开机",
+      "tools": [
+        "N31 原装或适配电源"
+      ],
+      "warnings": [
+        "出现异常报警、异味或异常声音时停止操作并进入检查流程。"
+      ]
+    },
+    {
+      "action": "双手操作顶盖两侧开启位置，缓慢打开顶盖，检查内部纸路、胶辊和导纸夹没有异物、残纸或明显损伤。",
+      "candidate_ids": [
+        "SC004",
+        "SC022",
+        "SC028"
+      ],
+      "confidence": 0.85,
+      "evidence_ids": [
+        "E018",
+        "E141",
+        "E145"
+      ],
+      "irreversible": false,
+      "object": "顶盖和内部纸路",
+      "parameters": [],
+      "phase": "EXECUTION",
+      "prerequisites": [
+        "S04"
+      ],
+      "recovery": {
+        "action": "发现内部异常时停止操作；无需继续检查时关闭顶盖并保持设备空闲。",
+        "evidence_ids": [
+          "E141",
+          "E145",
+          "E152"
+        ],
+        "mode": "RETURN_TO_STEP",
+        "target_step_id": "S04"
+      },
+      "required": true,
+      "semantic_key": "INSPECT_INTERNAL_PATH",
+      "source_types": [
+        "audio",
+        "pdf",
+        "video"
+      ],
+      "status": "NEEDS_REVIEW",
+      "step_id": "S05",
+      "success_check": "顶盖完全打开，内部纸路无遮挡且未见残纸或异物。",
+      "title": "打开顶盖并检查内部纸路",
+      "tools": [],
+      "warnings": [
+        "不要单侧猛拉顶盖，不要触碰或刮伤热敏打印区域。"
+      ]
+    },
+    {
+      "action": "双手对称移动左右内部导纸夹，使标签纸能够居中、平直通过且不被明显挤压。",
+      "candidate_ids": [
+        "SC005",
+        "SC006",
+        "SC022",
+        "SC029"
+      ],
+      "confidence": 0.898,
+      "evidence_ids": [
+        "E023",
+        "E069",
+        "E141",
+        "E146"
+      ],
+      "irreversible": false,
+      "object": "左右内部导纸夹",
+      "parameters": [],
+      "phase": "EXECUTION",
+      "prerequisites": [
+        "S05"
+      ],
+      "recovery": {
+        "action": "导纸夹过紧或过松时重新对称调节，直到靠近纸边但不挤压。",
+        "evidence_ids": [
+          "E146"
+        ],
+        "mode": "RETRY_CURRENT",
+        "target_step_id": null
+      },
+      "required": true,
+      "semantic_key": "ADJUST_INTERNAL_GUIDES",
+      "source_types": [
+        "audio",
+        "pdf",
+        "video"
+      ],
+      "status": "NEEDS_REVIEW",
+      "step_id": "S06",
+      "success_check": "左右导纸夹位置对称，纸张可居中通过且没有明显夹紧或大幅晃动。",
+      "title": "调节内部导纸夹",
+      "tools": [
+        "本批标签纸"
+      ],
+      "warnings": [
+        "导纸夹过紧可能挤压纸边，过松可能造成偏斜；具体合适间隙待专家确认。"
+      ]
+    },
+    {
+      "action": "确认内部纸路正常后关闭顶盖，再从机器背面双手调节左右进纸导轨，使其与标签纸宽度匹配。",
+      "candidate_ids": [
+        "SC007",
+        "SC008",
+        "SC023",
+        "SC029"
+      ],
+      "confidence": 0.911,
+      "evidence_ids": [
+        "E029",
+        "E074",
+        "E098",
+        "E146"
+      ],
+      "irreversible": false,
+      "object": "顶盖和后方进纸导轨",
+      "parameters": [],
+      "phase": "EXECUTION",
+      "prerequisites": [
+        "S04"
+      ],
+      "recovery": {
+        "action": "纸张无法居中平直通过时重新对称调节后方导轨，避免过紧或过松。",
+        "evidence_ids": [
+          "E146",
+          "E151"
+        ],
+        "mode": "RETRY_CURRENT",
+        "target_step_id": null
+      },
+      "required": true,
+      "semantic_key": "CLOSE_COVER_ADJUST_REAR_GUIDES",
+      "source_types": [
+        "audio",
+        "pdf",
+        "video"
+      ],
+      "status": "NEEDS_REVIEW",
+      "step_id": "S07",
+      "success_check": "顶盖闭合到位，后方左右导轨与纸宽匹配且纸张可以平直进入。",
+      "title": "关闭顶盖并调节后方进纸导轨",
+      "tools": [
+        "本批标签纸"
+      ],
+      "warnings": [
+        "顶盖未闭合到位时不要继续进纸。"
+      ]
+    },
+    {
+      "action": "从机器背面沿导轨平直插入标签纸，机器开始自动吸纸后松手，并观察出纸口是否送出一小段。",
+      "candidate_ids": [
+        "SC009",
+        "SC010",
+        "SC023",
+        "SC030"
+      ],
+      "confidence": 0.917,
+      "evidence_ids": [
+        "E034",
+        "E079",
+        "E098",
+        "E147"
+      ],
+      "irreversible": false,
+      "object": "标签纸、后方进纸口和前方出纸口",
+      "parameters": [],
+      "phase": "EXECUTION",
+      "prerequisites": [
+        "S07"
+      ],
+      "recovery": {
+        "action": "未自动吸纸、纸边歪斜或设备报警时停止推拉，退出介质并重新核对导轨后再送纸。",
+        "evidence_ids": [
+          "E147",
+          "E151",
+          "E152"
+        ],
+        "mode": "RETURN_TO_STEP",
+        "target_step_id": "S07"
+      },
+      "required": true,
+      "semantic_key": "INSERT_MEDIA_CONFIRM_AUTO_FEED",
+      "source_types": [
+        "audio",
+        "pdf",
+        "video"
+      ],
+      "status": "NEEDS_REVIEW",
+      "step_id": "S08",
+      "success_check": "标签纸被自动吸入，并从前方出纸口正常送出一小段。",
+      "title": "插入标签纸并确认自动吸纸",
+      "tools": [
+        "本批标签纸"
+      ],
+      "warnings": [
+        "自动吸纸时不要继续推拉或扭转标签纸。"
+      ]
+    },
+    {
+      "action": "按住走纸键，观察状态灯，在第二次闪烁后立即释放，使打印机执行缝标模式标签学习。",
+      "candidate_ids": [
+        "SC011",
+        "SC012",
+        "SC024",
+        "SC031"
+      ],
+      "confidence": 0.913,
+      "evidence_ids": [
+        "E039",
+        "E077",
+        "E104",
+        "E148",
+        "E149"
+      ],
+      "irreversible": false,
+      "object": "走纸键、状态灯和标签传感器",
+      "parameters": [
+        {
+          "evidence_ids": [
+            "E104"
+          ],
+          "name": "释放时机",
+          "unit": "",
+          "value": "状态灯第二次闪烁"
+        }
+      ],
+      "phase": "EXECUTION",
+      "prerequisites": [
+        "S08"
+      ],
+      "recovery": {
+        "action": "学习模式或停止位置错误时，重新确认缝标定位并再次执行缝标学习。",
+        "evidence_ids": [
+          "E149",
+          "E151"
+        ],
+        "mode": "RETRY_CURRENT",
+        "target_step_id": null
+      },
+      "required": true,
+      "semantic_key": "RUN_GAP_CALIBRATION",
+      "source_types": [
+        "audio",
+        "pdf",
+        "video"
+      ],
+      "status": "NEEDS_REVIEW",
+      "step_id": "S09",
+      "success_check": "第二次闪灯后已经释放走纸键，设备完成一轮介质学习且没有异常报警。",
+      "title": "执行缝标学习",
+      "tools": [],
+      "warnings": [
+        "本批为缝标介质，不要等待黑标学习对应的后续灯态。"
+      ]
+    },
+    {
+      "action": "短按走纸键后立即释放，观察设备是否只送出一张标签并停在正确边界。",
+      "candidate_ids": [
+        "SC013",
+        "SC025",
+        "SC032",
+        "SC033"
+      ],
+      "confidence": 0.917,
+      "evidence_ids": [
+        "E044",
+        "E104",
+        "E150",
+        "E154"
+      ],
+      "irreversible": false,
+      "object": "走纸键和标签停止位置",
+      "parameters": [
+        {
+          "evidence_ids": [
+            "E104"
+          ],
+          "name": "短按参考时长",
+          "unit": "s",
+          "value": 0.5
+        }
+      ],
+      "phase": "VERIFICATION",
+      "prerequisites": [
+        "S09"
+      ],
+      "recovery": {
+        "action": "出现连续跳纸、偏斜或停止位置错误时停止继续打印，检查送纸和导轨后重新学习。",
+        "evidence_ids": [
+          "E151",
+          "E154"
+        ],
+        "mode": "RETURN_TO_STEP",
+        "target_step_id": "S08"
+      },
+      "required": true,
+      "semantic_key": "VERIFY_SINGLE_LABEL_FEED",
+      "source_types": [
+        "audio",
+        "pdf",
+        "video"
+      ],
+      "status": "NEEDS_REVIEW",
+      "step_id": "S10",
+      "success_check": "只送出一张标签，停止位置落在标签边界附近且没有连续跳纸。",
+      "title": "执行单张走纸检查",
+      "tools": [],
+      "warnings": [
+        "出现连续跳纸或停止位置错误时停止测试，重新检查介质类型、导轨和学习模式。"
+      ]
+    },
+    {
+      "action": "按住走纸键，在状态灯第一次闪烁后释放，等待自检页完整打印。",
+      "candidate_ids": [
+        "SC014",
+        "SC025",
+        "SC032"
+      ],
+      "confidence": 0.889,
+      "evidence_ids": [
+        "E048",
+        "E104",
+        "E150"
+      ],
+      "irreversible": true,
+      "object": "走纸键、状态灯和自检页",
+      "parameters": [
+        {
+          "evidence_ids": [
+            "E104"
+          ],
+          "name": "释放时机",
+          "unit": "",
+          "value": "状态灯第一次闪烁"
+        }
+      ],
+      "phase": "VERIFICATION",
+      "prerequisites": [
+        "S10"
+      ],
+      "recovery": {
+        "action": "自检异常时不重复消耗标签，先核对介质学习和驱动设置，再按需重试。",
+        "evidence_ids": [
+          "E150",
+          "E151"
+        ],
+        "mode": "RETURN_TO_STEP",
+        "target_step_id": "S09"
+      },
+      "required": false,
+      "semantic_key": "PRINT_SELF_TEST",
+      "source_types": [
+        "audio",
+        "pdf",
+        "video"
+      ],
+      "status": "NEEDS_REVIEW",
+      "step_id": "S11",
+      "success_check": "自检页完整出纸，设备没有报警或中途停止。",
+      "title": "打印自检页",
+      "tools": [],
+      "warnings": [
+        "打印过程中不要拉扯纸张。"
+      ]
+    },
+    {
+      "action": "使用已经验证的本地打印设置发送一张测试标签，等待设备自行完成，不在出纸过程中拉纸。",
+      "candidate_ids": [
+        "SC015",
+        "SC016",
+        "SC032",
+        "SC033"
+      ],
+      "confidence": 0.794,
+      "evidence_ids": [
+        "E052",
+        "E082",
+        "E150",
+        "E154"
+      ],
+      "irreversible": true,
+      "object": "本地测试文件和测试标签",
+      "parameters": [],
+      "phase": "VERIFICATION",
+      "prerequisites": [
+        "S10"
+      ],
+      "recovery": {
+        "action": "测试标签异常时停止继续打印；已消耗标签不可恢复，返回走纸检查并核对尺寸缩放和驱动设置。",
+        "evidence_ids": [
+          "E150",
+          "E151",
+          "E154"
+        ],
+        "mode": "RETURN_TO_STEP",
+        "target_step_id": "S10"
+      },
+      "required": true,
+      "semantic_key": "PRINT_LOCAL_TEST_LABEL",
+      "source_types": [
+        "audio",
+        "video"
+      ],
+      "status": "NEEDS_REVIEW",
+      "step_id": "S12",
+      "success_check": "测试标签完整出纸，设备未连续跳纸、卡纸或异常停止。",
+      "title": "打印本地测试标签",
+      "tools": [
+        "本地计算机或已配置的打印终端"
+      ],
+      "warnings": [
+        "用于公开演示的画面不得暴露姓名、电话、地址、条码、二维码或唯一编号。",
+        "当前私有测试文件不得上传外部服务。"
+      ]
+    },
+    {
+      "action": "检查标签内容完整性、居中情况、偏斜、缺失、停止位置和连续跳纸现象，并记录本次换纸结果。",
+      "candidate_ids": [
+        "SC017",
+        "SC018",
+        "SC033"
+      ],
+      "confidence": 0.794,
+      "evidence_ids": [
+        "E057",
+        "E083",
+        "E154"
+      ],
+      "irreversible": false,
+      "object": "打印完成的测试标签和设备状态",
+      "parameters": [],
+      "phase": "VERIFICATION",
+      "prerequisites": [
+        "S12"
+      ],
+      "recovery": {
+        "action": "验收不通过时记录异常并返回单张走纸检查，按偏移、跳纸或识别失败顺序排查。",
+        "evidence_ids": [
+          "E151",
+          "E154"
+        ],
+        "mode": "RETURN_TO_STEP",
+        "target_step_id": "S10"
+      },
+      "required": true,
+      "semantic_key": "INSPECT_AND_RECORD_RESULT",
+      "source_types": [
+        "audio",
+        "video"
+      ],
+      "status": "NEEDS_REVIEW",
+      "step_id": "S13",
+      "success_check": "内容完整、位置基本居中，无连续跳纸、明显偏斜、缺失或异常报警，并留下验收记录。",
+      "title": "检查打印结果并记录验收",
+      "tools": [],
+      "warnings": [
+        "验收前不要揭开实体隐私遮挡。"
+      ]
+    }
+  ],
+  "phase_applicability": {
+    "EXECUTION": {
+      "reason": "包含开机、纸路调整、送纸和介质学习。",
+      "status": "APPLICABLE"
+    },
+    "PREPARATION": {
+      "reason": "先核对设备、介质定位方式和初始安全状态。",
+      "status": "APPLICABLE"
+    },
+    "RESET": {
+      "reason": "标准成功路径结束时打印机应保持可打印状态，无独立复位步骤；异常回退由各步骤 recovery 明确记录。",
+      "status": "NOT_APPLICABLE"
+    },
+    "VERIFICATION": {
+      "reason": "包含单张走纸、自检或测试打印以及结果验收。",
+      "status": "APPLICABLE"
+    }
+  },
+  "report_id": "SOURCE_CANDIDATE_SYNTHESIS_V1",
+  "source_candidates": [
+    {
+      "candidate_id": "SC001",
+      "confidence": 0.7,
+      "evidence_ids": [
+        "E001"
+      ],
+      "granularity": "ATOMIC",
+      "object": "N31 打印机与折叠标签纸",
+      "phase": "PREPARATION",
+      "proposed_action": "核对打印机和待装介质。",
+      "raw_claim": "开场画面可见 N31 打印机和待装折叠标签纸，但介质尺寸不能仅凭画面确认。",
+      "semantic_keys": [
+        "CHECK_DEVICE_MEDIA_COMPATIBILITY"
+      ],
+      "source_ref": "N31_VIDEO_OPERATION_FULL",
+      "source_type": "video",
+      "support_status": "PARTIAL"
+    },
+    {
+      "candidate_id": "SC002",
+      "confidence": 0.72,
+      "evidence_ids": [
+        "E066"
+      ],
+      "granularity": "ATOMIC",
+      "object": "标签正反面与相邻边界",
+      "phase": "PREPARATION",
+      "proposed_action": "检查标签间隙和背面以判断缝标定位。",
+      "raw_claim": "特写可见折叠标签的相邻边界和背面，未见周期性黑标。",
+      "semantic_keys": [
+        "IDENTIFY_GAP_MEDIA"
+      ],
+      "source_ref": "N31_VIDEO_MEDIA_TYPE",
+      "source_type": "video",
+      "support_status": "PARTIAL"
+    },
+    {
+      "candidate_id": "SC003",
+      "confidence": 0.62,
+      "evidence_ids": [
+        "E009"
+      ],
+      "granularity": "ATOMIC",
+      "object": "打印机纸路与标签纸",
+      "phase": "PREPARATION",
+      "proposed_action": "检查设备初始状态和待装标签纸。",
+      "raw_claim": "画面显示操作者在正式装纸前检查设备和纸张状态。",
+      "semantic_keys": [
+        "CHECK_INITIAL_STATE"
+      ],
+      "source_ref": "N31_VIDEO_OPERATION_FULL",
+      "source_type": "video",
+      "support_status": "PARTIAL"
+    },
+    {
+      "candidate_id": "SC004",
+      "confidence": 0.6,
+      "evidence_ids": [
+        "E018"
+      ],
+      "granularity": "ATOMIC",
+      "object": "顶盖与内部纸路",
+      "phase": "EXECUTION",
+      "proposed_action": "打开顶盖并观察内部纸路。",
+      "raw_claim": "画面可见顶盖被打开并露出内部纸路。",
+      "semantic_keys": [
+        "INSPECT_INTERNAL_PATH"
+      ],
+      "source_ref": "N31_VIDEO_OPERATION_FULL",
+      "source_type": "video",
+      "support_status": "PARTIAL"
+    },
+    {
+      "candidate_id": "SC005",
+      "confidence": 0.58,
+      "evidence_ids": [
+        "E023"
+      ],
+      "granularity": "TOO_FINE",
+      "object": "内部导纸夹",
+      "phase": "EXECUTION",
+      "proposed_action": "移动内部导纸夹。",
+      "raw_claim": "主视频显示手部移动内部导纸夹。",
+      "semantic_keys": [
+        "ADJUST_INTERNAL_GUIDES"
+      ],
+      "source_ref": "N31_VIDEO_OPERATION_FULL",
+      "source_type": "video",
+      "support_status": "PARTIAL"
+    },
+    {
+      "candidate_id": "SC006",
+      "confidence": 0.7,
+      "evidence_ids": [
+        "E069"
+      ],
+      "granularity": "TOO_FINE",
+      "object": "左右内部导纸夹",
+      "phase": "EXECUTION",
+      "proposed_action": "双手对称调节左右内部导纸夹。",
+      "raw_claim": "导纸夹特写显示双手对称调节左右夹片。",
+      "semantic_keys": [
+        "ADJUST_INTERNAL_GUIDES"
+      ],
+      "source_ref": "N31_VIDEO_GUIDES",
+      "source_type": "video",
+      "support_status": "PARTIAL"
+    },
+    {
+      "candidate_id": "SC007",
+      "confidence": 0.66,
+      "evidence_ids": [
+        "E029"
+      ],
+      "granularity": "TOO_FINE",
+      "object": "打印机顶盖",
+      "phase": "EXECUTION",
+      "proposed_action": "关闭顶盖。",
+      "raw_claim": "主视频显示操作者关闭打印机顶盖。",
+      "semantic_keys": [
+        "CLOSE_COVER_ADJUST_REAR_GUIDES"
+      ],
+      "source_ref": "N31_VIDEO_OPERATION_FULL",
+      "source_type": "video",
+      "support_status": "PARTIAL"
+    },
+    {
+      "candidate_id": "SC008",
+      "confidence": 0.72,
+      "evidence_ids": [
+        "E074"
+      ],
+      "granularity": "TOO_FINE",
+      "object": "后方进纸导轨",
+      "phase": "EXECUTION",
+      "proposed_action": "调节后方左右进纸导轨。",
+      "raw_claim": "后方特写显示双手调整左右进纸导轨。",
+      "semantic_keys": [
+        "CLOSE_COVER_ADJUST_REAR_GUIDES"
+      ],
+      "source_ref": "N31_VIDEO_GUIDES",
+      "source_type": "video",
+      "support_status": "PARTIAL"
+    },
+    {
+      "candidate_id": "SC009",
+      "confidence": 0.68,
+      "evidence_ids": [
+        "E034"
+      ],
+      "granularity": "TOO_FINE",
+      "object": "折叠标签纸",
+      "phase": "EXECUTION",
+      "proposed_action": "从后方平直插入标签纸。",
+      "raw_claim": "主视频显示标签纸从后方沿导轨插入。",
+      "semantic_keys": [
+        "INSERT_MEDIA_CONFIRM_AUTO_FEED"
+      ],
+      "source_ref": "N31_VIDEO_OPERATION_FULL",
+      "source_type": "video",
+      "support_status": "PARTIAL"
+    },
+    {
+      "candidate_id": "SC010",
+      "confidence": 0.72,
+      "evidence_ids": [
+        "E079"
+      ],
+      "granularity": "TOO_FINE",
+      "object": "标签纸与进出纸口",
+      "phase": "EXECUTION",
+      "proposed_action": "观察自动吸纸和前方出纸。",
+      "raw_claim": "送纸特写显示设备自动吸入标签纸并从前方送出一小段。",
+      "semantic_keys": [
+        "INSERT_MEDIA_CONFIRM_AUTO_FEED"
+      ],
+      "source_ref": "N31_VIDEO_MEDIA_FEED",
+      "source_type": "video",
+      "support_status": "PARTIAL"
+    },
+    {
+      "candidate_id": "SC011",
+      "confidence": 0.62,
+      "evidence_ids": [
+        "E039"
+      ],
+      "granularity": "ATOMIC",
+      "object": "走纸键与状态灯",
+      "phase": "EXECUTION",
+      "proposed_action": "长按走纸键执行介质学习。",
+      "raw_claim": "主视频显示长按走纸键并观察状态灯。",
+      "semantic_keys": [
+        "RUN_GAP_CALIBRATION"
+      ],
+      "source_ref": "N31_VIDEO_OPERATION_FULL",
+      "source_type": "video",
+      "support_status": "PARTIAL"
+    },
+    {
+      "candidate_id": "SC012",
+      "confidence": 0.68,
+      "evidence_ids": [
+        "E077"
+      ],
+      "granularity": "ATOMIC",
+      "object": "走纸键、状态灯与标签纸",
+      "phase": "EXECUTION",
+      "proposed_action": "按状态灯提示释放走纸键并完成学习。",
+      "raw_claim": "按键特写显示操作者按住走纸键后释放，设备随后走纸。",
+      "semantic_keys": [
+        "RUN_GAP_CALIBRATION"
+      ],
+      "source_ref": "N31_VIDEO_LEARNING",
+      "source_type": "video",
+      "support_status": "PARTIAL"
+    },
+    {
+      "candidate_id": "SC013",
+      "confidence": 0.72,
+      "evidence_ids": [
+        "E044"
+      ],
+      "granularity": "ATOMIC",
+      "object": "走纸键与标签纸",
+      "phase": "VERIFICATION",
+      "proposed_action": "短按走纸键检查单张走纸。",
+      "raw_claim": "画面显示短按走纸键后标签纸向前送出。",
+      "semantic_keys": [
+        "VERIFY_SINGLE_LABEL_FEED"
+      ],
+      "source_ref": "N31_VIDEO_OPERATION_FULL",
+      "source_type": "video",
+      "support_status": "PARTIAL"
+    },
+    {
+      "candidate_id": "SC014",
+      "confidence": 0.62,
+      "evidence_ids": [
+        "E048"
+      ],
+      "granularity": "ATOMIC",
+      "object": "走纸键与自检页",
+      "phase": "VERIFICATION",
+      "proposed_action": "按状态灯提示打印自检页。",
+      "raw_claim": "画面显示长按走纸键后设备开始打印输出。",
+      "semantic_keys": [
+        "PRINT_SELF_TEST"
+      ],
+      "source_ref": "N31_VIDEO_OPERATION_FULL",
+      "source_type": "video",
+      "support_status": "PARTIAL"
+    },
+    {
+      "candidate_id": "SC015",
+      "confidence": 0.62,
+      "evidence_ids": [
+        "E052"
+      ],
+      "granularity": "ATOMIC",
+      "object": "本地测试标签",
+      "phase": "VERIFICATION",
+      "proposed_action": "发送一张本地测试标签并等待打印完成。",
+      "raw_claim": "画面显示发送打印后标签从出纸口持续输出。",
+      "semantic_keys": [
+        "PRINT_LOCAL_TEST_LABEL"
+      ],
+      "source_ref": "N31_VIDEO_OPERATION_FULL",
+      "source_type": "video",
+      "support_status": "PARTIAL"
+    },
+    {
+      "candidate_id": "SC016",
+      "confidence": 0.58,
+      "evidence_ids": [
+        "E082"
+      ],
+      "granularity": "ATOMIC",
+      "object": "脱敏测试标签",
+      "phase": "VERIFICATION",
+      "proposed_action": "观察测试标签从出纸口输出。",
+      "raw_claim": "结果特写显示打印机出纸，但遮挡使内容完整性只能在本地人工确认。",
+      "semantic_keys": [
+        "PRINT_LOCAL_TEST_LABEL"
+      ],
+      "source_ref": "N31_VIDEO_PRINT_RESULT",
+      "source_type": "video",
+      "support_status": "PARTIAL"
+    },
+    {
+      "candidate_id": "SC017",
+      "confidence": 0.6,
+      "evidence_ids": [
+        "E057"
+      ],
+      "granularity": "TOO_FINE",
+      "object": "已打印标签",
+      "phase": "VERIFICATION",
+      "proposed_action": "查看打印结果。",
+      "raw_claim": "画面显示操作者在打印后查看并触碰标签。",
+      "semantic_keys": [
+        "INSPECT_AND_RECORD_RESULT"
+      ],
+      "source_ref": "N31_VIDEO_OPERATION_FULL",
+      "source_type": "video",
+      "support_status": "PARTIAL"
+    },
+    {
+      "candidate_id": "SC018",
+      "confidence": 0.62,
+      "evidence_ids": [
+        "E083"
+      ],
+      "granularity": "TOO_FINE",
+      "object": "脱敏测试标签",
+      "phase": "VERIFICATION",
+      "proposed_action": "检查标签出纸状态和偏斜。",
+      "raw_claim": "结果特写可见打印标签平稳输出，敏感编码区域已遮挡。",
+      "semantic_keys": [
+        "INSPECT_AND_RECORD_RESULT"
+      ],
+      "source_ref": "N31_VIDEO_PRINT_RESULT",
+      "source_type": "video",
+      "support_status": "PARTIAL"
+    },
+    {
+      "candidate_id": "SC019",
+      "confidence": 0.92,
+      "evidence_ids": [
+        "E096"
+      ],
+      "granularity": "TOO_COARSE",
+      "object": "设备规格与标签介质",
+      "phase": "PREPARATION",
+      "proposed_action": "核对介质规格并选择对应的定位方式。",
+      "raw_claim": "用户手册第12页同时给出介质规格以及缝标、黑标传感能力。",
+      "semantic_keys": [
+        "CHECK_DEVICE_MEDIA_COMPATIBILITY",
+        "IDENTIFY_GAP_MEDIA"
+      ],
+      "source_ref": "N31_MANUAL_REV1_0",
+      "source_type": "pdf",
+      "support_status": "SUPPORTED"
+    },
+    {
+      "candidate_id": "SC020",
+      "confidence": 0.86,
+      "evidence_ids": [
+        "E099"
+      ],
+      "granularity": "ATOMIC",
+      "object": "打印机纸路",
+      "phase": "PREPARATION",
+      "proposed_action": "确认纸路没有卡纸或残纸。",
+      "raw_claim": "用户手册第15页给出卡纸处理入口，支持装纸前排除卡纸和残纸。",
+      "semantic_keys": [
+        "CHECK_INITIAL_STATE"
+      ],
+      "source_ref": "N31_MANUAL_REV1_0",
+      "source_type": "pdf",
+      "support_status": "SUPPORTED"
+    },
+    {
+      "candidate_id": "SC021",
+      "confidence": 0.94,
+      "evidence_ids": [
+        "E142"
+      ],
+      "granularity": "ATOMIC",
+      "object": "电源线与电源开关",
+      "phase": "EXECUTION",
+      "proposed_action": "连接电源线并打开打印机电源。",
+      "raw_claim": "快速安装指南第2页给出电源连接和开机顺序。",
+      "semantic_keys": [
+        "POWER_ON_DEVICE"
+      ],
+      "source_ref": "N31_QUICK_GUIDE_REV1_5",
+      "source_type": "pdf",
+      "support_status": "SUPPORTED"
+    },
+    {
+      "candidate_id": "SC022",
+      "confidence": 0.9,
+      "evidence_ids": [
+        "E141"
+      ],
+      "granularity": "TOO_COARSE",
+      "object": "顶盖、纸路与内部导纸夹",
+      "phase": "EXECUTION",
+      "proposed_action": "打开顶盖检查纸路并调节内部导纸夹。",
+      "raw_claim": "快速安装指南第1页在同一图示中覆盖开盖、纸路检查和导纸夹位置。",
+      "semantic_keys": [
+        "INSPECT_INTERNAL_PATH",
+        "ADJUST_INTERNAL_GUIDES"
+      ],
+      "source_ref": "N31_QUICK_GUIDE_REV1_5",
+      "source_type": "pdf",
+      "support_status": "SUPPORTED"
+    },
+    {
+      "candidate_id": "SC023",
+      "confidence": 0.92,
+      "evidence_ids": [
+        "E098"
+      ],
+      "granularity": "TOO_COARSE",
+      "object": "后方导轨与标签纸",
+      "phase": "EXECUTION",
+      "proposed_action": "调节后方导轨后插入标签纸并确认自动送出。",
+      "raw_claim": "用户手册第14页连续描述调节后方导轨、插入标签纸和自动出纸。",
+      "semantic_keys": [
+        "CLOSE_COVER_ADJUST_REAR_GUIDES",
+        "INSERT_MEDIA_CONFIRM_AUTO_FEED"
+      ],
+      "source_ref": "N31_MANUAL_REV1_0",
+      "source_type": "pdf",
+      "support_status": "SUPPORTED"
+    },
+    {
+      "candidate_id": "SC024",
+      "confidence": 0.94,
+      "evidence_ids": [
+        "E104"
+      ],
+      "granularity": "ATOMIC",
+      "object": "走纸键与状态灯",
+      "phase": "EXECUTION",
+      "proposed_action": "按第二次闪灯释放走纸键执行缝标学习。",
+      "raw_claim": "用户手册第20页区分缝标、黑标学习的按键与状态灯释放时机。",
+      "semantic_keys": [
+        "RUN_GAP_CALIBRATION"
+      ],
+      "source_ref": "N31_MANUAL_REV1_0",
+      "source_type": "pdf",
+      "support_status": "SUPPORTED"
+    },
+    {
+      "candidate_id": "SC025",
+      "confidence": 0.92,
+      "evidence_ids": [
+        "E104"
+      ],
+      "granularity": "TOO_COARSE",
+      "object": "走纸键、标签纸与自检页",
+      "phase": "VERIFICATION",
+      "proposed_action": "按不同释放时机完成单张走纸和自检打印。",
+      "raw_claim": "用户手册第20页同时描述单张走纸和自检页两种按键动作。",
+      "semantic_keys": [
+        "VERIFY_SINGLE_LABEL_FEED",
+        "PRINT_SELF_TEST"
+      ],
+      "source_ref": "N31_MANUAL_REV1_0",
+      "source_type": "pdf",
+      "support_status": "SUPPORTED"
+    },
+    {
+      "candidate_id": "SC026",
+      "confidence": 0.98,
+      "evidence_ids": [
+        "E144"
+      ],
+      "granularity": "TOO_COARSE",
+      "object": "72×130毫米折叠热敏标签纸",
+      "phase": "PREPARATION",
+      "proposed_action": "核对本批介质尺寸、形态并判定为缝标。",
+      "raw_claim": "操作者确认本批纸为72×130毫米折叠热敏标签，相邻标签有缝隙且背面无周期性黑标。",
+      "semantic_keys": [
+        "CHECK_DEVICE_MEDIA_COMPATIBILITY",
+        "IDENTIFY_GAP_MEDIA"
+      ],
+      "source_ref": "N31_EXPERT_INTERVIEW",
+      "source_type": "audio",
+      "support_status": "SUPPORTED"
+    },
+    {
+      "candidate_id": "SC027",
+      "confidence": 0.96,
+      "evidence_ids": [
+        "E145"
+      ],
+      "granularity": "ATOMIC",
+      "object": "打印任务、设备状态与纸路",
+      "phase": "PREPARATION",
+      "proposed_action": "换纸前检查设备、任务和纸路状态。",
+      "raw_claim": "操作者要求换纸前确认任务暂停、设备无报警、旧纸退出且纸路无残纸异物。",
+      "semantic_keys": [
+        "CHECK_INITIAL_STATE"
+      ],
+      "source_ref": "N31_EXPERT_INTERVIEW",
+      "source_type": "audio",
+      "support_status": "SUPPORTED"
+    },
+    {
+      "candidate_id": "SC028",
+      "confidence": 0.9,
+      "evidence_ids": [
+        "E145"
+      ],
+      "granularity": "ATOMIC",
+      "object": "内部纸路",
+      "phase": "EXECUTION",
+      "proposed_action": "打开后检查内部纸路、残纸和异物。",
+      "raw_claim": "操作者说明发现卡纸或异物时应检查内部纸路，不得强行拉扯。",
+      "semantic_keys": [
+        "INSPECT_INTERNAL_PATH"
+      ],
+      "source_ref": "N31_EXPERT_INTERVIEW",
+      "source_type": "audio",
+      "support_status": "SUPPORTED"
+    },
+    {
+      "candidate_id": "SC029",
+      "confidence": 0.96,
+      "evidence_ids": [
+        "E146"
+      ],
+      "granularity": "TOO_COARSE",
+      "object": "内部导纸夹与后方导轨",
+      "phase": "EXECUTION",
+      "proposed_action": "对称调整内部导纸夹和后方导轨，使纸张居中平直。",
+      "raw_claim": "操作者说明内外导纸夹都要对称调整，靠近纸边但不明显挤压。",
+      "semantic_keys": [
+        "ADJUST_INTERNAL_GUIDES",
+        "CLOSE_COVER_ADJUST_REAR_GUIDES"
+      ],
+      "source_ref": "N31_EXPERT_INTERVIEW",
+      "source_type": "audio",
+      "support_status": "SUPPORTED"
+    },
+    {
+      "candidate_id": "SC030",
+      "confidence": 0.98,
+      "evidence_ids": [
+        "E147"
+      ],
+      "granularity": "ATOMIC",
+      "object": "标签纸与进出纸通道",
+      "phase": "EXECUTION",
+      "proposed_action": "插入标签纸并以自动吸纸、平直出纸和无报警确认到位。",
+      "raw_claim": "操作者说明沿后方导轨平直插纸，自动吸纸后松手，前方送出一小段且无报警即到位。",
+      "semantic_keys": [
+        "INSERT_MEDIA_CONFIRM_AUTO_FEED"
+      ],
+      "source_ref": "N31_EXPERT_INTERVIEW",
+      "source_type": "audio",
+      "support_status": "SUPPORTED"
+    },
+    {
+      "candidate_id": "SC031",
+      "confidence": 0.98,
+      "evidence_ids": [
+        "E148",
+        "E149"
+      ],
+      "granularity": "ATOMIC",
+      "object": "走纸键、状态灯与介质传感器",
+      "phase": "EXECUTION",
+      "proposed_action": "在第二次闪灯后释放走纸键执行缝标学习。",
+      "raw_claim": "操作者确认本批使用缝标学习，应在状态灯第二次闪烁后立即释放，不等待黑标灯态。",
+      "semantic_keys": [
+        "RUN_GAP_CALIBRATION"
+      ],
+      "source_ref": "N31_EXPERT_INTERVIEW",
+      "source_type": "audio",
+      "support_status": "SUPPORTED"
+    },
+    {
+      "candidate_id": "SC032",
+      "confidence": 0.98,
+      "evidence_ids": [
+        "E150"
+      ],
+      "granularity": "TOO_COARSE",
+      "object": "标签纸、自检页与测试标签",
+      "phase": "VERIFICATION",
+      "proposed_action": "完成单张走纸、自检条件判断和实际测试标签打印。",
+      "raw_claim": "操作者说明换纸后至少执行单张走纸和测试标签，自检页用于首次配置、规格变化或异常。",
+      "semantic_keys": [
+        "VERIFY_SINGLE_LABEL_FEED",
+        "PRINT_SELF_TEST",
+        "PRINT_LOCAL_TEST_LABEL"
+      ],
+      "source_ref": "N31_EXPERT_INTERVIEW",
+      "source_type": "audio",
+      "support_status": "SUPPORTED"
+    },
+    {
+      "candidate_id": "SC033",
+      "confidence": 0.98,
+      "evidence_ids": [
+        "E154"
+      ],
+      "granularity": "TOO_COARSE",
+      "object": "单张走纸结果与测试标签",
+      "phase": "VERIFICATION",
+      "proposed_action": "通过单张走纸、测试打印和结果检查确认换纸成功。",
+      "raw_claim": "操作者将稳定吸纸、单张停止、测试标签完整居中且无跳纸偏斜报警定义为换纸成功。",
+      "semantic_keys": [
+        "VERIFY_SINGLE_LABEL_FEED",
+        "PRINT_LOCAL_TEST_LABEL",
+        "INSPECT_AND_RECORD_RESULT"
+      ],
+      "source_ref": "N31_EXPERT_INTERVIEW",
+      "source_type": "audio",
+      "support_status": "SUPPORTED"
+    }
+  ],
+  "status": "NEEDS_REVIEW",
+  "summary": {
+    "all_steps_evidence_grounded": true,
+    "coarse_candidate_count": 8,
+    "coarse_fragment_count": 18,
+    "coarse_split_group_count": 10,
+    "deduplicated_candidate_ids": [],
+    "fine_candidate_count": 8,
+    "fine_merge_group_count": 4,
+    "graph_acyclic": true,
+    "irreversible_step_ids": [
+      "S11",
+      "S12"
+    ],
+    "low_confidence_step_ids": [],
+    "multi_source_step_count": 12,
+    "ordered_step_count": 13,
+    "phase_counts": {
+      "EXECUTION": 6,
+      "PREPARATION": 3,
+      "RESET": 0,
+      "VERIFICATION": 4
+    },
+    "recovery_step_count": 12,
+    "source_candidate_count": 33,
+    "source_candidate_counts": {
+      "audio": 8,
+      "pdf": 7,
+      "video": 18
+    },
+    "synonym_merge_group_count": 12,
+    "three_source_step_count": 10
+  },
+  "uses_gold_step_text": false,
+  "version": 1
+}

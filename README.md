@@ -108,7 +108,7 @@ bash scripts/check_native.sh
 bash scripts/start_native.sh
 ```
 
-Web 默认监听 `0.0.0.0:7860`。页面包含上传预处理、质检问题与证据、修订前后对比、局部修订审计、手机检查清单、培训测验、连续动作候选窗口、PDF结构验证和80秒培训视频，并可下载最终 SOP、检查清单、测验、A4海报、培训视频、视频生成清单、视频证据包、连续动作候选窗口、PDF结构报告和修订记录。下载白名单不包含原始素材。ASR 默认关闭；只有同时勾选外部处理授权时，规范化音频才会发送给 StepAudio。
+Web 默认监听 `0.0.0.0:7860`。页面包含上传预处理、三来源候选合并、质检问题与证据、修订前后对比、局部修订审计、手机检查清单、培训测验、连续动作候选窗口、PDF结构验证和80秒培训视频，并可下载最终 SOP、候选合并报告、检查清单、测验、A4海报、培训视频、视频生成清单、视频证据包、连续动作候选窗口、PDF结构报告和修订记录。下载白名单不包含原始素材。ASR 默认关闭；只有同时勾选外部处理授权时，规范化音频才会发送给 StepAudio。
 
 关键帧视觉理解和 SOP 规划同样默认关闭。只有勾选对应能力并确认外部处理授权时，关键帧或 Evidence Catalog 才会发送给 Step Plan；原始 PDF 和原始视频不会由上传接口自动外发。
 
@@ -125,7 +125,15 @@ bash scripts/start_native.sh
 bash scripts/run_n31_local.sh --with-video-processing
 ```
 
-两种模式都不会调用外部模型。默认模式复用已通过检查的安全成片，依次完成8来源摄取和142条本地 Evidence Catalog；存在已审核 Gold 时运行 `GOLD / FINAL` 最终评测，否则运行13步候选 SOP 的 `NOT_GOLD / PROVISIONAL_ONLY` 彩排；若 N31 预处理输出不存在，才回退到无版权模拟案例。
+两种模式都不会调用外部模型。默认模式复用已通过检查的安全成片，依次完成8来源摄取和142条本地 Evidence Catalog；存在已审核 Gold 时，还会从完整154条目录中生成视频18条、手册7条、口述8条来源候选，执行粗细粒度处理、同义合并和依赖排序，再运行 `GOLD / FINAL` 最终评测；否则运行13步候选 SOP 的 `NOT_GOLD / PROVISIONAL_ONLY` 彩排。若 N31 预处理输出不存在，才回退到无版权模拟案例。
+
+单独重建三类来源候选与合并报告：
+
+```bash
+bash scripts/build_n31_source_candidates.sh
+```
+
+该阶段不读取 Gold 步骤文本，也不调用外部模型；它只读取真实 Evidence Catalog、审核后的来源候选和候选语义规范。33条候选经过Schema与来源交叉检查后合成为13步无环依赖图，8条过粗候选拆成18个片段，8条过细候选进入合并；S04因视频复核为不可见，只保留手册支持，不把时间邻近误写成视觉事实。成功路径无需独立复位，异常回退则逐步记录。
 
 当仓库中存在 `cases/n31/gold/gold_sop.json` 时，`run_n31_local.sh` 会自动改用实际操作者审核的 Gold 约束，页面显示 `GOLD / FINAL`。重新执行专家录音ASR、术语核对、Gold固化和最终评测使用：
 
@@ -201,7 +209,7 @@ bash scripts/run_runtime_benchmark.sh dgx
 bash scripts/check_submission.sh
 ```
 
-预检会运行全量测试并核对项目身份、9份说明文档、12项成果、Git工作树、跟踪文件边界、`.env`忽略与600权限、本地密钥值泄漏和成果绝对路径。报告写入被Git忽略的 `outputs/submission/submission_preflight_latest.json`，不会记录密钥值。只有 `READY_FOR_SUBMISSION` 返回0；`NOT_READY`返回1，`DEVELOPMENT_CHECK`或 `READY_WITH_HUMAN_GATES` 返回2。开发中可显式使用 `--allow-dirty`，但不能得到正式提交结论。
+预检会运行全量测试并核对项目身份、9份说明文档、13项成果、Git工作树、跟踪文件边界、`.env`忽略与600权限、本地密钥值泄漏和成果绝对路径。报告写入被Git忽略的 `outputs/submission/submission_preflight_latest.json`，不会记录密钥值。只有 `READY_FOR_SUBMISSION` 返回0；`NOT_READY`返回1，`DEVELOPMENT_CHECK`或 `READY_WITH_HUMAN_GATES` 返回2。开发中可显式使用 `--allow-dirty`，但不能得到正式提交结论。
 
 从 Gold SOP 重新生成一页式 A4 培训海报：
 

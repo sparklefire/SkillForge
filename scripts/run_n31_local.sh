@@ -38,6 +38,7 @@ bash scripts/setup_ocr_languages.sh >/dev/null
   --output cases/n31/output/candidate_v1 >/dev/null
 
 if [[ -f cases/n31/gold/gold_sop.json ]]; then
+  bash scripts/build_n31_source_candidates.sh >/dev/null
   "$PYTHON" -m skillforge.gold_rehearsal \
     --gold-sop cases/n31/gold/gold_sop.json \
     --constraints cases/n31/gold/constraints.json \
@@ -68,6 +69,14 @@ candidate = json.loads(
         encoding="utf-8"
     )
 )
+source_candidates_path = (
+    root / "cases/n31/output/source_candidates_v1/source_candidate_synthesis.json"
+)
+source_candidates = (
+    json.loads(source_candidates_path.read_text(encoding="utf-8"))
+    if source_candidates_path.is_file()
+    else None
+)
 rehearsal = json.loads(
     (rehearsal_dir / "summary.json").read_text(encoding="utf-8")
 )
@@ -84,6 +93,18 @@ print(
                 "step_count": candidate["step_count"],
                 "gold_status": candidate["gold_status"],
             },
+            "source_candidates": (
+                {
+                    "candidate_count": source_candidates["summary"]["source_candidate_count"],
+                    "source_candidate_counts": source_candidates["summary"]["source_candidate_counts"],
+                    "merged_step_count": source_candidates["summary"]["ordered_step_count"],
+                    "multi_source_step_count": source_candidates["summary"]["multi_source_step_count"],
+                    "coarse_candidate_count": source_candidates["summary"]["coarse_candidate_count"],
+                    "fine_candidate_count": source_candidates["summary"]["fine_candidate_count"],
+                }
+                if source_candidates is not None
+                else None
+            ),
             "rehearsal": {
                 "before_severe_errors": rehearsal["before"]["severe_error_count"],
                 "after_severe_errors": rehearsal["after"]["severe_error_count"],

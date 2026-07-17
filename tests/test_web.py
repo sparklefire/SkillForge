@@ -82,6 +82,14 @@ def test_web_accepts_operator_reviewed_gold_result(tmp_path) -> None:
     assert pdf_structure["summary"]["page_count"] == 58
     assert pdf_structure["summary"]["needs_ocr_page_count"] == 0
     assert pdf_structure["summary"]["passed_query_count"] == 3
+    source_candidates = response.json()["source_candidate_synthesis"]
+    assert source_candidates["summary"]["source_candidate_counts"] == {
+        "video": 18,
+        "pdf": 7,
+        "audio": 8,
+    }
+    assert source_candidates["summary"]["ordered_step_count"] == 13
+    assert source_candidates["summary"]["multi_source_step_count"] == 12
     assert len(response.json()["checklist"]["items"]) == 13
     assert len(response.json()["quiz"]["questions"]) == 5
     checklist = client.get("/api/n31/artifacts/checklist")
@@ -111,6 +119,9 @@ def test_web_accepts_operator_reviewed_gold_result(tmp_path) -> None:
     pdf_download = client.get("/api/n31/artifacts/pdf-structure")
     assert pdf_download.status_code == 200
     assert pdf_download.json()["summary"]["block_count"] == 607
+    candidate_download = client.get("/api/n31/artifacts/source-candidates")
+    assert candidate_download.status_code == 200
+    assert candidate_download.json()["summary"]["coarse_candidate_count"] == 8
     assert client.get("/api/n31/artifacts/private-video").status_code == 404
     rerun = client.post("/api/n31/run")
     assert rerun.status_code == 200
