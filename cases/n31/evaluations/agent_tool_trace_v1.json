@@ -1,0 +1,659 @@
+{
+  "agents": [
+    {
+      "agent_id": "PERCEPTION_AGENT",
+      "allowed_tool_ids": [
+        "PDF_PAGE_LOOKUP",
+        "KEYFRAME_LOOKUP",
+        "VIDEO_INTERVAL_LOOKUP",
+        "AUDIO_INTERVAL_LOOKUP",
+        "EVIDENCE_SEARCH"
+      ],
+      "calls": [
+        {
+          "call_id": "A01-C01",
+          "evidence_bound": true,
+          "execution_basis": "LOCAL_DETERMINISTIC",
+          "human_gate": false,
+          "input_artifact_ids": [
+            "INGEST_MANIFEST"
+          ],
+          "output_artifact_ids": [
+            "PDF_STRUCTURE"
+          ],
+          "purpose": "保留手册原页码并建立可检索结构报告。",
+          "sequence": 1,
+          "status": "COMPLETED",
+          "tool_id": "PDF_PAGE_LOOKUP"
+        },
+        {
+          "call_id": "A01-C02",
+          "evidence_bound": true,
+          "execution_basis": "LOCAL_GPU_CANDIDATE_SELECTION",
+          "human_gate": false,
+          "input_artifact_ids": [
+            "INGEST_MANIFEST"
+          ],
+          "output_artifact_ids": [
+            "DGX_VISUAL"
+          ],
+          "purpose": "在DGX上筛选安全视频的场景变化候选。",
+          "sequence": 2,
+          "status": "COMPLETED",
+          "tool_id": "KEYFRAME_LOOKUP"
+        },
+        {
+          "call_id": "A01-C03",
+          "evidence_bound": true,
+          "execution_basis": "LOCAL_DETERMINISTIC",
+          "human_gate": false,
+          "input_artifact_ids": [
+            "DGX_VISUAL"
+          ],
+          "output_artifact_ids": [
+            "SOURCE_CANDIDATES"
+          ],
+          "purpose": "把同源关键帧合并为可回看的候选时间窗口。",
+          "sequence": 3,
+          "status": "COMPLETED",
+          "tool_id": "VIDEO_INTERVAL_LOOKUP"
+        },
+        {
+          "call_id": "A01-C04",
+          "evidence_bound": true,
+          "execution_basis": "LOCAL_DETERMINISTIC",
+          "human_gate": false,
+          "input_artifact_ids": [
+            "INGEST_MANIFEST"
+          ],
+          "output_artifact_ids": [
+            "SOURCE_CANDIDATES"
+          ],
+          "purpose": "把操作者口述答案绑定录音时间段和Evidence。",
+          "sequence": 4,
+          "status": "COMPLETED",
+          "tool_id": "AUDIO_INTERVAL_LOOKUP"
+        },
+        {
+          "call_id": "A01-C05",
+          "evidence_bound": true,
+          "execution_basis": "LOCAL_DETERMINISTIC",
+          "human_gate": false,
+          "input_artifact_ids": [
+            "PDF_STRUCTURE",
+            "DGX_VISUAL",
+            "INGEST_MANIFEST"
+          ],
+          "output_artifact_ids": [
+            "SOURCE_CANDIDATES",
+            "MULTISOURCE_EVAL"
+          ],
+          "purpose": "合并视频、PDF和口述候选并验证多源覆盖。",
+          "sequence": 5,
+          "status": "COMPLETED",
+          "tool_id": "EVIDENCE_SEARCH"
+        }
+      ],
+      "label": "Perception Agent",
+      "prohibited_action": "不得把GPU数值候选或稀疏关键帧自动升级为设备事实。",
+      "responsibility": "提取带原页码、视频时间点和录音时间点的结构化Evidence及候选窗口。",
+      "sequence": 1,
+      "status": "COMPLETED"
+    },
+    {
+      "agent_id": "SOP_AGENT",
+      "allowed_tool_ids": [
+        "EVIDENCE_SEARCH",
+        "SOP_PLAN",
+        "HUMAN_CONFIRM"
+      ],
+      "calls": [
+        {
+          "call_id": "A02-C01",
+          "evidence_bound": true,
+          "execution_basis": "HUMAN_VERIFIED_SOURCE_PROJECTION",
+          "human_gate": false,
+          "input_artifact_ids": [
+            "SOURCE_CANDIDATES",
+            "MULTISOURCE_EVAL"
+          ],
+          "output_artifact_ids": [
+            "GOLD_SOP"
+          ],
+          "purpose": "从多源候选规划13步证据绑定SOP。",
+          "sequence": 1,
+          "status": "COMPLETED",
+          "tool_id": "SOP_PLAN"
+        },
+        {
+          "call_id": "A02-C02",
+          "evidence_bound": true,
+          "execution_basis": "HUMAN_REVIEW",
+          "human_gate": true,
+          "input_artifact_ids": [
+            "GOLD_SOP"
+          ],
+          "output_artifact_ids": [
+            "GOLD_SOP"
+          ],
+          "purpose": "由实际操作者确认步骤、条件、参数和成功标准。",
+          "sequence": 2,
+          "status": "COMPLETED",
+          "tool_id": "HUMAN_CONFIRM"
+        }
+      ],
+      "label": "SOP Agent",
+      "prohibited_action": "不得补写无来源工具、参数或绝对安全承诺。",
+      "responsibility": "依据Evidence与约束规划8至15步SOP、依赖和证据绑定。",
+      "sequence": 2,
+      "status": "COMPLETED"
+    },
+    {
+      "agent_id": "CREATOR_AGENT",
+      "allowed_tool_ids": [
+        "ARTIFACT_SAVE",
+        "ARTIFACT_RENDER"
+      ],
+      "calls": [
+        {
+          "call_id": "A03-C01",
+          "evidence_bound": true,
+          "execution_basis": "LOCAL_DETERMINISTIC",
+          "human_gate": false,
+          "input_artifact_ids": [
+            "GOLD_SOP",
+            "OUTPUT_PROFILE"
+          ],
+          "output_artifact_ids": [
+            "SOP_VIEWS",
+            "CHECKLIST",
+            "QUIZ"
+          ],
+          "purpose": "生成三种SOP视图、手机清单和五类测验。",
+          "sequence": 1,
+          "status": "COMPLETED",
+          "tool_id": "ARTIFACT_SAVE"
+        },
+        {
+          "call_id": "A03-C02",
+          "evidence_bound": true,
+          "execution_basis": "TEXT_ONLY_TTS",
+          "human_gate": false,
+          "input_artifact_ids": [
+            "GOLD_SOP",
+            "OUTPUT_PROFILE"
+          ],
+          "output_artifact_ids": [
+            "POSTER",
+            "TRAINING_VIDEO"
+          ],
+          "purpose": "渲染A4海报和80秒证据绑定培训视频。",
+          "sequence": 2,
+          "status": "COMPLETED",
+          "tool_id": "ARTIFACT_RENDER"
+        }
+      ],
+      "label": "Creator Agent",
+      "prohibited_action": "不得脱离Gold改变必要步骤、条件步骤或引用边界。",
+      "responsibility": "从已绑定证据的Gold SOP生成清单、测验、海报和培训视频。",
+      "sequence": 3,
+      "status": "COMPLETED"
+    },
+    {
+      "agent_id": "VERIFIER_AGENT",
+      "allowed_tool_ids": [
+        "RULE_VERIFY",
+        "SEMANTIC_VERIFY"
+      ],
+      "calls": [
+        {
+          "call_id": "A04-C01",
+          "evidence_bound": true,
+          "execution_basis": "LOCAL_DETERMINISTIC",
+          "human_gate": false,
+          "input_artifact_ids": [
+            "GOLD_SOP"
+          ],
+          "output_artifact_ids": [
+            "INITIAL_CONFLICTS",
+            "GROUNDING_GATE"
+          ],
+          "purpose": "对受控错误草稿执行确定性规则质检和无来源门禁。",
+          "sequence": 1,
+          "status": "COMPLETED",
+          "tool_id": "RULE_VERIFY"
+        },
+        {
+          "call_id": "A04-C02",
+          "evidence_bound": true,
+          "execution_basis": "AUTHORIZED_MODEL_INFERENCE",
+          "human_gate": false,
+          "input_artifact_ids": [
+            "GOLD_SOP"
+          ],
+          "output_artifact_ids": [
+            "SEMANTIC_REVIEW"
+          ],
+          "purpose": "对结构化步骤和Evidence陈述执行高推理语义复核。",
+          "sequence": 2,
+          "status": "COMPLETED",
+          "tool_id": "SEMANTIC_VERIFY"
+        },
+        {
+          "call_id": "A04-C03",
+          "evidence_bound": true,
+          "execution_basis": "LOCAL_DETERMINISTIC",
+          "human_gate": false,
+          "input_artifact_ids": [
+            "AFTER_SOP"
+          ],
+          "output_artifact_ids": [
+            "FINAL_CONFLICTS"
+          ],
+          "purpose": "对局部修订结果复检并确认严重问题归零。",
+          "sequence": 3,
+          "status": "COMPLETED",
+          "tool_id": "RULE_VERIFY"
+        }
+      ],
+      "label": "Verifier Agent",
+      "prohibited_action": "不得直接覆盖人工Gold或把模型推断当作最终事实。",
+      "responsibility": "检测遗漏、顺序、无依据工具、参数、安全声明和语义冲突。",
+      "sequence": 4,
+      "status": "COMPLETED"
+    },
+    {
+      "agent_id": "REVISION_AGENT",
+      "allowed_tool_ids": [
+        "LOCAL_REVISION",
+        "SELECTIVE_REBUILD",
+        "HUMAN_CONFIRM"
+      ],
+      "calls": [
+        {
+          "call_id": "A05-C01",
+          "evidence_bound": true,
+          "execution_basis": "LOCAL_DETERMINISTIC",
+          "human_gate": false,
+          "input_artifact_ids": [
+            "GOLD_SOP",
+            "INITIAL_CONFLICTS"
+          ],
+          "output_artifact_ids": [
+            "AFTER_SOP",
+            "REVISION_AUDIT"
+          ],
+          "purpose": "按冲突和Evidence完成4项局部修改并保留审计。",
+          "sequence": 1,
+          "status": "COMPLETED",
+          "tool_id": "LOCAL_REVISION"
+        },
+        {
+          "call_id": "A05-C02",
+          "evidence_bound": true,
+          "execution_basis": "LOCAL_DETERMINISTIC",
+          "human_gate": false,
+          "input_artifact_ids": [
+            "AFTER_SOP",
+            "REVISION_AUDIT"
+          ],
+          "output_artifact_ids": [
+            "SELECTIVE_REBUILD"
+          ],
+          "purpose": "只失效受位置或内容影响的步骤、题目和镜头。",
+          "sequence": 2,
+          "status": "COMPLETED",
+          "tool_id": "SELECTIVE_REBUILD"
+        }
+      ],
+      "label": "Revision Agent",
+      "prohibited_action": "不得整包无差别重写或修改未受影响单元。",
+      "responsibility": "引用Evidence执行字段级局部修订并计算下游选择性重建范围。",
+      "sequence": 5,
+      "status": "COMPLETED"
+    }
+  ],
+  "artifact_type": "AGENT_TOOL_EXECUTION_TRACE",
+  "artifacts": [
+    {
+      "artifact_id": "INGEST_MANIFEST",
+      "classification": "PRIVATE_LOCAL_REFERENCE_DIGEST",
+      "contains_raw_media": false,
+      "kind": "JSON",
+      "sha256": "7c2869a78e99c52d9317c7d1819112e91ae55bbc1c7cc08cfeba80660acf352c",
+      "size_bytes": 3011
+    },
+    {
+      "artifact_id": "DGX_VISUAL",
+      "classification": "STRUCTURED_EVIDENCE",
+      "contains_raw_media": false,
+      "kind": "JSON",
+      "sha256": "b475c03d34b4a5db8c423b97f72fdfc11d1d5e99e28c699ed2cac6fc912ab9fb",
+      "size_bytes": 17979
+    },
+    {
+      "artifact_id": "PDF_STRUCTURE",
+      "classification": "STRUCTURED_EVIDENCE",
+      "contains_raw_media": false,
+      "kind": "JSON",
+      "sha256": "0e40aea7fbdc3440a4c99e97e2a3db2e37f02b6e6a930445808ab2aee850aa97",
+      "size_bytes": 5948
+    },
+    {
+      "artifact_id": "SOURCE_CANDIDATES",
+      "classification": "STRUCTURED_EVIDENCE",
+      "contains_raw_media": false,
+      "kind": "JSON",
+      "sha256": "28708602befa289bb6a8ce97436b43384a2569a3de79c1b104011815d3c68ec3",
+      "size_bytes": 68264
+    },
+    {
+      "artifact_id": "MULTISOURCE_EVAL",
+      "classification": "STRUCTURED_EVIDENCE",
+      "contains_raw_media": false,
+      "kind": "JSON",
+      "sha256": "f0adc9b6dbfd1f34d1e3e57ec3588d60b96562bea5b6b167fd05408040aac7af",
+      "size_bytes": 3859
+    },
+    {
+      "artifact_id": "GOLD_SOP",
+      "classification": "STRUCTURED_EVIDENCE",
+      "contains_raw_media": false,
+      "kind": "JSON",
+      "sha256": "a8f111a52f496f93e9934cedd493630d73732ad73e6e4e79832f0133c31c6f8a",
+      "size_bytes": 99953
+    },
+    {
+      "artifact_id": "OUTPUT_PROFILE",
+      "classification": "PUBLIC_ARTIFACT",
+      "contains_raw_media": false,
+      "kind": "JSON",
+      "sha256": "6e6eb1c1810dd58c65ebd3878a918a52d7d5e37701ba1b6c9ed116faed97ce2d",
+      "size_bytes": 1614
+    },
+    {
+      "artifact_id": "SOP_VIEWS",
+      "classification": "PUBLIC_ARTIFACT",
+      "contains_raw_media": false,
+      "kind": "JSON",
+      "sha256": "7c18ecbf1be02bbfd91cd245335343b515fcedf3261e8571263a698ae0036397",
+      "size_bytes": 90630
+    },
+    {
+      "artifact_id": "CHECKLIST",
+      "classification": "PUBLIC_ARTIFACT",
+      "contains_raw_media": false,
+      "kind": "JSON",
+      "sha256": "6fd710aef2d7ecd139272a68cf0437bc5f42aac24cd34fa7a187d87b0ae40a88",
+      "size_bytes": 56872
+    },
+    {
+      "artifact_id": "QUIZ",
+      "classification": "PUBLIC_ARTIFACT",
+      "contains_raw_media": false,
+      "kind": "JSON",
+      "sha256": "28d2a117c621a82f228f6b56bdc719aea88e7390b0b2a85e871e89088d88f514",
+      "size_bytes": 43829
+    },
+    {
+      "artifact_id": "POSTER",
+      "classification": "PUBLIC_ARTIFACT",
+      "contains_raw_media": false,
+      "kind": "PDF",
+      "sha256": "d87dd874dc332d8057f0a1106b5b42085f6127f87ddeaa8f4b8a79eee08a8fba",
+      "size_bytes": 130442
+    },
+    {
+      "artifact_id": "TRAINING_VIDEO",
+      "classification": "PUBLIC_ARTIFACT",
+      "contains_raw_media": false,
+      "kind": "MP4",
+      "sha256": "61ec74826befc89889a6025a9acdb217adbd32af589a9c1f4bb4be1958ff695f",
+      "size_bytes": 35194451
+    },
+    {
+      "artifact_id": "INITIAL_CONFLICTS",
+      "classification": "STRUCTURED_EVIDENCE",
+      "contains_raw_media": false,
+      "kind": "JSON",
+      "sha256": "1ff90c6e0a2b63d17c38246e87b14d24e231242bd88a27fa46c91a5ba1d690c6",
+      "size_bytes": 23843
+    },
+    {
+      "artifact_id": "GROUNDING_GATE",
+      "classification": "STRUCTURED_EVIDENCE",
+      "contains_raw_media": false,
+      "kind": "JSON",
+      "sha256": "469a6c83f1fa22cb1616a8a12f5aee36fc61813350028d3e77abd430621ab1c1",
+      "size_bytes": 5821
+    },
+    {
+      "artifact_id": "SEMANTIC_REVIEW",
+      "classification": "STRUCTURED_EVIDENCE",
+      "contains_raw_media": false,
+      "kind": "JSON",
+      "sha256": "7cc4676d14bc12aec676e7f34ec126edc8c88e52abeb7df128eaf41ffed04b6f",
+      "size_bytes": 11170
+    },
+    {
+      "artifact_id": "AFTER_SOP",
+      "classification": "PUBLIC_ARTIFACT",
+      "contains_raw_media": false,
+      "kind": "JSON",
+      "sha256": "14205751476dbdd283dccfe52c3a6fee32c2c11a5861901a2b9c20899752f871",
+      "size_bytes": 11464
+    },
+    {
+      "artifact_id": "REVISION_AUDIT",
+      "classification": "STRUCTURED_EVIDENCE",
+      "contains_raw_media": false,
+      "kind": "JSON",
+      "sha256": "e9e2d83a2b5d0ac5f59eb697ae624be8ec530f56756ae327badec4e2c279324b",
+      "size_bytes": 3252
+    },
+    {
+      "artifact_id": "FINAL_CONFLICTS",
+      "classification": "STRUCTURED_EVIDENCE",
+      "contains_raw_media": false,
+      "kind": "JSON",
+      "sha256": "17784948680713e99db81cc9e5c37b37edde423f48cbe6036db5f5557f7af815",
+      "size_bytes": 73
+    },
+    {
+      "artifact_id": "SELECTIVE_REBUILD",
+      "classification": "STRUCTURED_EVIDENCE",
+      "contains_raw_media": false,
+      "kind": "JSON",
+      "sha256": "5d6b06f6fac263cfdad71e4aea687fb1ad1501e904e4169e0d4ad6ae396c568c",
+      "size_bytes": 5669
+    }
+  ],
+  "case_id": "n31_media_change",
+  "data_policy": {
+    "contains_absolute_paths": false,
+    "contains_artifact_paths": false,
+    "contains_credentials": false,
+    "contains_raw_media": false,
+    "storage_scope": "PUBLIC_STRUCTURED_AUDIT",
+    "trace_generation_external_model_calls": 0
+  },
+  "generated_at": "2026-07-17T17:05:37.872898+00:00",
+  "handoffs": [
+    {
+      "artifact_ids": [
+        "SOURCE_CANDIDATES",
+        "MULTISOURCE_EVAL"
+      ],
+      "from_agent": "PERCEPTION_AGENT",
+      "reason": "只传递结构化候选、来源和Evidence定位。",
+      "to_agent": "SOP_AGENT"
+    },
+    {
+      "artifact_ids": [
+        "GOLD_SOP"
+      ],
+      "from_agent": "SOP_AGENT",
+      "reason": "创作只读取操作者确认且证据绑定的Gold。",
+      "to_agent": "CREATOR_AGENT"
+    },
+    {
+      "artifact_ids": [
+        "SOP_VIEWS",
+        "CHECKLIST",
+        "QUIZ"
+      ],
+      "from_agent": "CREATOR_AGENT",
+      "reason": "生成物进入规则与语义质检。",
+      "to_agent": "VERIFIER_AGENT"
+    },
+    {
+      "artifact_ids": [
+        "INITIAL_CONFLICTS",
+        "GROUNDING_GATE"
+      ],
+      "from_agent": "VERIFIER_AGENT",
+      "reason": "只把已定位冲突交给局部修订。",
+      "to_agent": "REVISION_AGENT"
+    },
+    {
+      "artifact_ids": [
+        "AFTER_SOP",
+        "REVISION_AUDIT"
+      ],
+      "from_agent": "REVISION_AGENT",
+      "reason": "修订结果必须复检后才能发布。",
+      "to_agent": "VERIFIER_AGENT"
+    }
+  ],
+  "status": "COMPLETED",
+  "summary": {
+    "agent_count": 5,
+    "artifact_count": 19,
+    "evidence_bound_call_count": 14,
+    "handoff_count": 5,
+    "human_confirmation_call_count": 1,
+    "tool_call_count": 14,
+    "tool_count": 13,
+    "trace_generation_external_model_calls": 0
+  },
+  "tools": [
+    {
+      "access_scope": "PRIVATE_LOCAL_SOURCE",
+      "capability": "PDF_PAGE",
+      "external_boundary": "LOCAL_ONLY",
+      "human_confirmation": false,
+      "implementation": "GET /api/n31/evidence/{evidence_id}",
+      "side_effect": "READ_ONLY",
+      "tool_id": "PDF_PAGE_LOOKUP"
+    },
+    {
+      "access_scope": "SAFE_DERIVATIVE",
+      "capability": "KEYFRAME",
+      "external_boundary": "LOCAL_ONLY",
+      "human_confirmation": false,
+      "implementation": "GET /api/n31/checklist/keyframes/{evidence_id}",
+      "side_effect": "READ_ONLY",
+      "tool_id": "KEYFRAME_LOOKUP"
+    },
+    {
+      "access_scope": "SAFE_DERIVATIVE",
+      "capability": "VIDEO_INTERVAL",
+      "external_boundary": "LOCAL_ONLY",
+      "human_confirmation": false,
+      "implementation": "GET /api/n31/evidence/{evidence_id}",
+      "side_effect": "READ_ONLY",
+      "tool_id": "VIDEO_INTERVAL_LOOKUP"
+    },
+    {
+      "access_scope": "PRIVATE_LOCAL_SOURCE",
+      "capability": "AUDIO_INTERVAL",
+      "external_boundary": "LOCAL_ONLY",
+      "human_confirmation": false,
+      "implementation": "GET /api/n31/evidence/{evidence_id}",
+      "side_effect": "READ_ONLY",
+      "tool_id": "AUDIO_INTERVAL_LOOKUP"
+    },
+    {
+      "access_scope": "STRUCTURED_EVIDENCE",
+      "capability": "RETRIEVAL",
+      "external_boundary": "LOCAL_ONLY",
+      "human_confirmation": false,
+      "implementation": "skillforge.source_candidates:synthesize_source_candidates",
+      "side_effect": "PUBLIC_ARTIFACT_WRITE",
+      "tool_id": "EVIDENCE_SEARCH"
+    },
+    {
+      "access_scope": "STRUCTURED_EVIDENCE",
+      "capability": "PLANNING",
+      "external_boundary": "AUTHORIZED_STRUCTURED_OR_TEXT_ONLY",
+      "human_confirmation": false,
+      "implementation": "skillforge.planner:SOPAgent",
+      "side_effect": "PUBLIC_ARTIFACT_WRITE",
+      "tool_id": "SOP_PLAN"
+    },
+    {
+      "access_scope": "STRUCTURED_EVIDENCE",
+      "capability": "SAVE",
+      "external_boundary": "LOCAL_ONLY",
+      "human_confirmation": false,
+      "implementation": "skillforge.creator:create_sop_views",
+      "side_effect": "PUBLIC_ARTIFACT_WRITE",
+      "tool_id": "ARTIFACT_SAVE"
+    },
+    {
+      "access_scope": "SAFE_DERIVATIVE",
+      "capability": "RENDER",
+      "external_boundary": "AUTHORIZED_STRUCTURED_OR_TEXT_ONLY",
+      "human_confirmation": false,
+      "implementation": "skillforge.training_video:render_training_video",
+      "side_effect": "PUBLIC_ARTIFACT_WRITE",
+      "tool_id": "ARTIFACT_RENDER"
+    },
+    {
+      "access_scope": "STRUCTURED_EVIDENCE",
+      "capability": "VERIFY",
+      "external_boundary": "LOCAL_ONLY",
+      "human_confirmation": false,
+      "implementation": "skillforge.verifier:verify_sop",
+      "side_effect": "PUBLIC_ARTIFACT_WRITE",
+      "tool_id": "RULE_VERIFY"
+    },
+    {
+      "access_scope": "STRUCTURED_EVIDENCE",
+      "capability": "VERIFY",
+      "external_boundary": "AUTHORIZED_STRUCTURED_OR_TEXT_ONLY",
+      "human_confirmation": false,
+      "implementation": "skillforge.semantic_review:run_semantic_review",
+      "side_effect": "PUBLIC_ARTIFACT_WRITE",
+      "tool_id": "SEMANTIC_VERIFY"
+    },
+    {
+      "access_scope": "STRUCTURED_EVIDENCE",
+      "capability": "REVISE",
+      "external_boundary": "LOCAL_ONLY",
+      "human_confirmation": false,
+      "implementation": "skillforge.revision:revise_sop",
+      "side_effect": "PUBLIC_ARTIFACT_WRITE",
+      "tool_id": "LOCAL_REVISION"
+    },
+    {
+      "access_scope": "STRUCTURED_EVIDENCE",
+      "capability": "REVISE",
+      "external_boundary": "LOCAL_ONLY",
+      "human_confirmation": false,
+      "implementation": "skillforge.selective_rebuild:build_selective_rebuild_report",
+      "side_effect": "PUBLIC_ARTIFACT_WRITE",
+      "tool_id": "SELECTIVE_REBUILD"
+    },
+    {
+      "access_scope": "HUMAN_REVIEW",
+      "capability": "CONFIRM",
+      "external_boundary": "LOCAL_ONLY",
+      "human_confirmation": true,
+      "implementation": "POST /api/n31/review/sessions",
+      "side_effect": "LOCAL_PRIVATE_WRITE",
+      "tool_id": "HUMAN_CONFIRM"
+    }
+  ],
+  "version": 1
+}

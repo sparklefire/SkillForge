@@ -78,6 +78,12 @@
           "status": "PASSED"
         },
         {
+          "artifact_id": "AGENT_TOOL_TRACE",
+          "detail": "20750 bytes · sha256=739adef1d1e5e14c818433e87ec416cda80b562fc2eba70512e2c0aa254468a5",
+          "path": "cases/n31/evaluations/agent_tool_trace_v1.json",
+          "status": "PASSED"
+        },
+        {
           "artifact_id": "RUNTIME_BENCHMARK",
           "detail": "2638 bytes · sha256=185cccd7f26edc54815d240698c996fcc04c6dbd4f5262a56cbdf1d6ebe57ca2",
           "path": "output/evaluation/runtime_benchmark_dgx.json",
@@ -122,6 +128,7 @@
         "coverage_90_to_100": true,
         "dgx_cuda_native": true,
         "errors_5_to_0": true,
+        "five_agent_tool_trace": true,
         "gold_final": true,
         "grounding_gate_closed": true,
         "low_bitrate_previews_mapped": true,
@@ -159,6 +166,7 @@
     },
     {
       "assertions": {
+        "agent_tool_interface_auditable": true,
         "artifact_stage_rerun": true,
         "asr_correction_auditable": true,
         "conflict_decision_auditable": true,
@@ -180,7 +188,7 @@
   ],
   "contains_credentials": false,
   "contains_raw_media": false,
-  "generated_at": "2026-07-17T16:20:34.258787+00:00",
+  "generated_at": "2026-07-17T17:15:26.088593+00:00",
   "pending_human_gates": [
     "TRAINING_VIDEO_FULL_WATCH",
     "FINAL_STAGE_REHEARSAL",

@@ -1,0 +1,276 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/agent_tool_trace.schema.json",
+  "title": "SkillForge Agent Tool Execution Trace",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "artifact_type",
+    "version",
+    "case_id",
+    "generated_at",
+    "status",
+    "tools",
+    "agents",
+    "handoffs",
+    "artifacts",
+    "summary",
+    "data_policy"
+  ],
+  "properties": {
+    "artifact_type": {"const": "AGENT_TOOL_EXECUTION_TRACE"},
+    "version": {"const": 1},
+    "case_id": {"const": "n31_media_change"},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "status": {"const": "COMPLETED"},
+    "tools": {
+      "type": "array",
+      "minItems": 7,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/tool"}
+    },
+    "agents": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "items": {"$ref": "#/$defs/agent"}
+    },
+    "handoffs": {
+      "type": "array",
+      "minItems": 5,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/handoff"}
+    },
+    "artifacts": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/artifact"}
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "agent_count",
+        "tool_count",
+        "tool_call_count",
+        "artifact_count",
+        "handoff_count",
+        "evidence_bound_call_count",
+        "human_confirmation_call_count",
+        "trace_generation_external_model_calls"
+      ],
+      "properties": {
+        "agent_count": {"const": 5},
+        "tool_count": {"type": "integer", "minimum": 7},
+        "tool_call_count": {"type": "integer", "minimum": 1},
+        "artifact_count": {"type": "integer", "minimum": 1},
+        "handoff_count": {"type": "integer", "minimum": 5},
+        "evidence_bound_call_count": {"type": "integer", "minimum": 1},
+        "human_confirmation_call_count": {"type": "integer", "minimum": 1},
+        "trace_generation_external_model_calls": {"const": 0}
+      }
+    },
+    "data_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "storage_scope",
+        "contains_raw_media",
+        "contains_credentials",
+        "contains_absolute_paths",
+        "contains_artifact_paths",
+        "trace_generation_external_model_calls"
+      ],
+      "properties": {
+        "storage_scope": {"const": "PUBLIC_STRUCTURED_AUDIT"},
+        "contains_raw_media": {"const": false},
+        "contains_credentials": {"const": false},
+        "contains_absolute_paths": {"const": false},
+        "contains_artifact_paths": {"const": false},
+        "trace_generation_external_model_calls": {"const": 0}
+      }
+    }
+  },
+  "$defs": {
+    "agentId": {
+      "enum": [
+        "PERCEPTION_AGENT",
+        "SOP_AGENT",
+        "CREATOR_AGENT",
+        "VERIFIER_AGENT",
+        "REVISION_AGENT"
+      ]
+    },
+    "tool": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tool_id",
+        "capability",
+        "implementation",
+        "access_scope",
+        "side_effect",
+        "external_boundary",
+        "human_confirmation"
+      ],
+      "properties": {
+        "tool_id": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]+$"},
+        "capability": {
+          "enum": [
+            "PDF_PAGE",
+            "KEYFRAME",
+            "VIDEO_INTERVAL",
+            "AUDIO_INTERVAL",
+            "RETRIEVAL",
+            "PLANNING",
+            "SAVE",
+            "RENDER",
+            "VERIFY",
+            "REVISE",
+            "CONFIRM"
+          ]
+        },
+        "implementation": {"type": "string", "minLength": 1, "maxLength": 160},
+        "access_scope": {
+          "enum": [
+            "PRIVATE_LOCAL_SOURCE",
+            "SAFE_DERIVATIVE",
+            "STRUCTURED_EVIDENCE",
+            "PUBLIC_ARTIFACT",
+            "HUMAN_REVIEW"
+          ]
+        },
+        "side_effect": {
+          "enum": ["READ_ONLY", "LOCAL_PRIVATE_WRITE", "PUBLIC_ARTIFACT_WRITE"]
+        },
+        "external_boundary": {
+          "enum": ["LOCAL_ONLY", "AUTHORIZED_STRUCTURED_OR_TEXT_ONLY"]
+        },
+        "human_confirmation": {"type": "boolean"}
+      }
+    },
+    "agent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "agent_id",
+        "sequence",
+        "label",
+        "responsibility",
+        "prohibited_action",
+        "allowed_tool_ids",
+        "calls",
+        "status"
+      ],
+      "properties": {
+        "agent_id": {"$ref": "#/$defs/agentId"},
+        "sequence": {"type": "integer", "minimum": 1, "maximum": 5},
+        "label": {"type": "string", "minLength": 1},
+        "responsibility": {"type": "string", "minLength": 1},
+        "prohibited_action": {"type": "string", "minLength": 1},
+        "allowed_tool_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]+$"}
+        },
+        "calls": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/call"}
+        },
+        "status": {"const": "COMPLETED"}
+      }
+    },
+    "call": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "call_id",
+        "sequence",
+        "tool_id",
+        "purpose",
+        "input_artifact_ids",
+        "output_artifact_ids",
+        "execution_basis",
+        "evidence_bound",
+        "human_gate",
+        "status"
+      ],
+      "properties": {
+        "call_id": {"type": "string", "pattern": "^[A-Z][0-9]{2}-C[0-9]{2}$"},
+        "sequence": {"type": "integer", "minimum": 1},
+        "tool_id": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]+$"},
+        "purpose": {"type": "string", "minLength": 1},
+        "input_artifact_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]+$"}
+        },
+        "output_artifact_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]+$"}
+        },
+        "execution_basis": {
+          "enum": [
+            "LOCAL_DETERMINISTIC",
+            "LOCAL_GPU_CANDIDATE_SELECTION",
+            "AUTHORIZED_MODEL_INFERENCE",
+            "TEXT_ONLY_TTS",
+            "HUMAN_VERIFIED_SOURCE_PROJECTION",
+            "HUMAN_REVIEW"
+          ]
+        },
+        "evidence_bound": {"type": "boolean"},
+        "human_gate": {"type": "boolean"},
+        "status": {"const": "COMPLETED"}
+      }
+    },
+    "handoff": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from_agent", "to_agent", "artifact_ids", "reason"],
+      "properties": {
+        "from_agent": {"$ref": "#/$defs/agentId"},
+        "to_agent": {"$ref": "#/$defs/agentId"},
+        "artifact_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]+$"}
+        },
+        "reason": {"type": "string", "minLength": 1}
+      }
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "artifact_id",
+        "kind",
+        "classification",
+        "sha256",
+        "size_bytes",
+        "contains_raw_media"
+      ],
+      "properties": {
+        "artifact_id": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]+$"},
+        "kind": {"enum": ["JSON", "PDF", "MP4"]},
+        "classification": {
+          "enum": [
+            "PRIVATE_LOCAL_REFERENCE_DIGEST",
+            "STRUCTURED_EVIDENCE",
+            "PUBLIC_ARTIFACT"
+          ]
+        },
+        "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "size_bytes": {"type": "integer", "minimum": 1},
+        "contains_raw_media": {"const": false}
+      }
+    }
+  }
+}

@@ -16,6 +16,7 @@ from fastapi import Body, FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from starlette.concurrency import run_in_threadpool
 
+from .agent_trace import verify_agent_trace_artifacts
 from .asr_corrections import AsrCorrectionStore
 from .demo import ROOT, run_demo
 from .checklist_sessions import ChecklistSessionStore
@@ -102,6 +103,11 @@ N31_DOWNLOADS = {
         "cases/n31/evaluations/selective_rebuild_v1.json",
         "n31_selective_rebuild_v1.json",
     ),
+    "agent-tool-trace": (
+        "project",
+        "cases/n31/evaluations/agent_tool_trace_v1.json",
+        "n31_agent_tool_trace_v1.json",
+    ),
 }
 
 
@@ -123,6 +129,7 @@ HTML = """<!doctype html>
   <section class="panel"><h2 id="metrics-title">闭环指标</h2><div id="basis" class="notice"></div><div id="metrics" class="grid"></div></section>
   <section class="panel"><h2>现场演示控制</h2><div class="controls"><button id="rerun">完整运行 Gold 闭环</button><select id="stage-select" style="max-width:260px;margin:0"><option value="INGESTING">素材载入起重跑</option><option value="EXTRACTING">证据抽取起重跑</option><option value="PLANNING">SOP规划起重跑</option><option value="CREATING">错误草稿起重跑</option><option value="VERIFYING_INITIAL">首轮质检起重跑</option><option value="REVISING">局部修订起重跑</option><option value="VERIFYING_FINAL">最终复检起重跑</option><option value="RENDERING" selected>培训成果渲染重跑</option></select><button id="stage-rerun" class="secondary">只复用上游并重建下游</button></div><span id="rerun-status"></span><p>每次生成独立、哈希绑定的发布；阶段重跑先校验并复用上游，实际重建所选阶段及下游。失败版本不会替换当前稳定版本。</p></section>
   <section class="panel" id="workflow-panel" hidden><h2>可恢复工作流检查点</h2><div id="workflow-metrics" class="grid"></div><p id="workflow-note"></p><div id="workflow-events"></div></section>
+  <section class="panel" id="agent-tool-panel" hidden><h2>五类 Agent 与可审计工具链</h2><div id="agent-tool-metrics" class="grid"></div><p id="agent-tool-note"></p><div id="agent-tool-list"></div></section>
   <section class="panel" id="dgx-panel" hidden><h2>DGX Spark 本地视觉计算</h2><div id="dgx-metrics" class="grid"></div><div id="agent-trace"></div></section>
   <section class="panel" id="temporal-panel" hidden><h2>连续动作候选窗口</h2><div id="temporal-metrics" class="grid"></div><p id="temporal-note"></p><div id="temporal-windows"></div></section>
   <section class="panel" id="pdf-panel" hidden><h2>手册结构与检索验证</h2><div id="pdf-metrics" class="grid"></div><p id="pdf-note"></p><div id="pdf-queries"></div></section>
@@ -139,7 +146,7 @@ HTML = """<!doctype html>
   <section class="panel" id="conflict-decision-panel" hidden><h2>冲突裁决与最终采用</h2><p>确定性冲突可自动采用并记录原因；安全声明、缺失证据、无效证据和 REVIEW 动作强制进入人工确认，即使 Verifier 标记为 automatic=true 也不能绕过。</p><button id="conflict-decision-start">生成当前冲突裁决</button><span id="conflict-decision-status"></span><div id="conflict-decision-summary" class="notice" hidden></div><div id="conflict-decisions"></div></section>
   <section class="panel"><h2>修订前后对比</h2><div class="cols"><div><h3>修订前</h3><div id="before"></div></div><div><h3>修订后</h3><div id="after"></div></div></div></section>
   <section class="panel"><h2>局部修订审计</h2><div id="changes"></div></section>
-  <section class="panel" id="results-panel" hidden><h2>培训成果</h2><div id="training-video-card" hidden><h3>80秒横屏培训视频</h3><div id="training-video-notice" class="notice"></div><div id="training-video-metrics" class="grid"></div><video controls preload="metadata" style="width:100%;margin:14px 0;border-radius:12px;background:#000" src="/api/n31/media/training-video"></video></div><div class="downloads" id="n31-downloads"><a class="download" href="/api/n31/artifacts/final-sop">下载最终 SOP</a><a class="download" href="/api/n31/artifacts/sop-views">下载三种 SOP 视图</a><a class="download" href="/api/n31/artifacts/checklist">下载手机检查清单</a><a class="download" href="/api/n31/artifacts/quiz">下载培训测验</a><a class="download" href="/api/n31/artifacts/poster">下载 A4 培训海报</a><a class="download" href="/api/n31/artifacts/training-video">下载80秒培训视频</a><a class="download" href="/api/n31/artifacts/training-video-manifest">下载视频生成清单</a><a class="download" href="/api/n31/artifacts/training-video-evidence">下载视频证据包</a><a class="download" href="/api/n31/artifacts/temporal-windows">下载连续动作窗口</a><a class="download" href="/api/n31/artifacts/pdf-structure">下载手册结构报告</a><a class="download" href="/api/n31/artifacts/source-candidates">下载候选合并报告</a><a class="download" href="/api/n31/artifacts/grounding-gate">下载无来源内容门禁报告</a><a class="download" href="/api/n31/artifacts/semantic-review">下载语义质检报告</a><a class="download" href="/api/n31/artifacts/selective-rebuild">下载选择性重建报告</a><a class="download" href="/api/n31/artifacts/revision-audit">下载修订记录</a></div><div id="sop-views-card"><h3>三种 SOP 阅读视图</h3><div class="controls"><button class="sop-tab" data-view="concise">简洁版</button><button class="sop-tab secondary" data-view="detailed">详细版</button><button class="sop-tab secondary" data-view="evidence">带证据版</button></div><div id="sop-view"></div></div><div class="cols"><div><h3>手机端检查清单</h3><div id="checklist-progress" class="notice"></div><div id="checklist" class="check-card"></div><div class="controls"><button id="check-prev" class="secondary">上一步</button><button id="check-next" class="secondary">下一步</button></div><label>问题类型<select id="feedback-category"><option value="STEP_BLOCKED">步骤受阻</option><option value="CONTENT_ERROR">内容错误</option><option value="EVIDENCE_ISSUE">证据问题</option><option value="OTHER">其他</option></select></label><label>问题反馈<textarea id="feedback-comment" maxlength="500" placeholder="描述现场问题；记录只保存在本机，不进入Git"></textarea></label><button id="feedback-submit">提交本步反馈</button><span id="checklist-status"></span></div><div><h3>培训测验</h3><div id="quiz"></div></div></div></section>
+  <section class="panel" id="results-panel" hidden><h2>培训成果</h2><div id="training-video-card" hidden><h3>80秒横屏培训视频</h3><div id="training-video-notice" class="notice"></div><div id="training-video-metrics" class="grid"></div><video controls preload="metadata" style="width:100%;margin:14px 0;border-radius:12px;background:#000" src="/api/n31/media/training-video"></video></div><div class="downloads" id="n31-downloads"><a class="download" href="/api/n31/artifacts/final-sop">下载最终 SOP</a><a class="download" href="/api/n31/artifacts/sop-views">下载三种 SOP 视图</a><a class="download" href="/api/n31/artifacts/checklist">下载手机检查清单</a><a class="download" href="/api/n31/artifacts/quiz">下载培训测验</a><a class="download" href="/api/n31/artifacts/poster">下载 A4 培训海报</a><a class="download" href="/api/n31/artifacts/training-video">下载80秒培训视频</a><a class="download" href="/api/n31/artifacts/training-video-manifest">下载视频生成清单</a><a class="download" href="/api/n31/artifacts/training-video-evidence">下载视频证据包</a><a class="download" href="/api/n31/artifacts/temporal-windows">下载连续动作窗口</a><a class="download" href="/api/n31/artifacts/pdf-structure">下载手册结构报告</a><a class="download" href="/api/n31/artifacts/source-candidates">下载候选合并报告</a><a class="download" href="/api/n31/artifacts/grounding-gate">下载无来源内容门禁报告</a><a class="download" href="/api/n31/artifacts/semantic-review">下载语义质检报告</a><a class="download" href="/api/n31/artifacts/selective-rebuild">下载选择性重建报告</a><a class="download" href="/api/n31/artifacts/agent-tool-trace">下载 Agent 工具追踪</a><a class="download" href="/api/n31/artifacts/revision-audit">下载修订记录</a></div><div id="sop-views-card"><h3>三种 SOP 阅读视图</h3><div class="controls"><button class="sop-tab" data-view="concise">简洁版</button><button class="sop-tab secondary" data-view="detailed">详细版</button><button class="sop-tab secondary" data-view="evidence">带证据版</button></div><div id="sop-view"></div></div><div class="cols"><div><h3>手机端检查清单</h3><div id="checklist-progress" class="notice"></div><div id="checklist" class="check-card"></div><div class="controls"><button id="check-prev" class="secondary">上一步</button><button id="check-next" class="secondary">下一步</button></div><label>问题类型<select id="feedback-category"><option value="STEP_BLOCKED">步骤受阻</option><option value="CONTENT_ERROR">内容错误</option><option value="EVIDENCE_ISSUE">证据问题</option><option value="OTHER">其他</option></select></label><label>问题反馈<textarea id="feedback-comment" maxlength="500" placeholder="描述现场问题；记录只保存在本机，不进入Git"></textarea></label><button id="feedback-submit">提交本步反馈</button><span id="checklist-status"></span></div><div><h3>培训测验</h3><div id="quiz"></div></div></div></section>
   <section class="panel"><h2>上传素材并原生预处理</h2><p>上传内容只写入被 Git 忽略的本地输出目录。本页面不会自动把原始素材发送给外部模型。</p>
     <form id="upload"><label>操作视频<input type="file" name="video" accept="video/*"></label><label>设备 PDF<input type="file" name="pdf" accept="application/pdf"></label><label>专家录音<input type="file" name="audio" accept="audio/*"></label><label><input style="width:auto" type="checkbox" name="transcribe" value="true">调用 StepAudio ASR</label><label><input style="width:auto" type="checkbox" name="analyze_visuals" value="true">调用 Step 3.7 分析关键帧</label><label><input style="width:auto" type="checkbox" name="plan_sop" value="true">根据证据规划 SOP</label><label><input style="width:auto" type="checkbox" name="external_processing_authorized" value="true">已确认允许把选定派生内容发送给外部 API</label><button>开始处理</button><span id="status"></span></form><pre id="ingest"></pre>
   </section>
@@ -170,6 +177,7 @@ document.querySelector('#metrics-title').textContent=isGold?'N31 真实素材 Go
 document.querySelector('#basis').textContent=isGold?'实际操作者口述审核 · Gold v1 · 最终评测指标。':isReal?'候选基准 · 非 Gold · 指标仅用于证明闭环可运行，等待操作者审核后重跑最终评测。':'明确标注的无版权模拟数据，不作为真实案例评测。';
 document.querySelector('#metrics').innerHTML=[['必要步骤',`${pct(b.required_step_coverage)} → ${pct(a.required_step_coverage)}`],['证据覆盖',`${pct(b.evidence_supported_required_steps)} → ${pct(a.evidence_supported_required_steps)}`],['严重错误',`${b.severe_error_count} → ${a.severe_error_count}`],['局部修改',d.summary.revision_count],['状态',isReal?d.summary.gold_status||'NOT_GOLD':d.summary.workflow_state]].map(x=>`<div class="metric"><span class="muted">${esc(x[0])}</span><strong>${esc(x[1])}</strong></div>`).join('');
 if(d.workflow){const w=d.workflow,attempts=w.stage_attempts,events=w.history,failures=events.filter(x=>x.event_type==='FAILURE').length,reruns=events.filter(x=>x.event_type==='RERUN').length,sr=d.stage_run,reused=sr?sr.stages.filter(x=>x.execution==='REUSED').length:0,rebuilt=sr?sr.stages.filter(x=>x.execution==='REBUILT').length:0;document.querySelector('#workflow-panel').hidden=false;document.querySelector('#workflow-metrics').innerHTML=[['当前状态',w.state],['执行阶段',Object.values(attempts).filter(x=>x>0).length],['质检轮次',attempts.VERIFYING],['复用/重建',sr?`${reused}/${rebuilt}`:'离线包'],['阶段重跑',reruns]].map(x=>`<div class="metric"><span class="muted">${esc(x[0])}</span><strong>${esc(x[1])}</strong></div>`).join('');document.querySelector('#workflow-note').textContent=sr?`当前发布 ${sr.run_id.slice(0,8)} · 从${sr.start_stage}执行 · 发布摘要 ${sr.release_digest.slice(0,12)}；阶段产物已逐文件校验，失败版本不切换当前指针。`:'离线兜底包含已校验工作流检查点；点击完整运行后可演示真实产物阶段重跑。';document.querySelector('#workflow-events').innerHTML=events.slice(-6).map(x=>`<div class="change"><b>${esc(x.event_type)} · ${esc(x.from_state)} → ${esc(x.to_state)} · 第${esc(x.attempt)}次</b><div>${esc(x.reason||'无补充说明')}</div>${x.invalidated_states.length?`<div class="evidence">下游失效：${esc(x.invalidated_states.join(', '))}</div>`:''}</div>`).join('')}
+if(d.agent_tool_trace){const t=d.agent_tool_trace,s=t.summary;document.querySelector('#agent-tool-panel').hidden=false;document.querySelector('#agent-tool-metrics').innerHTML=[['Agent',s.agent_count],['工具',s.tool_count],['实际调用',s.tool_call_count],['产物哈希',s.artifact_count],['闭环交接',s.handoff_count],['人工确认',s.human_confirmation_call_count]].map(x=>`<div class="metric"><span class="muted">${esc(x[0])}</span><strong>${esc(x[1])}</strong></div>`).join('');document.querySelector('#agent-tool-note').textContent='不是架构图声明：每次工具调用、Agent权限、输入输出产物SHA-256和Revision→Verifier复检交接都写入严格Schema；追踪生成不调用外部模型，也不保存媒体路径。';document.querySelector('#agent-tool-list').innerHTML=t.agents.map(a=>`<div class="change"><b>${esc(a.sequence)} · ${esc(a.label)} · ${esc(a.status)}</b><div>${esc(a.responsibility)}</div><div class="evidence">工具：${esc(a.allowed_tool_ids.join(', '))}｜实际调用：${esc(a.calls.length)}</div><details><summary>展开调用与边界</summary>${a.calls.map(c=>`<div>${esc(c.call_id)} · ${esc(c.tool_id)} · ${esc(c.execution_basis)}<br>${esc(c.purpose)}<br>输出：${esc(c.output_artifact_ids.join(', '))}</div>`).join('')}</details></div>`).join('')}
 document.querySelector('#review-panel').hidden=!isGold;document.querySelector('#asr-correction-panel').hidden=!isGold;document.querySelector('#conflict-decision-panel').hidden=!isGold;if(isGold){renderReview();renderAsrCorrections();renderConflictDecisions()}
 if(d.dgx_visual_compute){const g=d.dgx_visual_compute,s=g.summary;document.querySelector('#dgx-panel').hidden=false;document.querySelector('#dgx-metrics').innerHTML=[['GPU',g.gpu.device_name],['本地视频',s.processed_video_count],['GPU处理帧',s.sampled_frame_count],['候选帧',s.selected_frame_count],['CUDA核耗时',`${Number(s.gpu_kernel_ms).toFixed(1)}ms`]].map(x=>`<div class="metric"><span class="muted">${esc(x[0])}</span><strong>${esc(x[1])}</strong></div>`).join('');document.querySelector('#agent-trace').innerHTML=g.agent_trace.map(x=>`<div class="change"><b>${esc(x.event_id)} · ${esc(x.agent)} · ${esc(x.action)}</b><div>${esc(x.decision)}</div><div class="evidence">工具：${esc(x.tool)}｜结果：${esc(x.outcome)}</div></div>`).join('')}
 if(d.temporal_action_windows){const t=d.temporal_action_windows,s=t.summary;document.querySelector('#temporal-panel').hidden=false;document.querySelector('#temporal-metrics').innerHTML=[['Gold步骤',s.step_count],['连续窗口',s.window_count],['视频来源',s.source_count],['DGX候选命中窗口',s.window_with_dgx_candidate_count],['独立DGX候选',s.unique_dgx_candidate_count]].map(x=>`<div class="metric"><span class="muted">${esc(x[0])}</span><strong>${esc(x[1])}</strong></div>`).join('');document.querySelector('#temporal-note').textContent='窗口只把同一视频时间线内的相邻Evidence区间合并，并绑定附近DGX场景候选；它用于定位人工/模型复核范围，不自动证明动作完成。';document.querySelector('#temporal-windows').innerHTML=t.windows.slice(0,6).map(w=>`<div class="change"><b>${esc(w.window_id)} · ${esc(w.title)}</b><div>${esc(w.source_ref)}｜${(w.start_ms/1000).toFixed(1)}–${(w.end_ms/1000).toFixed(1)}秒｜视觉${esc(w.visual_verdict)}</div><div class="evidence">Evidence：${esc(w.evidence_ids.join(', '))}｜DGX候选：${esc(w.dgx_candidate_timestamps_ms.map(v=>(v/1000).toFixed(1)+'s').join(', ')||'无')}</div></div>`).join('')}
@@ -466,6 +474,12 @@ def create_app(
             )
         return profile, manifest, availability
 
+    def active_agent_trace() -> dict[str, Any]:
+        path = ROOT / "cases/n31/evaluations/agent_tool_trace_v1.json"
+        if not path.is_file():
+            raise FileNotFoundError("N31 Agent工具追踪不存在")
+        return verify_agent_trace_artifacts(_read_json(path), project_root=ROOT)
+
     @app.get("/", response_class=HTMLResponse)
     def index() -> str:
         return HTML
@@ -561,6 +575,13 @@ def create_app(
                 )
                 payload["selective_rebuild"] = selective_rebuild
             try:
+                payload["agent_tool_trace"] = active_agent_trace()
+            except (FileNotFoundError, ValueError) as exc:
+                raise HTTPException(
+                    status_code=409,
+                    detail=f"Agent工具追踪校验失败: {str(exc)[:300]}",
+                ) from exc
+            try:
                 training_video = _training_video_manifest()
             except ValueError as exc:
                 raise HTTPException(
@@ -639,6 +660,15 @@ def create_app(
             media_type=_artifact_media_type(path),
             filename=download_name,
         )
+
+    @app.get("/api/n31/agents")
+    def n31_agent_tool_trace() -> dict[str, Any]:
+        try:
+            return active_agent_trace()
+        except FileNotFoundError as exc:
+            raise HTTPException(status_code=404, detail="N31 Agent工具追踪不存在") from exc
+        except ValueError as exc:
+            raise HTTPException(status_code=409, detail=str(exc)) from exc
 
     @app.post("/api/n31/review/sessions")
     def create_review_session() -> dict[str, Any]:

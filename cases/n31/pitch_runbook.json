@@ -155,6 +155,7 @@
     {"artifact_id": "GROUNDING_GATE", "path": "cases/n31/evaluations/deterministic_grounding_gate_v1.json", "kind": "JSON", "required": true},
     {"artifact_id": "SEMANTIC_REVIEW", "path": "cases/n31/evaluations/semantic_review_v1.json", "kind": "JSON", "required": true},
     {"artifact_id": "SELECTIVE_REBUILD", "path": "cases/n31/evaluations/selective_rebuild_v1.json", "kind": "JSON", "required": true},
+    {"artifact_id": "AGENT_TOOL_TRACE", "path": "cases/n31/evaluations/agent_tool_trace_v1.json", "kind": "JSON", "required": true},
     {"artifact_id": "RUNTIME_BENCHMARK", "path": "output/evaluation/runtime_benchmark_dgx.json", "kind": "JSON", "required": true},
     {"artifact_id": "POSTER", "path": "output/pdf/n31_a4_training_poster.pdf", "kind": "PDF", "required": true},
     {"artifact_id": "TRAINING_VIDEO", "path": "output/video/n31_training_video_v1.mp4", "kind": "MP4", "required": true},

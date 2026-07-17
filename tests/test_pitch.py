@@ -104,6 +104,14 @@ def test_pitch_requires_output_profile_and_low_bitrate_preview_mapping() -> None
     assert result["assertions"]["low_bitrate_previews_mapped"] is True
 
 
+def test_pitch_requires_auditable_five_agent_tool_trace() -> None:
+    artifact_ids = {item["artifact_id"] for item in _runbook()["required_artifacts"]}
+    assert "AGENT_TOOL_TRACE" in artifact_ids
+    result = _check_metrics(ROOT)
+    assert result["status"] == "PASSED"
+    assert result["assertions"]["five_agent_tool_trace"] is True
+
+
 def test_pitch_requires_five_grounded_quiz_categories() -> None:
     result = _check_metrics(ROOT)
     assert result["assertions"]["training_quiz_grounded"] is True
@@ -144,3 +152,4 @@ def test_pitch_requires_safe_evidence_navigation_and_operator_review() -> None:
     assert result["assertions"]["safety_conflict_human_gate"] is True
     assert result["assertions"]["asr_correction_auditable"] is True
     assert result["assertions"]["video_preview_configured"] is True
+    assert result["assertions"]["agent_tool_interface_auditable"] is True

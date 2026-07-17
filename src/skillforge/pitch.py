@@ -12,6 +12,7 @@ from typing import Any
 
 from fastapi.testclient import TestClient
 
+from .agent_trace import verify_agent_trace_artifacts
 from .contracts import validate_document
 from .conflict_adjudication import route_conflict
 from .demo import ROOT
@@ -161,6 +162,10 @@ def _check_metrics(root: Path) -> dict[str, Any]:
     selective_rebuild = validate_document(
         _read_json(root / "cases/n31/evaluations/selective_rebuild_v1.json"),
         "selective_rebuild_report.schema.json",
+    )
+    agent_trace = verify_agent_trace_artifacts(
+        _read_json(root / "cases/n31/evaluations/agent_tool_trace_v1.json"),
+        project_root=root,
     )
     sop_views = validate_document(
         _read_json(root / "cases/n31/demo_bundle/sop_views.json"),
@@ -533,6 +538,55 @@ def _check_metrics(root: Path) -> dict[str, Any]:
             "contains_credentials": False,
             "contains_absolute_paths": False,
         },
+        "five_agent_tool_trace": agent_trace["status"] == "COMPLETED"
+        and agent_trace["summary"]
+        == {
+            "agent_count": 5,
+            "tool_count": 13,
+            "tool_call_count": 14,
+            "artifact_count": 19,
+            "handoff_count": 5,
+            "evidence_bound_call_count": 14,
+            "human_confirmation_call_count": 1,
+            "trace_generation_external_model_calls": 0,
+        }
+        and [item["agent_id"] for item in agent_trace["agents"]]
+        == [
+            "PERCEPTION_AGENT",
+            "SOP_AGENT",
+            "CREATOR_AGENT",
+            "VERIFIER_AGENT",
+            "REVISION_AGENT",
+        ]
+        and {
+            (item["from_agent"], item["to_agent"])
+            for item in agent_trace["handoffs"]
+        }
+        >= {
+            ("VERIFIER_AGENT", "REVISION_AGENT"),
+            ("REVISION_AGENT", "VERIFIER_AGENT"),
+        }
+        and {
+            item["capability"] for item in agent_trace["tools"]
+        }
+        >= {
+            "PDF_PAGE",
+            "KEYFRAME",
+            "VIDEO_INTERVAL",
+            "RETRIEVAL",
+            "SAVE",
+            "RENDER",
+            "CONFIRM",
+        }
+        and agent_trace["data_policy"]
+        == {
+            "storage_scope": "PUBLIC_STRUCTURED_AUDIT",
+            "contains_raw_media": False,
+            "contains_credentials": False,
+            "contains_absolute_paths": False,
+            "contains_artifact_paths": False,
+            "trace_generation_external_model_calls": 0,
+        },
     }
     return {
         "check_id": "PITCH_CLAIMS",
@@ -603,6 +657,7 @@ def _check_demo_modes(runbook: dict[str, Any], root: Path) -> dict[str, Any]:
     )
     health = client.get("/health")
     payload = client.get("/api/n31")
+    agents_endpoint = client.get("/api/n31/agents")
     conflict_session = client.post("/api/n31/conflicts/sessions")
     asr_session = client.post("/api/n31/asr-corrections/sessions")
     asr_session_payload = asr_session.json() if asr_session.status_code == 200 else {}
@@ -731,6 +786,20 @@ def _check_demo_modes(runbook: dict[str, Any], root: Path) -> dict[str, Any]:
         == 6
         and len(payload.json().get("video_previews", {}).get("availability", []))
         == 6,
+        "agent_tool_interface_auditable": agents_endpoint.status_code == 200
+        and payload.status_code == 200
+        and payload.json().get("agent_tool_trace") == agents_endpoint.json()
+        and agents_endpoint.json().get("summary", {}).get("agent_count") == 5
+        and agents_endpoint.json().get("summary", {}).get("tool_count") == 13
+        and agents_endpoint.json().get("summary", {}).get("tool_call_count") == 14
+        and agents_endpoint.json().get("summary", {}).get(
+            "evidence_bound_call_count"
+        )
+        == 14
+        and agents_endpoint.json().get("data_policy", {}).get(
+            "contains_artifact_paths"
+        )
+        is False,
         "conflict_decision_auditable": conflict_session.status_code == 200
         and conflict_session.json().get("status") == "AUTO_FINALIZED"
         and conflict_session.json().get("finalization")

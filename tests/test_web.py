@@ -70,6 +70,7 @@ def test_web_accepts_operator_reviewed_gold_result(tmp_path) -> None:
     assert "/api/n31/artifacts/selective-rebuild" in home.text
     assert "交付配置与低码率素材预览" in home.text
     assert "<video controls" in home.text
+    assert "五类 Agent 与可审计工具链" in home.text
     assert "操作者 SOP 审核台" in home.text
     assert "专家口述 ASR 快速修正" in home.text
     assert "重新计算Evidence绑定摘要" in home.text
@@ -83,6 +84,10 @@ def test_web_accepts_operator_reviewed_gold_result(tmp_path) -> None:
     assert response.status_code == 200
     assert response.json()["summary"]["gold_status"] == "GOLD"
     assert response.json()["summary"]["metrics_status"] == "FINAL"
+    agent_trace = response.json()["agent_tool_trace"]
+    assert agent_trace["summary"]["agent_count"] == 5
+    assert agent_trace["summary"]["tool_count"] == 13
+    assert client.get("/api/n31/agents").json() == agent_trace
     assert response.json()["workflow"]["version"] == 1
     assert response.json()["workflow"]["state"] == "COMPLETED"
     assert response.json()["workflow"]["stage_attempts"]["VERIFYING"] == 2
