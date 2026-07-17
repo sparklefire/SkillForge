@@ -19,3 +19,7 @@ def test_builds_asset_free_gold_bundle(tmp_path) -> None:
     assert summary["after"]["severe_error_count"] == 0
     before = json.loads((output / "before_sop.json").read_text(encoding="utf-8"))
     assert "evidence_catalog" not in before
+    views = json.loads((output / "sop_views.json").read_text(encoding="utf-8"))
+    assert views["artifact_type"] == "SOP_VIEWS"
+    checklist = json.loads((output / "checklist.json").read_text(encoding="utf-8"))
+    assert checklist["interaction_mode"] == "ONE_STEP_PER_SCREEN"

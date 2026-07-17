@@ -144,6 +144,7 @@
   "required_artifacts": [
     {"artifact_id": "DEMO_BUNDLE", "path": "cases/n31/demo_bundle/bundle.json", "kind": "JSON", "required": true},
     {"artifact_id": "GOLD_SOP", "path": "cases/n31/gold/gold_sop.json", "kind": "JSON", "required": true},
+    {"artifact_id": "SOP_VIEWS", "path": "cases/n31/demo_bundle/sop_views.json", "kind": "JSON", "required": true},
     {"artifact_id": "MULTISOURCE_EVAL", "path": "cases/n31/evaluations/multisource_comparison_v1.json", "kind": "JSON", "required": true},
     {"artifact_id": "DGX_VISUAL", "path": "cases/n31/evaluations/dgx_visual_compute_v1.json", "kind": "JSON", "required": true},
     {"artifact_id": "TEMPORAL_WINDOWS", "path": "cases/n31/evaluations/temporal_action_windows_v1.json", "kind": "JSON", "required": true},

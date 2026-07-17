@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from .contracts import validate_document
-from .creator import create_checklist, create_quiz
+from .creator import create_checklist, create_quiz, create_sop_views
 from .demo import read_json, write_json
 from .observability import StructuredLogger
 from .revision import revise_sop
@@ -72,6 +72,7 @@ def run_provisional_rehearsal(
         workflow.transition(WorkflowState.NEEDS_REVIEW, "仍有确定性高严重度问题")
     else:
         workflow.transition(WorkflowState.RENDERING, "生成候选检查清单和测验")
+        write_json(output_dir / "sop_views.json", create_sop_views(revised))
         write_json(output_dir / "checklist.json", create_checklist(revised))
         write_json(output_dir / "quiz.json", create_quiz(revised))
         workflow.transition(WorkflowState.COMPLETED, "非Gold真实案例闭环彩排完成")

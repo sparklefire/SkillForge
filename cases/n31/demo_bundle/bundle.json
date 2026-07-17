@@ -16,8 +16,8 @@
     },
     {
       "name": "checklist.json",
-      "sha256": "3d1e1a929c1c7b798cd07d241ba808ec564fa37005dad90e02f892b8432217ea",
-      "size_bytes": 5898
+      "sha256": "516c1e42ceb9e87155eebe0ef38603cd8b107fdcd78fa051428284316d641330",
+      "size_bytes": 56053
     },
     {
       "name": "final_conflicts.json",
@@ -36,8 +36,13 @@
     },
     {
       "name": "revision_audit.json",
-      "sha256": "5e3c1f7e972a43285d2b42a9d5852d11ad4832ae95e5cedd32f14a0f34a4d93c",
+      "sha256": "4a264336f8effccfd86cbb098fee31ef0d791d95597e3402cc438b15f2aba26e",
       "size_bytes": 3176
+    },
+    {
+      "name": "sop_views.json",
+      "sha256": "7c18ecbf1be02bbfd91cd245335343b515fcedf3261e8571263a698ae0036397",
+      "size_bytes": 90630
     },
     {
       "name": "summary.json",
@@ -46,7 +51,7 @@
     },
     {
       "name": "workflow.json",
-      "sha256": "ca7ed57ff88eb09a568ac2e4b8fba41bcf14ad6aa5a8ef372c868baa62e15830",
+      "sha256": "16a6cc94e792f2ba1b816fe633e8f27a3f2b360373166779e804da3b2416ffff",
       "size_bytes": 1684
     }
   ],

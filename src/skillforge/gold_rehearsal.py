@@ -8,8 +8,8 @@ from pathlib import Path
 from typing import Any
 
 from .contracts import validate_document
-from .creator import create_checklist, create_quiz
-from .demo import read_json, write_json
+from .creator import create_checklist, create_quiz, create_sop_views
+from .demo import ROOT, read_json, write_json
 from .observability import StructuredLogger
 from .revision import revise_sop
 from .synthetic_case import inject_faults
@@ -85,7 +85,13 @@ def run_gold_rehearsal(
         workflow.transition(WorkflowState.NEEDS_REVIEW, "仍有确定性高严重度问题")
     else:
         workflow.transition(WorkflowState.RENDERING, "生成Gold检查清单和测验")
-        write_json(output_dir / "checklist.json", create_checklist(revised))
+        visual_path = ROOT / "cases/n31/evaluations/visual_sequence_review_v1.json"
+        visual_review = read_json(visual_path) if visual_path.is_file() else None
+        write_json(output_dir / "sop_views.json", create_sop_views(revised))
+        write_json(
+            output_dir / "checklist.json",
+            create_checklist(revised, visual_review=visual_review),
+        )
         write_json(output_dir / "quiz.json", create_quiz(revised))
         workflow.transition(WorkflowState.COMPLETED, "Gold真实案例闭环评测完成")
 

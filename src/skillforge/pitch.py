@@ -141,6 +141,14 @@ def _check_metrics(root: Path) -> dict[str, Any]:
         _read_json(root / "cases/n31/evaluations/source_candidate_synthesis_v1.json"),
         "source_candidate_synthesis.schema.json",
     )
+    sop_views = validate_document(
+        _read_json(root / "cases/n31/demo_bundle/sop_views.json"),
+        "sop_views.schema.json",
+    )
+    checklist = validate_document(
+        _read_json(root / "cases/n31/demo_bundle/checklist.json"),
+        "mobile_checklist.schema.json",
+    )
     manifest_path = root / "output/video/n31_training_video_manifest_v1.json"
     manifest = validate_document(
         _read_json(manifest_path), "training_video_manifest.schema.json"
@@ -228,6 +236,21 @@ def _check_metrics(root: Path) -> dict[str, Any]:
             and item["confidence_assessment"]["observation_ids"] == ["NO001"]
             for item in source_candidates["ordered_steps"]
         ),
+        "training_package_traceable": set(sop_views["views"])
+        == {"concise", "detailed", "evidence"}
+        and all(len(view["steps"]) == 13 for view in sop_views["views"].values())
+        and all(
+            {"action", "reason", "completion_marker", "risks", "sources"}
+            <= set(step)
+            for view in sop_views["views"].values()
+            for step in view["steps"]
+        )
+        and checklist["interaction_mode"] == "ONE_STEP_PER_SCREEN"
+        and len(checklist["items"]) == 13
+        and next(
+            item for item in checklist["items"] if item["step_id"] == "S04"
+        )["keyframe"]["visual_status"]
+        == "NOT_VISIBLE",
         "video_manifest_bound": video_path.is_file()
         and manifest["output"]["sha256"] == _sha256(video_path)
         and manifest["coverage"]["covered_gold_step_count"]

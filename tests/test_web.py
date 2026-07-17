@@ -97,11 +97,41 @@ def test_web_accepts_operator_reviewed_gold_result(tmp_path) -> None:
         "HUMAN_REVIEW_REQUIRED": 1,
     }
     assert len(response.json()["checklist"]["items"]) == 13
+    assert set(response.json()["sop_views"]["views"]) == {
+        "concise",
+        "detailed",
+        "evidence",
+    }
     assert len(response.json()["quiz"]["questions"]) == 5
     checklist = client.get("/api/n31/artifacts/checklist")
     assert checklist.status_code == 200
     assert checklist.json()["case_id"] == "n31_media_change"
     assert "attachment" in checklist.headers["content-disposition"]
+    sop_views = client.get("/api/n31/artifacts/sop-views")
+    assert sop_views.status_code == 200
+    assert sop_views.json()["artifact_type"] == "SOP_VIEWS"
+    session = client.post("/api/n31/checklist/sessions")
+    assert session.status_code == 200
+    session_id = session.json()["session_id"]
+    completed = client.patch(
+        f"/api/n31/checklist/sessions/{session_id}/items/S01",
+        json={"completed": True},
+    )
+    assert completed.status_code == 200
+    assert completed.json()["progress"]["completed_items"] == 1
+    feedback = client.patch(
+        f"/api/n31/checklist/sessions/{session_id}/items/S01",
+        json={
+            "feedback_category": "EVIDENCE_ISSUE",
+            "feedback_comment": "需要重新核对来源定位",
+        },
+    )
+    assert feedback.status_code == 200
+    assert len(feedback.json()["feedback_log"]) == 1
+    persisted = client.get(f"/api/n31/checklist/sessions/{session_id}")
+    assert persisted.status_code == 200
+    assert persisted.json()["items"][0]["completed"] is True
+    assert client.get("/api/n31/checklist/keyframes/E999").status_code == 404
     poster = client.get("/api/n31/artifacts/poster")
     assert poster.status_code == 200
     assert poster.headers["content-type"] == "application/pdf"

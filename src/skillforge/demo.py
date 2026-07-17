@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from .contracts import validate_document
-from .creator import create_checklist, create_quiz
+from .creator import create_checklist, create_quiz, create_sop_views
 from .observability import StructuredLogger
 from .revision import revise_sop
 from .synthetic_case import inject_faults
@@ -78,6 +78,7 @@ def run_demo(case_dir: Path, output_dir: Path) -> dict[str, Any]:
         workflow.transition(WorkflowState.NEEDS_REVIEW, "仍存在高严重度问题")
     else:
         workflow.transition(WorkflowState.RENDERING, "生成检查清单和培训测验")
+        write_json(output_dir / "sop_views.json", create_sop_views(revised))
         write_json(output_dir / "checklist.json", create_checklist(revised))
         write_json(output_dir / "quiz.json", create_quiz(revised))
         workflow.transition(WorkflowState.COMPLETED, "P0 模拟闭环完成")

@@ -11,11 +11,12 @@ from pathlib import Path
 from typing import Annotated, Any
 
 import uvicorn
-from fastapi import FastAPI, File, Form, HTTPException, UploadFile
+from fastapi import Body, FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from starlette.concurrency import run_in_threadpool
 
 from .demo import ROOT, run_demo
+from .checklist_sessions import ChecklistSessionStore
 from .contracts import validate_document
 from .gold_rehearsal import run_gold_rehearsal
 from .ingest import IngestionPipeline
@@ -29,6 +30,7 @@ ALLOWED_SUFFIXES = {
 }
 N31_DOWNLOADS = {
     "final-sop": ("active", "after_sop.json", "n31_final_sop.json"),
+    "sop-views": ("active", "sop_views.json", "n31_sop_views.json"),
     "checklist": ("active", "checklist.json", "n31_mobile_checklist.json"),
     "quiz": ("active", "quiz.json", "n31_training_quiz.json"),
     "revision-audit": (
@@ -82,7 +84,7 @@ HTML = """<!doctype html>
   <style>
     :root{color-scheme:dark;--bg:#07110d;--panel:#102019;--line:#294235;--text:#eef7f0;--muted:#a6b9ac;--green:#73e2a7;--amber:#ffc766;--red:#ff7b7b}
     *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 80% 0,#163327 0,transparent 38%),var(--bg);color:var(--text);font:15px/1.55 system-ui,-apple-system,"Noto Sans CJK SC",sans-serif}
-    main{max-width:1180px;margin:auto;padding:34px 20px 70px}h1{font-size:38px;margin:0 0 4px}h2{font-size:20px;margin:0 0 16px}p{color:var(--muted)}.tag{color:var(--green);letter-spacing:.14em;text-transform:uppercase;font-weight:700}.panel{background:color-mix(in srgb,var(--panel) 92%,transparent);border:1px solid var(--line);border-radius:18px;padding:20px;margin-top:18px;box-shadow:0 16px 50px #0004}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}.metric{padding:15px;border:1px solid var(--line);border-radius:14px;background:#0a1712}.metric strong{display:block;font-size:28px;color:var(--green)}.cols{display:grid;grid-template-columns:1fr 1fr;gap:14px}.step,.issue,.change,.result{border:1px solid var(--line);border-radius:12px;padding:13px;margin:9px 0;background:#0b1813}.issue{border-left:4px solid var(--red)}.change,.result{border-left:4px solid var(--green)}.evidence{color:var(--amber);font-size:13px;margin-top:8px}.muted{color:var(--muted)}.notice{padding:10px 12px;border:1px solid var(--amber);border-radius:10px;color:var(--amber);background:#251d0b;margin-bottom:14px}.downloads{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:14px}.download{display:inline-block;border:1px solid var(--green);border-radius:9px;padding:8px 12px;color:var(--green);text-decoration:none;font-weight:700}button{border:0;border-radius:10px;padding:11px 16px;background:var(--green);color:#062011;font-weight:800;cursor:pointer}input{width:100%;margin:6px 0 12px;padding:9px;border:1px solid var(--line);border-radius:8px;background:#08130f;color:var(--text)}label{display:block;color:var(--muted)}#status{margin-left:10px;color:var(--amber)}pre{white-space:pre-wrap;word-break:break-word;color:var(--muted)}@media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:800px){.grid,.cols{grid-template-columns:1fr}h1{font-size:30px}}
+    main{max-width:1180px;margin:auto;padding:34px 20px 70px}h1{font-size:38px;margin:0 0 4px}h2{font-size:20px;margin:0 0 16px}p{color:var(--muted)}.tag{color:var(--green);letter-spacing:.14em;text-transform:uppercase;font-weight:700}.panel{background:color-mix(in srgb,var(--panel) 92%,transparent);border:1px solid var(--line);border-radius:18px;padding:20px;margin-top:18px;box-shadow:0 16px 50px #0004}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}.metric{padding:15px;border:1px solid var(--line);border-radius:14px;background:#0a1712}.metric strong{display:block;font-size:28px;color:var(--green)}.cols{display:grid;grid-template-columns:1fr 1fr;gap:14px}.step,.issue,.change,.result{border:1px solid var(--line);border-radius:12px;padding:13px;margin:9px 0;background:#0b1813}.issue{border-left:4px solid var(--red)}.change,.result{border-left:4px solid var(--green)}.evidence{color:var(--amber);font-size:13px;margin-top:8px}.muted{color:var(--muted)}.notice{padding:10px 12px;border:1px solid var(--amber);border-radius:10px;color:var(--amber);background:#251d0b;margin-bottom:14px}.downloads,.controls{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:14px}.download{display:inline-block;border:1px solid var(--green);border-radius:9px;padding:8px 12px;color:var(--green);text-decoration:none;font-weight:700}button{border:0;border-radius:10px;padding:11px 16px;background:var(--green);color:#062011;font-weight:800;cursor:pointer}button.secondary{background:#1b3328;color:var(--text);border:1px solid var(--line)}input,select,textarea{width:100%;margin:6px 0 12px;padding:9px;border:1px solid var(--line);border-radius:8px;background:#08130f;color:var(--text)}textarea{min-height:72px;resize:vertical}.check-card{min-height:460px}.check-card img{width:100%;max-height:230px;object-fit:contain;background:#050a08;border-radius:10px;margin:10px 0}.warning-list{color:var(--amber)}details{margin-top:10px;color:var(--muted)}summary{cursor:pointer;color:var(--amber)}label{display:block;color:var(--muted)}#status,#checklist-status{margin-left:10px;color:var(--amber)}pre{white-space:pre-wrap;word-break:break-word;color:var(--muted)}@media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:800px){.grid,.cols{grid-template-columns:1fr}h1{font-size:30px}}
   </style>
 </head>
 <body><main>
@@ -99,7 +101,7 @@ HTML = """<!doctype html>
   <section class="panel"><h2>发现问题 → 展示证据</h2><div id="issues"></div></section>
   <section class="panel"><h2>修订前后对比</h2><div class="cols"><div><h3>修订前</h3><div id="before"></div></div><div><h3>修订后</h3><div id="after"></div></div></div></section>
   <section class="panel"><h2>局部修订审计</h2><div id="changes"></div></section>
-  <section class="panel" id="results-panel" hidden><h2>培训成果</h2><div id="training-video-card" hidden><h3>80秒横屏培训视频</h3><div id="training-video-notice" class="notice"></div><div id="training-video-metrics" class="grid"></div><video controls preload="metadata" style="width:100%;margin:14px 0;border-radius:12px;background:#000" src="/api/n31/media/training-video"></video></div><div class="downloads" id="n31-downloads"><a class="download" href="/api/n31/artifacts/final-sop">下载最终 SOP</a><a class="download" href="/api/n31/artifacts/checklist">下载手机检查清单</a><a class="download" href="/api/n31/artifacts/quiz">下载培训测验</a><a class="download" href="/api/n31/artifacts/poster">下载 A4 培训海报</a><a class="download" href="/api/n31/artifacts/training-video">下载80秒培训视频</a><a class="download" href="/api/n31/artifacts/training-video-manifest">下载视频生成清单</a><a class="download" href="/api/n31/artifacts/training-video-evidence">下载视频证据包</a><a class="download" href="/api/n31/artifacts/temporal-windows">下载连续动作窗口</a><a class="download" href="/api/n31/artifacts/pdf-structure">下载手册结构报告</a><a class="download" href="/api/n31/artifacts/source-candidates">下载候选合并报告</a><a class="download" href="/api/n31/artifacts/revision-audit">下载修订记录</a></div><div class="cols"><div><h3>手机端检查清单</h3><div id="checklist"></div></div><div><h3>培训测验</h3><div id="quiz"></div></div></div></section>
+  <section class="panel" id="results-panel" hidden><h2>培训成果</h2><div id="training-video-card" hidden><h3>80秒横屏培训视频</h3><div id="training-video-notice" class="notice"></div><div id="training-video-metrics" class="grid"></div><video controls preload="metadata" style="width:100%;margin:14px 0;border-radius:12px;background:#000" src="/api/n31/media/training-video"></video></div><div class="downloads" id="n31-downloads"><a class="download" href="/api/n31/artifacts/final-sop">下载最终 SOP</a><a class="download" href="/api/n31/artifacts/sop-views">下载三种 SOP 视图</a><a class="download" href="/api/n31/artifacts/checklist">下载手机检查清单</a><a class="download" href="/api/n31/artifacts/quiz">下载培训测验</a><a class="download" href="/api/n31/artifacts/poster">下载 A4 培训海报</a><a class="download" href="/api/n31/artifacts/training-video">下载80秒培训视频</a><a class="download" href="/api/n31/artifacts/training-video-manifest">下载视频生成清单</a><a class="download" href="/api/n31/artifacts/training-video-evidence">下载视频证据包</a><a class="download" href="/api/n31/artifacts/temporal-windows">下载连续动作窗口</a><a class="download" href="/api/n31/artifacts/pdf-structure">下载手册结构报告</a><a class="download" href="/api/n31/artifacts/source-candidates">下载候选合并报告</a><a class="download" href="/api/n31/artifacts/revision-audit">下载修订记录</a></div><div id="sop-views-card"><h3>三种 SOP 阅读视图</h3><div class="controls"><button class="sop-tab" data-view="concise">简洁版</button><button class="sop-tab secondary" data-view="detailed">详细版</button><button class="sop-tab secondary" data-view="evidence">带证据版</button></div><div id="sop-view"></div></div><div class="cols"><div><h3>手机端检查清单</h3><div id="checklist-progress" class="notice"></div><div id="checklist" class="check-card"></div><div class="controls"><button id="check-prev" class="secondary">上一步</button><button id="check-next" class="secondary">下一步</button></div><label>问题类型<select id="feedback-category"><option value="STEP_BLOCKED">步骤受阻</option><option value="CONTENT_ERROR">内容错误</option><option value="EVIDENCE_ISSUE">证据问题</option><option value="OTHER">其他</option></select></label><label>问题反馈<textarea id="feedback-comment" maxlength="500" placeholder="描述现场问题；记录只保存在本机，不进入Git"></textarea></label><button id="feedback-submit">提交本步反馈</button><span id="checklist-status"></span></div><div><h3>培训测验</h3><div id="quiz"></div></div></div></section>
   <section class="panel"><h2>上传素材并原生预处理</h2><p>上传内容只写入被 Git 忽略的本地输出目录。本页面不会自动把原始素材发送给外部模型。</p>
     <form id="upload"><label>操作视频<input type="file" name="video" accept="video/*"></label><label>设备 PDF<input type="file" name="pdf" accept="application/pdf"></label><label>专家录音<input type="file" name="audio" accept="audio/*"></label><label><input style="width:auto" type="checkbox" name="transcribe" value="true">调用 StepAudio ASR</label><label><input style="width:auto" type="checkbox" name="analyze_visuals" value="true">调用 Step 3.7 分析关键帧</label><label><input style="width:auto" type="checkbox" name="plan_sop" value="true">根据证据规划 SOP</label><label><input style="width:auto" type="checkbox" name="external_processing_authorized" value="true">已确认允许把选定派生内容发送给外部 API</label><button>开始处理</button><span id="status"></span></form><pre id="ingest"></pre>
   </section>
@@ -107,7 +109,12 @@ HTML = """<!doctype html>
 <script>
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const pct=v=>`${(Number(v)*100).toFixed(0)}%`;
-function renderDemo(d){const b=d.summary.before,a=d.summary.after,isReal=d.summary.synthetic===false,isGold=d.summary.gold_status==='GOLD';
+let activeDemo=null,checklistIndex=0,checklistSession=null,sopView='concise';
+const locator=e=>e.locator.page?`PDF第${e.locator.page}页${e.locator.paragraph?' · '+e.locator.paragraph:''}`:`${(e.locator.start_ms/1000).toFixed(1)}–${(e.locator.end_ms/1000).toFixed(1)}秒`;
+function renderSopView(){if(!activeDemo?.sop_views)return;const v=activeDemo.sop_views.views[sopView];document.querySelector('#sop-view').innerHTML=`<p>${esc(v.description)}</p>`+v.steps.map(x=>`<div class="step"><b>${esc(x.step_id)} ${esc(x.title)}</b><div>${esc(x.action)}</div><div class="muted">原因：${esc(x.reason)}</div><div>完成标志：${esc(x.completion_marker)}</div><div class="warning-list">${x.risks.map(r=>`风险：${esc(r)}`).join('<br>')||'风险：无额外提示'}</div><div class="evidence">来源：${x.sources.map(s=>`${esc(s.source_type)} · ${esc(s.source_ref)}`).join('；')}</div>${x.evidence_details?`<details><summary>展开证据</summary>${x.evidence_details.map(e=>`<div>${esc(e.evidence_id)} · ${esc(e.classification)} · ${esc(e.review_status)} · ${esc(locator(e))}</div>`).join('')}</details>`:''}</div>`).join('');document.querySelectorAll('.sop-tab').forEach(b=>b.classList.toggle('secondary',b.dataset.view!==sopView))}
+async function ensureChecklistSession(){if(checklistSession)return checklistSession;const r=await fetch('/api/n31/checklist/sessions',{method:'POST'});const d=await r.json();if(!r.ok)throw new Error(d.detail||'无法创建完成记录');checklistSession=d;return d}
+function renderChecklist(){if(!activeDemo?.checklist)return;const items=activeDemo.checklist.items,item=items[checklistIndex],state=checklistSession?.items.find(x=>x.step_id===item.step_id),done=state?.completed??item.completed,k=item.keyframe,interactive=activeDemo.summary.synthetic===false;document.querySelector('#checklist-progress').textContent=`第 ${checklistIndex+1}/${items.length} 步 · 已完成 ${checklistSession?.progress.completed_items||0}/${items.length} · ${checklistSession?.status||'NOT_STARTED'}`;document.querySelector('#checklist').innerHTML=`<div class="result"><b>${esc(item.step_id)} ${esc(item.title)}</b><div>${esc(item.action)}</div>${k?`<img src="/api/n31/checklist/keyframes/${esc(k.evidence_id)}" alt="${esc(item.step_id)}关键帧" onerror="this.style.display='none'"><div class="evidence">关键帧：${esc(k.evidence_id)} · ${(k.start_ms/1000).toFixed(1)}–${(k.end_ms/1000).toFixed(1)}秒 · 视觉状态 ${esc(k.visual_status)}</div>`:''}${k?.visual_status==='NOT_VISIBLE'?'<div class="notice">该画面不能证明本步动作，仅用于定位人工复核；本步依据手册和其他已审核来源。</div>':''}<div>完成标志：${esc(item.check)}</div><div class="warning-list">${item.warnings.map(w=>`风险：${esc(w)}`).join('<br>')}</div><details><summary>展开 ${item.evidence_details.length} 条证据</summary>${item.evidence_details.map(e=>`<div>${esc(e.evidence_id)} · ${esc(e.source_type)} · ${esc(e.classification)} · ${esc(e.review_status)} · ${esc(locator(e))}</div>`).join('')}</details><label><input id="step-completed" style="width:auto" type="checkbox" ${done?'checked':''} ${interactive?'':'disabled'}> 已完成并记录本步</label></div>`;document.querySelector('#check-prev').disabled=checklistIndex===0;document.querySelector('#check-next').disabled=checklistIndex===items.length-1;document.querySelector('#feedback-submit').disabled=!interactive;const box=document.querySelector('#step-completed');if(interactive)box.addEventListener('change',async()=>{const status=document.querySelector('#checklist-status');status.textContent=' 保存中…';try{const session=await ensureChecklistSession();const r=await fetch(`/api/n31/checklist/sessions/${session.session_id}/items/${item.step_id}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({completed:box.checked})});const d=await r.json();if(!r.ok)throw new Error(d.detail||'保存失败');checklistSession=d;status.textContent=' 已保存';renderChecklist()}catch(e){box.checked=!box.checked;status.textContent=` ${e.message}`}})}
+function renderDemo(d){activeDemo=d;const b=d.summary.before,a=d.summary.after,isReal=d.summary.synthetic===false,isGold=d.summary.gold_status==='GOLD';
 document.querySelector('#metrics-title').textContent=isGold?'N31 真实素材 Gold 闭环':isReal?'N31 真实素材闭环彩排':'无版权模拟闭环';
 document.querySelector('#basis').textContent=isGold?'实际操作者口述审核 · Gold v1 · 最终评测指标。':isReal?'候选基准 · 非 Gold · 指标仅用于证明闭环可运行，等待操作者审核后重跑最终评测。':'明确标注的无版权模拟数据，不作为真实案例评测。';
 document.querySelector('#metrics').innerHTML=[['必要步骤',`${pct(b.required_step_coverage)} → ${pct(a.required_step_coverage)}`],['证据覆盖',`${pct(b.evidence_supported_required_steps)} → ${pct(a.evidence_supported_required_steps)}`],['严重错误',`${b.severe_error_count} → ${a.severe_error_count}`],['局部修改',d.summary.revision_count],['状态',isReal?d.summary.gold_status||'NOT_GOLD':d.summary.workflow_state]].map(x=>`<div class="metric"><span class="muted">${esc(x[0])}</span><strong>${esc(x[1])}</strong></div>`).join('');
@@ -120,9 +127,10 @@ if(d.training_video){const t=d.training_video,o=t.output,c=t.coverage;document.q
 document.querySelector('#issues').innerHTML=d.initial_conflicts.conflicts.map(c=>`<div class="issue"><b>${esc(c.kind)}</b> · ${esc(c.message)}<div class="evidence">${c.evidence.map(e=>`${esc(e.evidence_id)}｜${esc(e.source_ref)}｜${esc(JSON.stringify(e.locator))}`).join('<br>')||'无来源内容：按规则拒绝'}</div></div>`).join('');
 const render=s=>s.steps.map(x=>`<div class="step"><b>${esc(x.step_id)} ${esc(x.title)}</b><div class="muted">${esc(x.action)}</div><div class="evidence">证据：${esc(x.evidence.join(', ')||'无')}</div></div>`).join('');document.querySelector('#before').innerHTML=render(d.before_sop);document.querySelector('#after').innerHTML=render(d.after_sop);
 document.querySelector('#changes').innerHTML=d.revision_audit.changes.map(c=>`<div class="change"><b>${esc(c.action)} · ${esc(c.path)}</b><div>${esc(c.reason)}</div><div class="evidence">证据：${esc(c.evidence_ids.join(', ')||'无依据，已删除')}</div></div>`).join('');
-if(d.checklist&&d.quiz){document.querySelector('#results-panel').hidden=false;document.querySelector('#n31-downloads').hidden=d.summary.synthetic!==false;document.querySelector('#checklist').innerHTML=d.checklist.items.map(x=>`<div class="result"><b>□ ${esc(x.step_id)} ${esc(x.title)}</b><div>${esc(x.check)}</div><div class="evidence">证据：${esc(x.evidence_ids.join(', '))}</div></div>`).join('');document.querySelector('#quiz').innerHTML=d.quiz.questions.map(x=>`<div class="result"><b>${esc(x.question_id)} ${esc(x.prompt)}</b><div>答案：${esc(x.answer===true?'正确':x.answer===false?'错误':x.answer)}</div><div class="muted">${esc(x.explanation)}</div><div class="evidence">证据：${esc(x.evidence_ids.join(', '))}</div></div>`).join('')}}
+if(d.checklist&&d.quiz){document.querySelector('#results-panel').hidden=false;document.querySelector('#n31-downloads').hidden=d.summary.synthetic!==false;document.querySelector('#sop-views-card').hidden=!d.sop_views;renderSopView();renderChecklist();document.querySelector('#quiz').innerHTML=d.quiz.questions.map(x=>`<div class="result"><b>${esc(x.question_id)} ${esc(x.prompt)}</b><div>答案：${esc(x.answer===true?'正确':x.answer===false?'错误':x.answer)}</div><div class="muted">${esc(x.explanation)}</div><div class="evidence">证据：${esc(x.evidence_ids.join(', '))}</div></div>`).join('')}}
 async function loadDemo(){let r=await fetch('/api/n31');if(r.ok){renderDemo(await r.json());return}r=await fetch('/api/demo');if(!r.ok){await fetch('/api/demo/run',{method:'POST'});r=await fetch('/api/demo')}renderDemo(await r.json())}
 document.querySelector('#rerun').addEventListener('click',async()=>{const s=document.querySelector('#rerun-status');s.textContent=' 运行中…';const r=await fetch('/api/n31/run',{method:'POST'});const d=await r.json();s.textContent=r.ok?` 完成：严重错误 ${d.before.severe_error_count} → ${d.after.severe_error_count}`:` 失败：${d.detail||'未知错误'}`;if(r.ok)await loadDemo()});
+document.querySelectorAll('.sop-tab').forEach(b=>b.addEventListener('click',()=>{sopView=b.dataset.view;renderSopView()}));document.querySelector('#check-prev').addEventListener('click',()=>{if(checklistIndex>0){checklistIndex--;renderChecklist()}});document.querySelector('#check-next').addEventListener('click',()=>{if(checklistIndex<(activeDemo?.checklist.items.length||1)-1){checklistIndex++;renderChecklist()}});document.querySelector('#feedback-submit').addEventListener('click',async()=>{const status=document.querySelector('#checklist-status'),comment=document.querySelector('#feedback-comment').value.trim(),item=activeDemo.checklist.items[checklistIndex];if(!comment){status.textContent=' 请先填写问题';return}status.textContent=' 保存中…';try{const session=await ensureChecklistSession();const r=await fetch(`/api/n31/checklist/sessions/${session.session_id}/items/${item.step_id}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({feedback_category:document.querySelector('#feedback-category').value,feedback_comment:comment})});const d=await r.json();if(!r.ok)throw new Error(d.detail||'保存失败');checklistSession=d;document.querySelector('#feedback-comment').value='';status.textContent=' 反馈已保存在本机';renderChecklist()}catch(e){status.textContent=` ${e.message}`}});
 document.querySelector('#upload').addEventListener('submit',async e=>{e.preventDefault();const status=document.querySelector('#status');status.textContent='处理中…';const r=await fetch('/api/ingest',{method:'POST',body:new FormData(e.target)});const d=await r.json();status.textContent=r.ok?'完成':'失败';document.querySelector('#ingest').textContent=JSON.stringify(d,null,2)});loadDemo();
 </script></body></html>"""
 
@@ -190,7 +198,7 @@ def _demo_payload(directory: Path) -> dict[str, Any]:
     if missing:
         raise FileNotFoundError(", ".join(missing))
     payload = {name: _read_json(directory / f"{name}.json") for name in names}
-    for name in ("checklist", "quiz", "workflow"):
+    for name in ("sop_views", "checklist", "quiz", "workflow"):
         path = directory / f"{name}.json"
         if path.is_file():
             payload[name] = _read_json(path)
@@ -240,6 +248,7 @@ def create_app(
         else:
             n31_dir = provisional_dir.resolve()
     active_n31_dir = {"path": n31_dir}
+    checklist_sessions = ChecklistSessionStore(root / "checklist_sessions")
     app = FastAPI(title="SkillForge", version="0.1.0")
 
     @app.get("/", response_class=HTMLResponse)
@@ -351,6 +360,83 @@ def create_app(
             path,
             media_type=_artifact_media_type(path),
             filename=download_name,
+        )
+
+    @app.post("/api/n31/checklist/sessions")
+    def create_checklist_session() -> dict[str, Any]:
+        try:
+            checklist = _demo_payload(active_n31_dir["path"])["checklist"]
+            return checklist_sessions.create(checklist)
+        except FileNotFoundError as exc:
+            raise HTTPException(status_code=404, detail="N31检查清单尚未生成") from exc
+        except (KeyError, ValueError) as exc:
+            raise HTTPException(status_code=409, detail="N31检查清单格式无效") from exc
+
+    @app.get("/api/n31/checklist/sessions/{session_id}")
+    def get_checklist_session(session_id: str) -> dict[str, Any]:
+        try:
+            return checklist_sessions.get(session_id)
+        except FileNotFoundError as exc:
+            raise HTTPException(status_code=404, detail="检查清单记录不存在") from exc
+
+    @app.patch("/api/n31/checklist/sessions/{session_id}/items/{step_id}")
+    def update_checklist_item(
+        session_id: str,
+        step_id: str,
+        payload: dict[str, Any] = Body(...),
+    ) -> dict[str, Any]:
+        allowed = {"completed", "feedback_category", "feedback_comment"}
+        if not payload or set(payload) - allowed:
+            raise HTTPException(status_code=400, detail="检查清单更新字段无效")
+        completed = payload.get("completed")
+        if "completed" in payload and not isinstance(completed, bool):
+            raise HTTPException(status_code=400, detail="completed 必须为布尔值")
+        try:
+            return checklist_sessions.update_item(
+                session_id,
+                step_id,
+                completed=completed if "completed" in payload else None,
+                feedback_category=payload.get("feedback_category"),
+                feedback_comment=payload.get("feedback_comment"),
+            )
+        except FileNotFoundError as exc:
+            raise HTTPException(status_code=404, detail="检查清单记录不存在") from exc
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/n31/checklist/keyframes/{evidence_id}")
+    def checklist_keyframe(evidence_id: str) -> FileResponse:
+        if not re.fullmatch(r"E[0-9]{3}", evidence_id):
+            raise HTTPException(status_code=404)
+        try:
+            checklist = _demo_payload(active_n31_dir["path"])["checklist"]
+        except (FileNotFoundError, KeyError) as exc:
+            raise HTTPException(status_code=404) from exc
+        keyframe = next(
+            (
+                item["keyframe"]
+                for item in checklist.get("items", [])
+                if item.get("keyframe")
+                and item["keyframe"].get("evidence_id") == evidence_id
+            ),
+            None,
+        )
+        if keyframe is None:
+            raise HTTPException(status_code=404)
+        allowed_root = (
+            ROOT / "cases/n31/output/ingest_local_v1"
+        ).resolve()
+        candidate = (allowed_root / keyframe["keyframe"]).resolve()
+        if (
+            allowed_root not in candidate.parents
+            or candidate.suffix.lower() not in {".jpg", ".jpeg", ".png"}
+            or not candidate.is_file()
+        ):
+            raise HTTPException(status_code=404)
+        return FileResponse(
+            candidate,
+            media_type="image/jpeg" if candidate.suffix.lower() != ".png" else "image/png",
+            content_disposition_type="inline",
         )
 
     @app.get("/api/n31/media/training-video")

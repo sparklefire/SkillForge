@@ -18,7 +18,7 @@ REQUIRED = (
     "final_conflicts",
     "revision_audit",
 )
-OPTIONAL = ("checklist", "quiz", "workflow")
+OPTIONAL = ("sop_views", "checklist", "quiz", "workflow")
 
 
 def _read(path: Path) -> Any:

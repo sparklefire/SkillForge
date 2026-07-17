@@ -1,0 +1,123 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/sop_views.schema.json",
+  "title": "SkillForge SOP Views",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["artifact_type", "version", "case_id", "sop_version", "title", "views"],
+  "properties": {
+    "artifact_type": {"const": "SOP_VIEWS"},
+    "version": {"const": 1},
+    "case_id": {"type": "string", "minLength": 1},
+    "sop_version": {"type": "integer", "minimum": 1},
+    "title": {"type": "string", "minLength": 1},
+    "views": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["concise", "detailed", "evidence"],
+      "properties": {
+        "concise": {"$ref": "#/$defs/conciseView"},
+        "detailed": {"$ref": "#/$defs/detailedView"},
+        "evidence": {"$ref": "#/$defs/evidenceView"}
+      }
+    }
+  },
+  "$defs": {
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_type", "source_ref"],
+      "properties": {
+        "source_type": {"enum": ["pdf", "video", "audio"]},
+        "source_ref": {"type": "string", "minLength": 1}
+      }
+    },
+    "baseStep": {
+      "type": "object",
+      "required": ["step_id", "title", "action", "reason", "completion_marker", "risks", "sources"],
+      "properties": {
+        "step_id": {"type": "string", "pattern": "^S[0-9]{2}$"},
+        "title": {"type": "string", "minLength": 1},
+        "action": {"type": "string", "minLength": 1},
+        "reason": {"type": "string", "minLength": 1},
+        "completion_marker": {"type": "string", "minLength": 1},
+        "risks": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "sources": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/source"}}
+      }
+    },
+    "conciseStep": {
+      "unevaluatedProperties": false,
+      "allOf": [
+        {"$ref": "#/$defs/baseStep"}
+      ]
+    },
+    "detailedStep": {
+      "unevaluatedProperties": false,
+      "allOf": [
+        {"$ref": "#/$defs/baseStep"},
+        {
+          "type": "object",
+          "required": ["prerequisites", "tools", "parameters", "required", "status"],
+          "properties": {
+            "prerequisites": {"type": "array", "items": {"type": "string", "pattern": "^S[0-9]{2}$"}},
+            "tools": {"type": "array", "items": {"type": "string", "minLength": 1}},
+            "parameters": {"type": "array", "items": {"$ref": "https://skillforge.local/schemas/sop.schema.json#/$defs/parameter"}},
+            "required": {"type": "boolean"},
+            "status": {"enum": ["DRAFT", "VERIFIED", "NEEDS_REVIEW", "REVISED"]}
+          }
+        }
+      ]
+    },
+    "evidenceDetail": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["evidence_id", "source_type", "source_ref", "claim", "locator", "classification", "review_status"],
+      "properties": {
+        "evidence_id": {"type": "string", "pattern": "^E[0-9]{3}$"},
+        "source_type": {"enum": ["pdf", "video", "audio"]},
+        "source_ref": {"type": "string", "minLength": 1},
+        "claim": {"type": "string", "minLength": 1},
+        "locator": {"$ref": "https://skillforge.local/schemas/evidence.schema.json#/properties/locator"},
+        "classification": {"enum": ["SOURCE_FACT", "EXPERT_ADVICE", "MODEL_INFERENCE"]},
+        "review_status": {"enum": ["UNREVIEWED", "VERIFIED", "REJECTED"]}
+      }
+    },
+    "evidenceStep": {
+      "unevaluatedProperties": false,
+      "allOf": [
+        {"$ref": "#/$defs/baseStep"},
+        {
+          "type": "object",
+          "required": ["evidence_details"],
+          "properties": {
+            "evidence_details": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/evidenceDetail"}}
+          }
+        }
+      ]
+    },
+    "conciseView": {
+      "type": "object", "additionalProperties": false,
+      "required": ["view_id", "description", "steps"],
+      "properties": {
+        "view_id": {"const": "CONCISE"}, "description": {"type": "string", "minLength": 1},
+        "steps": {"type": "array", "minItems": 8, "maxItems": 15, "items": {"$ref": "#/$defs/conciseStep"}}
+      }
+    },
+    "detailedView": {
+      "type": "object", "additionalProperties": false,
+      "required": ["view_id", "description", "steps"],
+      "properties": {
+        "view_id": {"const": "DETAILED"}, "description": {"type": "string", "minLength": 1},
+        "steps": {"type": "array", "minItems": 8, "maxItems": 15, "items": {"$ref": "#/$defs/detailedStep"}}
+      }
+    },
+    "evidenceView": {
+      "type": "object", "additionalProperties": false,
+      "required": ["view_id", "description", "steps"],
+      "properties": {
+        "view_id": {"const": "EVIDENCE"}, "description": {"type": "string", "minLength": 1},
+        "steps": {"type": "array", "minItems": 8, "maxItems": 15, "items": {"$ref": "#/$defs/evidenceStep"}}
+      }
+    }
+  }
+}

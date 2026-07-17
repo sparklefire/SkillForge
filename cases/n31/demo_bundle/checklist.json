@@ -1,14 +1,71 @@
 {
+  "artifact_type": "MOBILE_CHECKLIST",
   "case_id": "n31_media_change",
+  "completion_log": [],
+  "feedback_log": [],
+  "interaction_mode": "ONE_STEP_PER_SCREEN",
   "items": [
     {
+      "action": "确认设备为汉印 N31，并核对本批折叠热敏标签纸的类型和宽度属于设备支持范围。",
       "check": "设备型号正确，介质为折叠热敏标签纸，纸宽处于手册支持范围。",
       "completed": false,
+      "evidence_details": [
+        {
+          "claim": "N31 用户手册 2 产品规格 项目 直接热敏 203 / (8 / ) 4打印宽度毫米默认 ，最高 25 - 毫米 32 位RISC RA >=2MB >= MB 传感器 ,缺纸侦测 缝标侦测 ,黑标侦测 ,开盖侦测 折叠纸宽度毫米 ,模切或连80 厚度英寸 0 ) 0.00 英寸 22 微米 纸卷直径 卷芯内径英寸 毫米 英寸 毫米 外挂纸卷5 (127 ) TSPL 标签设计驱动,indows000,Win7,8,10 中文英文：GBK：ASCII ts,12×24dots 7",
+          "classification": "SOURCE_FACT",
+          "evidence_id": "E096",
+          "locator": {
+            "page": 12,
+            "paragraph": "页面全文候选"
+          },
+          "review_status": "UNREVIEWED",
+          "source_ref": "N31_MANUAL_REV1_0",
+          "source_type": "pdf"
+        },
+        {
+          "claim": "CONTINUOUS_OPERATION 关键帧候选；等待授权后的视觉理解或人工确认动作、部件和设备状态。",
+          "classification": "MODEL_INFERENCE",
+          "evidence_id": "E001",
+          "locator": {
+            "end_ms": 5000,
+            "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000001.jpg",
+            "start_ms": 0
+          },
+          "review_status": "UNREVIEWED",
+          "source_ref": "N31_VIDEO_OPERATION_FULL",
+          "source_type": "video"
+        },
+        {
+          "claim": "本批介质为72×130毫米折叠式热敏标签纸，相邻标签有缝隙，背面没有周期性黑标，应使用缝标定位。",
+          "classification": "EXPERT_ADVICE",
+          "evidence_id": "E144",
+          "locator": {
+            "end_ms": 68720,
+            "start_ms": 40720
+          },
+          "review_status": "VERIFIED",
+          "source_ref": "N31_EXPERT_INTERVIEW",
+          "source_type": "audio"
+        }
+      ],
       "evidence_ids": [
         "E096",
         "E001",
         "E144"
       ],
+      "item_id": "CL01",
+      "keyframe": {
+        "end_ms": 5000,
+        "evidence_id": "E001",
+        "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000001.jpg",
+        "source_ref": "N31_VIDEO_OPERATION_FULL",
+        "start_ms": 0,
+        "visual_status": "PARTIAL"
+      },
+      "reason": "完成本步后应确认：设备型号正确，介质为折叠热敏标签纸，纸宽处于手册支持范围。",
+      "required": true,
+      "risk_level": "WARNING",
+      "screen_index": 1,
       "step_id": "S01",
       "title": "核对设备和介质适配性",
       "warnings": [
@@ -16,8 +73,72 @@
       ]
     },
     {
+      "action": "查看相邻标签间隙和介质背面，确认存在标签缝隙且没有周期性黑标，将本批介质判定为缝标定位。",
       "check": "能够指出标签间隙，背面未见周期性黑标，并将后续学习模式确定为缝标。",
       "completed": false,
+      "evidence_details": [
+        {
+          "claim": "N31 用户手册 2 产品规格 项目 直接热敏 203 / (8 / ) 4打印宽度毫米默认 ，最高 25 - 毫米 32 位RISC RA >=2MB >= MB 传感器 ,缺纸侦测 缝标侦测 ,黑标侦测 ,开盖侦测 折叠纸宽度毫米 ,模切或连80 厚度英寸 0 ) 0.00 英寸 22 微米 纸卷直径 卷芯内径英寸 毫米 英寸 毫米 外挂纸卷5 (127 ) TSPL 标签设计驱动,indows000,Win7,8,10 中文英文：GBK：ASCII ts,12×24dots 7",
+          "classification": "SOURCE_FACT",
+          "evidence_id": "E096",
+          "locator": {
+            "page": 12,
+            "paragraph": "页面全文候选"
+          },
+          "review_status": "UNREVIEWED",
+          "source_ref": "N31_MANUAL_REV1_0",
+          "source_type": "pdf"
+        },
+        {
+          "claim": "MEDIA_REVERSE_AND_GAP 关键帧候选；等待授权后的视觉理解或人工确认动作、部件和设备状态。",
+          "classification": "MODEL_INFERENCE",
+          "evidence_id": "E066",
+          "locator": {
+            "end_ms": 5000,
+            "keyframe": "derived/video/N31_VIDEO_MEDIA_TYPE/frames/frame_000001.jpg",
+            "start_ms": 0
+          },
+          "review_status": "UNREVIEWED",
+          "source_ref": "N31_VIDEO_MEDIA_TYPE",
+          "source_type": "video"
+        },
+        {
+          "claim": "本批介质为72×130毫米折叠式热敏标签纸，相邻标签有缝隙，背面没有周期性黑标，应使用缝标定位。",
+          "classification": "EXPERT_ADVICE",
+          "evidence_id": "E144",
+          "locator": {
+            "end_ms": 68720,
+            "start_ms": 40720
+          },
+          "review_status": "VERIFIED",
+          "source_ref": "N31_EXPERT_INTERVIEW",
+          "source_type": "audio"
+        },
+        {
+          "claim": "本批纸使用缝标学习；按住走纸键，在状态灯第二次闪烁后立即释放，不等待黑标学习对应的后续灯态。",
+          "classification": "EXPERT_ADVICE",
+          "evidence_id": "E149",
+          "locator": {
+            "end_ms": 227680,
+            "start_ms": 195680
+          },
+          "review_status": "VERIFIED",
+          "source_ref": "N31_EXPERT_INTERVIEW",
+          "source_type": "audio"
+        },
+        {
+          "claim": "新手常漏掉介质定位方式判断、内外导纸夹调整，以及装纸后的学习、单张走纸和测试打印。",
+          "classification": "EXPERT_ADVICE",
+          "evidence_id": "E153",
+          "locator": {
+            "end_ms": 357600,
+            "start_ms": 331760
+          },
+          "review_status": "VERIFIED",
+          "source_ref": "N31_EXPERT_INTERVIEW",
+          "source_type": "audio"
+        }
+      ],
       "evidence_ids": [
         "E096",
         "E066",
@@ -25,6 +146,19 @@
         "E149",
         "E153"
       ],
+      "item_id": "CL02",
+      "keyframe": {
+        "end_ms": 5000,
+        "evidence_id": "E066",
+        "keyframe": "derived/video/N31_VIDEO_MEDIA_TYPE/frames/frame_000001.jpg",
+        "source_ref": "N31_VIDEO_MEDIA_TYPE",
+        "start_ms": 0,
+        "visual_status": "PARTIAL"
+      },
+      "reason": "完成本步后应确认：能够指出标签间隙，背面未见周期性黑标，并将后续学习模式确定为缝标。",
+      "required": true,
+      "risk_level": "WARNING",
+      "screen_index": 2,
       "step_id": "S02",
       "title": "判断缝标定位方式",
       "warnings": [
@@ -32,8 +166,72 @@
       ]
     },
     {
+      "action": "确认电源开关处于关闭状态，进纸通道没有残纸、卡纸或异物，标签纸平整且没有明显褶皱。",
       "check": "设备未通电，纸路清洁无阻塞，待装标签纸平整。",
       "completed": false,
+      "evidence_details": [
+        {
+          "claim": "CONTINUOUS_OPERATION 关键帧候选；等待授权后的视觉理解或人工确认动作、部件和设备状态。",
+          "classification": "MODEL_INFERENCE",
+          "evidence_id": "E009",
+          "locator": {
+            "end_ms": 45000,
+            "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000009.jpg",
+            "start_ms": 40000
+          },
+          "review_status": "UNREVIEWED",
+          "source_ref": "N31_VIDEO_OPERATION_FULL",
+          "source_type": "video"
+        },
+        {
+          "claim": "N31 用户手册 .面向机器正面，双手同时向前拨动顶盖开启钮。 向上掀起顶盖。 将卡住的纸张从进纸通道抽出后，请 褶皱的纸丢弃。 10",
+          "classification": "SOURCE_FACT",
+          "evidence_id": "E099",
+          "locator": {
+            "page": 15,
+            "paragraph": "页面全文候选"
+          },
+          "review_status": "UNREVIEWED",
+          "source_ref": "N31_MANUAL_REV1_0",
+          "source_type": "pdf"
+        },
+        {
+          "claim": "换纸前应确认任务完成或暂停、设备无异常、旧纸正常退出、纸路无残纸卡纸异物且新纸平整；卡纸转异常流程，不强拉。",
+          "classification": "EXPERT_ADVICE",
+          "evidence_id": "E145",
+          "locator": {
+            "end_ms": 99600,
+            "start_ms": 68720
+          },
+          "review_status": "VERIFIED",
+          "source_ref": "N31_EXPERT_INTERVIEW",
+          "source_type": "audio"
+        },
+        {
+          "claim": "异常时先停打，再依次检查装反、歪斜、褶皱和送纸位置，检查内外导轨，核对缝标/黑标及学习模式，重做学习和单张走纸，再查尺寸缩放与驱动。",
+          "classification": "EXPERT_ADVICE",
+          "evidence_id": "E151",
+          "locator": {
+            "end_ms": 300400,
+            "start_ms": 260400
+          },
+          "review_status": "VERIFIED",
+          "source_ref": "N31_EXPERT_INTERVIEW",
+          "source_type": "audio"
+        },
+        {
+          "claim": "不得在进纸或打印时强推强拉扭纸，不送入褶皱破损纸，不把缝标纸按黑标学习，不让导纸夹挤压纸边，不暴力处理卡纸或用硬物刮擦胶辊、传感器和热敏区。",
+          "classification": "EXPERT_ADVICE",
+          "evidence_id": "E152",
+          "locator": {
+            "end_ms": 331760,
+            "start_ms": 300400
+          },
+          "review_status": "VERIFIED",
+          "source_ref": "N31_EXPERT_INTERVIEW",
+          "source_type": "audio"
+        }
+      ],
       "evidence_ids": [
         "E009",
         "E099",
@@ -41,6 +239,19 @@
         "E151",
         "E152"
       ],
+      "item_id": "CL03",
+      "keyframe": {
+        "end_ms": 40000,
+        "evidence_id": "E008",
+        "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000008.jpg",
+        "source_ref": "N31_VIDEO_OPERATION_FULL",
+        "start_ms": 35000,
+        "visual_status": "PARTIAL"
+      },
+      "reason": "完成本步后应确认：设备未通电，纸路清洁无阻塞，待装标签纸平整。",
+      "required": true,
+      "risk_level": "WARNING",
+      "screen_index": 3,
       "step_id": "S03",
       "title": "检查初始状态",
       "warnings": [
@@ -48,12 +259,53 @@
       ]
     },
     {
+      "action": "在电源开关关闭时连接电源线，再打开电源开关并观察状态灯和设备声音。",
       "check": "电源连接牢固，设备完成启动，状态灯没有异常报警。",
       "completed": false,
+      "evidence_details": [
+        {
+          "claim": "CONTINUOUS_OPERATION 关键帧候选；等待授权后的视觉理解或人工确认动作、部件和设备状态。",
+          "classification": "MODEL_INFERENCE",
+          "evidence_id": "E014",
+          "locator": {
+            "end_ms": 70000,
+            "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000014.jpg",
+            "start_ms": 65000
+          },
+          "review_status": "UNREVIEWED",
+          "source_ref": "N31_VIDEO_OPERATION_FULL",
+          "source_type": "video"
+        },
+        {
+          "claim": "安装介质 处理卡纸 1.面对机器背面，双手同时按住进纸导轨，依据纸张大小，左右调节导轨间距。 3.将卡住的纸张从进纸通道抽出后，将褶皱 4.将卡住的纸抽出后即可进行正常的介 的纸丢弃。 质安装。 2.将标签纸插入进纸导轨， 纸张则会自动吸入。 保修条款 一、本产品热写头片保证寿命为30KM或3个月（以先到为准），如打印头 出现创伤、刮伤、烧毁、腐蚀等不可抗力因素不在保修范围内，其余 部件保修时间为自购买之日起12个月。 充电/开机使用 二、存在以下情况之一者，不属于保修范围之内： 1.确认打印机电源开关处于关闭（O）状态。 1、未经我公司及授权维修人员许可，擅自对产品进行拆卸，或产品序 2.将电源线连接到打印机。 列号标贴被撕去及模糊不清，无法辨认； 3.将电源线另一端连接到附近的插座。 2、由于固体颗粒刮伤热敏头片，引起的打印白线，则头片不属于保修 范围； ！ 注意：请确保标签纸送到位，标签纸将自动从出纸口送出一小段。 3、其他人为引起的故障。 三、保修期内，维修时所更换的产品零配件归我公司所有； 处理卡纸2.手动向上掀起顶盖。 1.面向机器正面，双手同时向前拨动顶 四、用户负责将产",
+          "classification": "SOURCE_FACT",
+          "evidence_id": "E142",
+          "locator": {
+            "page": 2,
+            "paragraph": "页面全文候选"
+          },
+          "review_status": "UNREVIEWED",
+          "source_ref": "N31_QUICK_GUIDE_REV1_5",
+          "source_type": "pdf"
+        }
+      ],
       "evidence_ids": [
         "E014",
         "E142"
       ],
+      "item_id": "CL04",
+      "keyframe": {
+        "end_ms": 65000,
+        "evidence_id": "E013",
+        "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000013.jpg",
+        "source_ref": "N31_VIDEO_OPERATION_FULL",
+        "start_ms": 60000,
+        "visual_status": "NOT_VISIBLE"
+      },
+      "reason": "完成本步后应确认：电源连接牢固，设备完成启动，状态灯没有异常报警。",
+      "required": true,
+      "risk_level": "WARNING",
+      "screen_index": 4,
       "step_id": "S04",
       "title": "连接电源并开机",
       "warnings": [
@@ -61,14 +313,79 @@
       ]
     },
     {
+      "action": "双手操作顶盖两侧开启位置，缓慢打开顶盖，检查内部纸路、胶辊和导纸夹没有异物、残纸或明显损伤。",
       "check": "顶盖完全打开，内部纸路无遮挡且未见残纸或异物。",
       "completed": false,
+      "evidence_details": [
+        {
+          "claim": "CONTINUOUS_OPERATION 关键帧候选；等待授权后的视觉理解或人工确认动作、部件和设备状态。",
+          "classification": "MODEL_INFERENCE",
+          "evidence_id": "E018",
+          "locator": {
+            "end_ms": 90000,
+            "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000018.jpg",
+            "start_ms": 85000
+          },
+          "review_status": "UNREVIEWED",
+          "source_ref": "N31_VIDEO_OPERATION_FULL",
+          "source_type": "video"
+        },
+        {
+          "claim": "开箱清单 打印机 适配器电源线 安装指南 关注汉印公众号 在线微信客服 获取产品介绍 （保修/售后/技术支持） USB数据线 快速安装指南 ！ 注意：箱内实际内容以出货清单为准。 N31 产品保修卡 外观及组件 前视 走纸键 后视 尊敬的用户： 外置纸卷进纸口 （状态指示灯） 为了保障您的权益以及为您提供更优质的售后服务，请您在 顶盖 购买产品时仔细填写并保留此卡，进行保修服务时请与购买发 票一同出示！ 用户名称： 电源开关 联系地址： 省 市 区（县） 顶盖开启钮 电源接口 USB接口 联系电话： 內视 经销商名称（盖章）：产品型号（序列号）: 联系地址： 打印支架组 联系电话： 警告： 在居住环境中，运行此设备可能会造成无线电干扰。 可移动式导纸夹 顶盖支架锁 购买日期： 年 月 胶辊 固定式标签侦测器 驱动、配置工具等相关软件和手册下载地址：http://cn.hprt.com/XiaZai/N31 ！ 注意：接口因客户选择而异，上图所示接口仅供参考。 版本：1.5 -1- -2-",
+          "classification": "SOURCE_FACT",
+          "evidence_id": "E141",
+          "locator": {
+            "page": 1,
+            "paragraph": "页面全文候选"
+          },
+          "review_status": "UNREVIEWED",
+          "source_ref": "N31_QUICK_GUIDE_REV1_5",
+          "source_type": "pdf"
+        },
+        {
+          "claim": "换纸前应确认任务完成或暂停、设备无异常、旧纸正常退出、纸路无残纸卡纸异物且新纸平整；卡纸转异常流程，不强拉。",
+          "classification": "EXPERT_ADVICE",
+          "evidence_id": "E145",
+          "locator": {
+            "end_ms": 99600,
+            "start_ms": 68720
+          },
+          "review_status": "VERIFIED",
+          "source_ref": "N31_EXPERT_INTERVIEW",
+          "source_type": "audio"
+        },
+        {
+          "claim": "不得在进纸或打印时强推强拉扭纸，不送入褶皱破损纸，不把缝标纸按黑标学习，不让导纸夹挤压纸边，不暴力处理卡纸或用硬物刮擦胶辊、传感器和热敏区。",
+          "classification": "EXPERT_ADVICE",
+          "evidence_id": "E152",
+          "locator": {
+            "end_ms": 331760,
+            "start_ms": 300400
+          },
+          "review_status": "VERIFIED",
+          "source_ref": "N31_EXPERT_INTERVIEW",
+          "source_type": "audio"
+        }
+      ],
       "evidence_ids": [
         "E018",
         "E141",
         "E145",
         "E152"
       ],
+      "item_id": "CL05",
+      "keyframe": {
+        "end_ms": 85000,
+        "evidence_id": "E017",
+        "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000017.jpg",
+        "source_ref": "N31_VIDEO_OPERATION_FULL",
+        "start_ms": 80000,
+        "visual_status": "PARTIAL"
+      },
+      "reason": "完成本步后应确认：顶盖完全打开，内部纸路无遮挡且未见残纸或异物。",
+      "required": false,
+      "risk_level": "WARNING",
+      "screen_index": 5,
       "step_id": "S05",
       "title": "打开顶盖并检查内部纸路",
       "warnings": [
@@ -76,8 +393,97 @@
       ]
     },
     {
+      "action": "双手对称移动左右内部导纸夹，使标签纸能够居中、平直通过且不被明显挤压。",
       "check": "左右导纸夹位置对称，纸张可居中通过且没有明显夹紧或大幅晃动。",
       "completed": false,
+      "evidence_details": [
+        {
+          "claim": "CONTINUOUS_OPERATION 关键帧候选；等待授权后的视觉理解或人工确认动作、部件和设备状态。",
+          "classification": "MODEL_INFERENCE",
+          "evidence_id": "E023",
+          "locator": {
+            "end_ms": 115000,
+            "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000023.jpg",
+            "start_ms": 110000
+          },
+          "review_status": "UNREVIEWED",
+          "source_ref": "N31_VIDEO_OPERATION_FULL",
+          "source_type": "video"
+        },
+        {
+          "claim": "PAPER_GUIDE_ADJUSTMENT 关键帧候选；等待授权后的视觉理解或人工确认动作、部件和设备状态。",
+          "classification": "MODEL_INFERENCE",
+          "evidence_id": "E069",
+          "locator": {
+            "end_ms": 5000,
+            "keyframe": "derived/video/N31_VIDEO_GUIDES/frames/frame_000001.jpg",
+            "start_ms": 0
+          },
+          "review_status": "UNREVIEWED",
+          "source_ref": "N31_VIDEO_GUIDES",
+          "source_type": "video"
+        },
+        {
+          "claim": "开箱清单 打印机 适配器电源线 安装指南 关注汉印公众号 在线微信客服 获取产品介绍 （保修/售后/技术支持） USB数据线 快速安装指南 ！ 注意：箱内实际内容以出货清单为准。 N31 产品保修卡 外观及组件 前视 走纸键 后视 尊敬的用户： 外置纸卷进纸口 （状态指示灯） 为了保障您的权益以及为您提供更优质的售后服务，请您在 顶盖 购买产品时仔细填写并保留此卡，进行保修服务时请与购买发 票一同出示！ 用户名称： 电源开关 联系地址： 省 市 区（县） 顶盖开启钮 电源接口 USB接口 联系电话： 內视 经销商名称（盖章）：产品型号（序列号）: 联系地址： 打印支架组 联系电话： 警告： 在居住环境中，运行此设备可能会造成无线电干扰。 可移动式导纸夹 顶盖支架锁 购买日期： 年 月 胶辊 固定式标签侦测器 驱动、配置工具等相关软件和手册下载地址：http://cn.hprt.com/XiaZai/N31 ！ 注意：接口因客户选择而异，上图所示接口仅供参考。 版本：1.5 -1- -2-",
+          "classification": "SOURCE_FACT",
+          "evidence_id": "E141",
+          "locator": {
+            "page": 1,
+            "paragraph": "页面全文候选"
+          },
+          "review_status": "UNREVIEWED",
+          "source_ref": "N31_QUICK_GUIDE_REV1_5",
+          "source_type": "pdf"
+        },
+        {
+          "claim": "左右导纸夹应对称、靠近纸边但不明显挤压，纸张能顺畅移动且没有大幅左右晃动；过紧可能卡纸，过松可能偏斜。",
+          "classification": "EXPERT_ADVICE",
+          "evidence_id": "E146",
+          "locator": {
+            "end_ms": 129920,
+            "start_ms": 99600
+          },
+          "review_status": "VERIFIED",
+          "source_ref": "N31_EXPERT_INTERVIEW",
+          "source_type": "audio"
+        },
+        {
+          "claim": "异常时先停打，再依次检查装反、歪斜、褶皱和送纸位置，检查内外导轨，核对缝标/黑标及学习模式，重做学习和单张走纸，再查尺寸缩放与驱动。",
+          "classification": "EXPERT_ADVICE",
+          "evidence_id": "E151",
+          "locator": {
+            "end_ms": 300400,
+            "start_ms": 260400
+          },
+          "review_status": "VERIFIED",
+          "source_ref": "N31_EXPERT_INTERVIEW",
+          "source_type": "audio"
+        },
+        {
+          "claim": "不得在进纸或打印时强推强拉扭纸，不送入褶皱破损纸，不把缝标纸按黑标学习，不让导纸夹挤压纸边，不暴力处理卡纸或用硬物刮擦胶辊、传感器和热敏区。",
+          "classification": "EXPERT_ADVICE",
+          "evidence_id": "E152",
+          "locator": {
+            "end_ms": 331760,
+            "start_ms": 300400
+          },
+          "review_status": "VERIFIED",
+          "source_ref": "N31_EXPERT_INTERVIEW",
+          "source_type": "audio"
+        },
+        {
+          "claim": "新手常漏掉介质定位方式判断、内外导纸夹调整，以及装纸后的学习、单张走纸和测试打印。",
+          "classification": "EXPERT_ADVICE",
+          "evidence_id": "E153",
+          "locator": {
+            "end_ms": 357600,
+            "start_ms": 331760
+          },
+          "review_status": "VERIFIED",
+          "source_ref": "N31_EXPERT_INTERVIEW",
+          "source_type": "audio"
+        }
+      ],
       "evidence_ids": [
         "E023",
         "E069",
@@ -87,6 +493,19 @@
         "E152",
         "E153"
       ],
+      "item_id": "CL06",
+      "keyframe": {
+        "end_ms": 110000,
+        "evidence_id": "E022",
+        "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000022.jpg",
+        "source_ref": "N31_VIDEO_OPERATION_FULL",
+        "start_ms": 105000,
+        "visual_status": "PARTIAL"
+      },
+      "reason": "完成本步后应确认：左右导纸夹位置对称，纸张可居中通过且没有明显夹紧或大幅晃动。",
+      "required": false,
+      "risk_level": "WARNING",
+      "screen_index": 6,
       "step_id": "S06",
       "title": "调节内部导纸夹",
       "warnings": [
@@ -94,8 +513,85 @@
       ]
     },
     {
+      "action": "确认内部纸路正常后关闭顶盖，再从机器背面双手调节左右进纸导轨，使其与标签纸宽度匹配。",
       "check": "顶盖闭合到位，后方左右导轨与纸宽匹配且纸张可以平直进入。",
       "completed": false,
+      "evidence_details": [
+        {
+          "claim": "CONTINUOUS_OPERATION 关键帧候选；等待授权后的视觉理解或人工确认动作、部件和设备状态。",
+          "classification": "MODEL_INFERENCE",
+          "evidence_id": "E029",
+          "locator": {
+            "end_ms": 145000,
+            "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000029.jpg",
+            "start_ms": 140000
+          },
+          "review_status": "UNREVIEWED",
+          "source_ref": "N31_VIDEO_OPERATION_FULL",
+          "source_type": "video"
+        },
+        {
+          "claim": "N31 用户手册 3 安装和使用 3.1 处理 面对机器背面， 依据纸张大小，左右调节导轨间距。 将标签纸插入进纸导轨。 1.请确保标签纸送到位，标签纸将自动从出纸口送2. 9",
+          "classification": "SOURCE_FACT",
+          "evidence_id": "E098",
+          "locator": {
+            "page": 14,
+            "paragraph": "页面全文候选"
+          },
+          "review_status": "UNREVIEWED",
+          "source_ref": "N31_MANUAL_REV1_0",
+          "source_type": "pdf"
+        },
+        {
+          "claim": "PAPER_GUIDE_ADJUSTMENT 关键帧候选；等待授权后的视觉理解或人工确认动作、部件和设备状态。",
+          "classification": "MODEL_INFERENCE",
+          "evidence_id": "E074",
+          "locator": {
+            "end_ms": 30000,
+            "keyframe": "derived/video/N31_VIDEO_GUIDES/frames/frame_000006.jpg",
+            "start_ms": 25000
+          },
+          "review_status": "UNREVIEWED",
+          "source_ref": "N31_VIDEO_GUIDES",
+          "source_type": "video"
+        },
+        {
+          "claim": "左右导纸夹应对称、靠近纸边但不明显挤压，纸张能顺畅移动且没有大幅左右晃动；过紧可能卡纸，过松可能偏斜。",
+          "classification": "EXPERT_ADVICE",
+          "evidence_id": "E146",
+          "locator": {
+            "end_ms": 129920,
+            "start_ms": 99600
+          },
+          "review_status": "VERIFIED",
+          "source_ref": "N31_EXPERT_INTERVIEW",
+          "source_type": "audio"
+        },
+        {
+          "claim": "异常时先停打，再依次检查装反、歪斜、褶皱和送纸位置，检查内外导轨，核对缝标/黑标及学习模式，重做学习和单张走纸，再查尺寸缩放与驱动。",
+          "classification": "EXPERT_ADVICE",
+          "evidence_id": "E151",
+          "locator": {
+            "end_ms": 300400,
+            "start_ms": 260400
+          },
+          "review_status": "VERIFIED",
+          "source_ref": "N31_EXPERT_INTERVIEW",
+          "source_type": "audio"
+        },
+        {
+          "claim": "新手常漏掉介质定位方式判断、内外导纸夹调整，以及装纸后的学习、单张走纸和测试打印。",
+          "classification": "EXPERT_ADVICE",
+          "evidence_id": "E153",
+          "locator": {
+            "end_ms": 357600,
+            "start_ms": 331760
+          },
+          "review_status": "VERIFIED",
+          "source_ref": "N31_EXPERT_INTERVIEW",
+          "source_type": "audio"
+        }
+      ],
       "evidence_ids": [
         "E029",
         "E098",
@@ -104,6 +600,19 @@
         "E151",
         "E153"
       ],
+      "item_id": "CL07",
+      "keyframe": {
+        "end_ms": 140000,
+        "evidence_id": "E028",
+        "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000028.jpg",
+        "source_ref": "N31_VIDEO_OPERATION_FULL",
+        "start_ms": 135000,
+        "visual_status": "PARTIAL"
+      },
+      "reason": "完成本步后应确认：顶盖闭合到位，后方左右导轨与纸宽匹配且纸张可以平直进入。",
+      "required": true,
+      "risk_level": "WARNING",
+      "screen_index": 7,
       "step_id": "S07",
       "title": "关闭顶盖并调节后方进纸导轨",
       "warnings": [
@@ -111,8 +620,97 @@
       ]
     },
     {
+      "action": "从机器背面沿导轨平直插入标签纸，机器开始自动吸纸后松手，并观察出纸口是否送出一小段。",
       "check": "标签纸被自动吸入，并从前方出纸口正常送出一小段。",
       "completed": false,
+      "evidence_details": [
+        {
+          "claim": "CONTINUOUS_OPERATION 关键帧候选；等待授权后的视觉理解或人工确认动作、部件和设备状态。",
+          "classification": "MODEL_INFERENCE",
+          "evidence_id": "E034",
+          "locator": {
+            "end_ms": 170000,
+            "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000034.jpg",
+            "start_ms": 165000
+          },
+          "review_status": "UNREVIEWED",
+          "source_ref": "N31_VIDEO_OPERATION_FULL",
+          "source_type": "video"
+        },
+        {
+          "claim": "MEDIA_FEED 关键帧候选；等待授权后的视觉理解或人工确认动作、部件和设备状态。",
+          "classification": "MODEL_INFERENCE",
+          "evidence_id": "E079",
+          "locator": {
+            "end_ms": 5000,
+            "keyframe": "derived/video/N31_VIDEO_MEDIA_FEED/frames/frame_000001.jpg",
+            "start_ms": 0
+          },
+          "review_status": "UNREVIEWED",
+          "source_ref": "N31_VIDEO_MEDIA_FEED",
+          "source_type": "video"
+        },
+        {
+          "claim": "N31 用户手册 3 安装和使用 3.1 处理 面对机器背面， 依据纸张大小，左右调节导轨间距。 将标签纸插入进纸导轨。 1.请确保标签纸送到位，标签纸将自动从出纸口送2. 9",
+          "classification": "SOURCE_FACT",
+          "evidence_id": "E098",
+          "locator": {
+            "page": 14,
+            "paragraph": "页面全文候选"
+          },
+          "review_status": "UNREVIEWED",
+          "source_ref": "N31_MANUAL_REV1_0",
+          "source_type": "pdf"
+        },
+        {
+          "claim": "安装介质 处理卡纸 1.面对机器背面，双手同时按住进纸导轨，依据纸张大小，左右调节导轨间距。 3.将卡住的纸张从进纸通道抽出后，将褶皱 4.将卡住的纸抽出后即可进行正常的介 的纸丢弃。 质安装。 2.将标签纸插入进纸导轨， 纸张则会自动吸入。 保修条款 一、本产品热写头片保证寿命为30KM或3个月（以先到为准），如打印头 出现创伤、刮伤、烧毁、腐蚀等不可抗力因素不在保修范围内，其余 部件保修时间为自购买之日起12个月。 充电/开机使用 二、存在以下情况之一者，不属于保修范围之内： 1.确认打印机电源开关处于关闭（O）状态。 1、未经我公司及授权维修人员许可，擅自对产品进行拆卸，或产品序 2.将电源线连接到打印机。 列号标贴被撕去及模糊不清，无法辨认； 3.将电源线另一端连接到附近的插座。 2、由于固体颗粒刮伤热敏头片，引起的打印白线，则头片不属于保修 范围； ！ 注意：请确保标签纸送到位，标签纸将自动从出纸口送出一小段。 3、其他人为引起的故障。 三、保修期内，维修时所更换的产品零配件归我公司所有； 处理卡纸2.手动向上掀起顶盖。 1.面向机器正面，双手同时向前拨动顶 四、用户负责将产",
+          "classification": "SOURCE_FACT",
+          "evidence_id": "E142",
+          "locator": {
+            "page": 2,
+            "paragraph": "页面全文候选"
+          },
+          "review_status": "UNREVIEWED",
+          "source_ref": "N31_QUICK_GUIDE_REV1_5",
+          "source_type": "pdf"
+        },
+        {
+          "claim": "纸张沿后方导轨平直插入，自动吸纸后松手；前方正常送出一小段、纸边平直且无报警即为送到位。",
+          "classification": "EXPERT_ADVICE",
+          "evidence_id": "E147",
+          "locator": {
+            "end_ms": 153840,
+            "start_ms": 129920
+          },
+          "review_status": "VERIFIED",
+          "source_ref": "N31_EXPERT_INTERVIEW",
+          "source_type": "audio"
+        },
+        {
+          "claim": "异常时先停打，再依次检查装反、歪斜、褶皱和送纸位置，检查内外导轨，核对缝标/黑标及学习模式，重做学习和单张走纸，再查尺寸缩放与驱动。",
+          "classification": "EXPERT_ADVICE",
+          "evidence_id": "E151",
+          "locator": {
+            "end_ms": 300400,
+            "start_ms": 260400
+          },
+          "review_status": "VERIFIED",
+          "source_ref": "N31_EXPERT_INTERVIEW",
+          "source_type": "audio"
+        },
+        {
+          "claim": "不得在进纸或打印时强推强拉扭纸，不送入褶皱破损纸，不把缝标纸按黑标学习，不让导纸夹挤压纸边，不暴力处理卡纸或用硬物刮擦胶辊、传感器和热敏区。",
+          "classification": "EXPERT_ADVICE",
+          "evidence_id": "E152",
+          "locator": {
+            "end_ms": 331760,
+            "start_ms": 300400
+          },
+          "review_status": "VERIFIED",
+          "source_ref": "N31_EXPERT_INTERVIEW",
+          "source_type": "audio"
+        }
+      ],
       "evidence_ids": [
         "E034",
         "E079",
@@ -122,6 +720,19 @@
         "E151",
         "E152"
       ],
+      "item_id": "CL08",
+      "keyframe": {
+        "end_ms": 165000,
+        "evidence_id": "E033",
+        "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000033.jpg",
+        "source_ref": "N31_VIDEO_OPERATION_FULL",
+        "start_ms": 160000,
+        "visual_status": "PARTIAL"
+      },
+      "reason": "完成本步后应确认：标签纸被自动吸入，并从前方出纸口正常送出一小段。",
+      "required": true,
+      "risk_level": "WARNING",
+      "screen_index": 8,
       "step_id": "S08",
       "title": "插入标签纸并确认自动吸纸",
       "warnings": [
@@ -129,8 +740,97 @@
       ]
     },
     {
+      "action": "按住走纸键，观察状态灯，在第二次闪烁后立即释放，使打印机执行缝标模式标签学习。",
       "check": "第二次闪灯后已经释放走纸键，设备完成一轮介质学习且没有异常报警。",
       "completed": false,
+      "evidence_details": [
+        {
+          "claim": "CONTINUOUS_OPERATION 关键帧候选；等待授权后的视觉理解或人工确认动作、部件和设备状态。",
+          "classification": "MODEL_INFERENCE",
+          "evidence_id": "E039",
+          "locator": {
+            "end_ms": 195000,
+            "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000039.jpg",
+            "start_ms": 190000
+          },
+          "review_status": "UNREVIEWED",
+          "source_ref": "N31_VIDEO_OPERATION_FULL",
+          "source_type": "video"
+        },
+        {
+          "claim": "GAP_LABEL_LEARNING 关键帧候选；等待授权后的视觉理解或人工确认动作、部件和设备状态。",
+          "classification": "MODEL_INFERENCE",
+          "evidence_id": "E077",
+          "locator": {
+            "end_ms": 5000,
+            "keyframe": "derived/video/N31_VIDEO_LEARNING/frames/frame_000001.jpg",
+            "start_ms": 0
+          },
+          "review_status": "UNREVIEWED",
+          "source_ref": "N31_VIDEO_LEARNING",
+          "source_type": "video"
+        },
+        {
+          "claim": "N31 用户手册 . 走纸键： ■开机状态 下： ）短按走纸键 （约 .5s ），放开走纸键 ； ）按住 （约 .5s ），直到蓝灯或橙 灯闪烁 一次，放开走纸键 ； ）按住走纸键 （约 s ），直到蓝灯或橙 灯闪烁两次，放开走纸键后打印机会进行缝标模式标签学习 ）按住走纸键 （约 .5s ），直到蓝灯或橙灯 ，放开走纸键 打印机进行黑标模式标签学 。 ■打印机 状态下 走纸键 （约 .5s ），放开走纸键后打印机会暂停打印 打印机暂停状态下短按走纸键（约 .5s ），放开 继续 。 15",
+          "classification": "SOURCE_FACT",
+          "evidence_id": "E104",
+          "locator": {
+            "page": 20,
+            "paragraph": "页面全文候选"
+          },
+          "review_status": "UNREVIEWED",
+          "source_ref": "N31_MANUAL_REV1_0",
+          "source_type": "pdf"
+        },
+        {
+          "claim": "介质规格或定位方式改变，或出现停止位置错误、连续跳纸、识别失败时应重新学习；本次完整培训执行一次缝标学习，同规格补纸可按现场规则决定。",
+          "classification": "EXPERT_ADVICE",
+          "evidence_id": "E148",
+          "locator": {
+            "end_ms": 195680,
+            "start_ms": 153840
+          },
+          "review_status": "VERIFIED",
+          "source_ref": "N31_EXPERT_INTERVIEW",
+          "source_type": "audio"
+        },
+        {
+          "claim": "本批纸使用缝标学习；按住走纸键，在状态灯第二次闪烁后立即释放，不等待黑标学习对应的后续灯态。",
+          "classification": "EXPERT_ADVICE",
+          "evidence_id": "E149",
+          "locator": {
+            "end_ms": 227680,
+            "start_ms": 195680
+          },
+          "review_status": "VERIFIED",
+          "source_ref": "N31_EXPERT_INTERVIEW",
+          "source_type": "audio"
+        },
+        {
+          "claim": "异常时先停打，再依次检查装反、歪斜、褶皱和送纸位置，检查内外导轨，核对缝标/黑标及学习模式，重做学习和单张走纸，再查尺寸缩放与驱动。",
+          "classification": "EXPERT_ADVICE",
+          "evidence_id": "E151",
+          "locator": {
+            "end_ms": 300400,
+            "start_ms": 260400
+          },
+          "review_status": "VERIFIED",
+          "source_ref": "N31_EXPERT_INTERVIEW",
+          "source_type": "audio"
+        },
+        {
+          "claim": "新手常漏掉介质定位方式判断、内外导纸夹调整，以及装纸后的学习、单张走纸和测试打印。",
+          "classification": "EXPERT_ADVICE",
+          "evidence_id": "E153",
+          "locator": {
+            "end_ms": 357600,
+            "start_ms": 331760
+          },
+          "review_status": "VERIFIED",
+          "source_ref": "N31_EXPERT_INTERVIEW",
+          "source_type": "audio"
+        }
+      ],
       "evidence_ids": [
         "E039",
         "E077",
@@ -140,6 +840,19 @@
         "E151",
         "E153"
       ],
+      "item_id": "CL09",
+      "keyframe": {
+        "end_ms": 190000,
+        "evidence_id": "E038",
+        "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000038.jpg",
+        "source_ref": "N31_VIDEO_OPERATION_FULL",
+        "start_ms": 185000,
+        "visual_status": "PARTIAL"
+      },
+      "reason": "完成本步后应确认：第二次闪灯后已经释放走纸键，设备完成一轮介质学习且没有异常报警。",
+      "required": true,
+      "risk_level": "WARNING",
+      "screen_index": 9,
       "step_id": "S09",
       "title": "执行缝标学习",
       "warnings": [
@@ -147,8 +860,84 @@
       ]
     },
     {
+      "action": "短按走纸键后立即释放，观察设备是否只送出一张标签并停在正确边界。",
       "check": "只送出一张标签，停止位置落在标签边界附近且没有连续跳纸。",
       "completed": false,
+      "evidence_details": [
+        {
+          "claim": "CONTINUOUS_OPERATION 关键帧候选；等待授权后的视觉理解或人工确认动作、部件和设备状态。",
+          "classification": "MODEL_INFERENCE",
+          "evidence_id": "E044",
+          "locator": {
+            "end_ms": 220000,
+            "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000044.jpg",
+            "start_ms": 215000
+          },
+          "review_status": "UNREVIEWED",
+          "source_ref": "N31_VIDEO_OPERATION_FULL",
+          "source_type": "video"
+        },
+        {
+          "claim": "N31 用户手册 . 走纸键： ■开机状态 下： ）短按走纸键 （约 .5s ），放开走纸键 ； ）按住 （约 .5s ），直到蓝灯或橙 灯闪烁 一次，放开走纸键 ； ）按住走纸键 （约 s ），直到蓝灯或橙 灯闪烁两次，放开走纸键后打印机会进行缝标模式标签学习 ）按住走纸键 （约 .5s ），直到蓝灯或橙灯 ，放开走纸键 打印机进行黑标模式标签学 。 ■打印机 状态下 走纸键 （约 .5s ），放开走纸键后打印机会暂停打印 打印机暂停状态下短按走纸键（约 .5s ），放开 继续 。 15",
+          "classification": "SOURCE_FACT",
+          "evidence_id": "E104",
+          "locator": {
+            "page": 20,
+            "paragraph": "页面全文候选"
+          },
+          "review_status": "UNREVIEWED",
+          "source_ref": "N31_MANUAL_REV1_0",
+          "source_type": "pdf"
+        },
+        {
+          "claim": "换纸后最低要求是一次单张走纸和一次实际测试标签打印；自检页用于首次配置、规格变化或异常，同规格换纸可按现场规则决定。",
+          "classification": "EXPERT_ADVICE",
+          "evidence_id": "E150",
+          "locator": {
+            "end_ms": 260400,
+            "start_ms": 227680
+          },
+          "review_status": "VERIFIED",
+          "source_ref": "N31_EXPERT_INTERVIEW",
+          "source_type": "audio"
+        },
+        {
+          "claim": "异常时先停打，再依次检查装反、歪斜、褶皱和送纸位置，检查内外导轨，核对缝标/黑标及学习模式，重做学习和单张走纸，再查尺寸缩放与驱动。",
+          "classification": "EXPERT_ADVICE",
+          "evidence_id": "E151",
+          "locator": {
+            "end_ms": 300400,
+            "start_ms": 260400
+          },
+          "review_status": "VERIFIED",
+          "source_ref": "N31_EXPERT_INTERVIEW",
+          "source_type": "audio"
+        },
+        {
+          "claim": "新手常漏掉介质定位方式判断、内外导纸夹调整，以及装纸后的学习、单张走纸和测试打印。",
+          "classification": "EXPERT_ADVICE",
+          "evidence_id": "E153",
+          "locator": {
+            "end_ms": 357600,
+            "start_ms": 331760
+          },
+          "review_status": "VERIFIED",
+          "source_ref": "N31_EXPERT_INTERVIEW",
+          "source_type": "audio"
+        },
+        {
+          "claim": "成功标准为稳定吸纸，单张走纸只送一张并停在边界附近，测试标签完整且基本居中，无连续跳纸、明显偏斜、卡纸或报警；公开演示不得显示个人信息、编码和唯一编号。",
+          "classification": "EXPERT_ADVICE",
+          "evidence_id": "E154",
+          "locator": {
+            "end_ms": 386400,
+            "start_ms": 357600
+          },
+          "review_status": "VERIFIED",
+          "source_ref": "N31_EXPERT_INTERVIEW",
+          "source_type": "audio"
+        }
+      ],
       "evidence_ids": [
         "E044",
         "E104",
@@ -157,6 +946,19 @@
         "E153",
         "E154"
       ],
+      "item_id": "CL10",
+      "keyframe": {
+        "end_ms": 215000,
+        "evidence_id": "E043",
+        "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000043.jpg",
+        "source_ref": "N31_VIDEO_OPERATION_FULL",
+        "start_ms": 210000,
+        "visual_status": "PARTIAL"
+      },
+      "reason": "完成本步后应确认：只送出一张标签，停止位置落在标签边界附近且没有连续跳纸。",
+      "required": true,
+      "risk_level": "WARNING",
+      "screen_index": 10,
       "step_id": "S10",
       "title": "执行单张走纸检查",
       "warnings": [
@@ -164,14 +966,79 @@
       ]
     },
     {
+      "action": "按住走纸键，在状态灯第一次闪烁后释放，等待自检页完整打印。",
       "check": "自检页完整出纸，设备没有报警或中途停止。",
       "completed": false,
+      "evidence_details": [
+        {
+          "claim": "CONTINUOUS_OPERATION 关键帧候选；等待授权后的视觉理解或人工确认动作、部件和设备状态。",
+          "classification": "MODEL_INFERENCE",
+          "evidence_id": "E048",
+          "locator": {
+            "end_ms": 240000,
+            "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000048.jpg",
+            "start_ms": 235000
+          },
+          "review_status": "UNREVIEWED",
+          "source_ref": "N31_VIDEO_OPERATION_FULL",
+          "source_type": "video"
+        },
+        {
+          "claim": "N31 用户手册 . 走纸键： ■开机状态 下： ）短按走纸键 （约 .5s ），放开走纸键 ； ）按住 （约 .5s ），直到蓝灯或橙 灯闪烁 一次，放开走纸键 ； ）按住走纸键 （约 s ），直到蓝灯或橙 灯闪烁两次，放开走纸键后打印机会进行缝标模式标签学习 ）按住走纸键 （约 .5s ），直到蓝灯或橙灯 ，放开走纸键 打印机进行黑标模式标签学 。 ■打印机 状态下 走纸键 （约 .5s ），放开走纸键后打印机会暂停打印 打印机暂停状态下短按走纸键（约 .5s ），放开 继续 。 15",
+          "classification": "SOURCE_FACT",
+          "evidence_id": "E104",
+          "locator": {
+            "page": 20,
+            "paragraph": "页面全文候选"
+          },
+          "review_status": "UNREVIEWED",
+          "source_ref": "N31_MANUAL_REV1_0",
+          "source_type": "pdf"
+        },
+        {
+          "claim": "换纸后最低要求是一次单张走纸和一次实际测试标签打印；自检页用于首次配置、规格变化或异常，同规格换纸可按现场规则决定。",
+          "classification": "EXPERT_ADVICE",
+          "evidence_id": "E150",
+          "locator": {
+            "end_ms": 260400,
+            "start_ms": 227680
+          },
+          "review_status": "VERIFIED",
+          "source_ref": "N31_EXPERT_INTERVIEW",
+          "source_type": "audio"
+        },
+        {
+          "claim": "不得在进纸或打印时强推强拉扭纸，不送入褶皱破损纸，不把缝标纸按黑标学习，不让导纸夹挤压纸边，不暴力处理卡纸或用硬物刮擦胶辊、传感器和热敏区。",
+          "classification": "EXPERT_ADVICE",
+          "evidence_id": "E152",
+          "locator": {
+            "end_ms": 331760,
+            "start_ms": 300400
+          },
+          "review_status": "VERIFIED",
+          "source_ref": "N31_EXPERT_INTERVIEW",
+          "source_type": "audio"
+        }
+      ],
       "evidence_ids": [
         "E048",
         "E104",
         "E150",
         "E152"
       ],
+      "item_id": "CL11",
+      "keyframe": {
+        "end_ms": 235000,
+        "evidence_id": "E047",
+        "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000047.jpg",
+        "source_ref": "N31_VIDEO_OPERATION_FULL",
+        "start_ms": 230000,
+        "visual_status": "PARTIAL"
+      },
+      "reason": "完成本步后应确认：自检页完整出纸，设备没有报警或中途停止。",
+      "required": false,
+      "risk_level": "WARNING",
+      "screen_index": 11,
       "step_id": "S11",
       "title": "打印自检页",
       "warnings": [
@@ -179,8 +1046,85 @@
       ]
     },
     {
+      "action": "使用已经验证的本地打印设置发送一张测试标签，等待设备自行完成，不在出纸过程中拉纸。",
       "check": "测试标签完整出纸，设备未连续跳纸、卡纸或异常停止。",
       "completed": false,
+      "evidence_details": [
+        {
+          "claim": "CONTINUOUS_OPERATION 关键帧候选；等待授权后的视觉理解或人工确认动作、部件和设备状态。",
+          "classification": "MODEL_INFERENCE",
+          "evidence_id": "E052",
+          "locator": {
+            "end_ms": 260000,
+            "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000052.jpg",
+            "start_ms": 255000
+          },
+          "review_status": "UNREVIEWED",
+          "source_ref": "N31_VIDEO_OPERATION_FULL",
+          "source_type": "video"
+        },
+        {
+          "claim": "PRINT_SUCCESS_CHECK 关键帧候选；等待授权后的视觉理解或人工确认动作、部件和设备状态。",
+          "classification": "MODEL_INFERENCE",
+          "evidence_id": "E082",
+          "locator": {
+            "end_ms": 5000,
+            "keyframe": "derived/video/N31_VIDEO_PRINT_RESULT/frames/frame_000001.jpg",
+            "start_ms": 0
+          },
+          "review_status": "UNREVIEWED",
+          "source_ref": "N31_VIDEO_PRINT_RESULT",
+          "source_type": "video"
+        },
+        {
+          "claim": "换纸后最低要求是一次单张走纸和一次实际测试标签打印；自检页用于首次配置、规格变化或异常，同规格换纸可按现场规则决定。",
+          "classification": "EXPERT_ADVICE",
+          "evidence_id": "E150",
+          "locator": {
+            "end_ms": 260400,
+            "start_ms": 227680
+          },
+          "review_status": "VERIFIED",
+          "source_ref": "N31_EXPERT_INTERVIEW",
+          "source_type": "audio"
+        },
+        {
+          "claim": "不得在进纸或打印时强推强拉扭纸，不送入褶皱破损纸，不把缝标纸按黑标学习，不让导纸夹挤压纸边，不暴力处理卡纸或用硬物刮擦胶辊、传感器和热敏区。",
+          "classification": "EXPERT_ADVICE",
+          "evidence_id": "E152",
+          "locator": {
+            "end_ms": 331760,
+            "start_ms": 300400
+          },
+          "review_status": "VERIFIED",
+          "source_ref": "N31_EXPERT_INTERVIEW",
+          "source_type": "audio"
+        },
+        {
+          "claim": "新手常漏掉介质定位方式判断、内外导纸夹调整，以及装纸后的学习、单张走纸和测试打印。",
+          "classification": "EXPERT_ADVICE",
+          "evidence_id": "E153",
+          "locator": {
+            "end_ms": 357600,
+            "start_ms": 331760
+          },
+          "review_status": "VERIFIED",
+          "source_ref": "N31_EXPERT_INTERVIEW",
+          "source_type": "audio"
+        },
+        {
+          "claim": "成功标准为稳定吸纸，单张走纸只送一张并停在边界附近，测试标签完整且基本居中，无连续跳纸、明显偏斜、卡纸或报警；公开演示不得显示个人信息、编码和唯一编号。",
+          "classification": "EXPERT_ADVICE",
+          "evidence_id": "E154",
+          "locator": {
+            "end_ms": 386400,
+            "start_ms": 357600
+          },
+          "review_status": "VERIFIED",
+          "source_ref": "N31_EXPERT_INTERVIEW",
+          "source_type": "audio"
+        }
+      ],
       "evidence_ids": [
         "E052",
         "E082",
@@ -189,6 +1133,19 @@
         "E153",
         "E154"
       ],
+      "item_id": "CL12",
+      "keyframe": {
+        "end_ms": 255000,
+        "evidence_id": "E051",
+        "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000051.jpg",
+        "source_ref": "N31_VIDEO_OPERATION_FULL",
+        "start_ms": 250000,
+        "visual_status": "PARTIAL"
+      },
+      "reason": "完成本步后应确认：测试标签完整出纸，设备未连续跳纸、卡纸或异常停止。",
+      "required": true,
+      "risk_level": "WARNING",
+      "screen_index": 12,
       "step_id": "S12",
       "title": "打印本地测试标签",
       "warnings": [
@@ -197,14 +1154,80 @@
       ]
     },
     {
+      "action": "检查标签内容完整性、居中情况、偏斜、缺失、停止位置和连续跳纸现象，并记录本次换纸结果。",
       "check": "设备稳定吸纸；单张走纸只送出一张并停在标签边界附近；测试标签完整、基本居中；无连续跳纸、明显偏斜、卡纸或异常报警，并留下验收记录。",
       "completed": false,
+      "evidence_details": [
+        {
+          "claim": "CONTINUOUS_OPERATION 关键帧候选；等待授权后的视觉理解或人工确认动作、部件和设备状态。",
+          "classification": "MODEL_INFERENCE",
+          "evidence_id": "E057",
+          "locator": {
+            "end_ms": 285000,
+            "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000057.jpg",
+            "start_ms": 280000
+          },
+          "review_status": "UNREVIEWED",
+          "source_ref": "N31_VIDEO_OPERATION_FULL",
+          "source_type": "video"
+        },
+        {
+          "claim": "PRINT_SUCCESS_CHECK 关键帧候选；等待授权后的视觉理解或人工确认动作、部件和设备状态。",
+          "classification": "MODEL_INFERENCE",
+          "evidence_id": "E083",
+          "locator": {
+            "end_ms": 10000,
+            "keyframe": "derived/video/N31_VIDEO_PRINT_RESULT/frames/frame_000002.jpg",
+            "start_ms": 5000
+          },
+          "review_status": "UNREVIEWED",
+          "source_ref": "N31_VIDEO_PRINT_RESULT",
+          "source_type": "video"
+        },
+        {
+          "claim": "异常时先停打，再依次检查装反、歪斜、褶皱和送纸位置，检查内外导轨，核对缝标/黑标及学习模式，重做学习和单张走纸，再查尺寸缩放与驱动。",
+          "classification": "EXPERT_ADVICE",
+          "evidence_id": "E151",
+          "locator": {
+            "end_ms": 300400,
+            "start_ms": 260400
+          },
+          "review_status": "VERIFIED",
+          "source_ref": "N31_EXPERT_INTERVIEW",
+          "source_type": "audio"
+        },
+        {
+          "claim": "成功标准为稳定吸纸，单张走纸只送一张并停在边界附近，测试标签完整且基本居中，无连续跳纸、明显偏斜、卡纸或报警；公开演示不得显示个人信息、编码和唯一编号。",
+          "classification": "EXPERT_ADVICE",
+          "evidence_id": "E154",
+          "locator": {
+            "end_ms": 386400,
+            "start_ms": 357600
+          },
+          "review_status": "VERIFIED",
+          "source_ref": "N31_EXPERT_INTERVIEW",
+          "source_type": "audio"
+        }
+      ],
       "evidence_ids": [
         "E057",
         "E083",
         "E151",
         "E154"
       ],
+      "item_id": "CL13",
+      "keyframe": {
+        "end_ms": 280000,
+        "evidence_id": "E056",
+        "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000056.jpg",
+        "source_ref": "N31_VIDEO_OPERATION_FULL",
+        "start_ms": 275000,
+        "visual_status": "PARTIAL"
+      },
+      "reason": "完成本步后应确认：设备稳定吸纸；单张走纸只送出一张并停在标签边界附近；测试标签完整、基本居中；无连续跳纸、明显偏斜、卡纸或异常报警，并留下验收记录。",
+      "required": true,
+      "risk_level": "WARNING",
+      "screen_index": 13,
       "step_id": "S13",
       "title": "检查打印结果并记录验收",
       "warnings": [
@@ -212,5 +1235,11 @@
       ]
     }
   ],
-  "sop_version": 2
+  "progress": {
+    "completed_items": 0,
+    "status": "NOT_STARTED",
+    "total_items": 13
+  },
+  "sop_version": 2,
+  "version": 1
 }

@@ -1,26 +1,200 @@
-"""Deterministic checklist and evidence-backed quiz generation."""
+"""Deterministic SOP views, checklist, and evidence-backed quiz generation."""
 
 from __future__ import annotations
 
 from typing import Any
 
+from .contracts import validate_document
 
-def create_checklist(sop: dict[str, Any]) -> dict[str, Any]:
+
+def _catalog(sop: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    return {item["evidence_id"]: item for item in sop["evidence_catalog"]}
+
+
+def _source_summaries(
+    evidence_ids: list[str], catalog: dict[str, dict[str, Any]]
+) -> list[dict[str, str]]:
+    seen: set[tuple[str, str]] = set()
+    sources = []
+    for evidence_id in evidence_ids:
+        evidence = catalog[evidence_id]
+        key = (evidence["source_type"], evidence["source_ref"])
+        if key in seen:
+            continue
+        seen.add(key)
+        sources.append({"source_type": key[0], "source_ref": key[1]})
+    return sources
+
+
+def _evidence_details(
+    evidence_ids: list[str], catalog: dict[str, dict[str, Any]]
+) -> list[dict[str, Any]]:
+    return [
+        {
+            "evidence_id": evidence_id,
+            "source_type": catalog[evidence_id]["source_type"],
+            "source_ref": catalog[evidence_id]["source_ref"],
+            "claim": catalog[evidence_id]["claim"],
+            "locator": catalog[evidence_id]["locator"],
+            "classification": catalog[evidence_id]["classification"],
+            "review_status": catalog[evidence_id]["review_status"],
+        }
+        for evidence_id in evidence_ids
+    ]
+
+
+def _base_view_step(
+    step: dict[str, Any], catalog: dict[str, dict[str, Any]], *, concise: bool
+) -> dict[str, Any]:
+    completion = step["success_check"]
     return {
+        "step_id": step["step_id"],
+        "title": step["title"],
+        "action": step["action"],
+        "reason": (
+            f"用于确认：{completion}"
+            if concise
+            else f"执行本步是为了达到可验证的完成状态：{completion}"
+        ),
+        "completion_marker": completion,
+        "risks": list(step["warnings"]),
+        "sources": _source_summaries(step["evidence"], catalog),
+    }
+
+
+def create_sop_views(sop: dict[str, Any]) -> dict[str, Any]:
+    """Render three traceable reading depths from one verified SOP."""
+
+    catalog = _catalog(sop)
+    concise_steps = [
+        _base_view_step(step, catalog, concise=True) for step in sop["steps"]
+    ]
+    detailed_steps = []
+    evidence_steps = []
+    for step in sop["steps"]:
+        base = _base_view_step(step, catalog, concise=False)
+        detailed_steps.append(
+            {
+                **base,
+                "prerequisites": list(step["prerequisites"]),
+                "tools": list(step["tools"]),
+                "parameters": list(step["parameters"]),
+                "required": step["required"],
+                "status": step["status"],
+            }
+        )
+        evidence_steps.append(
+            {
+                **base,
+                "evidence_details": _evidence_details(step["evidence"], catalog),
+            }
+        )
+    document = {
+        "artifact_type": "SOP_VIEWS",
+        "version": 1,
         "case_id": sop["case_id"],
         "sop_version": sop["version"],
+        "title": sop["title"],
+        "views": {
+            "concise": {
+                "view_id": "CONCISE",
+                "description": "现场快速执行；保留动作、原因、完成标志、风险和来源。",
+                "steps": concise_steps,
+            },
+            "detailed": {
+                "view_id": "DETAILED",
+                "description": "培训与审核；补充前置步骤、工具、参数和状态。",
+                "steps": detailed_steps,
+            },
+            "evidence": {
+                "view_id": "EVIDENCE",
+                "description": "逐步展开证据分类、审核状态和页码或时间点。",
+                "steps": evidence_steps,
+            },
+        },
+    }
+    return validate_document(document, "sop_views.schema.json")
+
+
+def _visual_index(visual_review: dict[str, Any] | None) -> dict[str, dict[str, Any]]:
+    if visual_review is None:
+        return {}
+    return {item["step_id"]: item for item in visual_review.get("assessments", [])}
+
+
+def _keyframe(
+    step: dict[str, Any],
+    catalog: dict[str, dict[str, Any]],
+    assessment: dict[str, Any] | None,
+) -> dict[str, Any] | None:
+    if assessment and assessment.get("frames"):
+        frame = assessment["frames"][0]
+        return {
+            "evidence_id": frame["evidence_id"],
+            "source_ref": frame["source_ref"],
+            "start_ms": frame["start_ms"],
+            "end_ms": frame["end_ms"],
+            "keyframe": frame["keyframe"],
+            "visual_status": assessment["model_result"]["verdict"],
+        }
+    for evidence_id in step["evidence"]:
+        evidence = catalog[evidence_id]
+        locator = evidence["locator"]
+        if evidence["source_type"] == "video" and locator.get("keyframe"):
+            return {
+                "evidence_id": evidence_id,
+                "source_ref": evidence["source_ref"],
+                "start_ms": locator["start_ms"],
+                "end_ms": locator["end_ms"],
+                "keyframe": locator["keyframe"],
+                "visual_status": "UNREVIEWED",
+            }
+    return None
+
+
+def create_checklist(
+    sop: dict[str, Any], visual_review: dict[str, Any] | None = None
+) -> dict[str, Any]:
+    """Build a one-step-per-screen checklist template with evidence locators."""
+
+    catalog = _catalog(sop)
+    assessments = _visual_index(visual_review)
+    document = {
+        "artifact_type": "MOBILE_CHECKLIST",
+        "version": 1,
+        "case_id": sop["case_id"],
+        "sop_version": sop["version"],
+        "interaction_mode": "ONE_STEP_PER_SCREEN",
+        "progress": {
+            "total_items": len(sop["steps"]),
+            "completed_items": 0,
+            "status": "NOT_STARTED",
+        },
         "items": [
             {
+                "item_id": f"CL{index:02d}",
+                "screen_index": index,
                 "step_id": step["step_id"],
                 "title": step["title"],
+                "action": step["action"],
+                "reason": f"完成本步后应确认：{step['success_check']}",
                 "check": step["success_check"],
                 "warnings": step["warnings"],
+                "risk_level": "WARNING" if step["warnings"] else "NORMAL",
+                "keyframe": _keyframe(
+                    step, catalog, assessments.get(step["step_id"])
+                ),
                 "evidence_ids": list(step["evidence"]),
+                "evidence_details": _evidence_details(step["evidence"], catalog),
+                "required": step["required"],
                 "completed": False,
             }
-            for step in sop["steps"]
+            for index, step in enumerate(sop["steps"], start=1)
         ],
+        "completion_log": [],
+        "feedback_log": [],
     }
+    return validate_document(document, "mobile_checklist.schema.json")
 
 
 def create_quiz(sop: dict[str, Any], limit: int = 5) -> dict[str, Any]:

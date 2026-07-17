@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/mobile_checklist.schema.json",
+  "title": "SkillForge Mobile Checklist",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["artifact_type", "version", "case_id", "sop_version", "interaction_mode", "progress", "items", "completion_log", "feedback_log"],
+  "properties": {
+    "artifact_type": {"const": "MOBILE_CHECKLIST"},
+    "version": {"const": 1},
+    "case_id": {"type": "string", "minLength": 1},
+    "sop_version": {"type": "integer", "minimum": 1},
+    "interaction_mode": {"const": "ONE_STEP_PER_SCREEN"},
+    "progress": {"$ref": "#/$defs/progress"},
+    "items": {"type": "array", "minItems": 8, "maxItems": 15, "items": {"$ref": "#/$defs/item"}},
+    "completion_log": {"type": "array", "maxItems": 0},
+    "feedback_log": {"type": "array", "maxItems": 0}
+  },
+  "$defs": {
+    "progress": {
+      "type": "object", "additionalProperties": false,
+      "required": ["total_items", "completed_items", "status"],
+      "properties": {
+        "total_items": {"type": "integer", "minimum": 8, "maximum": 15},
+        "completed_items": {"const": 0},
+        "status": {"const": "NOT_STARTED"}
+      }
+    },
+    "evidenceDetail": {
+      "type": "object", "additionalProperties": false,
+      "required": ["evidence_id", "source_type", "source_ref", "claim", "locator", "classification", "review_status"],
+      "properties": {
+        "evidence_id": {"type": "string", "pattern": "^E[0-9]{3}$"},
+        "source_type": {"enum": ["pdf", "video", "audio"]},
+        "source_ref": {"type": "string", "minLength": 1},
+        "claim": {"type": "string", "minLength": 1},
+        "locator": {"$ref": "https://skillforge.local/schemas/evidence.schema.json#/properties/locator"},
+        "classification": {"enum": ["SOURCE_FACT", "EXPERT_ADVICE", "MODEL_INFERENCE"]},
+        "review_status": {"enum": ["UNREVIEWED", "VERIFIED", "REJECTED"]}
+      }
+    },
+    "keyframe": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["evidence_id", "source_ref", "start_ms", "end_ms", "keyframe", "visual_status"],
+      "properties": {
+        "evidence_id": {"type": "string", "pattern": "^E[0-9]{3}$"},
+        "source_ref": {"type": "string", "minLength": 1},
+        "start_ms": {"type": "integer", "minimum": 0},
+        "end_ms": {"type": "integer", "minimum": 0},
+        "keyframe": {"type": "string", "minLength": 1},
+        "visual_status": {"enum": ["SUPPORTED", "PARTIAL", "NOT_VISIBLE", "CONTRADICTED", "UNREVIEWED"]}
+      }
+    },
+    "item": {
+      "type": "object", "additionalProperties": false,
+      "required": ["item_id", "screen_index", "step_id", "title", "action", "reason", "check", "warnings", "risk_level", "keyframe", "evidence_ids", "evidence_details", "required", "completed"],
+      "properties": {
+        "item_id": {"type": "string", "pattern": "^CL[0-9]{2}$"},
+        "screen_index": {"type": "integer", "minimum": 1, "maximum": 15},
+        "step_id": {"type": "string", "pattern": "^S[0-9]{2}$"},
+        "title": {"type": "string", "minLength": 1},
+        "action": {"type": "string", "minLength": 1},
+        "reason": {"type": "string", "minLength": 1},
+        "check": {"type": "string", "minLength": 1},
+        "warnings": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "risk_level": {"enum": ["NORMAL", "WARNING"]},
+        "keyframe": {"$ref": "#/$defs/keyframe"},
+        "evidence_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^E[0-9]{3}$"}},
+        "evidence_details": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/evidenceDetail"}},
+        "required": {"type": "boolean"},
+        "completed": {"const": false}
+      }
+    }
+  }
+}
