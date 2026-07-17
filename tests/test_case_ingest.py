@@ -101,6 +101,12 @@ def test_case_ingest_multiple_videos_and_pdfs(tmp_path) -> None:
     assert len({item["evidence_id"] for item in catalog["evidence"]}) == 6
     for item in catalog["evidence"]:
         validate_document(item, "evidence.schema.json")
+    pdf_assets = [item for item in result["assets"] if item["type"] == "pdf"]
+    assert all(item["structured_block_count"] >= 1 for item in pdf_assets)
+    assert all(item["search_chunk_count"] >= 1 for item in pdf_assets)
+    assert all(
+        (output / item["search_index"]).is_file() for item in pdf_assets
+    )
 
 
 def test_case_ingest_rejects_private_review_source(tmp_path) -> None:
@@ -150,4 +156,31 @@ def test_case_ingest_requires_explicit_local_only_flag(tmp_path) -> None:
         encoding="utf-8",
     )
     with pytest.raises(ValueError, match="external_processing_authorized=false"):
+        CaseIngestionPipeline(tmp_path, tmp_path / "output").run(manifest_path)
+
+
+def test_case_ingest_rejects_unknown_pdf_ocr_mode(tmp_path) -> None:
+    _make_pdf(tmp_path / "manual.pdf", "Structured manual content for OCR mode QA.")
+    manifest_path = tmp_path / "case.json"
+    manifest_path.write_text(
+        json.dumps(
+            {
+                "version": 1,
+                "case_id": "test_case",
+                "title": "Test case",
+                "external_processing_authorized": False,
+                "pdf_ocr_mode": "guess",
+                "sources": [
+                    {
+                        "source_id": "PDF",
+                        "type": "pdf",
+                        "path": "manual.pdf",
+                        "approved_for_local_ingest": True,
+                    }
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+    with pytest.raises(ValueError, match="pdf_ocr_mode"):
         CaseIngestionPipeline(tmp_path, tmp_path / "output").run(manifest_path)

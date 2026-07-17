@@ -1,0 +1,229 @@
+{
+  "case_id": "n31_media_change",
+  "data_policy": {
+    "contains_absolute_paths": false,
+    "contains_credentials": false,
+    "contains_page_images": false,
+    "contains_pdf_text": false,
+    "external_model_calls": 0,
+    "raw_pdf_and_private_index_git_ignored": true
+  },
+  "external_model_calls": 0,
+  "generated_at": "2026-07-17T05:49:26.801890+00:00",
+  "ocr_configuration": {
+    "dpi": 200,
+    "languages": "chi_sim+eng",
+    "traineddata_sha256": {
+      "chi_sim": "a5fcb6f0db1e1d6d8522f39db4e848f05984669172e584e8d76b6b3141e1f730",
+      "eng": "7d4322bd2a7749724879683fc3912cb542f19906c83bcc1a52132556427170b2"
+    }
+  },
+  "ocr_mode": "auto",
+  "queries": [
+    {
+      "exact_match_count": 3,
+      "hit_count": 10,
+      "query": "进纸导轨",
+      "query_id": "Q01",
+      "status": "PASSED",
+      "top_hits": [
+        {
+          "block_id": "P0014-B007",
+          "exact_match": true,
+          "kind": "PARAGRAPH",
+          "page": 14,
+          "score": 15.0,
+          "source_ref": "N31_MANUAL_REV1_0"
+        },
+        {
+          "block_id": "P0002-B003",
+          "exact_match": true,
+          "kind": "LIST_ITEM",
+          "page": 2,
+          "score": 15.0,
+          "source_ref": "N31_QUICK_GUIDE_REV1_5"
+        },
+        {
+          "block_id": "P0002-B006",
+          "exact_match": true,
+          "kind": "LIST_ITEM",
+          "page": 2,
+          "score": 15.0,
+          "source_ref": "N31_QUICK_GUIDE_REV1_5"
+        },
+        {
+          "block_id": "P0014-B006",
+          "exact_match": false,
+          "kind": "PARAGRAPH",
+          "page": 14,
+          "score": 2.857,
+          "source_ref": "N31_MANUAL_REV1_0"
+        },
+        {
+          "block_id": "P0015-B005",
+          "exact_match": false,
+          "kind": "PARAGRAPH",
+          "page": 15,
+          "score": 2.143,
+          "source_ref": "N31_MANUAL_REV1_0"
+        }
+      ]
+    },
+    {
+      "exact_match_count": 1,
+      "hit_count": 10,
+      "query": "缝标模式标签学习",
+      "query_id": "Q02",
+      "status": "PASSED",
+      "top_hits": [
+        {
+          "block_id": "P0020-B007",
+          "exact_match": true,
+          "kind": "PARAGRAPH",
+          "page": 20,
+          "score": 15.0,
+          "source_ref": "N31_MANUAL_REV1_0"
+        },
+        {
+          "block_id": "P0020-B008",
+          "exact_match": false,
+          "kind": "PARAGRAPH",
+          "page": 20,
+          "score": 3.571,
+          "source_ref": "N31_MANUAL_REV1_0"
+        },
+        {
+          "block_id": "P0021-B014",
+          "exact_match": false,
+          "kind": "PARAGRAPH",
+          "page": 21,
+          "score": 3.571,
+          "source_ref": "N31_MANUAL_REV1_0"
+        },
+        {
+          "block_id": "P0021-B009",
+          "exact_match": false,
+          "kind": "PARAGRAPH",
+          "page": 21,
+          "score": 2.143,
+          "source_ref": "N31_MANUAL_REV1_0"
+        },
+        {
+          "block_id": "P0021-B016",
+          "exact_match": false,
+          "kind": "PARAGRAPH",
+          "page": 21,
+          "score": 2.143,
+          "source_ref": "N31_MANUAL_REV1_0"
+        }
+      ]
+    },
+    {
+      "exact_match_count": 2,
+      "hit_count": 10,
+      "query": "按住走纸键",
+      "query_id": "Q03",
+      "status": "PASSED",
+      "top_hits": [
+        {
+          "block_id": "P0020-B007",
+          "exact_match": true,
+          "kind": "PARAGRAPH",
+          "page": 20,
+          "score": 15.0,
+          "source_ref": "N31_MANUAL_REV1_0"
+        },
+        {
+          "block_id": "P0020-B008",
+          "exact_match": true,
+          "kind": "PARAGRAPH",
+          "page": 20,
+          "score": 15.0,
+          "source_ref": "N31_MANUAL_REV1_0"
+        },
+        {
+          "block_id": "P0020-B006",
+          "exact_match": false,
+          "kind": "PARAGRAPH",
+          "page": 20,
+          "score": 4.444,
+          "source_ref": "N31_MANUAL_REV1_0"
+        },
+        {
+          "block_id": "P0020-B005",
+          "exact_match": false,
+          "kind": "PARAGRAPH",
+          "page": 20,
+          "score": 3.333,
+          "source_ref": "N31_MANUAL_REV1_0"
+        },
+        {
+          "block_id": "P0020-B010",
+          "exact_match": false,
+          "kind": "PARAGRAPH",
+          "page": 20,
+          "score": 3.333,
+          "source_ref": "N31_MANUAL_REV1_0"
+        }
+      ]
+    }
+  ],
+  "report_id": "N31_PDF_STRUCTURE_V1",
+  "sources": [
+    {
+      "block_count": 531,
+      "block_counts_by_kind": {
+        "HEADING": 40,
+        "LIST_ITEM": 69,
+        "PARAGRAPH": 405,
+        "TABLE": 5,
+        "WARNING": 12
+      },
+      "character_count": 23841,
+      "input_sha256": "2c8e2c54760f9ee888a9cf2c9d490dfebabf5d2c56a1e64a390dc70c11ed2cb1",
+      "needs_ocr_page_count": 0,
+      "ocr_applied_page_count": 9,
+      "page_count": 56,
+      "rights_status": "LOCAL_EVIDENCE_USE_ONLY",
+      "search_chunk_count": 531,
+      "source_ref": "N31_MANUAL_REV1_0"
+    },
+    {
+      "block_count": 76,
+      "block_counts_by_kind": {
+        "HEADING": 9,
+        "LIST_ITEM": 18,
+        "PARAGRAPH": 43,
+        "WARNING": 6
+      },
+      "character_count": 4331,
+      "input_sha256": "522c47a6055bd47f051b70cfdabaec72711805975c09a0a1b75bef7ec6f3c38d",
+      "needs_ocr_page_count": 0,
+      "ocr_applied_page_count": 0,
+      "page_count": 2,
+      "rights_status": "LOCAL_EVIDENCE_USE_ONLY",
+      "search_chunk_count": 76,
+      "source_ref": "N31_QUICK_GUIDE_REV1_5"
+    }
+  ],
+  "status": "COMPLETED",
+  "summary": {
+    "block_count": 607,
+    "block_counts_by_kind": {
+      "HEADING": 49,
+      "LIST_ITEM": 87,
+      "PARAGRAPH": 448,
+      "TABLE": 5,
+      "WARNING": 18
+    },
+    "character_count": 28172,
+    "needs_ocr_page_count": 0,
+    "ocr_applied_page_count": 9,
+    "page_count": 58,
+    "passed_query_count": 3,
+    "query_count": 3,
+    "search_chunk_count": 607,
+    "source_count": 2
+  },
+  "version": 1
+}

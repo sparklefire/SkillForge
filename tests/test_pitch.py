@@ -70,3 +70,11 @@ def test_pitch_requires_bounded_temporal_windows() -> None:
     result = _check_metrics(ROOT)
     assert result["status"] == "PASSED"
     assert result["assertions"]["temporal_windows_bounded"] is True
+
+
+def test_pitch_requires_grounded_pdf_structure_report() -> None:
+    artifact_ids = {item["artifact_id"] for item in _runbook()["required_artifacts"]}
+    assert "PDF_STRUCTURE" in artifact_ids
+    result = _check_metrics(ROOT)
+    assert result["status"] == "PASSED"
+    assert result["assertions"]["pdf_structure_grounded"] is True

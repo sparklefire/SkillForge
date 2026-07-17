@@ -4,6 +4,10 @@
   "title": "汉印 N31 电子面单打印机更换标签纸、介质学习与试印验收",
   "external_processing_authorized": false,
   "frame_interval_seconds": 5.0,
+  "pdf_ocr_mode": "auto",
+  "pdf_ocr_languages": "chi_sim+eng",
+  "pdf_ocr_dpi": 200,
+  "pdf_ocr_tessdata": "outputs/cache/tessdata",
   "sources": [
     {
       "source_id": "N31_VIDEO_OPERATION_FULL",

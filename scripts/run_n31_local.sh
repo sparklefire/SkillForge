@@ -26,6 +26,8 @@ if [[ "$MODE" == "full-local" ]]; then
   "$PYTHON" scripts/process_n31_videos.py >/dev/null
 fi
 
+bash scripts/setup_ocr_languages.sh >/dev/null
+
 "$PYTHON" -m skillforge.case_ingest \
   --manifest cases/n31/ingest_manifest.json \
   --output cases/n31/output/ingest_local_v1 >/dev/null

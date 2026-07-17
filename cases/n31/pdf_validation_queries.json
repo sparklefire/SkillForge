@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "case_id": "n31_media_change",
+  "queries": [
+    {"query_id": "Q01", "query": "进纸导轨"},
+    {"query_id": "Q02", "query": "缝标模式标签学习"},
+    {"query_id": "Q03", "query": "按住走纸键"}
+  ]
+}

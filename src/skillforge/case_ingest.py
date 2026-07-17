@@ -12,7 +12,7 @@ from typing import Any
 from .contracts import validate_document
 from .media import extract_keyframes, probe_media
 from .observability import StructuredLogger
-from .pdf_ingest import extract_pdf
+from .pdf_ingest import build_pdf_search_index, extract_pdf
 
 
 def _sha256(path: Path) -> str:
@@ -147,25 +147,51 @@ class CaseIngestionPipeline:
             "external_processing_authorization": False,
         }
 
-    def _ingest_pdf(self, source: dict[str, Any], path: Path) -> dict[str, Any]:
+    def _ingest_pdf(
+        self,
+        source: dict[str, Any],
+        path: Path,
+        *,
+        ocr_mode: str,
+        ocr_languages: str,
+        ocr_dpi: int,
+        ocr_tessdata: Path | None,
+    ) -> dict[str, Any]:
         source_id = source["source_id"]
         extracted = extract_pdf(
             path,
             self.output_dir / "derived" / "pdf" / source_id / "pages",
+            ocr_mode=ocr_mode,
+            ocr_languages=ocr_languages,
+            ocr_dpi=ocr_dpi,
+            ocr_tessdata=ocr_tessdata,
         )
+        search_index = build_pdf_search_index(source_id, extracted)
+        search_index_path = (
+            self.output_dir / "derived" / "pdf" / source_id / "search_index.json"
+        )
+        _write_json(search_index_path, search_index)
         character_count = 0
         ocr_candidate_count = 0
         for page in extracted["pages"]:
             character_count += page["character_count"]
             ocr_candidate_count += int(page["needs_ocr"])
             claim = " ".join(page["text"].split())[:500]
+            first_heading = next(
+                (
+                    block["text"]
+                    for block in page["blocks"]
+                    if block["kind"] == "HEADING"
+                ),
+                "页面全文候选",
+            )
             self._add_evidence(
                 source_type="pdf",
                 source_ref=source_id,
                 claim=claim or f"第 {page['page']} 页未提取到足够文本，需要 OCR。",
                 locator={
                     "page": page["page"],
-                    "paragraph": "页面全文候选",
+                    "paragraph": first_heading[:120],
                 },
                 classification="SOURCE_FACT" if claim else "MODEL_INFERENCE",
                 relevance=float(source.get("default_relevance", 0.7 if claim else 0.2)),
@@ -181,6 +207,12 @@ class CaseIngestionPipeline:
             "page_count": extracted["page_count"],
             "character_count": character_count,
             "ocr_candidate_count": ocr_candidate_count,
+            "ocr_mode": ocr_mode,
+            "ocr_applied_page_count": extracted["ocr_applied_page_count"],
+            "structured_block_count": extracted["block_count"],
+            "block_counts_by_kind": extracted["block_counts_by_kind"],
+            "search_index": _relative(search_index_path, self.output_dir),
+            "search_chunk_count": search_index["chunk_count"],
             "rights_status": source.get("rights_status"),
             "external_processing_authorization": False,
         }
@@ -190,6 +222,19 @@ class CaseIngestionPipeline:
         frame_interval_seconds = float(config.get("frame_interval_seconds", 5.0))
         if frame_interval_seconds <= 0:
             raise ValueError("frame_interval_seconds 必须大于 0")
+        pdf_ocr_mode = str(config.get("pdf_ocr_mode", "disabled"))
+        if pdf_ocr_mode not in {"disabled", "auto", "required"}:
+            raise ValueError("pdf_ocr_mode 必须是 disabled、auto 或 required")
+        pdf_ocr_languages = str(config.get("pdf_ocr_languages", "chi_sim+eng"))
+        pdf_ocr_dpi = int(config.get("pdf_ocr_dpi", 200))
+        raw_tessdata = config.get("pdf_ocr_tessdata")
+        pdf_ocr_tessdata = (
+            _inside(self.project_root / str(raw_tessdata), self.project_root)
+            if raw_tessdata
+            else None
+        )
+        if pdf_ocr_mode != "disabled" and pdf_ocr_tessdata is None:
+            raise ValueError("启用PDF OCR时必须配置pdf_ocr_tessdata")
         self.evidence.clear()
         assets: list[dict[str, Any]] = []
         self.logger.emit(
@@ -211,7 +256,14 @@ class CaseIngestionPipeline:
             if source["type"] == "video":
                 asset = self._ingest_video(source, path, frame_interval_seconds)
             else:
-                asset = self._ingest_pdf(source, path)
+                asset = self._ingest_pdf(
+                    source,
+                    path,
+                    ocr_mode=pdf_ocr_mode,
+                    ocr_languages=pdf_ocr_languages,
+                    ocr_dpi=pdf_ocr_dpi,
+                    ocr_tessdata=pdf_ocr_tessdata,
+                )
             assets.append(asset)
             self.logger.emit(
                 "case_ingest.source.completed",

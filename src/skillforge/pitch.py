@@ -133,6 +133,10 @@ def _check_metrics(root: Path) -> dict[str, Any]:
         _read_json(root / "cases/n31/evaluations/temporal_action_windows_v1.json"),
         "temporal_action_windows.schema.json",
     )
+    pdf_structure = validate_document(
+        _read_json(root / "cases/n31/evaluations/pdf_structure_v1.json"),
+        "pdf_structure_report.schema.json",
+    )
     manifest_path = root / "output/video/n31_training_video_manifest_v1.json"
     manifest = validate_document(
         _read_json(manifest_path), "training_video_manifest.schema.json"
@@ -173,6 +177,30 @@ def _check_metrics(root: Path) -> dict[str, Any]:
             and item["end_ms"] == 75_000
             for item in temporal["windows"]
         ),
+        "pdf_structure_grounded": pdf_structure["status"] == "COMPLETED"
+        and pdf_structure["external_model_calls"] == 0
+        and pdf_structure["summary"]["source_count"] == 2
+        and pdf_structure["summary"]["page_count"] == 58
+        and pdf_structure["summary"]["block_count"] == 607
+        and pdf_structure["summary"]["needs_ocr_page_count"] == 0
+        and pdf_structure["summary"]["ocr_applied_page_count"] == 9
+        and pdf_structure["summary"]["search_chunk_count"] == 607
+        and pdf_structure["summary"]["passed_query_count"]
+        == pdf_structure["summary"]["query_count"]
+        == 3
+        and {
+            item["query_id"]: (
+                item["status"],
+                item["top_hits"][0]["source_ref"],
+                item["top_hits"][0]["page"],
+            )
+            for item in pdf_structure["queries"]
+        }
+        == {
+            "Q01": ("PASSED", "N31_MANUAL_REV1_0", 14),
+            "Q02": ("PASSED", "N31_MANUAL_REV1_0", 20),
+            "Q03": ("PASSED", "N31_MANUAL_REV1_0", 20),
+        },
         "video_manifest_bound": video_path.is_file()
         and manifest["output"]["sha256"] == _sha256(video_path)
         and manifest["coverage"]["covered_gold_step_count"]
