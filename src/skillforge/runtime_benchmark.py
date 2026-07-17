@@ -145,7 +145,10 @@ def build_runtime_benchmark(
                 if response.status_code != 200:
                     raise ValueError(f"Web现场重算失败: HTTP {response.status_code}")
                 summary = response.json()
-            return summary, output_dir / "n31_live_run"
+            run_id = summary.get("stage_run", {}).get("run_id")
+            if not run_id:
+                raise ValueError("Web现场重算缺少阶段运行标识")
+            return summary, output_dir / "n31_stage_runs" / "runs" / run_id
 
         gold_samples, gold_sizes, gold_assertions = _measure(
             gold_operation,

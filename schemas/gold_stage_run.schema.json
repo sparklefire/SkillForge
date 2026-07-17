@@ -1,0 +1,167 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/gold_stage_run.schema.json",
+  "title": "SkillForge Gold Artifact Stage Run",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "run_id",
+    "case_id",
+    "status",
+    "start_stage",
+    "source_run_id",
+    "created_at",
+    "completed_at",
+    "published",
+    "stages",
+    "workflow_sha256",
+    "release_digest",
+    "failure",
+    "data_policy"
+  ],
+  "properties": {
+    "version": {"const": 1},
+    "run_id": {"type": "string", "format": "uuid"},
+    "case_id": {"const": "n31_media_change"},
+    "status": {"enum": ["COMPLETED", "FAILED", "NEEDS_REVIEW"]},
+    "start_stage": {"$ref": "#/$defs/stage_id"},
+    "source_run_id": {
+      "oneOf": [
+        {"type": "null"},
+        {"type": "string", "format": "uuid"}
+      ]
+    },
+    "created_at": {"type": "string", "format": "date-time"},
+    "completed_at": {
+      "oneOf": [
+        {"type": "null"},
+        {"type": "string", "format": "date-time"}
+      ]
+    },
+    "published": {"type": "boolean"},
+    "stages": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "stage_id",
+          "workflow_state",
+          "execution",
+          "status",
+          "started_at",
+          "completed_at",
+          "outputs",
+          "error"
+        ],
+        "properties": {
+          "stage_id": {"$ref": "#/$defs/stage_id"},
+          "workflow_state": {"$ref": "workflow_run.schema.json#/$defs/rerunnable_state"},
+          "execution": {"enum": ["REBUILT", "REUSED"]},
+          "status": {"enum": ["COMPLETED", "FAILED"]},
+          "started_at": {"type": "string", "format": "date-time"},
+          "completed_at": {
+            "oneOf": [
+              {"type": "null"},
+              {"type": "string", "format": "date-time"}
+            ]
+          },
+          "outputs": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {"$ref": "#/$defs/output"}
+          },
+          "error": {
+            "oneOf": [
+              {"type": "null"},
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["error_type", "message", "retryable"],
+                "properties": {
+                  "error_type": {"type": "string", "minLength": 1},
+                  "message": {"type": "string", "minLength": 1, "maxLength": 500},
+                  "retryable": {"type": "boolean"}
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "workflow_sha256": {
+      "oneOf": [
+        {"type": "null"},
+        {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+      ]
+    },
+    "release_digest": {
+      "oneOf": [
+        {"type": "null"},
+        {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+      ]
+    },
+    "failure": {
+      "oneOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["stage_id", "error_type", "message", "retryable"],
+          "properties": {
+            "stage_id": {"$ref": "#/$defs/stage_id"},
+            "error_type": {"type": "string", "minLength": 1},
+            "message": {"type": "string", "minLength": 1, "maxLength": 500},
+            "retryable": {"type": "boolean"}
+          }
+        }
+      ]
+    },
+    "data_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "external_model_calls",
+        "contains_raw_media",
+        "contains_credentials",
+        "contains_absolute_paths"
+      ],
+      "properties": {
+        "external_model_calls": {"const": 0},
+        "contains_raw_media": {"const": false},
+        "contains_credentials": {"const": false},
+        "contains_absolute_paths": {"const": false}
+      }
+    }
+  },
+  "$defs": {
+    "stage_id": {
+      "enum": [
+        "INGESTING",
+        "EXTRACTING",
+        "PLANNING",
+        "CREATING",
+        "VERIFYING_INITIAL",
+        "REVISING",
+        "VERIFYING_FINAL",
+        "RENDERING"
+      ]
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "sha256", "size_bytes"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*\\.json$"
+        },
+        "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "size_bytes": {"type": "integer", "minimum": 1}
+      }
+    }
+  }
+}

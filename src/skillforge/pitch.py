@@ -522,6 +522,9 @@ def _check_demo_modes(runbook: dict[str, Any], root: Path) -> dict[str, Any]:
     health = client.get("/health")
     payload = client.get("/api/n31")
     rerun = client.post("/api/n31/run")
+    stage_before = client.get("/api/n31/stages/current")
+    stage_rerun = client.post("/api/n31/stages/RENDERING/rerun")
+    stage_after = client.get("/api/n31/stages/current")
     evidence = client.get("/api/n31/evidence/E144")
     review = client.post("/api/n31/review/sessions")
     review_id = review.json().get("session_id") if review.status_code == 200 else None
@@ -563,6 +566,16 @@ def _check_demo_modes(runbook: dict[str, Any], root: Path) -> dict[str, Any]:
         else None
     )
     offline_bundle = _read_json(root / "cases/n31/demo_bundle/bundle.json")
+    before_manifest = stage_before.json() if stage_before.status_code == 200 else {}
+    after_manifest = stage_after.json() if stage_after.status_code == 200 else {}
+    before_hashes = {
+        item["stage_id"]: {output["name"]: output["sha256"] for output in item["outputs"]}
+        for item in before_manifest.get("stages", [])
+    }
+    after_hashes = {
+        item["stage_id"]: {output["name"]: output["sha256"] for output in item["outputs"]}
+        for item in after_manifest.get("stages", [])
+    }
     assertions = {
         "mode_priority": ordered_modes == MODE_ORDER,
         "health": health.status_code == 200
@@ -588,6 +601,34 @@ def _check_demo_modes(runbook: dict[str, Any], root: Path) -> dict[str, Any]:
         and rerun.json().get("before", {}).get("severe_error_count") == 5
         and rerun.json().get("after", {}).get("severe_error_count") == 0
         and rerun.json().get("revision_count") == 4,
+        "artifact_stage_rerun": stage_before.status_code == 200
+        and stage_rerun.status_code == 200
+        and stage_after.status_code == 200
+        and after_manifest.get("source_run_id") == before_manifest.get("run_id")
+        and after_manifest.get("start_stage") == "RENDERING"
+        and stage_rerun.json().get("reused_stages")
+        == [
+            "INGESTING",
+            "EXTRACTING",
+            "PLANNING",
+            "CREATING",
+            "VERIFYING_INITIAL",
+            "REVISING",
+            "VERIFYING_FINAL",
+        ]
+        and stage_rerun.json().get("rebuilt_stages") == ["RENDERING"]
+        and all(
+            before_hashes.get(stage) == after_hashes.get(stage)
+            for stage in stage_rerun.json().get("reused_stages", [])
+        )
+        and after_manifest.get("published") is True
+        and after_manifest.get("data_policy")
+        == {
+            "external_model_calls": 0,
+            "contains_raw_media": False,
+            "contains_credentials": False,
+            "contains_absolute_paths": False,
+        },
         "evidence_locator_safe": evidence.status_code == 200
         and evidence.json().get("evidence_id") == "E144"
         and evidence.json().get("navigation", {}).get("kind") == "AUDIO_TIME"

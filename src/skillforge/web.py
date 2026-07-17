@@ -6,6 +6,7 @@ import json
 import hashlib
 import os
 import re
+import threading
 import uuid
 from pathlib import Path
 from typing import Annotated, Any
@@ -19,7 +20,7 @@ from .demo import ROOT, run_demo
 from .checklist_sessions import ChecklistSessionStore
 from .contracts import validate_document
 from .evidence_locator import build_evidence_locator
-from .gold_rehearsal import run_gold_rehearsal
+from .gold_stage_runner import GoldStage, GoldStageExecutor, GoldStageRunStore
 from .ingest import IngestionPipeline
 from .review_sessions import SopReviewSessionStore, rebuild_step_artifacts
 
@@ -114,7 +115,7 @@ HTML = """<!doctype html>
   <h1>匠传 SkillForge</h1>
   <p>从素材证据到 SOP，再到发现问题、引用证据和局部自动修订。</p>
   <section class="panel"><h2 id="metrics-title">闭环指标</h2><div id="basis" class="notice"></div><div id="metrics" class="grid"></div></section>
-  <section class="panel"><h2>现场演示控制</h2><button id="rerun">重新运行 Gold 质检与局部修订</button><span id="rerun-status"></span><p>只处理已审核的结构化证据，不发送原始素材，也不调用外部模型。</p></section>
+  <section class="panel"><h2>现场演示控制</h2><div class="controls"><button id="rerun">完整运行 Gold 闭环</button><select id="stage-select" style="max-width:260px;margin:0"><option value="INGESTING">素材载入起重跑</option><option value="EXTRACTING">证据抽取起重跑</option><option value="PLANNING">SOP规划起重跑</option><option value="CREATING">错误草稿起重跑</option><option value="VERIFYING_INITIAL">首轮质检起重跑</option><option value="REVISING">局部修订起重跑</option><option value="VERIFYING_FINAL">最终复检起重跑</option><option value="RENDERING" selected>培训成果渲染重跑</option></select><button id="stage-rerun" class="secondary">只复用上游并重建下游</button></div><span id="rerun-status"></span><p>每次生成独立、哈希绑定的发布；阶段重跑先校验并复用上游，实际重建所选阶段及下游。失败版本不会替换当前稳定版本。</p></section>
   <section class="panel" id="workflow-panel" hidden><h2>可恢复工作流检查点</h2><div id="workflow-metrics" class="grid"></div><p id="workflow-note"></p><div id="workflow-events"></div></section>
   <section class="panel" id="dgx-panel" hidden><h2>DGX Spark 本地视觉计算</h2><div id="dgx-metrics" class="grid"></div><div id="agent-trace"></div></section>
   <section class="panel" id="temporal-panel" hidden><h2>连续动作候选窗口</h2><div id="temporal-metrics" class="grid"></div><p id="temporal-note"></p><div id="temporal-windows"></div></section>
@@ -153,7 +154,7 @@ function renderDemo(d){activeDemo=d;const b=d.summary.before,a=d.summary.after,i
 document.querySelector('#metrics-title').textContent=isGold?'N31 真实素材 Gold 闭环':isReal?'N31 真实素材闭环彩排':'无版权模拟闭环';
 document.querySelector('#basis').textContent=isGold?'实际操作者口述审核 · Gold v1 · 最终评测指标。':isReal?'候选基准 · 非 Gold · 指标仅用于证明闭环可运行，等待操作者审核后重跑最终评测。':'明确标注的无版权模拟数据，不作为真实案例评测。';
 document.querySelector('#metrics').innerHTML=[['必要步骤',`${pct(b.required_step_coverage)} → ${pct(a.required_step_coverage)}`],['证据覆盖',`${pct(b.evidence_supported_required_steps)} → ${pct(a.evidence_supported_required_steps)}`],['严重错误',`${b.severe_error_count} → ${a.severe_error_count}`],['局部修改',d.summary.revision_count],['状态',isReal?d.summary.gold_status||'NOT_GOLD':d.summary.workflow_state]].map(x=>`<div class="metric"><span class="muted">${esc(x[0])}</span><strong>${esc(x[1])}</strong></div>`).join('');
-if(d.workflow){const w=d.workflow,attempts=w.stage_attempts,events=w.history,failures=events.filter(x=>x.event_type==='FAILURE').length,reruns=events.filter(x=>x.event_type==='RERUN').length;document.querySelector('#workflow-panel').hidden=false;document.querySelector('#workflow-metrics').innerHTML=[['当前状态',w.state],['执行阶段',Object.values(attempts).filter(x=>x>0).length],['质检轮次',attempts.VERIFYING],['失败记录',failures],['阶段重跑',reruns]].map(x=>`<div class="metric"><span class="muted">${esc(x[0])}</span><strong>${esc(x[1])}</strong></div>`).join('');document.querySelector('#workflow-note').textContent='每次状态迁移都进入Schema校验的检查点；可重试失败可以从原阶段恢复，不可重试失败必须由操作者修复后显式重跑。当前仅声明状态与下游失效审计，未把未执行的产物重建误报为完成。';document.querySelector('#workflow-events').innerHTML=events.slice(-6).map(x=>`<div class="change"><b>${esc(x.event_type)} · ${esc(x.from_state)} → ${esc(x.to_state)} · 第${esc(x.attempt)}次</b><div>${esc(x.reason||'无补充说明')}</div>${x.invalidated_states.length?`<div class="evidence">下游失效：${esc(x.invalidated_states.join(', '))}</div>`:''}</div>`).join('')}
+if(d.workflow){const w=d.workflow,attempts=w.stage_attempts,events=w.history,failures=events.filter(x=>x.event_type==='FAILURE').length,reruns=events.filter(x=>x.event_type==='RERUN').length,sr=d.stage_run,reused=sr?sr.stages.filter(x=>x.execution==='REUSED').length:0,rebuilt=sr?sr.stages.filter(x=>x.execution==='REBUILT').length:0;document.querySelector('#workflow-panel').hidden=false;document.querySelector('#workflow-metrics').innerHTML=[['当前状态',w.state],['执行阶段',Object.values(attempts).filter(x=>x>0).length],['质检轮次',attempts.VERIFYING],['复用/重建',sr?`${reused}/${rebuilt}`:'离线包'],['阶段重跑',reruns]].map(x=>`<div class="metric"><span class="muted">${esc(x[0])}</span><strong>${esc(x[1])}</strong></div>`).join('');document.querySelector('#workflow-note').textContent=sr?`当前发布 ${sr.run_id.slice(0,8)} · 从${sr.start_stage}执行 · 发布摘要 ${sr.release_digest.slice(0,12)}；阶段产物已逐文件校验，失败版本不切换当前指针。`:'离线兜底包含已校验工作流检查点；点击完整运行后可演示真实产物阶段重跑。';document.querySelector('#workflow-events').innerHTML=events.slice(-6).map(x=>`<div class="change"><b>${esc(x.event_type)} · ${esc(x.from_state)} → ${esc(x.to_state)} · 第${esc(x.attempt)}次</b><div>${esc(x.reason||'无补充说明')}</div>${x.invalidated_states.length?`<div class="evidence">下游失效：${esc(x.invalidated_states.join(', '))}</div>`:''}</div>`).join('')}
 document.querySelector('#review-panel').hidden=!isGold;if(isGold)renderReview();
 if(d.dgx_visual_compute){const g=d.dgx_visual_compute,s=g.summary;document.querySelector('#dgx-panel').hidden=false;document.querySelector('#dgx-metrics').innerHTML=[['GPU',g.gpu.device_name],['本地视频',s.processed_video_count],['GPU处理帧',s.sampled_frame_count],['候选帧',s.selected_frame_count],['CUDA核耗时',`${Number(s.gpu_kernel_ms).toFixed(1)}ms`]].map(x=>`<div class="metric"><span class="muted">${esc(x[0])}</span><strong>${esc(x[1])}</strong></div>`).join('');document.querySelector('#agent-trace').innerHTML=g.agent_trace.map(x=>`<div class="change"><b>${esc(x.event_id)} · ${esc(x.agent)} · ${esc(x.action)}</b><div>${esc(x.decision)}</div><div class="evidence">工具：${esc(x.tool)}｜结果：${esc(x.outcome)}</div></div>`).join('')}
 if(d.temporal_action_windows){const t=d.temporal_action_windows,s=t.summary;document.querySelector('#temporal-panel').hidden=false;document.querySelector('#temporal-metrics').innerHTML=[['Gold步骤',s.step_count],['连续窗口',s.window_count],['视频来源',s.source_count],['DGX候选命中窗口',s.window_with_dgx_candidate_count],['独立DGX候选',s.unique_dgx_candidate_count]].map(x=>`<div class="metric"><span class="muted">${esc(x[0])}</span><strong>${esc(x[1])}</strong></div>`).join('');document.querySelector('#temporal-note').textContent='窗口只把同一视频时间线内的相邻Evidence区间合并，并绑定附近DGX场景候选；它用于定位人工/模型复核范围，不自动证明动作完成。';document.querySelector('#temporal-windows').innerHTML=t.windows.slice(0,6).map(w=>`<div class="change"><b>${esc(w.window_id)} · ${esc(w.title)}</b><div>${esc(w.source_ref)}｜${(w.start_ms/1000).toFixed(1)}–${(w.end_ms/1000).toFixed(1)}秒｜视觉${esc(w.visual_verdict)}</div><div class="evidence">Evidence：${esc(w.evidence_ids.join(', '))}｜DGX候选：${esc(w.dgx_candidate_timestamps_ms.map(v=>(v/1000).toFixed(1)+'s').join(', ')||'无')}</div></div>`).join('')}
@@ -170,6 +171,7 @@ document.querySelector('#changes').innerHTML=d.revision_audit.changes.map(c=>`<d
 if(d.checklist&&d.quiz){document.querySelector('#results-panel').hidden=false;document.querySelector('#n31-downloads').hidden=d.summary.synthetic!==false;document.querySelector('#sop-views-card').hidden=!d.sop_views;renderSopView();renderChecklist();document.querySelector('#quiz').innerHTML=d.quiz.questions.map(x=>`<div class="result"><b>${esc(x.question_id)} · ${esc(x.category)}<br>${esc(x.prompt)}</b>${x.options.length?`<ol>${x.options.map(o=>`<li>${esc(o.text)}</li>`).join('')}</ol>`:''}<div>答案：${esc(quizAnswer(x))}</div><div class="muted">${esc(x.explanation)}</div><div class="evidence">答案来源：${evidenceButtons(x.answer_evidence_ids)}｜解析来源：${evidenceButtons(x.explanation_evidence_ids)}</div><details><summary>展开证据定位</summary>${x.evidence_details.map(e=>`<div>${evidenceButtons([e.evidence_id])} · ${esc(e.source_type)} · ${esc(e.classification)} · ${esc(e.review_status)} · ${esc(locator(e))}</div>`).join('')}</details></div>`).join('')}}
 async function loadDemo(){let r=await fetch('/api/n31');if(r.ok){renderDemo(await r.json());return}r=await fetch('/api/demo');if(!r.ok){await fetch('/api/demo/run',{method:'POST'});r=await fetch('/api/demo')}renderDemo(await r.json())}
 document.querySelector('#rerun').addEventListener('click',async()=>{const s=document.querySelector('#rerun-status');s.textContent=' 运行中…';const r=await fetch('/api/n31/run',{method:'POST'});const d=await r.json();s.textContent=r.ok?` 完成：严重错误 ${d.before.severe_error_count} → ${d.after.severe_error_count}`:` 失败：${d.detail||'未知错误'}`;if(r.ok)await loadDemo()});
+document.querySelector('#stage-rerun').addEventListener('click',async()=>{const s=document.querySelector('#rerun-status'),stage=document.querySelector('#stage-select').value;s.textContent=` 从 ${stage} 重跑中…`;const r=await fetch(`/api/n31/stages/${stage}/rerun`,{method:'POST'}),d=await r.json();s.textContent=r.ok?` 完成：复用 ${d.reused_stages.length} 阶段，重建 ${d.rebuilt_stages.length} 阶段`:` 失败：${d.detail||'未知错误'}`;if(r.ok)await loadDemo()});
 document.querySelectorAll('.sop-tab').forEach(b=>b.addEventListener('click',()=>{sopView=b.dataset.view;renderSopView()}));document.querySelector('#check-prev').addEventListener('click',()=>{if(checklistIndex>0){checklistIndex--;renderChecklist()}});document.querySelector('#check-next').addEventListener('click',()=>{if(checklistIndex<(activeDemo?.checklist.items.length||1)-1){checklistIndex++;renderChecklist()}});document.querySelector('#feedback-submit').addEventListener('click',async()=>{const status=document.querySelector('#checklist-status'),comment=document.querySelector('#feedback-comment').value.trim(),item=activeDemo.checklist.items[checklistIndex];if(!comment){status.textContent=' 请先填写问题';return}status.textContent=' 保存中…';try{const session=await ensureChecklistSession();const r=await fetch(`/api/n31/checklist/sessions/${session.session_id}/items/${item.step_id}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({feedback_category:document.querySelector('#feedback-category').value,feedback_comment:comment})});const d=await r.json();if(!r.ok)throw new Error(d.detail||'保存失败');checklistSession=d;document.querySelector('#feedback-comment').value='';status.textContent=' 反馈已保存在本机';renderChecklist()}catch(e){status.textContent=` ${e.message}`}});
 document.querySelector('#review-start').addEventListener('click',startReview);document.addEventListener('click',e=>{const evidence=e.target.closest('[data-evidence]');if(evidence){showEvidence(evidence.dataset.evidence);return}const review=e.target.closest('[data-review-action]');if(review)reviewAction(review)});
 document.querySelector('#upload').addEventListener('submit',async e=>{e.preventDefault();const status=document.querySelector('#status');status.textContent='处理中…';const r=await fetch('/api/ingest',{method:'POST',body:new FormData(e.target)});const d=await r.json();status.textContent=r.ok?'完成':'失败';document.querySelector('#ingest').textContent=JSON.stringify(d,null,2)});loadDemo();
@@ -274,6 +276,7 @@ def _demo_payload(directory: Path) -> dict[str, Any]:
         "grounding_gate",
         "semantic_review",
         "selective_rebuild",
+        "stage_run",
     ):
         path = directory / f"{name}.json"
         if path.is_file():
@@ -288,6 +291,8 @@ def _demo_payload(directory: Path) -> dict[str, Any]:
                 validate_document(document, "semantic_review_report.schema.json")
             elif name == "selective_rebuild":
                 validate_document(document, "selective_rebuild_report.schema.json")
+            elif name == "stage_run":
+                validate_document(document, "gold_stage_run.schema.json")
             payload[name] = document
     return payload
 
@@ -335,6 +340,18 @@ def create_app(
         else:
             n31_dir = provisional_dir.resolve()
     active_n31_dir = {"path": n31_dir}
+    stage_store = GoldStageRunStore(root / "n31_stage_runs")
+    stage_executor = GoldStageExecutor(
+        stage_store,
+        ROOT / "cases/n31/gold",
+        visual_review_path=ROOT / "cases/n31/evaluations/visual_sequence_review_v1.json",
+    )
+    stage_lock = threading.Lock()
+    if (stage_store.root / "current.json").is_file():
+        try:
+            active_n31_dir["path"] = stage_store.current()[0]
+        except (FileNotFoundError, ValueError):
+            pass
     checklist_sessions = ChecklistSessionStore(root / "checklist_sessions")
     review_sessions = SopReviewSessionStore(root / "sop_review_sessions")
     app = FastAPI(title="SkillForge", version="0.1.0")
@@ -379,6 +396,10 @@ def create_app(
             "training_video_status": (
                 training_video["status"] if training_video else None
             ),
+            "artifact_stage_runner": True,
+            "artifact_stage_release_available": (
+                stage_store.root / "current.json"
+            ).is_file(),
         }
 
     @app.get("/api/n31")
@@ -463,22 +484,44 @@ def create_app(
 
     @app.post("/api/n31/run")
     def execute_n31_gold() -> dict[str, Any]:
-        case = ROOT / "cases" / "n31" / "gold"
-        live_dir = root / "n31_live_run"
         try:
-            summary = run_gold_rehearsal(
-                case / "gold_sop.json",
-                case / "constraints.json",
-                case / "fault_injection.json",
-                live_dir,
-            )
-        except (FileNotFoundError, ValueError) as exc:
+            with stage_lock:
+                result = stage_executor.run_full()
+                live_dir, _ = stage_store.current()
+        except (FileNotFoundError, ValueError, OSError) as exc:
             raise HTTPException(
                 status_code=500,
                 detail=f"N31 Gold现场运行失败: {str(exc)[:300]}",
             ) from exc
         active_n31_dir["path"] = live_dir
-        return summary
+        return {**result["summary"], "stage_run": {key: value for key, value in result.items() if key != "summary"}}
+
+    @app.get("/api/n31/stages/current")
+    def current_n31_stage_run() -> dict[str, Any]:
+        try:
+            _, manifest = stage_store.current()
+        except FileNotFoundError as exc:
+            raise HTTPException(status_code=404, detail="尚无阶段化现场运行") from exc
+        except ValueError as exc:
+            raise HTTPException(status_code=409, detail=f"当前发布校验失败: {str(exc)[:300]}") from exc
+        return manifest
+
+    @app.post("/api/n31/stages/{stage_id}/rerun")
+    def rerun_n31_stage(stage_id: str) -> dict[str, Any]:
+        try:
+            stage = GoldStage(stage_id)
+        except ValueError as exc:
+            raise HTTPException(status_code=404, detail="未知Gold产物阶段") from exc
+        if not (stage_store.root / "current.json").is_file():
+            raise HTTPException(status_code=409, detail="请先完成一次Gold全流程运行")
+        try:
+            with stage_lock:
+                result = stage_executor.rerun(stage)
+                live_dir, _ = stage_store.current()
+        except (FileNotFoundError, ValueError, OSError) as exc:
+            raise HTTPException(status_code=500, detail=f"Gold阶段重跑失败: {str(exc)[:300]}") from exc
+        active_n31_dir["path"] = live_dir
+        return result
 
     @app.get("/api/n31/artifacts/{artifact_name}")
     def download_n31_artifact(artifact_name: str) -> FileResponse:

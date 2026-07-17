@@ -17,8 +17,12 @@ def test_native_web_health_and_demo(tmp_path) -> None:
         "n31_rehearsal_available": False,
         "training_video_available": True,
         "training_video_status": "READY_FOR_HUMAN_REVIEW",
+        "artifact_stage_runner": True,
+        "artifact_stage_release_available": False,
     }
     assert client.get("/api/demo").status_code == 404
+    assert client.get("/api/n31/stages/current").status_code == 404
+    assert client.post("/api/n31/stages/RENDERING/rerun").status_code == 409
     result = client.post("/api/demo/run")
     assert result.status_code == 200
     assert result.json()["workflow_state"] == "COMPLETED"
@@ -65,6 +69,7 @@ def test_web_accepts_operator_reviewed_gold_result(tmp_path) -> None:
     assert "单步重建" in home.text
     assert "/api/n31/evidence/" in home.text
     assert "可恢复工作流检查点" in home.text
+    assert "只复用上游并重建下游" in home.text
     response = client.get("/api/n31")
     assert response.status_code == 200
     assert response.json()["summary"]["gold_status"] == "GOLD"
@@ -292,9 +297,36 @@ def test_web_accepts_operator_reviewed_gold_result(tmp_path) -> None:
     assert rerun.json()["gold_status"] == "GOLD"
     assert rerun.json()["before"]["severe_error_count"] == 5
     assert rerun.json()["after"]["severe_error_count"] == 0
+    assert rerun.json()["stage_run"]["rebuilt_stages"] == [
+        "INGESTING",
+        "EXTRACTING",
+        "PLANNING",
+        "CREATING",
+        "VERIFYING_INITIAL",
+        "REVISING",
+        "VERIFYING_FINAL",
+        "RENDERING",
+    ]
+    current_run = client.get("/api/n31/stages/current")
+    assert current_run.status_code == 200
+    assert current_run.json()["published"] is True
+    assert current_run.json()["status"] == "COMPLETED"
+    stage_rerun = client.post("/api/n31/stages/RENDERING/rerun")
+    assert stage_rerun.status_code == 200
+    assert stage_rerun.json()["reused_stages"] == [
+        "INGESTING",
+        "EXTRACTING",
+        "PLANNING",
+        "CREATING",
+        "VERIFYING_INITIAL",
+        "REVISING",
+        "VERIFYING_FINAL",
+    ]
+    assert stage_rerun.json()["rebuilt_stages"] == ["RENDERING"]
     active = client.get("/api/n31").json()
     assert active["summary"]["metrics_status"] == "FINAL"
     assert len(active["checklist"]["items"]) == 13
+    assert active["stage_run"]["start_stage"] == "RENDERING"
 
 
 def test_artifact_media_type_is_explicit() -> None:
