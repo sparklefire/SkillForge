@@ -76,7 +76,9 @@ def test_rejects_stale_optional_artifact_before_publication(tmp_path) -> None:
 
 def test_rejects_selective_report_bound_to_different_audit(tmp_path) -> None:
     source = tmp_path / "source"
-    shutil.copytree(ROOT / "cases/n31/output/gold_rehearsal_v1", source)
+    # Use the tracked, schema-gated fixture instead of a developer-specific
+    # ignored rehearsal cache, which may legitimately be from an older run.
+    shutil.copytree(ROOT / "cases/n31/demo_bundle", source)
     audit_path = source / "revision_audit.json"
     audit = json.loads(audit_path.read_text(encoding="utf-8"))
     audit["completed_at"] = "2026-01-01T00:00:00+00:00"
