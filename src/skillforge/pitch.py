@@ -13,6 +13,7 @@ from typing import Any
 from fastapi.testclient import TestClient
 
 from .contracts import validate_document
+from .conflict_adjudication import route_conflict
 from .demo import ROOT
 from .web import create_app
 
@@ -521,6 +522,17 @@ def _check_demo_modes(runbook: dict[str, Any], root: Path) -> dict[str, Any]:
     )
     health = client.get("/health")
     payload = client.get("/api/n31")
+    conflict_session = client.post("/api/n31/conflicts/sessions")
+    safety_probe = dict(payload.json()["initial_conflicts"]["conflicts"][0])
+    safety_probe.update(
+        {
+            "kind": "UNSUPPORTED_SAFETY_CLAIM",
+            "automatic": True,
+            "proposed_action": "REPLACE",
+            "status": "OPEN",
+        }
+    )
+    safety_route = route_conflict(safety_probe)
     rerun = client.post("/api/n31/run")
     stage_before = client.get("/api/n31/stages/current")
     stage_rerun = client.post("/api/n31/stages/RENDERING/rerun")
@@ -585,6 +597,41 @@ def _check_demo_modes(runbook: dict[str, Any], root: Path) -> dict[str, Any]:
         and offline_bundle.get("contains_credentials") is False,
         "offline_payload": payload.status_code == 200
         and payload.json()["summary"].get("gold_status") == "GOLD",
+        "conflict_decision_auditable": conflict_session.status_code == 200
+        and conflict_session.json().get("status") == "AUTO_FINALIZED"
+        and conflict_session.json().get("finalization")
+        == {
+            "publishable": True,
+            "final_sop_sha256": conflict_session.json()
+            .get("source_bindings", {})
+            .get("proposed_sop_sha256"),
+            "proposed_residual_conflict_count": 0,
+            "adopted_unresolved_conflict_count": 0,
+            "adopted_conflict_count": 5,
+            "rejected_conflict_count": 0,
+            "pending_conflict_count": 0,
+        }
+        and all(
+            item.get("route") == "AUTO"
+            and item.get("human_decision") == "NOT_REQUIRED"
+            and item.get("final_result")
+            in {"ADOPTED", "RESOLVED_BY_RELATED_CHANGE"}
+            for item in conflict_session.json().get("decisions", [])
+        ),
+        "safety_conflict_human_gate": safety_route[0] == "HUMAN"
+        and safety_route[2] is True
+        and conflict_session.json()
+        .get("routing_policy", {})
+        .get("safety_override_enabled")
+        is True
+        and conflict_session.json()
+        .get("routing_policy", {})
+        .get("human_required_kinds")
+        == [
+            "UNSUPPORTED_SAFETY_CLAIM",
+            "MISSING_EVIDENCE",
+            "INVALID_EVIDENCE",
+        ],
         "workflow_checkpoint_safe": payload.status_code == 200
         and payload.json().get("workflow", {}).get("version") == 1
         and payload.json().get("workflow", {}).get("state") == "COMPLETED"

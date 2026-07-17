@@ -1,0 +1,191 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/conflict_decision_session.schema.json",
+  "title": "SkillForge Conflict Decision Session",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "artifact_type",
+    "version",
+    "session_id",
+    "case_id",
+    "created_at",
+    "updated_at",
+    "status",
+    "routing_policy",
+    "source_bindings",
+    "decisions",
+    "finalization",
+    "events",
+    "data_policy"
+  ],
+  "properties": {
+    "artifact_type": {"const": "CONFLICT_DECISION_SESSION"},
+    "version": {"const": 1},
+    "session_id": {"type": "string", "pattern": "^[a-f0-9]{32}$"},
+    "case_id": {"type": "string", "minLength": 1},
+    "created_at": {"type": "string", "format": "date-time"},
+    "updated_at": {"type": "string", "format": "date-time"},
+    "status": {
+      "enum": ["AUTO_FINALIZED", "AWAITING_HUMAN", "FINALIZED", "NEEDS_REVIEW"]
+    },
+    "routing_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["safety_override_enabled", "human_required_kinds", "human_required_action"],
+      "properties": {
+        "safety_override_enabled": {"const": true},
+        "human_required_kinds": {
+          "const": ["UNSUPPORTED_SAFETY_CLAIM", "MISSING_EVIDENCE", "INVALID_EVIDENCE"]
+        },
+        "human_required_action": {"const": "REVIEW"}
+      }
+    },
+    "source_bindings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "initial_conflicts_sha256",
+        "revision_audit_sha256",
+        "proposed_sop_sha256",
+        "final_conflicts_sha256"
+      ],
+      "properties": {
+        "initial_conflicts_sha256": {"$ref": "#/$defs/sha256"},
+        "revision_audit_sha256": {"$ref": "#/$defs/sha256"},
+        "proposed_sop_sha256": {"$ref": "#/$defs/sha256"},
+        "final_conflicts_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "decisions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "conflict_id",
+          "kind",
+          "severity",
+          "step_ids",
+          "message",
+          "evidence_ids",
+          "proposed_action",
+          "change_paths",
+          "route",
+          "route_reason",
+          "safety_override",
+          "automatic_decision",
+          "human_decision",
+          "final_result",
+          "confirmed_by",
+          "confirmed_at",
+          "comment"
+        ],
+        "properties": {
+          "conflict_id": {"type": "string", "pattern": "^C[0-9]{3}$"},
+          "kind": {
+            "enum": [
+              "MISSING_STEP",
+              "MISSING_PREREQUISITE",
+              "ORDER_ERROR",
+              "UNSUPPORTED_TOOL",
+              "UNSUPPORTED_PARAMETER",
+              "UNSUPPORTED_SAFETY_CLAIM",
+              "MISSING_EVIDENCE",
+              "INVALID_EVIDENCE"
+            ]
+          },
+          "severity": {"enum": ["LOW", "MEDIUM", "HIGH", "CRITICAL"]},
+          "step_ids": {
+            "type": "array",
+            "items": {"type": "string", "pattern": "^S[0-9]{2}$"}
+          },
+          "message": {"type": "string", "minLength": 1},
+          "evidence_ids": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {"type": "string", "pattern": "^E[0-9]{3}$"}
+          },
+          "proposed_action": {"enum": ["INSERT", "REORDER", "REMOVE", "REPLACE", "REVIEW"]},
+          "change_paths": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {"type": "string", "minLength": 1}
+          },
+          "route": {"enum": ["AUTO", "HUMAN"]},
+          "route_reason": {"type": "string", "minLength": 1},
+          "safety_override": {"type": "boolean"},
+          "automatic_decision": {"enum": ["ADOPT_PROPOSED", "DEFER_TO_HUMAN"]},
+          "human_decision": {"enum": ["NOT_REQUIRED", "PENDING", "APPROVED", "REJECTED"]},
+          "final_result": {"enum": ["PENDING", "ADOPTED", "KEPT_ORIGINAL", "RESOLVED_BY_RELATED_CHANGE"]},
+          "confirmed_by": {
+            "oneOf": [{"type": "null"}, {"const": "OPERATOR"}]
+          },
+          "confirmed_at": {
+            "oneOf": [{"type": "null"}, {"type": "string", "format": "date-time"}]
+          },
+          "comment": {
+            "oneOf": [{"type": "null"}, {"type": "string", "minLength": 1, "maxLength": 500}]
+          }
+        }
+      }
+    },
+    "finalization": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "publishable",
+        "final_sop_sha256",
+        "proposed_residual_conflict_count",
+        "adopted_unresolved_conflict_count",
+        "adopted_conflict_count",
+        "rejected_conflict_count",
+        "pending_conflict_count"
+      ],
+      "properties": {
+        "publishable": {"type": "boolean"},
+        "final_sop_sha256": {
+          "oneOf": [{"type": "null"}, {"$ref": "#/$defs/sha256"}]
+        },
+        "proposed_residual_conflict_count": {"type": "integer", "minimum": 0},
+        "adopted_unresolved_conflict_count": {"type": "integer", "minimum": 0},
+        "adopted_conflict_count": {"type": "integer", "minimum": 0},
+        "rejected_conflict_count": {"type": "integer", "minimum": 0},
+        "pending_conflict_count": {"type": "integer", "minimum": 0}
+      }
+    },
+    "events": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["event_id", "event_type", "conflict_id", "actor", "automatic", "detail", "recorded_at"],
+        "properties": {
+          "event_id": {"type": "string", "pattern": "^[a-f0-9]{32}$"},
+          "event_type": {"enum": ["SESSION_CREATED", "AUTO_ADOPTED", "HUMAN_APPROVED", "HUMAN_REJECTED", "FINALIZED", "REOPENED"]},
+          "conflict_id": {
+            "oneOf": [{"type": "null"}, {"type": "string", "pattern": "^C[0-9]{3}$"}]
+          },
+          "actor": {"enum": ["SYSTEM", "OPERATOR"]},
+          "automatic": {"type": "boolean"},
+          "detail": {"type": "string", "minLength": 1, "maxLength": 500},
+          "recorded_at": {"type": "string", "format": "date-time"}
+        }
+      }
+    },
+    "data_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["external_model_calls", "contains_raw_media", "contains_credentials", "contains_absolute_paths"],
+      "properties": {
+        "external_model_calls": {"const": 0},
+        "contains_raw_media": {"const": false},
+        "contains_credentials": {"const": false},
+        "contains_absolute_paths": {"const": false}
+      }
+    }
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+  }
+}

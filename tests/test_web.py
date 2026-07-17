@@ -66,6 +66,8 @@ def test_web_accepts_operator_reviewed_gold_result(tmp_path) -> None:
     assert "受影响范围与选择性重建" in home.text
     assert "/api/n31/artifacts/selective-rebuild" in home.text
     assert "操作者 SOP 审核台" in home.text
+    assert "冲突裁决与最终采用" in home.text
+    assert "安全声明、缺失证据、无效证据" in home.text
     assert "单步重建" in home.text
     assert "/api/n31/evidence/" in home.text
     assert "可恢复工作流检查点" in home.text
@@ -249,6 +251,34 @@ def test_web_accepts_operator_reviewed_gold_result(tmp_path) -> None:
         "/api/n31/checklist/previews/S"
     )
     assert client.get("/api/n31/evidence/E999").status_code == 404
+
+    conflict_session = client.post("/api/n31/conflicts/sessions")
+    assert conflict_session.status_code == 200
+    conflict_id = conflict_session.json()["session_id"]
+    assert conflict_session.json()["status"] == "AUTO_FINALIZED"
+    assert conflict_session.json()["finalization"] == {
+        "publishable": True,
+        "final_sop_sha256": conflict_session.json()["source_bindings"][
+            "proposed_sop_sha256"
+        ],
+        "proposed_residual_conflict_count": 0,
+        "adopted_unresolved_conflict_count": 0,
+        "adopted_conflict_count": 5,
+        "rejected_conflict_count": 0,
+        "pending_conflict_count": 0,
+    }
+    assert all(
+        item["final_result"] in {"ADOPTED", "RESOLVED_BY_RELATED_CHANGE"}
+        for item in conflict_session.json()["decisions"]
+    )
+    assert client.get(f"/api/n31/conflicts/sessions/{conflict_id}").status_code == 200
+    manual_override = client.patch(
+        f"/api/n31/conflicts/sessions/{conflict_id}/decisions/C001",
+        json={"human_decision": "APPROVED", "comment": "错误尝试人工覆盖"},
+    )
+    assert manual_override.status_code == 400
+    assert "不能伪装成人工裁决" in manual_override.json()["detail"]
+    assert client.get("/api/n31/conflicts/sessions/not-found").status_code == 404
 
     review = client.post("/api/n31/review/sessions")
     assert review.status_code == 200

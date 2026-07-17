@@ -158,6 +158,7 @@
     {
       "assertions": {
         "artifact_stage_rerun": true,
+        "conflict_decision_auditable": true,
         "entry_script": true,
         "evidence_locator_safe": true,
         "health": true,
@@ -166,6 +167,7 @@
         "offline_bundle_safe": true,
         "offline_payload": true,
         "operator_review_controls": true,
+        "safety_conflict_human_gate": true,
         "workflow_checkpoint_safe": true
       },
       "check_id": "DEMO_FALLBACKS",
@@ -174,7 +176,7 @@
   ],
   "contains_credentials": false,
   "contains_raw_media": false,
-  "generated_at": "2026-07-17T14:17:52.713277+00:00",
+  "generated_at": "2026-07-17T14:43:33.431498+00:00",
   "pending_human_gates": [
     "TRAINING_VIDEO_FULL_WATCH",
     "FINAL_STAGE_REHEARSAL",
