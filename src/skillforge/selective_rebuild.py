@@ -24,6 +24,17 @@ def _canonical_sha256(payload: Any) -> str:
     return hashlib.sha256(encoded).hexdigest()
 
 
+def revision_audit_binding(audit: dict[str, Any]) -> str:
+    """Bind semantic revision content while allowing deterministic rerun timestamps."""
+
+    semantic_audit = {
+        key: value
+        for key, value in audit.items()
+        if key not in {"started_at", "completed_at"}
+    }
+    return _canonical_sha256(semantic_audit)
+
+
 def _compact_sop(sop: dict[str, Any]) -> dict[str, Any]:
     return {
         "case_id": sop["case_id"],
@@ -299,7 +310,7 @@ def build_selective_rebuild_report(
         "source_bindings": {
             "before_sop_sha256": _canonical_sha256(_compact_sop(before_full)),
             "after_sop_sha256": _canonical_sha256(_compact_sop(after_full)),
-            "revision_audit_sha256": _canonical_sha256(audit),
+            "revision_audit_sha256": revision_audit_binding(audit),
             "storyboard_sha256": _canonical_sha256(storyboard),
         },
         "affected_steps": affected,

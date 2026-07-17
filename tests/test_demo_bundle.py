@@ -81,7 +81,7 @@ def test_rejects_selective_report_bound_to_different_audit(tmp_path) -> None:
     shutil.copytree(ROOT / "cases/n31/demo_bundle", source)
     audit_path = source / "revision_audit.json"
     audit = json.loads(audit_path.read_text(encoding="utf-8"))
-    audit["completed_at"] = "2026-01-01T00:00:00+00:00"
+    audit["changes"][0]["reason"] += "（被篡改）"
     audit_path.write_text(json.dumps(audit, ensure_ascii=False), encoding="utf-8")
 
     with pytest.raises(ValueError, match="revision_audit_sha256"):

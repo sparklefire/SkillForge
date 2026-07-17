@@ -2,7 +2,10 @@ import copy
 import json
 from pathlib import Path
 
-from skillforge.selective_rebuild import build_selective_rebuild_report
+from skillforge.selective_rebuild import (
+    build_selective_rebuild_report,
+    revision_audit_binding,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -85,3 +88,14 @@ def test_source_bindings_are_deterministic() -> None:
     second = _report()
     assert first == second
     assert all(len(value) == 64 for value in first["source_bindings"].values())
+
+
+def test_revision_binding_ignores_runtime_timestamps_but_not_content() -> None:
+    audit = _read("cases/n31/demo_bundle/revision_audit.json")
+    rerun = copy.deepcopy(audit)
+    rerun["started_at"] = "2026-01-01T00:00:00+00:00"
+    rerun["completed_at"] = "2026-01-01T00:00:01+00:00"
+    assert revision_audit_binding(rerun) == revision_audit_binding(audit)
+
+    rerun["changes"][0]["reason"] += "（变化）"
+    assert revision_audit_binding(rerun) != revision_audit_binding(audit)

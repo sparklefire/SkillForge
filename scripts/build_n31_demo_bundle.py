@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any
 
 from skillforge.contracts import validate_document
+from skillforge.selective_rebuild import revision_audit_binding
 
 
 REQUIRED = (
@@ -96,12 +97,16 @@ def _validate_cross_bindings(output: Path) -> None:
     sources = {
         "before_sop_sha256": output / "before_sop.json",
         "after_sop_sha256": output / "after_sop.json",
-        "revision_audit_sha256": output / "revision_audit.json",
     }
     for binding, path in sources.items():
         actual = _canonical_sha256(_read(path))
         if bindings[binding] != actual:
             raise ValueError(f"选择性重建报告的{binding}与离线包内容不一致")
+    audit_binding = revision_audit_binding(_read(output / "revision_audit.json"))
+    if bindings["revision_audit_sha256"] != audit_binding:
+        raise ValueError(
+            "选择性重建报告的revision_audit_sha256与离线包内容不一致"
+        )
 
 
 def build_bundle(

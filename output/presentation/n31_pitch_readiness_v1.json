@@ -13,7 +13,7 @@
       "items": [
         {
           "artifact_id": "DEMO_BUNDLE",
-          "detail": "2268 bytes · sha256=71336a58115c2e76e44238df663449ade2aade75257fbacf03d95ceacd227755",
+          "detail": "2268 bytes · sha256=6fb8a9608b983de64374ce14128b3c03b20bf6fe07074837da36439daf94c92b",
           "path": "cases/n31/demo_bundle/bundle.json",
           "status": "PASSED"
         },
@@ -73,7 +73,7 @@
         },
         {
           "artifact_id": "SELECTIVE_REBUILD",
-          "detail": "5669 bytes · sha256=3c8515030d1175e66bea7d9a36da8527f68ca858117c6d364f10015d88aa8d76",
+          "detail": "5669 bytes · sha256=5d6b06f6fac263cfdad71e4aea687fb1ad1501e904e4169e0d4ad6ae396c568c",
           "path": "cases/n31/evaluations/selective_rebuild_v1.json",
           "status": "PASSED"
         },
@@ -173,7 +173,7 @@
   ],
   "contains_credentials": false,
   "contains_raw_media": false,
-  "generated_at": "2026-07-17T13:48:56.474248+00:00",
+  "generated_at": "2026-07-17T13:57:35.599601+00:00",
   "pending_human_gates": [
     "TRAINING_VIDEO_FULL_WATCH",
     "FINAL_STAGE_REHEARSAL",
