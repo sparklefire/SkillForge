@@ -43,7 +43,7 @@ def test_build_candidate_sop_and_review_queue() -> None:
                 "action": "Perform an action.",
                 "object": "Object",
                 "prerequisites": [f"S{index - 1:02d}"] if index > 1 else [],
-                "tools": [],
+                "tools": [f"Tool {index}"],
                 "parameters": (
                     [
                         {
@@ -56,7 +56,7 @@ def test_build_candidate_sop_and_review_queue() -> None:
                     if index == 1
                     else []
                 ),
-                "warnings": [],
+                "warnings": [f"Warning {index}."],
                 "success_check": "Action is complete.",
                 "evidence_selectors": [
                     {"source_ref": "MANUAL", "page": index}

@@ -94,3 +94,8 @@ def test_pitch_requires_traceable_training_package() -> None:
     result = _check_metrics(ROOT)
     assert result["assertions"]["training_package_traceable"] is True
     assert result["assertions"]["checklist_previews_public"] is True
+
+
+def test_pitch_requires_five_grounded_quiz_categories() -> None:
+    result = _check_metrics(ROOT)
+    assert result["assertions"]["training_quiz_grounded"] is True

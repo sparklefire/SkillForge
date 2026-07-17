@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 
 from scripts.build_n31_demo_bundle import build_bundle
+from skillforge.contracts import validate_document
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -23,3 +24,6 @@ def test_builds_asset_free_gold_bundle(tmp_path) -> None:
     assert views["artifact_type"] == "SOP_VIEWS"
     checklist = json.loads((output / "checklist.json").read_text(encoding="utf-8"))
     assert checklist["interaction_mode"] == "ONE_STEP_PER_SCREEN"
+    quiz = json.loads((output / "quiz.json").read_text(encoding="utf-8"))
+    validate_document(quiz, "training_quiz.schema.json")
+    assert quiz["coverage"]["category_count"] == 5

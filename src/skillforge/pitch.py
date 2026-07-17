@@ -149,6 +149,10 @@ def _check_metrics(root: Path) -> dict[str, Any]:
         _read_json(root / "cases/n31/demo_bundle/checklist.json"),
         "mobile_checklist.schema.json",
     )
+    quiz = validate_document(
+        _read_json(root / "cases/n31/demo_bundle/quiz.json"),
+        "training_quiz.schema.json",
+    )
     checklist_thumbnails = validate_document(
         _read_json(root / "output/checklist_thumbnails/manifest.json"),
         "checklist_thumbnail_manifest.schema.json",
@@ -271,6 +275,39 @@ def _check_metrics(root: Path) -> dict[str, Any]:
             item["step_id"]: item["keyframe"]["preview_path"]
             for item in checklist["items"]
         },
+        "training_quiz_grounded": quiz["coverage"]
+        == {
+            "question_count": 5,
+            "category_count": 5,
+            "categories": [
+                "ORDERING",
+                "TOOL_SELECTION",
+                "RISK_RESPONSE",
+                "STATUS_RECOGNITION",
+                "ERROR_JUDGMENT",
+            ],
+            "all_answers_grounded": True,
+            "all_explanations_grounded": True,
+        }
+        and [item["type"] for item in quiz["questions"]]
+        == [
+            "ORDERING",
+            "MULTIPLE_SELECT",
+            "SINGLE_CHOICE",
+            "SINGLE_CHOICE",
+            "TRUE_FALSE",
+        ]
+        and all(
+            set(item["answer_evidence_ids"]) <= set(item["evidence_ids"])
+            and set(item["explanation_evidence_ids"]) <= set(item["evidence_ids"])
+            and {detail["evidence_id"] for detail in item["evidence_details"]}
+            == set(item["evidence_ids"])
+            and all(
+                set(option["evidence_ids"]) <= set(item["evidence_ids"])
+                for option in item["options"]
+            )
+            for item in quiz["questions"]
+        ),
         "video_manifest_bound": video_path.is_file()
         and manifest["output"]["sha256"] == _sha256(video_path)
         and manifest["coverage"]["covered_gold_step_count"]

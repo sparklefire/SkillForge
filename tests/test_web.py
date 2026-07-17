@@ -103,6 +103,14 @@ def test_web_accepts_operator_reviewed_gold_result(tmp_path) -> None:
         "evidence",
     }
     assert len(response.json()["quiz"]["questions"]) == 5
+    assert [item["category"] for item in response.json()["quiz"]["questions"]] == [
+        "ORDERING",
+        "TOOL_SELECTION",
+        "RISK_RESPONSE",
+        "STATUS_RECOGNITION",
+        "ERROR_JUDGMENT",
+    ]
+    assert response.json()["quiz"]["coverage"]["all_answers_grounded"] is True
     checklist = client.get("/api/n31/artifacts/checklist")
     assert checklist.status_code == 200
     assert checklist.json()["case_id"] == "n31_media_change"
@@ -110,6 +118,10 @@ def test_web_accepts_operator_reviewed_gold_result(tmp_path) -> None:
     sop_views = client.get("/api/n31/artifacts/sop-views")
     assert sop_views.status_code == 200
     assert sop_views.json()["artifact_type"] == "SOP_VIEWS"
+    quiz = client.get("/api/n31/artifacts/quiz")
+    assert quiz.status_code == 200
+    assert quiz.json()["artifact_type"] == "TRAINING_QUIZ"
+    assert quiz.json()["coverage"]["category_count"] == 5
     session = client.post("/api/n31/checklist/sessions")
     assert session.status_code == 200
     session_id = session.json()["session_id"]

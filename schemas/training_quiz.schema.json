@@ -1,0 +1,144 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/training_quiz.schema.json",
+  "title": "SkillForge Evidence-backed Training Quiz",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["artifact_type", "version", "case_id", "sop_version", "coverage", "questions"],
+  "properties": {
+    "artifact_type": {"const": "TRAINING_QUIZ"},
+    "version": {"const": 1},
+    "case_id": {"type": "string", "minLength": 1},
+    "sop_version": {"type": "integer", "minimum": 1},
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["question_count", "category_count", "categories", "all_answers_grounded", "all_explanations_grounded"],
+      "properties": {
+        "question_count": {"const": 5},
+        "category_count": {"const": 5},
+        "categories": {
+          "type": "array",
+          "const": ["ORDERING", "TOOL_SELECTION", "RISK_RESPONSE", "STATUS_RECOGNITION", "ERROR_JUDGMENT"]
+        },
+        "all_answers_grounded": {"const": true},
+        "all_explanations_grounded": {"const": true}
+      }
+    },
+    "questions": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "items": {"$ref": "#/$defs/question"},
+      "allOf": [
+        {"contains": {"properties": {"category": {"const": "ORDERING"}}, "required": ["category"]}, "minContains": 1, "maxContains": 1},
+        {"contains": {"properties": {"category": {"const": "TOOL_SELECTION"}}, "required": ["category"]}, "minContains": 1, "maxContains": 1},
+        {"contains": {"properties": {"category": {"const": "RISK_RESPONSE"}}, "required": ["category"]}, "minContains": 1, "maxContains": 1},
+        {"contains": {"properties": {"category": {"const": "STATUS_RECOGNITION"}}, "required": ["category"]}, "minContains": 1, "maxContains": 1},
+        {"contains": {"properties": {"category": {"const": "ERROR_JUDGMENT"}}, "required": ["category"]}, "minContains": 1, "maxContains": 1}
+      ]
+    }
+  },
+  "$defs": {
+    "option": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["option_id", "text", "value", "evidence_ids"],
+      "properties": {
+        "option_id": {"type": "string", "pattern": "^O[0-9]{2}$"},
+        "text": {"type": "string", "minLength": 1},
+        "value": {"type": "string", "minLength": 1},
+        "evidence_ids": {
+          "type": "array", "minItems": 1, "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^E[0-9]{3}$"}
+        }
+      }
+    },
+    "question": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["question_id", "category", "type", "prompt", "step_ids", "options", "answer", "explanation", "evidence_ids", "answer_evidence_ids", "explanation_evidence_ids", "evidence_details"],
+      "properties": {
+        "question_id": {"type": "string", "pattern": "^Q[0-9]{2}$"},
+        "category": {"enum": ["ORDERING", "TOOL_SELECTION", "RISK_RESPONSE", "STATUS_RECOGNITION", "ERROR_JUDGMENT"]},
+        "type": {"enum": ["ORDERING", "MULTIPLE_SELECT", "SINGLE_CHOICE", "TRUE_FALSE"]},
+        "prompt": {"type": "string", "minLength": 1},
+        "step_ids": {
+          "type": "array", "minItems": 1, "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^S[0-9]{2}$"}
+        },
+        "options": {"type": "array", "items": {"$ref": "#/$defs/option"}},
+        "answer": {
+          "oneOf": [
+            {"type": "boolean"},
+            {"type": "string", "minLength": 1},
+            {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+          ]
+        },
+        "explanation": {"type": "string", "minLength": 1},
+        "evidence_ids": {
+          "type": "array", "minItems": 1, "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^E[0-9]{3}$"}
+        },
+        "answer_evidence_ids": {
+          "type": "array", "minItems": 1, "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^E[0-9]{3}$"}
+        },
+        "explanation_evidence_ids": {
+          "type": "array", "minItems": 1, "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^E[0-9]{3}$"}
+        },
+        "evidence_details": {
+          "type": "array", "minItems": 1,
+          "items": {"$ref": "https://skillforge.local/schemas/evidence.schema.json"}
+        }
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"category": {"const": "ORDERING"}}},
+          "then": {
+            "properties": {
+              "type": {"const": "ORDERING"},
+              "step_ids": {"minItems": 3, "maxItems": 4},
+              "options": {"minItems": 3, "maxItems": 4},
+              "answer": {"type": "array", "minItems": 3, "maxItems": 4, "items": {"type": "string", "pattern": "^S[0-9]{2}$"}}
+            }
+          }
+        },
+        {
+          "if": {"properties": {"category": {"const": "TOOL_SELECTION"}}},
+          "then": {
+            "properties": {
+              "type": {"const": "MULTIPLE_SELECT"},
+              "step_ids": {"minItems": 1, "maxItems": 1},
+              "options": {"minItems": 2, "maxItems": 10},
+              "answer": {"type": "array", "minItems": 1, "maxItems": 10, "items": {"type": "string", "minLength": 1}}
+            }
+          }
+        },
+        {
+          "if": {"properties": {"category": {"enum": ["RISK_RESPONSE", "STATUS_RECOGNITION"]}}},
+          "then": {
+            "properties": {
+              "type": {"const": "SINGLE_CHOICE"},
+              "step_ids": {"minItems": 1, "maxItems": 1},
+              "options": {"minItems": 3, "maxItems": 4},
+              "answer": {"type": "string", "minLength": 1}
+            }
+          }
+        },
+        {
+          "if": {"properties": {"category": {"const": "ERROR_JUDGMENT"}}},
+          "then": {
+            "properties": {
+              "type": {"const": "TRUE_FALSE"},
+              "step_ids": {"minItems": 1, "maxItems": 1},
+              "options": {"maxItems": 0},
+              "answer": {"const": false}
+            }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -31,12 +31,12 @@
     },
     {
       "name": "quiz.json",
-      "sha256": "50d9e3ba55529dbc557e9f795c10e0d014771143871ac07bd50ef606504209b5",
-      "size_bytes": 2140
+      "sha256": "28d2a117c621a82f228f6b56bdc719aea88e7390b0b2a85e871e89088d88f514",
+      "size_bytes": 43829
     },
     {
       "name": "revision_audit.json",
-      "sha256": "ccca30d666b931978cc1e430c59e4cf0ea989ea228ac88d29e725a9734f8a6c2",
+      "sha256": "1a338b9df1fd9206a7e3e2628622d35cdd2b986728a34716545d0331f9666072",
       "size_bytes": 3176
     },
     {
@@ -51,7 +51,7 @@
     },
     {
       "name": "workflow.json",
-      "sha256": "b0c7edb52c0a9fcac1b0eda62a0b9462e0be2f1dfdb4ce31a23f7386ff957186",
+      "sha256": "e412c1561cb83d8469c17779cda0ae4feb3b98872da1776411f105935b76338e",
       "size_bytes": 1684
     }
   ],
