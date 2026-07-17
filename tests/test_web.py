@@ -68,6 +68,8 @@ def test_web_accepts_operator_reviewed_gold_result(tmp_path) -> None:
     assert "/api/n31/artifacts/semantic-review" in home.text
     assert "受影响范围与选择性重建" in home.text
     assert "/api/n31/artifacts/selective-rebuild" in home.text
+    assert "交付配置与低码率素材预览" in home.text
+    assert "<video controls" in home.text
     assert "操作者 SOP 审核台" in home.text
     assert "专家口述 ASR 快速修正" in home.text
     assert "重新计算Evidence绑定摘要" in home.text
@@ -127,6 +129,15 @@ def test_web_accepts_operator_reviewed_gold_result(tmp_path) -> None:
         "VERIFIER_QUEUE": 6,
         "HUMAN_REVIEW_REQUIRED": 1,
     }
+    output_profile = response.json()["output_profile"]
+    assert output_profile["audience"]["primary_role"] == "NEW_OPERATOR"
+    assert output_profile["language"]["locale"] == "zh-CN"
+    assert output_profile["duration"]["training_video_target_seconds"] == 80
+    previews = response.json()["video_previews"]
+    assert previews["manifest"]["summary"]["source_count"] == 6
+    assert previews["manifest"]["summary"]["all_checks_passed"] is True
+    assert len(previews["availability"]) == 6
+    assert 0 <= previews["available_count"] <= 6
     grounding_gate = response.json()["grounding_gate"]
     assert grounding_gate["status"] == "PASSED"
     assert grounding_gate["summary"] == {

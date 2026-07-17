@@ -1,0 +1,50 @@
+{
+  "artifact_type": "CASE_OUTPUT_PROFILE",
+  "version": 1,
+  "case_id": "n31_media_change",
+  "audience": {
+    "primary_role": "NEW_OPERATOR",
+    "experience_level": "BEGINNER",
+    "usage_context": "ON_DEVICE_TASK_SUPPORT"
+  },
+  "language": {
+    "locale": "zh-CN",
+    "content_language": "SIMPLIFIED_CHINESE",
+    "narration_language": "MANDARIN",
+    "terminology_policy": "DEVICE_MANUAL_AND_OPERATOR_VERIFIED"
+  },
+  "duration": {
+    "source_video_min_seconds": 180,
+    "source_video_max_seconds": 480,
+    "training_video_min_seconds": 60,
+    "training_video_target_seconds": 80,
+    "training_video_max_seconds": 90
+  },
+  "output_types": [
+    {"output_type": "STRUCTURED_SOP", "format": "JSON", "required": true},
+    {"output_type": "MOBILE_CHECKLIST", "format": "JSON", "required": true},
+    {"output_type": "TRAINING_QUIZ", "format": "JSON", "required": true},
+    {"output_type": "A4_POSTER", "format": "PDF", "required": true},
+    {"output_type": "TRAINING_VIDEO", "format": "MP4", "required": true},
+    {"output_type": "REVISION_AUDIT", "format": "JSON", "required": true}
+  ],
+  "preview_profile": {
+    "max_width": 854,
+    "max_height": 480,
+    "fps": 15,
+    "video_codec": "h264",
+    "target_video_kbps": 420,
+    "audio_codec": "aac",
+    "audio_kbps": 48,
+    "max_total_kbps": 600,
+    "faststart": true,
+    "accepted_privacy_status": "LOCAL_QA_PASSED"
+  },
+  "data_policy": {
+    "storage_scope": "LOCAL_PRIVATE_DERIVATIVE",
+    "external_model_calls": 0,
+    "third_party_sources_allowed": false,
+    "contains_credentials": false,
+    "contains_absolute_paths": false
+  }
+}

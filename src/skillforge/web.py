@@ -25,6 +25,10 @@ from .evidence_locator import build_evidence_locator
 from .gold_stage_runner import GoldStage, GoldStageExecutor, GoldStageRunStore
 from .ingest import IngestionPipeline
 from .review_sessions import SopReviewSessionStore, rebuild_step_artifacts
+from .video_preview import (
+    validate_output_profile,
+    verified_preview_path,
+)
 
 
 MAX_UPLOAD_BYTES = 512 * 1024 * 1024
@@ -123,6 +127,7 @@ HTML = """<!doctype html>
   <section class="panel" id="temporal-panel" hidden><h2>连续动作候选窗口</h2><div id="temporal-metrics" class="grid"></div><p id="temporal-note"></p><div id="temporal-windows"></div></section>
   <section class="panel" id="pdf-panel" hidden><h2>手册结构与检索验证</h2><div id="pdf-metrics" class="grid"></div><p id="pdf-note"></p><div id="pdf-queries"></div></section>
   <section class="panel" id="candidate-panel" hidden><h2>三类来源候选 → 规范步骤</h2><div id="candidate-metrics" class="grid"></div><p id="candidate-note"></p><div id="candidate-groups"></div></section>
+  <section class="panel" id="output-profile-panel" hidden><h2>交付配置与低码率素材预览</h2><div id="output-profile-metrics" class="grid"></div><p id="output-profile-note"></p><div id="video-previews"></div></section>
   <section class="panel" id="multisource-panel" hidden><h2>为什么需要多源证据</h2><div id="source-metrics" class="grid"></div><p id="visual-note"></p></section>
   <section class="panel" id="grounding-panel" hidden><h2>无来源内容拒绝门禁</h2><div id="grounding-metrics" class="grid"></div><p>四个独立篡改场景均执行：发现问题 → 展示当前步骤Evidence边界 → 局部修订 → 重新质检。</p><div id="grounding-scenarios"></div></section>
   <section class="panel" id="semantic-panel" hidden><h2>高推理语义质检</h2><div id="semantic-metrics" class="grid"></div><p id="semantic-note"></p><div id="semantic-assessments"></div></section>
@@ -170,6 +175,7 @@ if(d.dgx_visual_compute){const g=d.dgx_visual_compute,s=g.summary;document.query
 if(d.temporal_action_windows){const t=d.temporal_action_windows,s=t.summary;document.querySelector('#temporal-panel').hidden=false;document.querySelector('#temporal-metrics').innerHTML=[['Gold步骤',s.step_count],['连续窗口',s.window_count],['视频来源',s.source_count],['DGX候选命中窗口',s.window_with_dgx_candidate_count],['独立DGX候选',s.unique_dgx_candidate_count]].map(x=>`<div class="metric"><span class="muted">${esc(x[0])}</span><strong>${esc(x[1])}</strong></div>`).join('');document.querySelector('#temporal-note').textContent='窗口只把同一视频时间线内的相邻Evidence区间合并，并绑定附近DGX场景候选；它用于定位人工/模型复核范围，不自动证明动作完成。';document.querySelector('#temporal-windows').innerHTML=t.windows.slice(0,6).map(w=>`<div class="change"><b>${esc(w.window_id)} · ${esc(w.title)}</b><div>${esc(w.source_ref)}｜${(w.start_ms/1000).toFixed(1)}–${(w.end_ms/1000).toFixed(1)}秒｜视觉${esc(w.visual_verdict)}</div><div class="evidence">Evidence：${esc(w.evidence_ids.join(', '))}｜DGX候选：${esc(w.dgx_candidate_timestamps_ms.map(v=>(v/1000).toFixed(1)+'s').join(', ')||'无')}</div></div>`).join('')}
 if(d.pdf_structure){const p=d.pdf_structure,s=p.summary;document.querySelector('#pdf-panel').hidden=false;document.querySelector('#pdf-metrics').innerHTML=[['手册',s.source_count],['页数',s.page_count],['结构块',s.block_count],['OCR处理页',s.ocr_applied_page_count],['待OCR页',s.needs_ocr_page_count],['检索验证',`${s.passed_query_count}/${s.query_count}`]].map(x=>`<div class="metric"><span class="muted">${esc(x[0])}</span><strong>${esc(x[1])}</strong></div>`).join('');document.querySelector('#pdf-note').textContent='原始手册、页面图和含正文检索索引只保存在本地；Web只展示不含正文的页码级验证报告。';document.querySelector('#pdf-queries').innerHTML=p.queries.map(q=>{const h=q.top_hits[0];return `<div class="change"><b>${esc(q.query_id)} · ${esc(q.query)}</b><div>${esc(q.status)}｜精确命中${esc(q.exact_match_count)}条</div><div class="evidence">${h?`首条：${esc(h.source_ref)} PDF第${esc(h.page)}页｜${esc(h.kind)}`:'无检索结果'}</div></div>`}).join('')}
 if(d.source_candidate_synthesis){const c=d.source_candidate_synthesis,s=c.summary,byStep=Object.fromEntries(c.ordered_steps.map(x=>[x.step_id,x]));document.querySelector('#candidate-panel').hidden=false;document.querySelector('#candidate-metrics').innerHTML=[['视频候选',s.source_candidate_counts.video],['手册候选',s.source_candidate_counts.pdf],['口述候选',s.source_candidate_counts.audio],['合并步骤',s.ordered_step_count],['多源步骤',s.multi_source_step_count],['人工复核',s.review_route_counts.HUMAN_REVIEW_REQUIRED],['粗/细粒度',`${s.coarse_candidate_count}/${s.fine_candidate_count}`]].map(x=>`<div class="metric"><span class="muted">${esc(x[0])}</span><strong>${esc(x[1])}</strong></div>`).join('');document.querySelector('#candidate-note').textContent='候选先按视频、手册和口述分别保存，再按来源权威性、多源佐证和负面观察计算置信度，随后拆分过粗动作、合并同义或过细动作并校验依赖。S04视频不可见，因此自动进入人工复核。';document.querySelector('#candidate-groups').innerHTML=c.merge_groups.slice(0,8).map(g=>{const a=byStep[g.step_id].confidence_assessment;return `<div class="change"><b>${esc(g.step_id)} · ${esc(g.operations.join(' + '))}</b><div>${esc(g.rationale)}</div><div>置信度 ${esc(a.score)} · ${esc(a.band)} · ${esc(a.route)}</div><div class="evidence">来源：${esc(g.source_types.join('、'))}｜候选：${esc(g.candidate_ids.join(', '))}｜Evidence：${esc(g.evidence_ids.join(', '))}</div></div>`}).join('')}
+if(d.output_profile&&d.video_previews){const p=d.output_profile,v=d.video_previews,m=v.manifest,a=Object.fromEntries(v.availability.map(x=>[x.source_id,x]));document.querySelector('#output-profile-panel').hidden=false;document.querySelector('#output-profile-metrics').innerHTML=[['受众',`${p.audience.primary_role} / ${p.audience.experience_level}`],['语言',p.language.locale],['培训视频',`${p.duration.training_video_target_seconds}秒`],['输出类型',p.output_types.length],['低码率预览',`${v.available_count}/${m.summary.source_count}`]].map(x=>`<div class="metric"><span class="muted">${esc(x[0])}</span><strong>${esc(x[1])}</strong></div>`).join('');document.querySelector('#output-profile-note').textContent=`预览固定不超过${m.profile.max_width}×${m.profile.max_height}、${m.profile.fps}fps、${m.profile.max_total_kbps}kbps；只处理LOCAL_QA_PASSED自摄安全视频，不调用外部模型。每个预览保留源时间轴到预览时间轴的映射。`;document.querySelector('#video-previews').innerHTML=m.items.map(x=>{const available=a[x.source_id]?.available;return `<div class="${available?'change':'step'}"><b>${esc(x.source_id)} · ${esc(x.source_role)}</b><div>${(x.preview_duration_ms/1000).toFixed(1)}秒 · ${esc(x.width)}×${esc(x.height)} · ${Number(x.fps).toFixed(1)}fps · ${Number(x.average_total_bitrate_kbps).toFixed(1)}kbps</div>${available?`<video controls preload="metadata" style="width:100%;max-height:320px;margin:10px 0;border-radius:10px;background:#000" src="${esc(a[x.source_id].media_url)}"></video>`:'<div class="muted">当前部署未携带私有预览文件；结构化映射和离线成果仍可用。</div>'}<div class="evidence">源0–${(x.source_duration_ms/1000).toFixed(1)}秒 → 预览0–${(x.preview_duration_ms/1000).toFixed(1)}秒｜时长差${x.duration_delta_ms}ms｜SHA ${esc(x.preview_sha256.slice(0,12))}</div></div>`}).join('')}
 if(d.multisource_comparison&&d.visual_review){const s=d.multisource_comparison.source_ablation,v=d.visual_review.summary,p=d.multisource_comparison.privacy_comparison;document.querySelector('#multisource-panel').hidden=false;document.querySelector('#source-metrics').innerHTML=[['手册单源',pct(s.manual_only.coverage)],['专家口述单源',pct(s.expert_audio_only.coverage)],['两种以上来源',pct(s.two_or_more_source_types.coverage)],['视频部分可观察',pct(s.video_observable_partial_or_better.coverage)],['视觉矛盾',v.contradicted_count]].map(x=>`<div class="metric"><span class="muted">${esc(x[0])}</span><strong>${esc(x[1])}</strong></div>`).join('');document.querySelector('#visual-note').textContent=`严格视觉复核：${v.supported_count}步完整支持、${v.partial_count}步部分可见、${v.not_visible_count}步不可见、${v.contradicted_count}步矛盾。模型标记${p.model_flagged_step_count}步需隐私复核；本地安全派生QA为${p.local_safe_derivative_qa}，标记保留但不自动推翻人工检查。`}
 if(d.grounding_gate){const g=d.grounding_gate,s=g.summary;document.querySelector('#grounding-panel').hidden=false;document.querySelector('#grounding-metrics').innerHTML=[['篡改场景',s.scenario_count],['成功检出',s.detected_count],['局部恢复',s.revised_count],['残留冲突',s.residual_conflict_count],['外部模型调用',g.model_calls]].map(x=>`<div class="metric"><span class="muted">${esc(x[0])}</span><strong>${esc(x[1])}</strong></div>`).join('');document.querySelector('#grounding-scenarios').innerHTML=g.scenarios.map(x=>`<div class="issue"><b>${esc(x.scenario_id)} · ${esc(x.expected_conflict_kind)}</b><div>${esc(x.mutation_summary)}</div><div>${esc(x.rejection_reason)}</div><div class="evidence">Evidence边界：${esc(x.reference_evidence_ids.join(', '))}</div><details><summary>查看修订前后</summary><div>修订前：${esc(JSON.stringify(x.before_value))}</div><div>修订后：${esc(JSON.stringify(x.after_value))}</div><div>动作：${esc(x.revision_actions.join(', '))}｜复检残留：${esc(x.residual_conflict_count)}</div></details></div>`).join('')}
 if(d.semantic_review){const r=d.semantic_review,s=r.summary;document.querySelector('#semantic-panel').hidden=false;document.querySelector('#semantic-metrics').innerHTML=[['复核步骤',s.step_count],['证据支持',s.supported_count],['语义问题',s.finding_count],['高严重度',s.high_severity_count],['模型调用',r.model_calls]].map(x=>`<div class="metric"><span class="muted">${esc(x[0])}</span><strong>${esc(x[1])}</strong></div>`).join('');document.querySelector('#semantic-note').textContent=`${r.model} · ${r.reasoning_effort}推理；检查曲解来源、来源冲突、顺序风险和异常遗漏。只发送${r.review_scope.evidence_count}条结构化Evidence陈述，不发送原始媒体、完整转写、手册页面、本地路径或凭证；模型不能自动覆盖Gold。`;document.querySelector('#semantic-assessments').innerHTML=r.assessments.map(x=>`<div class="change"><b>${esc(x.step_id)} · ${esc(x.verdict)} · 置信度${esc(x.confidence)}</b><div>${esc(x.rationale)}</div><div class="evidence">Evidence：${esc(x.evidence_ids.join(', '))}</div>${x.risk_notes.length?`<div class="warning-list">${esc(x.risk_notes.join('；'))}</div>`:''}</div>`).join('')}
@@ -330,6 +336,9 @@ def _suffix(kind: str, upload: UploadFile) -> str:
 def create_app(
     output_root: Path | None = None,
     n31_rehearsal_dir: Path | None = None,
+    n31_preview_dir: Path | None = None,
+    n31_preview_manifest_path: Path | None = None,
+    n31_output_profile_path: Path | None = None,
 ) -> FastAPI:
     root = (output_root or ROOT / "outputs").resolve()
     root.mkdir(parents=True, exist_ok=True)
@@ -366,6 +375,16 @@ def create_app(
     review_sessions = SopReviewSessionStore(root / "sop_review_sessions")
     conflict_decisions = ConflictDecisionStore(root / "conflict_decisions")
     asr_corrections = AsrCorrectionStore(root / "asr_correction_sessions")
+    preview_dir = (
+        n31_preview_dir or ROOT / "cases/n31/output/video_previews_v1"
+    ).expanduser().resolve()
+    preview_manifest_path = (
+        n31_preview_manifest_path
+        or ROOT / "cases/n31/evaluations/video_preview_manifest_v1.json"
+    ).expanduser().resolve()
+    output_profile_path = (
+        n31_output_profile_path or ROOT / "cases/n31/output_profile.json"
+    ).expanduser().resolve()
     app = FastAPI(title="SkillForge", version="0.1.0")
 
     def active_n31_sop() -> dict[str, Any]:
@@ -413,6 +432,39 @@ def create_app(
         if not isinstance(transcript, dict):
             raise HTTPException(status_code=409, detail="N31专家转写格式无效")
         return transcript, active_n31_sop()
+
+    def active_video_previews() -> tuple[dict[str, Any], dict[str, Any], list[dict[str, Any]]]:
+        if not output_profile_path.is_file() or not preview_manifest_path.is_file():
+            raise FileNotFoundError("N31输出配置或低码率预览报告不存在")
+        profile = validate_output_profile(_read_json(output_profile_path))
+        manifest = validate_document(
+            _read_json(preview_manifest_path),
+            "video_preview_manifest.schema.json",
+        )
+        if profile["case_id"] != manifest["case_id"]:
+            raise ValueError("N31输出配置与低码率预览案例编号不一致")
+        availability = []
+        for item in manifest["items"]:
+            try:
+                verified_preview_path(
+                    manifest,
+                    source_id=item["source_id"],
+                    output_dir=preview_dir,
+                    output_profile=profile,
+                )
+                available = True
+            except FileNotFoundError:
+                available = False
+            availability.append(
+                {
+                    "source_id": item["source_id"],
+                    "available": available,
+                    "media_url": (
+                        f"/api/n31/previews/{item['source_id']}" if available else None
+                    ),
+                }
+            )
+        return profile, manifest, availability
 
     @app.get("/", response_class=HTMLResponse)
     def index() -> str:
@@ -516,6 +568,19 @@ def create_app(
                 ) from exc
             if training_video:
                 payload["training_video"] = training_video
+            try:
+                output_profile, preview_manifest, availability = active_video_previews()
+            except (FileNotFoundError, ValueError) as exc:
+                raise HTTPException(
+                    status_code=409,
+                    detail=f"低码率预览配置校验失败: {str(exc)[:300]}",
+                ) from exc
+            payload["output_profile"] = output_profile
+            payload["video_previews"] = {
+                "manifest": preview_manifest,
+                "availability": availability,
+                "available_count": sum(item["available"] for item in availability),
+            }
         return JSONResponse(payload)
 
     @app.post("/api/n31/run")
@@ -851,6 +916,29 @@ def create_app(
         return FileResponse(
             ROOT / item["preview_path"],
             media_type="image/jpeg",
+            content_disposition_type="inline",
+        )
+
+    @app.get("/api/n31/previews/{source_id}")
+    def n31_video_preview(source_id: str) -> FileResponse:
+        if not re.fullmatch(r"[A-Z0-9_]+", source_id):
+            raise HTTPException(status_code=404)
+        try:
+            profile, manifest, _ = active_video_previews()
+            path, _ = verified_preview_path(
+                manifest,
+                source_id=source_id,
+                output_dir=preview_dir,
+                output_profile=profile,
+            )
+        except FileNotFoundError as exc:
+            raise HTTPException(status_code=404, detail="低码率预览不存在") from exc
+        except ValueError as exc:
+            raise HTTPException(status_code=409, detail=str(exc)) from exc
+        return FileResponse(
+            path,
+            media_type="video/mp4",
+            filename=path.name,
             content_disposition_type="inline",
         )
 

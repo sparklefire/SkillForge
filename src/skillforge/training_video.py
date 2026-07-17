@@ -20,12 +20,14 @@ from .media import MediaProcessingError, probe_media, resolve_ffmpeg
 from .media_privacy import measure_loudness
 from .observability import StructuredLogger, redact
 from .step_plan import StepPlanError, load_dotenv
+from .video_preview import validate_output_profile
 
 
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_STORYBOARD = ROOT / "cases" / "n31" / "training_video_storyboard.json"
 DEFAULT_GOLD = ROOT / "cases" / "n31" / "gold" / "gold_sop.json"
 DEFAULT_INGEST = ROOT / "cases" / "n31" / "ingest_manifest.json"
+DEFAULT_OUTPUT_PROFILE = ROOT / "cases" / "n31" / "output_profile.json"
 DEFAULT_OUTPUT = ROOT / "output" / "video" / "n31_training_video_v1.mp4"
 DEFAULT_MANIFEST = ROOT / "output" / "video" / "n31_training_video_manifest_v1.json"
 DEFAULT_EVIDENCE_PACK = (
@@ -220,6 +222,52 @@ class StepAudioTTSClient:
 
 def load_storyboard(path: Path = DEFAULT_STORYBOARD) -> dict[str, Any]:
     return validate_document(_read_json(path), "training_video_storyboard.schema.json")
+
+
+def validate_storyboard_against_output_profile(
+    storyboard: dict[str, Any],
+    output_profile: dict[str, Any],
+) -> dict[str, Any]:
+    """Bind the rendered training video to the case delivery contract."""
+    validate_document(storyboard, "training_video_storyboard.schema.json")
+    validate_output_profile(output_profile)
+    if storyboard["case_id"] != output_profile["case_id"]:
+        raise TrainingVideoError("Storyboard与交付配置的case_id不一致")
+
+    duration = output_profile["duration"]
+    target = storyboard["target_duration_seconds"]
+    if not (
+        duration["training_video_min_seconds"]
+        <= target
+        <= duration["training_video_max_seconds"]
+    ):
+        raise TrainingVideoError("Storyboard时长不在交付配置允许范围内")
+    if target != duration["training_video_target_seconds"]:
+        raise TrainingVideoError("Storyboard时长与交付配置目标时长不一致")
+
+    training_video = next(
+        (
+            item
+            for item in output_profile["output_types"]
+            if item["output_type"] == "TRAINING_VIDEO"
+        ),
+        None,
+    )
+    if training_video != {
+        "output_type": "TRAINING_VIDEO",
+        "format": "MP4",
+        "required": True,
+    }:
+        raise TrainingVideoError("交付配置未将MP4培训视频设为必需输出")
+
+    language = output_profile["language"]
+    if (
+        language["locale"] != "zh-CN"
+        or language["content_language"] != "SIMPLIFIED_CHINESE"
+        or language["narration_language"] != "MANDARIN"
+    ):
+        raise TrainingVideoError("N31分镜只支持zh-CN简体中文普通话交付配置")
+    return output_profile
 
 
 def validate_storyboard_against_case(
@@ -655,6 +703,7 @@ def render_training_video(
     storyboard_path: Path = DEFAULT_STORYBOARD,
     gold_path: Path = DEFAULT_GOLD,
     ingest_path: Path = DEFAULT_INGEST,
+    output_profile_path: Path = DEFAULT_OUTPUT_PROFILE,
     output_path: Path = DEFAULT_OUTPUT,
     manifest_path: Path = DEFAULT_MANIFEST,
     evidence_pack_path: Path = DEFAULT_EVIDENCE_PACK,
@@ -665,6 +714,8 @@ def render_training_video(
     storyboard = load_storyboard(storyboard_path)
     gold = _read_json(gold_path)
     ingest = _read_json(ingest_path)
+    output_profile = _read_json(output_profile_path)
+    validate_storyboard_against_output_profile(storyboard, output_profile)
     validation = validate_storyboard_against_case(storyboard, gold, ingest)
     work_dir.mkdir(parents=True, exist_ok=True)
     font = resolve_cjk_font()
@@ -858,6 +909,9 @@ def main() -> int:
     parser.add_argument("--storyboard", type=Path, default=DEFAULT_STORYBOARD)
     parser.add_argument("--gold", type=Path, default=DEFAULT_GOLD)
     parser.add_argument("--ingest", type=Path, default=DEFAULT_INGEST)
+    parser.add_argument(
+        "--output-profile", type=Path, default=DEFAULT_OUTPUT_PROFILE
+    )
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument("--manifest", type=Path, default=DEFAULT_MANIFEST)
     parser.add_argument("--evidence-pack", type=Path, default=DEFAULT_EVIDENCE_PACK)
@@ -878,6 +932,7 @@ def main() -> int:
             storyboard_path=args.storyboard,
             gold_path=args.gold,
             ingest_path=args.ingest,
+            output_profile_path=args.output_profile,
             output_path=args.output,
             manifest_path=args.manifest,
             evidence_pack_path=args.evidence_pack,

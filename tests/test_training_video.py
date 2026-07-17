@@ -1,17 +1,21 @@
 import json
 import stat
+from copy import deepcopy
 from pathlib import Path
 
+import pytest
 from PIL import Image
 
 from skillforge.training_video import (
     StepAudioTTSClient,
+    TrainingVideoError,
     build_training_video_evidence_pack,
     build_tts_payload,
     load_storyboard,
     render_scene_overlay,
     resolve_cjk_font,
     validate_storyboard_against_case,
+    validate_storyboard_against_output_profile,
 )
 
 
@@ -33,6 +37,35 @@ def test_storyboard_covers_every_gold_step_and_stays_in_80_seconds() -> None:
     assert len(result["required_step_ids"]) == 10
     assert result["evidence_boundary_passed"] is True
     assert len(result["narration"]) <= 1000
+
+
+def test_storyboard_is_bound_to_checked_in_output_profile() -> None:
+    storyboard = load_storyboard()
+    profile = json.loads(
+        (ROOT / "cases/n31/output_profile.json").read_text(encoding="utf-8")
+    )
+    result = validate_storyboard_against_output_profile(storyboard, profile)
+    assert result["audience"]["primary_role"] == "NEW_OPERATOR"
+    assert result["language"]["locale"] == "zh-CN"
+    assert result["duration"]["training_video_target_seconds"] == 80
+
+
+def test_storyboard_rejects_mismatched_output_profile() -> None:
+    storyboard = load_storyboard()
+    profile = json.loads(
+        (ROOT / "cases/n31/output_profile.json").read_text(encoding="utf-8")
+    )
+    invalid = deepcopy(profile)
+    invalid["duration"]["training_video_target_seconds"] = 85
+    with pytest.raises(TrainingVideoError, match="目标时长不一致"):
+        validate_storyboard_against_output_profile(storyboard, invalid)
+
+    invalid = deepcopy(profile)
+    invalid["language"]["locale"] = "en-US"
+    invalid["language"]["content_language"] = "ENGLISH"
+    invalid["language"]["narration_language"] = "ENGLISH"
+    with pytest.raises(TrainingVideoError, match="只支持zh-CN"):
+        validate_storyboard_against_output_profile(storyboard, invalid)
 
 
 def test_training_video_evidence_pack_is_portable_and_complete() -> None:

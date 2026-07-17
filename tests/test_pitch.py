@@ -97,6 +97,13 @@ def test_pitch_requires_traceable_training_package() -> None:
     assert result["assertions"]["checklist_previews_public"] is True
 
 
+def test_pitch_requires_output_profile_and_low_bitrate_preview_mapping() -> None:
+    result = _check_metrics(ROOT)
+    assert result["status"] == "PASSED"
+    assert result["assertions"]["output_profile_complete"] is True
+    assert result["assertions"]["low_bitrate_previews_mapped"] is True
+
+
 def test_pitch_requires_five_grounded_quiz_categories() -> None:
     result = _check_metrics(ROOT)
     assert result["assertions"]["training_quiz_grounded"] is True
@@ -136,3 +143,4 @@ def test_pitch_requires_safe_evidence_navigation_and_operator_review() -> None:
     assert result["assertions"]["conflict_decision_auditable"] is True
     assert result["assertions"]["safety_conflict_human_gate"] is True
     assert result["assertions"]["asr_correction_auditable"] is True
+    assert result["assertions"]["video_preview_configured"] is True

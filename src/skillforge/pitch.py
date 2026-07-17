@@ -15,6 +15,8 @@ from fastapi.testclient import TestClient
 from .contracts import validate_document
 from .conflict_adjudication import route_conflict
 from .demo import ROOT
+from .revision import digest
+from .video_preview import validate_output_profile
 from .web import create_app
 
 
@@ -175,6 +177,17 @@ def _check_metrics(root: Path) -> dict[str, Any]:
     checklist_thumbnails = validate_document(
         _read_json(root / "output/checklist_thumbnails/manifest.json"),
         "checklist_thumbnail_manifest.schema.json",
+    )
+    output_profile = validate_output_profile(
+        _read_json(root / "cases/n31/output_profile.json")
+    )
+    video_previews = validate_document(
+        _read_json(root / "cases/n31/evaluations/video_preview_manifest_v1.json"),
+        "video_preview_manifest.schema.json",
+    )
+    storyboard = validate_document(
+        _read_json(root / "cases/n31/training_video_storyboard.json"),
+        "training_video_storyboard.schema.json",
     )
     manifest_path = root / "output/video/n31_training_video_manifest_v1.json"
     manifest = validate_document(
@@ -452,6 +465,74 @@ def _check_metrics(root: Path) -> dict[str, Any]:
         and manifest["coverage"]["covered_gold_step_count"]
         == manifest["coverage"]["gold_step_count"]
         == 13,
+        "output_profile_complete": output_profile["audience"]
+        == {
+            "primary_role": "NEW_OPERATOR",
+            "experience_level": "BEGINNER",
+            "usage_context": "ON_DEVICE_TASK_SUPPORT",
+        }
+        and output_profile["language"]["locale"] == "zh-CN"
+        and output_profile["duration"]["source_video_min_seconds"] == 180
+        and output_profile["duration"]["source_video_max_seconds"] == 480
+        and output_profile["duration"]["training_video_target_seconds"]
+        == storyboard["target_duration_seconds"]
+        == 80
+        and {item["output_type"] for item in output_profile["output_types"]}
+        == {
+            "STRUCTURED_SOP",
+            "MOBILE_CHECKLIST",
+            "TRAINING_QUIZ",
+            "A4_POSTER",
+            "TRAINING_VIDEO",
+            "REVISION_AUDIT",
+        },
+        "low_bitrate_previews_mapped": video_previews["status"] == "COMPLETED"
+        and video_previews["output_profile_sha256"] == digest(output_profile)
+        and video_previews["profile"]
+        == {
+            key: value
+            for key, value in output_profile["preview_profile"].items()
+            if key != "accepted_privacy_status"
+        }
+        and video_previews["summary"]["source_count"] == 6
+        and video_previews["summary"]["all_checks_passed"] is True
+        and video_previews["summary"]["max_average_total_bitrate_kbps"] <= 600
+        and {item["source_id"] for item in video_previews["items"]}
+        == {
+            "N31_VIDEO_OPERATION_FULL",
+            "N31_VIDEO_MEDIA_TYPE",
+            "N31_VIDEO_GUIDES",
+            "N31_VIDEO_LEARNING",
+            "N31_VIDEO_MEDIA_FEED",
+            "N31_VIDEO_PRINT_RESULT",
+        }
+        and all(
+            item["width"] <= 854
+            and item["height"] <= 480
+            and item["fps"] <= 15.1
+            and item["average_total_bitrate_kbps"] <= 600
+            and item["duration_delta_ms"] <= 250
+            and all(item["checks"].values())
+            and item["timeline_mapping"]
+            == [
+                {
+                    "source_start_ms": 0,
+                    "source_end_ms": item["source_duration_ms"],
+                    "preview_start_ms": 0,
+                    "preview_end_ms": item["preview_duration_ms"],
+                }
+            ]
+            for item in video_previews["items"]
+        )
+        and video_previews["data_policy"]
+        == {
+            "storage_scope": "LOCAL_PRIVATE_DERIVATIVE",
+            "external_model_calls": 0,
+            "contains_raw_media": False,
+            "contains_preview_media": False,
+            "contains_credentials": False,
+            "contains_absolute_paths": False,
+        },
     }
     return {
         "check_id": "PITCH_CLAIMS",
@@ -633,6 +714,23 @@ def _check_demo_modes(runbook: dict[str, Any], root: Path) -> dict[str, Any]:
         and offline_bundle.get("contains_credentials") is False,
         "offline_payload": payload.status_code == 200
         and payload.json()["summary"].get("gold_status") == "GOLD",
+        "video_preview_configured": payload.status_code == 200
+        and payload.json().get("output_profile", {}).get("audience", {}).get(
+            "primary_role"
+        )
+        == "NEW_OPERATOR"
+        and payload.json().get("output_profile", {}).get("language", {}).get("locale")
+        == "zh-CN"
+        and payload.json().get("output_profile", {}).get("duration", {}).get(
+            "training_video_target_seconds"
+        )
+        == 80
+        and payload.json().get("video_previews", {}).get("manifest", {}).get(
+            "summary", {}
+        ).get("source_count")
+        == 6
+        and len(payload.json().get("video_previews", {}).get("availability", []))
+        == 6,
         "conflict_decision_auditable": conflict_session.status_code == 200
         and conflict_session.json().get("status") == "AUTO_FINALIZED"
         and conflict_session.json().get("finalization")
