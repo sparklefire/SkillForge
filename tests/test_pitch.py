@@ -2,6 +2,8 @@ import copy
 import json
 from pathlib import Path
 
+import pytest
+
 from skillforge.contracts import validate_document
 from skillforge.pitch import (
     PHASE_ORDER,
@@ -9,10 +11,12 @@ from skillforge.pitch import (
     _check_metrics,
     _check_runtime_benchmark,
     _check_timeline,
+    build_readiness,
 )
 
 
 ROOT = Path(__file__).resolve().parents[1]
+RUNBOOK = ROOT / "cases/n31/pitch_runbook.json"
 
 
 def _runbook() -> dict:
@@ -154,3 +158,18 @@ def test_pitch_requires_safe_evidence_navigation_and_operator_review() -> None:
     assert result["assertions"]["asr_correction_auditable"] is True
     assert result["assertions"]["video_preview_configured"] is True
     assert result["assertions"]["agent_tool_interface_auditable"] is True
+
+
+def test_pitch_accepts_only_known_explicit_human_gate_confirmations() -> None:
+    confirmed = {
+        "TRAINING_VIDEO_FULL_WATCH",
+        "FINAL_STAGE_REHEARSAL",
+        "FINAL_RECORDING_REVIEW",
+        "TEAM_ELIGIBILITY_CONFIRMED",
+        "OFFICIAL_RULES_VERIFIED",
+    }
+    result = build_readiness(RUNBOOK, confirmed_gate_ids=confirmed)
+    assert result["status"] == "READY_FOR_SUBMISSION"
+    assert result["pending_human_gates"] == []
+    with pytest.raises(ValueError, match="未知人工门禁确认"):
+        build_readiness(RUNBOOK, confirmed_gate_ids={"NOT_A_REAL_GATE"})

@@ -953,9 +953,17 @@ def build_readiness(
     runbook_path: Path,
     *,
     root: Path = ROOT,
+    confirmed_gate_ids: set[str] | None = None,
 ) -> dict[str, Any]:
     root = root.resolve()
     runbook = validate_document(_read_json(runbook_path), "pitch_runbook.schema.json")
+    confirmed = confirmed_gate_ids or set()
+    known_gate_ids = {gate["gate_id"] for gate in runbook["human_gates"]}
+    unknown_confirmations = confirmed - known_gate_ids
+    if unknown_confirmations:
+        raise ValueError(
+            "未知人工门禁确认: " + ",".join(sorted(unknown_confirmations))
+        )
     checks = [
         _check_timeline(runbook),
         _check_artifacts(runbook, root),
@@ -965,7 +973,9 @@ def build_readiness(
     ]
     checks_passed = all(check["status"] == "PASSED" for check in checks)
     pending_gates = [
-        gate["gate_id"] for gate in runbook["human_gates"] if gate["status"] != "PASSED"
+        gate["gate_id"]
+        for gate in runbook["human_gates"]
+        if gate["status"] != "PASSED" and gate["gate_id"] not in confirmed
     ]
     if not checks_passed:
         status = "NOT_READY"

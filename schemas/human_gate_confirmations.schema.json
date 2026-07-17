@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/human_gate_confirmations.schema.json",
+  "title": "SkillForge Private Human Gate Confirmations",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "case_id",
+    "runbook_sha256",
+    "updated_at",
+    "confirmations",
+    "history",
+    "data_policy"
+  ],
+  "properties": {
+    "version": {"const": 1},
+    "case_id": {"const": "n31_media_change"},
+    "runbook_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "updated_at": {"type": "string", "format": "date-time"},
+    "confirmations": {
+      "type": "array",
+      "maxItems": 5,
+      "items": {"$ref": "#/$defs/confirmation"}
+    },
+    "history": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/historyEvent"}
+    },
+    "data_policy": {
+      "const": {
+        "private_local_state": true,
+        "contains_evidence_content": false,
+        "contains_credentials": false
+      }
+    }
+  },
+  "$defs": {
+    "confirmation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "gate_id",
+        "gate_label",
+        "reviewer",
+        "confirmed_at",
+        "note",
+        "evidence"
+      ],
+      "properties": {
+        "gate_id": {"type": "string", "pattern": "^[A-Z0-9_]+$"},
+        "gate_label": {"type": "string", "minLength": 1, "maxLength": 300},
+        "reviewer": {"type": "string", "minLength": 1, "maxLength": 200},
+        "confirmed_at": {"type": "string", "format": "date-time"},
+        "note": {"type": "string", "maxLength": 1000},
+        "evidence": {"$ref": "#/$defs/evidence"}
+      }
+    },
+    "evidence": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "locator", "sha256", "size_bytes"],
+          "properties": {
+            "kind": {"const": "LOCAL_FILE"},
+            "locator": {"type": "string", "minLength": 1, "maxLength": 4096},
+            "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+            "size_bytes": {"type": "integer", "minimum": 1}
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "locator", "sha256", "size_bytes"],
+          "properties": {
+            "kind": {"const": "HTTPS_URL"},
+            "locator": {"type": "string", "pattern": "^https://[^\\s]+$", "maxLength": 4096},
+            "sha256": {"type": "null"},
+            "size_bytes": {"type": "null"}
+          }
+        }
+      ]
+    },
+    "historyEvent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "action",
+        "gate_id",
+        "reviewer",
+        "occurred_at",
+        "note",
+        "evidence_sha256"
+      ],
+      "properties": {
+        "action": {"enum": ["CONFIRMED", "REVOKED", "RESET_STALE"]},
+        "gate_id": {"type": "string", "pattern": "^[A-Z0-9_]+$"},
+        "reviewer": {"type": "string", "minLength": 1, "maxLength": 200},
+        "occurred_at": {"type": "string", "format": "date-time"},
+        "note": {"type": "string", "maxLength": 1000},
+        "evidence_sha256": {
+          "anyOf": [
+            {"type": "null"},
+            {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+          ]
+        }
+      }
+    }
+  }
+}

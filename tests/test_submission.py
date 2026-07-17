@@ -29,6 +29,7 @@ def test_submission_preflight_preserves_human_gates() -> None:
     assert report["status"] == "DEVELOPMENT_CHECK"
     assert checks["PROJECT_IDENTITY"]["status"] == "PASSED"
     assert checks["REQUIRED_DOCUMENTS"]["status"] == "PASSED"
+    assert checks["HUMAN_GATE_CONFIRMATIONS"]["status"] == "PASSED"
     assert checks["PITCH_PACKAGE"]["status"] == "PASSED"
     assert checks["PUBLIC_ARTIFACT_BOUNDARY"]["status"] == "PASSED"
     assert checks["TRACKED_SENSITIVE_PATHS"]["status"] in {"PASSED", "SKIPPED"}

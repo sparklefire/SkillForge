@@ -201,6 +201,21 @@ bash scripts/check_pitch.sh
 
 验收器检查180秒时间轴、Gold指标、五类Agent与工具追踪、四场景无来源内容门禁、高推理语义复核、选择性重建边界、交付配置、低码率预览映射、DGX报告、PPT、海报、培训视频、证据包和三种演示兜底。当前状态为 `READY_WITH_HUMAN_GATES`：自动检查通过，但完整观看、真人彩排、最终录屏、团队资格和官方规则五项门禁仍待参赛者确认。正式材料见 [三分钟路演脚本](./docs/三分钟路演脚本.md)、[现场演示与录屏操作单](./docs/现场演示与录屏操作单.md) 和 [8页路演PPT](./output/presentation/SkillForge_三分钟路演_v1.pptx)。
 
+人工门禁不能由程序自动通过。完成某项人工工作后，使用私有确认器绑定当前运行单和证据哈希，不要手改路演JSON：
+
+```bash
+bash scripts/manage_human_gates.sh status
+
+# 示例：实际完整观看当前80秒成片后，才可执行
+bash scripts/manage_human_gates.sh confirm \
+  --gate TRAINING_VIDEO_FULL_WATCH \
+  --reviewer "确认人姓名" \
+  --evidence-file output/video/n31_training_video_v1.mp4 \
+  --note "已完整观看并确认旁白节奏"
+```
+
+确认记录写入Git忽略的 `outputs/submission/human_gate_confirmations.json`，目录权限700、文件权限600。记录包含确认人和私有证据定位，但状态与提交预检只输出门禁编号和汇总，不输出确认人、说明或证据路径。运行单、门禁文案或本地证据发生变化时确认立即失效；更新证据必须显式使用 `--replace`，撤销使用 `revoke`，运行单变化后使用 `reset-stale` 清空过期确认。
+
 可复现运行时基准：
 
 ```bash
@@ -217,7 +232,7 @@ bash scripts/run_runtime_benchmark.sh dgx
 bash scripts/check_submission.sh
 ```
 
-预检会运行全量测试并核对项目身份、9份说明文档、18项成果、Git工作树、跟踪文件边界、`.env`忽略与600权限、本地密钥值泄漏和成果绝对路径。报告写入被Git忽略的 `outputs/submission/submission_preflight_latest.json`，不会记录密钥值。只有 `READY_FOR_SUBMISSION` 返回0；`NOT_READY`返回1，`DEVELOPMENT_CHECK`或 `READY_WITH_HUMAN_GATES` 返回2。开发中可显式使用 `--allow-dirty`，但不能得到正式提交结论。
+预检会运行全量测试并核对项目身份、9份说明文档、18项成果、Git工作树、跟踪文件边界、`.env`忽略与600权限、本地密钥值泄漏、成果绝对路径及私有人工确认有效性。报告和确认目录均由Git忽略；报告只写门禁汇总，不记录密钥值、确认人、说明或证据路径。只有 `READY_FOR_SUBMISSION` 返回0；`NOT_READY`返回1，`DEVELOPMENT_CHECK`或 `READY_WITH_HUMAN_GATES` 返回2。开发中可显式使用 `--allow-dirty`，但不能得到正式提交结论。
 
 受证据约束的高推理语义复核需要显式确认允许发送结构化Gold步骤和Evidence陈述；它不会发送原始媒体、完整转写、手册页面、本地路径或凭证：
 

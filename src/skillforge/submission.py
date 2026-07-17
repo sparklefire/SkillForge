@@ -4,10 +4,12 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import stat
 import subprocess
 import sys
+import tempfile
 import zipfile
 from datetime import datetime, timezone
 from pathlib import Path
@@ -15,6 +17,7 @@ from typing import Any, Iterable
 
 from .contracts import validate_document
 from .demo import ROOT
+from .human_gates import HumanGateStore
 from .pitch import build_readiness
 
 
@@ -44,11 +47,24 @@ def _read_json(path: Path) -> dict[str, Any]:
 
 
 def _write_json(path: Path, payload: Any) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(
-        json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
-        encoding="utf-8",
-    )
+    path = path.expanduser().resolve()
+    parent_existed = path.parent.exists()
+    path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+    if not parent_existed or path.parent == (ROOT / "outputs/submission").resolve():
+        os.chmod(path.parent, 0o700)
+    descriptor, temporary_name = tempfile.mkstemp(prefix=f".{path.name}.", dir=path.parent)
+    temporary = Path(temporary_name)
+    try:
+        with os.fdopen(descriptor, "w", encoding="utf-8") as handle:
+            json.dump(payload, handle, ensure_ascii=False, indent=2, sort_keys=True)
+            handle.write("\n")
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.chmod(temporary, 0o600)
+        os.replace(temporary, path)
+        os.chmod(path, 0o600)
+    finally:
+        temporary.unlink(missing_ok=True)
 
 
 def _check(check_id: str, status: str, *details: str) -> dict[str, Any]:
@@ -196,8 +212,15 @@ def _check_required_documents(root: Path) -> dict[str, Any]:
     )
 
 
-def _check_pitch_package(root: Path) -> tuple[dict[str, Any], dict[str, Any]]:
-    readiness = build_readiness(root / "cases/n31/pitch_runbook.json", root=root)
+def _check_pitch_package(
+    root: Path,
+    confirmed_gate_ids: set[str],
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    readiness = build_readiness(
+        root / "cases/n31/pitch_runbook.json",
+        root=root,
+        confirmed_gate_ids=confirmed_gate_ids,
+    )
     passed = readiness["status"] != "NOT_READY" and all(
         item["status"] == "PASSED" for item in readiness["checks"]
     )
@@ -211,6 +234,34 @@ def _check_pitch_package(root: Path) -> tuple[dict[str, Any], dict[str, Any]]:
             f"{len(artifact_check['items'])}项成果通过；路演状态={readiness['status']}",
         ),
         readiness,
+    )
+
+
+def _check_human_gate_confirmations(
+    root: Path,
+    confirmations_path: Path,
+) -> tuple[dict[str, Any], set[str]]:
+    store = HumanGateStore(
+        confirmations_path,
+        runbook_path=root / "cases/n31/pitch_runbook.json",
+    )
+    audit = store.audit()
+    if audit["valid"]:
+        detail = (
+            f"人工门禁有效={audit['summary']['passed']}/{audit['summary']['total']}; "
+            f"待确认={audit['summary']['pending']}; 状态={audit['store_state']}"
+        )
+        return _check("HUMAN_GATE_CONFIRMATIONS", "PASSED", detail), set(
+            audit["confirmed_gate_ids"]
+        )
+    issue_codes = ",".join(audit["issues"][:5])
+    return (
+        _check(
+            "HUMAN_GATE_CONFIRMATIONS",
+            "FAILED",
+            f"私有人工确认无效；状态={audit['store_state']}; 问题={issue_codes}",
+        ),
+        set(),
     )
 
 
@@ -326,17 +377,23 @@ def build_submission_preflight(
     run_tests: bool = True,
     allow_dirty: bool = False,
     allow_missing_git: bool = False,
+    confirmations_path: Path | None = None,
 ) -> dict[str, Any]:
     root = root.resolve()
+    confirmation_check, confirmed_gate_ids = _check_human_gate_confirmations(
+        root,
+        (confirmations_path or root / "outputs/submission/human_gate_confirmations.json").resolve(),
+    )
     git_checks, commit, branch, clean, values = _check_git_and_secrets(
         root,
         allow_dirty=allow_dirty,
         allow_missing_git=allow_missing_git,
     )
-    pitch_check, readiness = _check_pitch_package(root)
+    pitch_check, readiness = _check_pitch_package(root, confirmed_gate_ids)
     checks = [
         _check_project_identity(root),
         _check_required_documents(root),
+        confirmation_check,
         pitch_check,
         _check_public_artifacts(root, values),
         *git_checks,
@@ -382,11 +439,17 @@ def main() -> int:
     parser.add_argument("--skip-tests", action="store_true")
     parser.add_argument("--allow-dirty", action="store_true")
     parser.add_argument("--allow-missing-git", action="store_true")
+    parser.add_argument(
+        "--confirmations",
+        type=Path,
+        default=ROOT / "outputs/submission/human_gate_confirmations.json",
+    )
     args = parser.parse_args()
     report = build_submission_preflight(
         run_tests=not args.skip_tests,
         allow_dirty=args.allow_dirty,
         allow_missing_git=args.allow_missing_git,
+        confirmations_path=args.confirmations,
     )
     _write_json(args.output, report)
     print(json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True))
