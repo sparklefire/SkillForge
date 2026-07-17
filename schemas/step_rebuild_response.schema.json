@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/step_rebuild_response.schema.json",
+  "title": "SkillForge Single Step Rebuild Response",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "artifact_type",
+    "version",
+    "session_id",
+    "case_id",
+    "sop_version",
+    "step_id",
+    "rebuild_number",
+    "generated_at",
+    "scope",
+    "sop_views",
+    "checklist_item",
+    "quiz_questions",
+    "evidence_ids",
+    "data_policy"
+  ],
+  "properties": {
+    "artifact_type": {"const": "SINGLE_STEP_REBUILD"},
+    "version": {"const": 1},
+    "session_id": {"type": "string", "pattern": "^[a-f0-9]{32}$"},
+    "case_id": {"type": "string", "minLength": 1},
+    "sop_version": {"type": "integer", "minimum": 1},
+    "step_id": {"type": "string", "pattern": "^S[0-9]{2}$"},
+    "rebuild_number": {"type": "integer", "minimum": 1},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sop_view_units", "checklist_units", "quiz_question_ids", "unchanged_step_count", "external_model_calls"],
+      "properties": {
+        "sop_view_units": {"const": 3},
+        "checklist_units": {"const": 1},
+        "quiz_question_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^Q[0-9]{2}$"}},
+        "unchanged_step_count": {"type": "integer", "minimum": 7, "maximum": 14},
+        "external_model_calls": {"const": 0}
+      }
+    },
+    "sop_views": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["concise", "detailed", "evidence"],
+      "properties": {
+        "concise": {"type": "object", "required": ["step_id", "title", "action"]},
+        "detailed": {"type": "object", "required": ["step_id", "title", "action"]},
+        "evidence": {"type": "object", "required": ["step_id", "title", "action", "evidence_details"]}
+      }
+    },
+    "checklist_item": {"type": "object", "required": ["item_id", "screen_index", "step_id", "title", "evidence_ids"]},
+    "quiz_questions": {"type": "array", "items": {"type": "object", "required": ["question_id", "step_ids", "evidence_ids"]}},
+    "evidence_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^E[0-9]{3}$"}},
+    "data_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["external_model_calls", "contains_raw_media", "contains_credentials", "contains_absolute_paths"],
+      "properties": {
+        "external_model_calls": {"const": 0},
+        "contains_raw_media": {"const": false},
+        "contains_credentials": {"const": false},
+        "contains_absolute_paths": {"const": false}
+      }
+    }
+  }
+}

@@ -158,11 +158,13 @@
     {
       "assertions": {
         "entry_script": true,
+        "evidence_locator_safe": true,
         "health": true,
         "live_rerun": true,
         "mode_priority": true,
         "offline_bundle_safe": true,
-        "offline_payload": true
+        "offline_payload": true,
+        "operator_review_controls": true
       },
       "check_id": "DEMO_FALLBACKS",
       "status": "PASSED"
@@ -170,7 +172,7 @@
   ],
   "contains_credentials": false,
   "contains_raw_media": false,
-  "generated_at": "2026-07-17T09:02:14.787150+00:00",
+  "generated_at": "2026-07-17T13:12:52.495581+00:00",
   "pending_human_gates": [
     "TRAINING_VIDEO_FULL_WATCH",
     "FINAL_STAGE_REHEARSAL",

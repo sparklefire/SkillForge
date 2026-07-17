@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/evidence_locator_response.schema.json",
+  "title": "SkillForge Safe Evidence Locator Response",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "artifact_type",
+    "version",
+    "case_id",
+    "evidence_id",
+    "source_type",
+    "source_ref",
+    "claim",
+    "classification",
+    "review_status",
+    "step_ids",
+    "locator",
+    "navigation",
+    "data_policy"
+  ],
+  "properties": {
+    "artifact_type": {"const": "SAFE_EVIDENCE_LOCATOR"},
+    "version": {"const": 1},
+    "case_id": {"type": "string", "minLength": 1},
+    "evidence_id": {"type": "string", "pattern": "^E[0-9]{3}$"},
+    "source_type": {"enum": ["pdf", "video", "audio"]},
+    "source_ref": {"type": "string", "minLength": 1},
+    "claim": {"type": "string", "minLength": 1},
+    "classification": {"enum": ["SOURCE_FACT", "EXPERT_ADVICE", "MODEL_INFERENCE"]},
+    "review_status": {"enum": ["UNREVIEWED", "VERIFIED", "REJECTED"]},
+    "step_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^S[0-9]{2}$"}},
+    "locator": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "page": {"type": "integer", "minimum": 1},
+        "paragraph": {"type": "string", "minLength": 1},
+        "start_ms": {"type": "integer", "minimum": 0},
+        "end_ms": {"type": "integer", "minimum": 0}
+      },
+      "anyOf": [{"required": ["page"]}, {"required": ["start_ms", "end_ms"]}]
+    },
+    "navigation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "label", "safe_preview_url", "raw_source_url"],
+      "properties": {
+        "kind": {"enum": ["PDF_PAGE", "VIDEO_TIME", "AUDIO_TIME"]},
+        "label": {"type": "string", "minLength": 1},
+        "safe_preview_url": {"type": ["string", "null"], "pattern": "^/api/n31/checklist/previews/S[0-9]{2}$"},
+        "raw_source_url": {"type": "null"}
+      }
+    },
+    "data_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["contains_raw_media", "contains_credentials", "contains_absolute_paths", "external_model_calls"],
+      "properties": {
+        "contains_raw_media": {"const": false},
+        "contains_credentials": {"const": false},
+        "contains_absolute_paths": {"const": false},
+        "external_model_calls": {"const": 0}
+      }
+    }
+  }
+}

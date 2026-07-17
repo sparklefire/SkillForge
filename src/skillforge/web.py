@@ -18,8 +18,10 @@ from starlette.concurrency import run_in_threadpool
 from .demo import ROOT, run_demo
 from .checklist_sessions import ChecklistSessionStore
 from .contracts import validate_document
+from .evidence_locator import build_evidence_locator
 from .gold_rehearsal import run_gold_rehearsal
 from .ingest import IngestionPipeline
+from .review_sessions import SopReviewSessionStore, rebuild_step_artifacts
 
 
 MAX_UPLOAD_BYTES = 512 * 1024 * 1024
@@ -104,7 +106,7 @@ HTML = """<!doctype html>
   <style>
     :root{color-scheme:dark;--bg:#07110d;--panel:#102019;--line:#294235;--text:#eef7f0;--muted:#a6b9ac;--green:#73e2a7;--amber:#ffc766;--red:#ff7b7b}
     *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 80% 0,#163327 0,transparent 38%),var(--bg);color:var(--text);font:15px/1.55 system-ui,-apple-system,"Noto Sans CJK SC",sans-serif}
-    main{max-width:1180px;margin:auto;padding:34px 20px 70px}h1{font-size:38px;margin:0 0 4px}h2{font-size:20px;margin:0 0 16px}p{color:var(--muted)}.tag{color:var(--green);letter-spacing:.14em;text-transform:uppercase;font-weight:700}.panel{background:color-mix(in srgb,var(--panel) 92%,transparent);border:1px solid var(--line);border-radius:18px;padding:20px;margin-top:18px;box-shadow:0 16px 50px #0004}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}.metric{padding:15px;border:1px solid var(--line);border-radius:14px;background:#0a1712}.metric strong{display:block;font-size:28px;color:var(--green)}.cols{display:grid;grid-template-columns:1fr 1fr;gap:14px}.step,.issue,.change,.result{border:1px solid var(--line);border-radius:12px;padding:13px;margin:9px 0;background:#0b1813}.issue{border-left:4px solid var(--red)}.change,.result{border-left:4px solid var(--green)}.evidence{color:var(--amber);font-size:13px;margin-top:8px}.muted{color:var(--muted)}.notice{padding:10px 12px;border:1px solid var(--amber);border-radius:10px;color:var(--amber);background:#251d0b;margin-bottom:14px}.downloads,.controls{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:14px}.download{display:inline-block;border:1px solid var(--green);border-radius:9px;padding:8px 12px;color:var(--green);text-decoration:none;font-weight:700}button{border:0;border-radius:10px;padding:11px 16px;background:var(--green);color:#062011;font-weight:800;cursor:pointer}button.secondary{background:#1b3328;color:var(--text);border:1px solid var(--line)}input,select,textarea{width:100%;margin:6px 0 12px;padding:9px;border:1px solid var(--line);border-radius:8px;background:#08130f;color:var(--text)}textarea{min-height:72px;resize:vertical}.check-card{min-height:460px}.check-card img{width:100%;max-height:230px;object-fit:contain;background:#050a08;border-radius:10px;margin:10px 0}.warning-list{color:var(--amber)}details{margin-top:10px;color:var(--muted)}summary{cursor:pointer;color:var(--amber)}label{display:block;color:var(--muted)}#status,#checklist-status{margin-left:10px;color:var(--amber)}pre{white-space:pre-wrap;word-break:break-word;color:var(--muted)}@media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:800px){.grid,.cols{grid-template-columns:1fr}h1{font-size:30px}}
+    main{max-width:1180px;margin:auto;padding:34px 20px 70px}h1{font-size:38px;margin:0 0 4px}h2{font-size:20px;margin:0 0 16px}p{color:var(--muted)}.tag{color:var(--green);letter-spacing:.14em;text-transform:uppercase;font-weight:700}.panel{background:color-mix(in srgb,var(--panel) 92%,transparent);border:1px solid var(--line);border-radius:18px;padding:20px;margin-top:18px;box-shadow:0 16px 50px #0004}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}.metric{padding:15px;border:1px solid var(--line);border-radius:14px;background:#0a1712}.metric strong{display:block;font-size:28px;color:var(--green)}.cols{display:grid;grid-template-columns:1fr 1fr;gap:14px}.step,.issue,.change,.result{border:1px solid var(--line);border-radius:12px;padding:13px;margin:9px 0;background:#0b1813}.issue{border-left:4px solid var(--red)}.change,.result{border-left:4px solid var(--green)}.evidence{color:var(--amber);font-size:13px;margin-top:8px}.muted{color:var(--muted)}.notice{padding:10px 12px;border:1px solid var(--amber);border-radius:10px;color:var(--amber);background:#251d0b;margin-bottom:14px}.downloads,.controls{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:14px}.download{display:inline-block;border:1px solid var(--green);border-radius:9px;padding:8px 12px;color:var(--green);text-decoration:none;font-weight:700}button{border:0;border-radius:10px;padding:11px 16px;background:var(--green);color:#062011;font-weight:800;cursor:pointer}button.secondary{background:#1b3328;color:var(--text);border:1px solid var(--line)}button:disabled{opacity:.45;cursor:not-allowed}.evidence-link{padding:2px 7px;margin:2px;border:1px solid var(--amber);border-radius:7px;background:#251d0b;color:var(--amber);font-size:12px}.review-step{display:grid;grid-template-columns:44px 1fr auto;gap:10px;align-items:center}.review-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.review-actions button{padding:6px 9px;font-size:12px}input,select,textarea{width:100%;margin:6px 0 12px;padding:9px;border:1px solid var(--line);border-radius:8px;background:#08130f;color:var(--text)}textarea{min-height:72px;resize:vertical}.check-card{min-height:460px}.check-card img,#evidence-detail img{width:100%;max-height:230px;object-fit:contain;background:#050a08;border-radius:10px;margin:10px 0}.warning-list{color:var(--amber)}details{margin-top:10px;color:var(--muted)}summary{cursor:pointer;color:var(--amber)}label{display:block;color:var(--muted)}#status,#checklist-status,#review-status{margin-left:10px;color:var(--amber)}pre{white-space:pre-wrap;word-break:break-word;color:var(--muted)}@media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:800px){.grid,.cols{grid-template-columns:1fr}.review-step{grid-template-columns:1fr}.review-actions{justify-content:flex-start}h1{font-size:30px}}
   </style>
 </head>
 <body><main>
@@ -121,6 +123,8 @@ HTML = """<!doctype html>
   <section class="panel" id="grounding-panel" hidden><h2>无来源内容拒绝门禁</h2><div id="grounding-metrics" class="grid"></div><p>四个独立篡改场景均执行：发现问题 → 展示当前步骤Evidence边界 → 局部修订 → 重新质检。</p><div id="grounding-scenarios"></div></section>
   <section class="panel" id="semantic-panel" hidden><h2>高推理语义质检</h2><div id="semantic-metrics" class="grid"></div><p id="semantic-note"></p><div id="semantic-assessments"></div></section>
   <section class="panel" id="selective-panel" hidden><h2>受影响范围与选择性重建</h2><div id="selective-metrics" class="grid"></div><p id="selective-note"></p><div id="selective-plans"></div></section>
+  <section class="panel" id="review-panel" hidden><h2>操作者 SOP 审核台</h2><p>审核记录只保存在本机忽略目录。锁定后才能确认；安全重排会校验前置依赖和锁定位置；单步重建不调用外部模型。</p><button id="review-start">开始新的审核会话</button><span id="review-status"></span><div id="review-summary" class="notice" hidden></div><div id="review-steps"></div><div id="review-rebuild-result"></div></section>
+  <section class="panel" id="evidence-panel" hidden><h2>Evidence 安全定位</h2><div id="evidence-detail"></div></section>
   <section class="panel"><h2>发现问题 → 展示证据</h2><div id="issues"></div></section>
   <section class="panel"><h2>修订前后对比</h2><div class="cols"><div><h3>修订前</h3><div id="before"></div></div><div><h3>修订后</h3><div id="after"></div></div></div></section>
   <section class="panel"><h2>局部修订审计</h2><div id="changes"></div></section>
@@ -132,16 +136,23 @@ HTML = """<!doctype html>
 <script>
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const pct=v=>`${(Number(v)*100).toFixed(0)}%`;
-let activeDemo=null,checklistIndex=0,checklistSession=null,sopView='concise';
+let activeDemo=null,checklistIndex=0,checklistSession=null,sopView='concise',reviewSession=null;
 const locator=e=>e.locator.page?`PDF第${e.locator.page}页${e.locator.paragraph?' · '+e.locator.paragraph:''}`:`${(e.locator.start_ms/1000).toFixed(1)}–${(e.locator.end_ms/1000).toFixed(1)}秒`;
 const quizAnswer=q=>q.answer===true?'正确':q.answer===false?'错误':Array.isArray(q.answer)?q.answer.join(q.category==='ORDERING'?' → ':'、'):q.answer;
-function renderSopView(){if(!activeDemo?.sop_views)return;const v=activeDemo.sop_views.views[sopView];document.querySelector('#sop-view').innerHTML=`<p>${esc(v.description)}</p>`+v.steps.map(x=>`<div class="step"><b>${esc(x.step_id)} ${esc(x.title)}</b><div>${esc(x.action)}</div><div class="muted">原因：${esc(x.reason)}</div><div>完成标志：${esc(x.completion_marker)}</div><div class="warning-list">${x.risks.map(r=>`风险：${esc(r)}`).join('<br>')||'风险：无额外提示'}</div><div class="evidence">来源：${x.sources.map(s=>`${esc(s.source_type)} · ${esc(s.source_ref)}`).join('；')}</div>${x.evidence_details?`<details><summary>展开证据</summary>${x.evidence_details.map(e=>`<div>${esc(e.evidence_id)} · ${esc(e.classification)} · ${esc(e.review_status)} · ${esc(locator(e))}</div>`).join('')}</details>`:''}</div>`).join('');document.querySelectorAll('.sop-tab').forEach(b=>b.classList.toggle('secondary',b.dataset.view!==sopView))}
+const evidenceButtons=ids=>(ids||[]).map(id=>`<button class="evidence-link" data-evidence="${esc(id)}" title="点击查看安全定位">${esc(id)}</button>`).join('')||'无';
+function renderSopView(){if(!activeDemo?.sop_views)return;const v=activeDemo.sop_views.views[sopView];document.querySelector('#sop-view').innerHTML=`<p>${esc(v.description)}</p>`+v.steps.map(x=>`<div class="step"><b>${esc(x.step_id)} ${esc(x.title)}</b><div>${esc(x.action)}</div><div class="muted">原因：${esc(x.reason)}</div><div>完成标志：${esc(x.completion_marker)}</div><div class="warning-list">${x.risks.map(r=>`风险：${esc(r)}`).join('<br>')||'风险：无额外提示'}</div><div class="evidence">来源：${x.sources.map(s=>`${esc(s.source_type)} · ${esc(s.source_ref)}`).join('；')}</div>${x.evidence_details?`<details><summary>展开证据</summary>${x.evidence_details.map(e=>`<div>${evidenceButtons([e.evidence_id])} · ${esc(e.classification)} · ${esc(e.review_status)} · ${esc(locator(e))}</div>`).join('')}</details>`:''}</div>`).join('');document.querySelectorAll('.sop-tab').forEach(b=>b.classList.toggle('secondary',b.dataset.view!==sopView))}
 async function ensureChecklistSession(){if(checklistSession)return checklistSession;const r=await fetch('/api/n31/checklist/sessions',{method:'POST'});const d=await r.json();if(!r.ok)throw new Error(d.detail||'无法创建完成记录');checklistSession=d;return d}
-function renderChecklist(){if(!activeDemo?.checklist)return;const items=activeDemo.checklist.items,item=items[checklistIndex],state=checklistSession?.items.find(x=>x.step_id===item.step_id),done=state?.completed??item.completed,k=item.keyframe,interactive=activeDemo.summary.synthetic===false;document.querySelector('#checklist-progress').textContent=`第 ${checklistIndex+1}/${items.length} 步 · 已完成 ${checklistSession?.progress.completed_items||0}/${items.length} · ${checklistSession?.status||'NOT_STARTED'}`;document.querySelector('#checklist').innerHTML=`<div class="result"><b>${esc(item.step_id)} ${esc(item.title)}</b><div>${esc(item.action)}</div>${k?`<img src="/api/n31/checklist/previews/${esc(item.step_id)}" alt="${esc(item.step_id)}安全训练预览" onerror="this.style.display='none'"><div class="evidence">安全训练预览来自已审核80秒成片；Evidence定位：${esc(k.evidence_id)} · ${(k.start_ms/1000).toFixed(1)}–${(k.end_ms/1000).toFixed(1)}秒 · 视觉状态 ${esc(k.visual_status)}</div>`:''}${k?.visual_status==='NOT_VISIBLE'?'<div class="notice">该画面不能证明本步动作，仅用于定位人工复核；本步依据手册和其他已审核来源。</div>':''}<div>完成标志：${esc(item.check)}</div><div class="warning-list">${item.warnings.map(w=>`风险：${esc(w)}`).join('<br>')}</div><details><summary>展开 ${item.evidence_details.length} 条证据</summary>${item.evidence_details.map(e=>`<div>${esc(e.evidence_id)} · ${esc(e.source_type)} · ${esc(e.classification)} · ${esc(e.review_status)} · ${esc(locator(e))}</div>`).join('')}</details><label><input id="step-completed" style="width:auto" type="checkbox" ${done?'checked':''} ${interactive?'':'disabled'}> 已完成并记录本步</label></div>`;document.querySelector('#check-prev').disabled=checklistIndex===0;document.querySelector('#check-next').disabled=checklistIndex===items.length-1;document.querySelector('#feedback-submit').disabled=!interactive;const box=document.querySelector('#step-completed');if(interactive)box.addEventListener('change',async()=>{const status=document.querySelector('#checklist-status');status.textContent=' 保存中…';try{const session=await ensureChecklistSession();const r=await fetch(`/api/n31/checklist/sessions/${session.session_id}/items/${item.step_id}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({completed:box.checked})});const d=await r.json();if(!r.ok)throw new Error(d.detail||'保存失败');checklistSession=d;status.textContent=' 已保存';renderChecklist()}catch(e){box.checked=!box.checked;status.textContent=` ${e.message}`}})}
+function renderChecklist(){if(!activeDemo?.checklist)return;const items=activeDemo.checklist.items,item=items[checklistIndex],state=checklistSession?.items.find(x=>x.step_id===item.step_id),done=state?.completed??item.completed,k=item.keyframe,interactive=activeDemo.summary.synthetic===false;document.querySelector('#checklist-progress').textContent=`第 ${checklistIndex+1}/${items.length} 步 · 已完成 ${checklistSession?.progress.completed_items||0}/${items.length} · ${checklistSession?.status||'NOT_STARTED'}`;document.querySelector('#checklist').innerHTML=`<div class="result"><b>${esc(item.step_id)} ${esc(item.title)}</b><div>${esc(item.action)}</div>${k?`<img src="/api/n31/checklist/previews/${esc(item.step_id)}" alt="${esc(item.step_id)}安全训练预览" onerror="this.style.display='none'"><div class="evidence">安全训练预览来自已审核80秒成片；Evidence定位：${evidenceButtons([k.evidence_id])} · ${(k.start_ms/1000).toFixed(1)}–${(k.end_ms/1000).toFixed(1)}秒 · 视觉状态 ${esc(k.visual_status)}</div>`:''}${k?.visual_status==='NOT_VISIBLE'?'<div class="notice">该画面不能证明本步动作，仅用于定位人工复核；本步依据手册和其他已审核来源。</div>':''}<div>完成标志：${esc(item.check)}</div><div class="warning-list">${item.warnings.map(w=>`风险：${esc(w)}`).join('<br>')}</div><details><summary>展开 ${item.evidence_details.length} 条证据</summary>${item.evidence_details.map(e=>`<div>${evidenceButtons([e.evidence_id])} · ${esc(e.source_type)} · ${esc(e.classification)} · ${esc(e.review_status)} · ${esc(locator(e))}</div>`).join('')}</details><label><input id="step-completed" style="width:auto" type="checkbox" ${done?'checked':''} ${interactive?'':'disabled'}> 已完成并记录本步</label></div>`;document.querySelector('#check-prev').disabled=checklistIndex===0;document.querySelector('#check-next').disabled=checklistIndex===items.length-1;document.querySelector('#feedback-submit').disabled=!interactive;const box=document.querySelector('#step-completed');if(interactive)box.addEventListener('change',async()=>{const status=document.querySelector('#checklist-status');status.textContent=' 保存中…';try{const session=await ensureChecklistSession();const r=await fetch(`/api/n31/checklist/sessions/${session.session_id}/items/${item.step_id}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({completed:box.checked})});const d=await r.json();if(!r.ok)throw new Error(d.detail||'保存失败');checklistSession=d;status.textContent=' 已保存';renderChecklist()}catch(e){box.checked=!box.checked;status.textContent=` ${e.message}`}})}
+async function apiJson(url,options={}){const r=await fetch(url,options),d=await r.json();if(!r.ok)throw new Error(d.detail||`请求失败 ${r.status}`);return d}
+function renderReview(){const panel=document.querySelector('#review-panel'),summary=document.querySelector('#review-summary'),steps=document.querySelector('#review-steps');if(!reviewSession){summary.hidden=true;steps.innerHTML='';return}const confirmed=reviewSession.steps.filter(x=>x.confirmed).length,locked=reviewSession.steps.filter(x=>x.locked).length;summary.hidden=false;summary.textContent=`会话 ${reviewSession.session_id.slice(0,8)} · ${reviewSession.status} · 已锁定 ${locked}/13 · 已确认 ${confirmed}/13 · 审计事件 ${reviewSession.events.length}`;steps.innerHTML=reviewSession.steps.map(x=>`<div class="step review-step"><strong>${x.position}</strong><div><b>${esc(x.step_id)} ${esc(x.title)}</b><div class="muted">前置：${esc(x.prerequisites.join(', ')||'无')} · 重建${x.rebuild_count}次 · ${x.locked?'已锁定':'未锁定'} · ${x.confirmed?'已确认':'待确认'}</div></div><div class="review-actions"><button class="secondary" data-review-action="up" data-step="${esc(x.step_id)}" data-position="${x.position}" ${x.position===1||x.locked?'disabled':''}>上移</button><button class="secondary" data-review-action="down" data-step="${esc(x.step_id)}" data-position="${x.position}" ${x.position===reviewSession.steps.length||x.locked?'disabled':''}>下移</button><button class="secondary" data-review-action="rebuild" data-step="${esc(x.step_id)}" ${x.locked?'disabled':''}>单步重建</button><button data-review-action="lock" data-step="${esc(x.step_id)}" ${x.confirmed?'disabled':''}>${x.locked?'解锁':'锁定'}</button><button data-review-action="confirm" data-step="${esc(x.step_id)}" ${!x.locked?'disabled':''}>${x.confirmed?'撤回确认':'人工确认'}</button></div></div>`).join('');panel.hidden=false}
+async function startReview(){const status=document.querySelector('#review-status');status.textContent=' 创建中…';try{reviewSession=await apiJson('/api/n31/review/sessions',{method:'POST'});status.textContent=' 审核会话已创建';renderReview()}catch(e){status.textContent=` ${e.message}`}}
+async function reviewAction(button){if(!reviewSession)return;const action=button.dataset.reviewAction,stepId=button.dataset.step,status=document.querySelector('#review-status');status.textContent=' 保存中…';try{const current=reviewSession.steps.find(x=>x.step_id===stepId);if(action==='up'||action==='down'){const target=Number(button.dataset.position)+(action==='up'?-1:1);reviewSession=await apiJson(`/api/n31/review/sessions/${reviewSession.session_id}/reorder`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({step_id:stepId,target_position:target})})}else if(action==='lock'){reviewSession=await apiJson(`/api/n31/review/sessions/${reviewSession.session_id}/steps/${stepId}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({locked:!current.locked})})}else if(action==='confirm'){reviewSession=await apiJson(`/api/n31/review/sessions/${reviewSession.session_id}/steps/${stepId}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({confirmed:!current.confirmed})})}else if(action==='rebuild'){const d=await apiJson(`/api/n31/review/sessions/${reviewSession.session_id}/steps/${stepId}/rebuild`,{method:'POST'});reviewSession=await apiJson(`/api/n31/review/sessions/${reviewSession.session_id}`);document.querySelector('#review-rebuild-result').innerHTML=`<div class="change"><b>${esc(d.step_id)} 单步重建 #${esc(d.rebuild_number)}</b><div>只重建三种SOP视图、1个检查卡和测验 ${esc(d.scope.quiz_question_ids.join(', ')||'无关联题')}；其余${esc(d.scope.unchanged_step_count)}步保持不变。</div><div class="evidence">Evidence：${evidenceButtons(d.evidence_ids)}｜外部模型调用 ${esc(d.scope.external_model_calls)}</div></div>`}status.textContent=' 已保存';renderReview()}catch(e){status.textContent=` ${e.message}`}}
+async function showEvidence(evidenceId){const panel=document.querySelector('#evidence-panel'),detail=document.querySelector('#evidence-detail');panel.hidden=false;detail.innerHTML='<div class="notice">正在读取安全定位…</div>';panel.scrollIntoView({behavior:'smooth',block:'start'});try{const d=await apiJson(`/api/n31/evidence/${evidenceId}`);detail.innerHTML=`<div class="result"><b>${esc(d.evidence_id)} · ${esc(d.navigation.label)}</b><div>${esc(d.claim)}</div><div class="evidence">${esc(d.source_type)} · ${esc(d.source_ref)} · ${esc(d.classification)} · ${esc(d.review_status)} · 绑定步骤 ${esc(d.step_ids.join(', ')||'无')}</div>${d.navigation.safe_preview_url?`<img src="${esc(d.navigation.safe_preview_url)}" alt="${esc(d.evidence_id)}安全预览">`:''}<div class="notice">仅显示结构化页码或时间点${d.navigation.safe_preview_url?'及已审核安全预览':''}；不提供原始素材链接。</div></div>`}catch(e){detail.innerHTML=`<div class="notice">${esc(e.message)}</div>`}}
 function renderDemo(d){activeDemo=d;const b=d.summary.before,a=d.summary.after,isReal=d.summary.synthetic===false,isGold=d.summary.gold_status==='GOLD';
 document.querySelector('#metrics-title').textContent=isGold?'N31 真实素材 Gold 闭环':isReal?'N31 真实素材闭环彩排':'无版权模拟闭环';
 document.querySelector('#basis').textContent=isGold?'实际操作者口述审核 · Gold v1 · 最终评测指标。':isReal?'候选基准 · 非 Gold · 指标仅用于证明闭环可运行，等待操作者审核后重跑最终评测。':'明确标注的无版权模拟数据，不作为真实案例评测。';
 document.querySelector('#metrics').innerHTML=[['必要步骤',`${pct(b.required_step_coverage)} → ${pct(a.required_step_coverage)}`],['证据覆盖',`${pct(b.evidence_supported_required_steps)} → ${pct(a.evidence_supported_required_steps)}`],['严重错误',`${b.severe_error_count} → ${a.severe_error_count}`],['局部修改',d.summary.revision_count],['状态',isReal?d.summary.gold_status||'NOT_GOLD':d.summary.workflow_state]].map(x=>`<div class="metric"><span class="muted">${esc(x[0])}</span><strong>${esc(x[1])}</strong></div>`).join('');
+document.querySelector('#review-panel').hidden=!isGold;if(isGold)renderReview();
 if(d.dgx_visual_compute){const g=d.dgx_visual_compute,s=g.summary;document.querySelector('#dgx-panel').hidden=false;document.querySelector('#dgx-metrics').innerHTML=[['GPU',g.gpu.device_name],['本地视频',s.processed_video_count],['GPU处理帧',s.sampled_frame_count],['候选帧',s.selected_frame_count],['CUDA核耗时',`${Number(s.gpu_kernel_ms).toFixed(1)}ms`]].map(x=>`<div class="metric"><span class="muted">${esc(x[0])}</span><strong>${esc(x[1])}</strong></div>`).join('');document.querySelector('#agent-trace').innerHTML=g.agent_trace.map(x=>`<div class="change"><b>${esc(x.event_id)} · ${esc(x.agent)} · ${esc(x.action)}</b><div>${esc(x.decision)}</div><div class="evidence">工具：${esc(x.tool)}｜结果：${esc(x.outcome)}</div></div>`).join('')}
 if(d.temporal_action_windows){const t=d.temporal_action_windows,s=t.summary;document.querySelector('#temporal-panel').hidden=false;document.querySelector('#temporal-metrics').innerHTML=[['Gold步骤',s.step_count],['连续窗口',s.window_count],['视频来源',s.source_count],['DGX候选命中窗口',s.window_with_dgx_candidate_count],['独立DGX候选',s.unique_dgx_candidate_count]].map(x=>`<div class="metric"><span class="muted">${esc(x[0])}</span><strong>${esc(x[1])}</strong></div>`).join('');document.querySelector('#temporal-note').textContent='窗口只把同一视频时间线内的相邻Evidence区间合并，并绑定附近DGX场景候选；它用于定位人工/模型复核范围，不自动证明动作完成。';document.querySelector('#temporal-windows').innerHTML=t.windows.slice(0,6).map(w=>`<div class="change"><b>${esc(w.window_id)} · ${esc(w.title)}</b><div>${esc(w.source_ref)}｜${(w.start_ms/1000).toFixed(1)}–${(w.end_ms/1000).toFixed(1)}秒｜视觉${esc(w.visual_verdict)}</div><div class="evidence">Evidence：${esc(w.evidence_ids.join(', '))}｜DGX候选：${esc(w.dgx_candidate_timestamps_ms.map(v=>(v/1000).toFixed(1)+'s').join(', ')||'无')}</div></div>`).join('')}
 if(d.pdf_structure){const p=d.pdf_structure,s=p.summary;document.querySelector('#pdf-panel').hidden=false;document.querySelector('#pdf-metrics').innerHTML=[['手册',s.source_count],['页数',s.page_count],['结构块',s.block_count],['OCR处理页',s.ocr_applied_page_count],['待OCR页',s.needs_ocr_page_count],['检索验证',`${s.passed_query_count}/${s.query_count}`]].map(x=>`<div class="metric"><span class="muted">${esc(x[0])}</span><strong>${esc(x[1])}</strong></div>`).join('');document.querySelector('#pdf-note').textContent='原始手册、页面图和含正文检索索引只保存在本地；Web只展示不含正文的页码级验证报告。';document.querySelector('#pdf-queries').innerHTML=p.queries.map(q=>{const h=q.top_hits[0];return `<div class="change"><b>${esc(q.query_id)} · ${esc(q.query)}</b><div>${esc(q.status)}｜精确命中${esc(q.exact_match_count)}条</div><div class="evidence">${h?`首条：${esc(h.source_ref)} PDF第${esc(h.page)}页｜${esc(h.kind)}`:'无检索结果'}</div></div>`}).join('')}
@@ -151,13 +162,14 @@ if(d.grounding_gate){const g=d.grounding_gate,s=g.summary;document.querySelector
 if(d.semantic_review){const r=d.semantic_review,s=r.summary;document.querySelector('#semantic-panel').hidden=false;document.querySelector('#semantic-metrics').innerHTML=[['复核步骤',s.step_count],['证据支持',s.supported_count],['语义问题',s.finding_count],['高严重度',s.high_severity_count],['模型调用',r.model_calls]].map(x=>`<div class="metric"><span class="muted">${esc(x[0])}</span><strong>${esc(x[1])}</strong></div>`).join('');document.querySelector('#semantic-note').textContent=`${r.model} · ${r.reasoning_effort}推理；检查曲解来源、来源冲突、顺序风险和异常遗漏。只发送${r.review_scope.evidence_count}条结构化Evidence陈述，不发送原始媒体、完整转写、手册页面、本地路径或凭证；模型不能自动覆盖Gold。`;document.querySelector('#semantic-assessments').innerHTML=r.assessments.map(x=>`<div class="change"><b>${esc(x.step_id)} · ${esc(x.verdict)} · 置信度${esc(x.confidence)}</b><div>${esc(x.rationale)}</div><div class="evidence">Evidence：${esc(x.evidence_ids.join(', '))}</div>${x.risk_notes.length?`<div class="warning-list">${esc(x.risk_notes.join('；'))}</div>`:''}</div>`).join('')}
 if(d.selective_rebuild){const r=d.selective_rebuild,s=r.summary;document.querySelector('#selective-panel').hidden=false;document.querySelector('#selective-metrics').innerHTML=[['受影响步骤',s.affected_step_count],['内容变化',s.content_changed_step_count],['重建测验题',s.quiz_question_count],['重渲染镜头',s.video_scene_count],['外部模型调用',r.data_policy.external_model_calls]].map(x=>`<div class="metric"><span class="muted">${esc(x[0])}</span><strong>${esc(x[1])}</strong></div>`).join('');document.querySelector('#selective-note').textContent='Revision Audit已精确重放为After SOP；4道未变化测验题和8个无关视频镜头逐对象保留，A4因固定单页布局只在依赖变化时整页重建。';document.querySelector('#selective-plans').innerHTML=r.artifact_plans.map(x=>`<div class="change"><b>${esc(x.artifact_type)} · ${esc(x.action)} · ${esc(x.scope)}</b><div>${esc(x.reason)}</div><div class="evidence">重建单元：${esc(x.units.join(', ')||'无')}｜保持不变：${esc(x.unchanged_unit_count)}</div></div>`).join('')}
 if(d.training_video){const t=d.training_video,o=t.output,c=t.coverage;document.querySelector('#training-video-card').hidden=false;document.querySelector('#training-video-notice').textContent=t.final_human_review_required?'自动检查与AI辅助抽帧检查已通过；最终提交前仍需参赛者完整观看并确认旁白节奏。':'参赛者已完成最终观看确认。';document.querySelector('#training-video-metrics').innerHTML=[['时长',`${(o.duration_ms/1000).toFixed(0)}秒`],['Gold步骤',`${c.covered_gold_step_count}/${c.gold_step_count}`],['必要步骤',`${c.covered_required_step_count}/${c.required_step_count}`],['证据引用',c.evidence_reference_count],['状态',t.status]].map(x=>`<div class="metric"><span class="muted">${esc(x[0])}</span><strong>${esc(x[1])}</strong></div>`).join('')}
-document.querySelector('#issues').innerHTML=d.initial_conflicts.conflicts.map(c=>`<div class="issue"><b>${esc(c.kind)}</b> · ${esc(c.message)}<div class="evidence">${c.evidence.map(e=>`${esc(e.evidence_id)}｜${esc(e.source_ref)}｜${esc(JSON.stringify(e.locator))}`).join('<br>')||'无来源内容：按规则拒绝'}</div></div>`).join('');
-const render=s=>s.steps.map(x=>`<div class="step"><b>${esc(x.step_id)} ${esc(x.title)}</b><div class="muted">${esc(x.action)}</div><div class="evidence">证据：${esc(x.evidence.join(', ')||'无')}</div></div>`).join('');document.querySelector('#before').innerHTML=render(d.before_sop);document.querySelector('#after').innerHTML=render(d.after_sop);
-document.querySelector('#changes').innerHTML=d.revision_audit.changes.map(c=>`<div class="change"><b>${esc(c.action)} · ${esc(c.path)}</b><div>${esc(c.reason)}</div><div class="evidence">证据：${esc(c.evidence_ids.join(', ')||'无依据，已删除')}</div></div>`).join('');
-if(d.checklist&&d.quiz){document.querySelector('#results-panel').hidden=false;document.querySelector('#n31-downloads').hidden=d.summary.synthetic!==false;document.querySelector('#sop-views-card').hidden=!d.sop_views;renderSopView();renderChecklist();document.querySelector('#quiz').innerHTML=d.quiz.questions.map(x=>`<div class="result"><b>${esc(x.question_id)} · ${esc(x.category)}<br>${esc(x.prompt)}</b>${x.options.length?`<ol>${x.options.map(o=>`<li>${esc(o.text)}</li>`).join('')}</ol>`:''}<div>答案：${esc(quizAnswer(x))}</div><div class="muted">${esc(x.explanation)}</div><div class="evidence">答案来源：${esc(x.answer_evidence_ids.join(', '))}｜解析来源：${esc(x.explanation_evidence_ids.join(', '))}</div><details><summary>展开证据定位</summary>${x.evidence_details.map(e=>`<div>${esc(e.evidence_id)} · ${esc(e.source_type)} · ${esc(e.classification)} · ${esc(e.review_status)} · ${esc(locator(e))}</div>`).join('')}</details></div>`).join('')}}
+document.querySelector('#issues').innerHTML=d.initial_conflicts.conflicts.map(c=>`<div class="issue"><b>${esc(c.kind)}</b> · ${esc(c.message)}<div class="evidence">${c.evidence.map(e=>`${evidenceButtons([e.evidence_id])}｜${esc(e.source_ref)}｜${esc(JSON.stringify(e.locator))}`).join('<br>')||'无来源内容：按规则拒绝'}</div></div>`).join('');
+const render=s=>s.steps.map(x=>`<div class="step"><b>${esc(x.step_id)} ${esc(x.title)}</b><div class="muted">${esc(x.action)}</div><div class="evidence">证据：${evidenceButtons(x.evidence)}</div></div>`).join('');document.querySelector('#before').innerHTML=render(d.before_sop);document.querySelector('#after').innerHTML=render(d.after_sop);
+document.querySelector('#changes').innerHTML=d.revision_audit.changes.map(c=>`<div class="change"><b>${esc(c.action)} · ${esc(c.path)}</b><div>${esc(c.reason)}</div><div class="evidence">证据：${evidenceButtons(c.evidence_ids)}</div></div>`).join('');
+if(d.checklist&&d.quiz){document.querySelector('#results-panel').hidden=false;document.querySelector('#n31-downloads').hidden=d.summary.synthetic!==false;document.querySelector('#sop-views-card').hidden=!d.sop_views;renderSopView();renderChecklist();document.querySelector('#quiz').innerHTML=d.quiz.questions.map(x=>`<div class="result"><b>${esc(x.question_id)} · ${esc(x.category)}<br>${esc(x.prompt)}</b>${x.options.length?`<ol>${x.options.map(o=>`<li>${esc(o.text)}</li>`).join('')}</ol>`:''}<div>答案：${esc(quizAnswer(x))}</div><div class="muted">${esc(x.explanation)}</div><div class="evidence">答案来源：${evidenceButtons(x.answer_evidence_ids)}｜解析来源：${evidenceButtons(x.explanation_evidence_ids)}</div><details><summary>展开证据定位</summary>${x.evidence_details.map(e=>`<div>${evidenceButtons([e.evidence_id])} · ${esc(e.source_type)} · ${esc(e.classification)} · ${esc(e.review_status)} · ${esc(locator(e))}</div>`).join('')}</details></div>`).join('')}}
 async function loadDemo(){let r=await fetch('/api/n31');if(r.ok){renderDemo(await r.json());return}r=await fetch('/api/demo');if(!r.ok){await fetch('/api/demo/run',{method:'POST'});r=await fetch('/api/demo')}renderDemo(await r.json())}
 document.querySelector('#rerun').addEventListener('click',async()=>{const s=document.querySelector('#rerun-status');s.textContent=' 运行中…';const r=await fetch('/api/n31/run',{method:'POST'});const d=await r.json();s.textContent=r.ok?` 完成：严重错误 ${d.before.severe_error_count} → ${d.after.severe_error_count}`:` 失败：${d.detail||'未知错误'}`;if(r.ok)await loadDemo()});
 document.querySelectorAll('.sop-tab').forEach(b=>b.addEventListener('click',()=>{sopView=b.dataset.view;renderSopView()}));document.querySelector('#check-prev').addEventListener('click',()=>{if(checklistIndex>0){checklistIndex--;renderChecklist()}});document.querySelector('#check-next').addEventListener('click',()=>{if(checklistIndex<(activeDemo?.checklist.items.length||1)-1){checklistIndex++;renderChecklist()}});document.querySelector('#feedback-submit').addEventListener('click',async()=>{const status=document.querySelector('#checklist-status'),comment=document.querySelector('#feedback-comment').value.trim(),item=activeDemo.checklist.items[checklistIndex];if(!comment){status.textContent=' 请先填写问题';return}status.textContent=' 保存中…';try{const session=await ensureChecklistSession();const r=await fetch(`/api/n31/checklist/sessions/${session.session_id}/items/${item.step_id}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({feedback_category:document.querySelector('#feedback-category').value,feedback_comment:comment})});const d=await r.json();if(!r.ok)throw new Error(d.detail||'保存失败');checklistSession=d;document.querySelector('#feedback-comment').value='';status.textContent=' 反馈已保存在本机';renderChecklist()}catch(e){status.textContent=` ${e.message}`}});
+document.querySelector('#review-start').addEventListener('click',startReview);document.addEventListener('click',e=>{const evidence=e.target.closest('[data-evidence]');if(evidence){showEvidence(evidence.dataset.evidence);return}const review=e.target.closest('[data-review-action]');if(review)reviewAction(review)});
 document.querySelector('#upload').addEventListener('submit',async e=>{e.preventDefault();const status=document.querySelector('#status');status.textContent='处理中…';const r=await fetch('/api/ingest',{method:'POST',body:new FormData(e.target)});const d=await r.json();status.textContent=r.ok?'完成':'失败';document.querySelector('#ingest').textContent=JSON.stringify(d,null,2)});loadDemo();
 </script></body></html>"""
 
@@ -320,7 +332,30 @@ def create_app(
             n31_dir = provisional_dir.resolve()
     active_n31_dir = {"path": n31_dir}
     checklist_sessions = ChecklistSessionStore(root / "checklist_sessions")
+    review_sessions = SopReviewSessionStore(root / "sop_review_sessions")
     app = FastAPI(title="SkillForge", version="0.1.0")
+
+    def active_n31_sop() -> dict[str, Any]:
+        try:
+            payload = _demo_payload(active_n31_dir["path"])
+        except FileNotFoundError as exc:
+            raise HTTPException(status_code=404, detail="N31 Gold结果尚未生成") from exc
+        summary = payload["summary"]
+        if (
+            summary.get("synthetic") is not False
+            or summary.get("gold_status") != "GOLD"
+            or summary.get("metrics_status") != "FINAL"
+        ):
+            raise HTTPException(status_code=409, detail="只有Gold最终结果可以进入人工审核")
+        sop = dict(payload["after_sop"])
+        if "evidence_catalog" not in sop:
+            gold = _read_json(ROOT / "cases/n31/gold/gold_sop.json")
+            validate_document(gold, "sop.schema.json")
+            sop["evidence_catalog"] = gold["evidence_catalog"]
+        try:
+            return validate_document(sop, "sop.schema.json")
+        except ValueError as exc:
+            raise HTTPException(status_code=409, detail="N31最终SOP格式无效") from exc
 
     @app.get("/", response_class=HTMLResponse)
     def index() -> str:
@@ -456,6 +491,95 @@ def create_app(
             media_type=_artifact_media_type(path),
             filename=download_name,
         )
+
+    @app.post("/api/n31/review/sessions")
+    def create_review_session() -> dict[str, Any]:
+        return review_sessions.create(active_n31_sop())
+
+    @app.get("/api/n31/review/sessions/{session_id}")
+    def get_review_session(session_id: str) -> dict[str, Any]:
+        try:
+            return review_sessions.get(session_id)
+        except FileNotFoundError as exc:
+            raise HTTPException(status_code=404, detail="SOP审核会话不存在") from exc
+
+    @app.patch("/api/n31/review/sessions/{session_id}/steps/{step_id}")
+    def update_review_step(
+        session_id: str,
+        step_id: str,
+        payload: dict[str, Any] = Body(...),
+    ) -> dict[str, Any]:
+        if not payload or set(payload) - {"locked", "confirmed"}:
+            raise HTTPException(status_code=400, detail="审核步骤更新字段无效")
+        if any(not isinstance(value, bool) for value in payload.values()):
+            raise HTTPException(status_code=400, detail="locked和confirmed必须为布尔值")
+        try:
+            return review_sessions.set_step_state(
+                session_id,
+                step_id,
+                active_n31_sop(),
+                locked=payload.get("locked") if "locked" in payload else None,
+                confirmed=(
+                    payload.get("confirmed") if "confirmed" in payload else None
+                ),
+            )
+        except FileNotFoundError as exc:
+            raise HTTPException(status_code=404, detail="SOP审核会话不存在") from exc
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.post("/api/n31/review/sessions/{session_id}/reorder")
+    def reorder_review_step(
+        session_id: str,
+        payload: dict[str, Any] = Body(...),
+    ) -> dict[str, Any]:
+        if set(payload) != {"step_id", "target_position"}:
+            raise HTTPException(status_code=400, detail="重排请求字段无效")
+        if (
+            not isinstance(payload["step_id"], str)
+            or not isinstance(payload["target_position"], int)
+            or isinstance(payload["target_position"], bool)
+        ):
+            raise HTTPException(status_code=400, detail="重排步骤或位置类型无效")
+        try:
+            return review_sessions.reorder(
+                session_id,
+                payload["step_id"],
+                payload["target_position"],
+                active_n31_sop(),
+            )
+        except FileNotFoundError as exc:
+            raise HTTPException(status_code=404, detail="SOP审核会话不存在") from exc
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.post(
+        "/api/n31/review/sessions/{session_id}/steps/{step_id}/rebuild"
+    )
+    def rebuild_review_step(session_id: str, step_id: str) -> dict[str, Any]:
+        visual_path = ROOT / "cases/n31/evaluations/visual_sequence_review_v1.json"
+        visual_review = _read_json(visual_path) if visual_path.is_file() else None
+        try:
+            return rebuild_step_artifacts(
+                review_sessions,
+                session_id,
+                step_id,
+                active_n31_sop(),
+                visual_review=visual_review,
+            )
+        except FileNotFoundError as exc:
+            raise HTTPException(status_code=404, detail="SOP审核会话不存在") from exc
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/n31/evidence/{evidence_id}")
+    def locate_n31_evidence(evidence_id: str) -> dict[str, Any]:
+        if not re.fullmatch(r"E[0-9]{3}", evidence_id):
+            raise HTTPException(status_code=404, detail="Evidence不存在")
+        try:
+            return build_evidence_locator(active_n31_sop(), evidence_id)
+        except KeyError as exc:
+            raise HTTPException(status_code=404, detail="Evidence不存在") from exc
 
     @app.post("/api/n31/checklist/sessions")
     def create_checklist_session() -> dict[str, Any]:

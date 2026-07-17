@@ -45,6 +45,9 @@ def test_web_prefers_explicitly_labelled_n31_rehearsal(tmp_path) -> None:
     response = client.get("/api/n31")
     assert response.status_code == 200
     assert response.json()["summary"]["gold_status"] == "NOT_GOLD"
+    review = client.post("/api/n31/review/sessions")
+    assert review.status_code == 409
+    assert "只有Gold最终结果" in review.json()["detail"]
 
 
 def test_web_accepts_operator_reviewed_gold_result(tmp_path) -> None:
@@ -58,6 +61,9 @@ def test_web_accepts_operator_reviewed_gold_result(tmp_path) -> None:
     assert "/api/n31/artifacts/semantic-review" in home.text
     assert "受影响范围与选择性重建" in home.text
     assert "/api/n31/artifacts/selective-rebuild" in home.text
+    assert "操作者 SOP 审核台" in home.text
+    assert "单步重建" in home.text
+    assert "/api/n31/evidence/" in home.text
     response = client.get("/api/n31")
     assert response.status_code == 200
     assert response.json()["summary"]["gold_status"] == "GOLD"
@@ -218,6 +224,63 @@ def test_web_accepts_operator_reviewed_gold_result(tmp_path) -> None:
     selective_download = client.get("/api/n31/artifacts/selective-rebuild")
     assert selective_download.status_code == 200
     assert selective_download.json()["report_id"] == "N31_SELECTIVE_REBUILD_V1"
+    evidence = client.get("/api/n31/evidence/E144")
+    assert evidence.status_code == 200
+    assert evidence.json()["navigation"] == {
+        "kind": "AUDIO_TIME",
+        "label": "40.7–68.7秒",
+        "safe_preview_url": None,
+        "raw_source_url": None,
+    }
+    video_evidence = client.get("/api/n31/evidence/E001")
+    assert video_evidence.status_code == 200
+    assert "keyframe" not in video_evidence.json()["locator"]
+    assert video_evidence.json()["navigation"]["safe_preview_url"].startswith(
+        "/api/n31/checklist/previews/S"
+    )
+    assert client.get("/api/n31/evidence/E999").status_code == 404
+
+    review = client.post("/api/n31/review/sessions")
+    assert review.status_code == 200
+    review_id = review.json()["session_id"]
+    assert len(review.json()["steps"]) == 13
+    rebuilt = client.post(
+        f"/api/n31/review/sessions/{review_id}/steps/S12/rebuild"
+    )
+    assert rebuilt.status_code == 200
+    assert rebuilt.json()["scope"]["quiz_question_ids"] == ["Q03"]
+    assert rebuilt.json()["scope"]["unchanged_step_count"] == 12
+    reordered = client.post(
+        f"/api/n31/review/sessions/{review_id}/reorder",
+        json={"step_id": "S11", "target_position": 12},
+    )
+    assert reordered.status_code == 200
+    assert [item["step_id"] for item in reordered.json()["steps"]][10:13] == [
+        "S12",
+        "S11",
+        "S13",
+    ]
+    invalid_order = client.post(
+        f"/api/n31/review/sessions/{review_id}/reorder",
+        json={"step_id": "S09", "target_position": 8},
+    )
+    assert invalid_order.status_code == 400
+    assert "S08 必须先于 S09" in invalid_order.json()["detail"]
+    locked = client.patch(
+        f"/api/n31/review/sessions/{review_id}/steps/S01",
+        json={"locked": True},
+    )
+    assert locked.status_code == 200
+    confirmed = client.patch(
+        f"/api/n31/review/sessions/{review_id}/steps/S01",
+        json={"confirmed": True},
+    )
+    assert confirmed.status_code == 200
+    s01 = next(
+        item for item in confirmed.json()["steps"] if item["step_id"] == "S01"
+    )
+    assert s01["locked"] is True and s01["confirmed"] is True
+    assert client.get(f"/api/n31/review/sessions/{review_id}").status_code == 200
     assert client.get("/api/n31/artifacts/private-video").status_code == 404
     rerun = client.post("/api/n31/run")
     assert rerun.status_code == 200

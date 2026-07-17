@@ -5,6 +5,7 @@ from pathlib import Path
 from skillforge.contracts import validate_document
 from skillforge.pitch import (
     PHASE_ORDER,
+    _check_demo_modes,
     _check_metrics,
     _check_runtime_benchmark,
     _check_timeline,
@@ -123,3 +124,10 @@ def test_pitch_requires_bounded_selective_rebuild() -> None:
     result = _check_metrics(ROOT)
     assert result["status"] == "PASSED"
     assert result["assertions"]["selective_rebuild_bounded"] is True
+
+
+def test_pitch_requires_safe_evidence_navigation_and_operator_review() -> None:
+    result = _check_demo_modes(_runbook(), ROOT)
+    assert result["status"] == "PASSED"
+    assert result["assertions"]["evidence_locator_safe"] is True
+    assert result["assertions"]["operator_review_controls"] is True

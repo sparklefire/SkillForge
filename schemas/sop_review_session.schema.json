@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/sop_review_session.schema.json",
+  "title": "SkillForge SOP Review Session",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "artifact_type",
+    "version",
+    "session_id",
+    "case_id",
+    "sop_version",
+    "source_sop_sha256",
+    "created_at",
+    "updated_at",
+    "status",
+    "steps",
+    "events",
+    "data_policy"
+  ],
+  "properties": {
+    "artifact_type": {"const": "SOP_REVIEW_SESSION"},
+    "version": {"const": 1},
+    "session_id": {"type": "string", "pattern": "^[a-f0-9]{32}$"},
+    "case_id": {"type": "string", "minLength": 1},
+    "sop_version": {"type": "integer", "minimum": 1},
+    "source_sop_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "created_at": {"type": "string", "format": "date-time"},
+    "updated_at": {"type": "string", "format": "date-time"},
+    "status": {"enum": ["IN_REVIEW", "COMPLETED"]},
+    "steps": {
+      "type": "array",
+      "minItems": 8,
+      "maxItems": 15,
+      "items": {"$ref": "#/$defs/step"}
+    },
+    "events": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/event"}
+    },
+    "data_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["external_model_calls", "contains_raw_media", "contains_credentials", "contains_absolute_paths"],
+      "properties": {
+        "external_model_calls": {"const": 0},
+        "contains_raw_media": {"const": false},
+        "contains_credentials": {"const": false},
+        "contains_absolute_paths": {"const": false}
+      }
+    }
+  },
+  "$defs": {
+    "step": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["step_id", "title", "position", "prerequisites", "locked", "confirmed", "rebuild_count"],
+      "properties": {
+        "step_id": {"type": "string", "pattern": "^S[0-9]{2}$"},
+        "title": {"type": "string", "minLength": 1},
+        "position": {"type": "integer", "minimum": 1, "maximum": 15},
+        "prerequisites": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^S[0-9]{2}$"}
+        },
+        "locked": {"type": "boolean"},
+        "confirmed": {"type": "boolean"},
+        "rebuild_count": {"type": "integer", "minimum": 0}
+      }
+    },
+    "event": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["event_id", "action", "step_id", "before_position", "after_position", "actor", "automatic", "detail", "recorded_at"],
+      "properties": {
+        "event_id": {"type": "string", "pattern": "^[a-f0-9]{32}$"},
+        "action": {"enum": ["LOCKED", "UNLOCKED", "CONFIRMED", "REOPENED", "REORDERED", "STEP_REBUILT"]},
+        "step_id": {"type": "string", "pattern": "^S[0-9]{2}$"},
+        "before_position": {"type": ["integer", "null"], "minimum": 1, "maximum": 15},
+        "after_position": {"type": ["integer", "null"], "minimum": 1, "maximum": 15},
+        "actor": {"const": "OPERATOR"},
+        "automatic": {"const": false},
+        "detail": {"type": "string", "minLength": 1},
+        "recorded_at": {"type": "string", "format": "date-time"}
+      }
+    }
+  }
+}

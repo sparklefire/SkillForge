@@ -522,6 +522,46 @@ def _check_demo_modes(runbook: dict[str, Any], root: Path) -> dict[str, Any]:
     health = client.get("/health")
     payload = client.get("/api/n31")
     rerun = client.post("/api/n31/run")
+    evidence = client.get("/api/n31/evidence/E144")
+    review = client.post("/api/n31/review/sessions")
+    review_id = review.json().get("session_id") if review.status_code == 200 else None
+    rebuild = (
+        client.post(f"/api/n31/review/sessions/{review_id}/steps/S12/rebuild")
+        if review_id
+        else None
+    )
+    reordered = (
+        client.post(
+            f"/api/n31/review/sessions/{review_id}/reorder",
+            json={"step_id": "S11", "target_position": 12},
+        )
+        if review_id
+        else None
+    )
+    invalid_order = (
+        client.post(
+            f"/api/n31/review/sessions/{review_id}/reorder",
+            json={"step_id": "S09", "target_position": 8},
+        )
+        if review_id
+        else None
+    )
+    locked = (
+        client.patch(
+            f"/api/n31/review/sessions/{review_id}/steps/S01",
+            json={"locked": True},
+        )
+        if review_id
+        else None
+    )
+    confirmed = (
+        client.patch(
+            f"/api/n31/review/sessions/{review_id}/steps/S01",
+            json={"confirmed": True},
+        )
+        if review_id and locked is not None and locked.status_code == 200
+        else None
+    )
     offline_bundle = _read_json(root / "cases/n31/demo_bundle/bundle.json")
     assertions = {
         "mode_priority": ordered_modes == MODE_ORDER,
@@ -536,6 +576,31 @@ def _check_demo_modes(runbook: dict[str, Any], root: Path) -> dict[str, Any]:
         and rerun.json().get("before", {}).get("severe_error_count") == 5
         and rerun.json().get("after", {}).get("severe_error_count") == 0
         and rerun.json().get("revision_count") == 4,
+        "evidence_locator_safe": evidence.status_code == 200
+        and evidence.json().get("evidence_id") == "E144"
+        and evidence.json().get("navigation", {}).get("kind") == "AUDIO_TIME"
+        and evidence.json().get("navigation", {}).get("raw_source_url") is None
+        and evidence.json().get("data_policy", {}).get("contains_raw_media") is False,
+        "operator_review_controls": review.status_code == 200
+        and len(review.json().get("steps", [])) == 13
+        and rebuild is not None
+        and rebuild.status_code == 200
+        and rebuild.json().get("scope", {}).get("unchanged_step_count") == 12
+        and rebuild.json().get("scope", {}).get("external_model_calls") == 0
+        and reordered is not None
+        and reordered.status_code == 200
+        and invalid_order is not None
+        and invalid_order.status_code == 400
+        and locked is not None
+        and locked.status_code == 200
+        and confirmed is not None
+        and confirmed.status_code == 200
+        and any(
+            item.get("step_id") == "S01"
+            and item.get("locked") is True
+            and item.get("confirmed") is True
+            for item in confirmed.json().get("steps", [])
+        ),
         "entry_script": (root / "scripts/run_demo_mode.sh").is_file(),
     }
     return {
