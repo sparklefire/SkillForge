@@ -90,6 +90,12 @@ def test_web_accepts_operator_reviewed_gold_result(tmp_path) -> None:
     }
     assert source_candidates["summary"]["ordered_step_count"] == 13
     assert source_candidates["summary"]["multi_source_step_count"] == 12
+    assert source_candidates["summary"]["low_confidence_step_ids"] == ["S04"]
+    assert source_candidates["summary"]["review_route_counts"] == {
+        "AUTO_VERIFY": 6,
+        "VERIFIER_QUEUE": 6,
+        "HUMAN_REVIEW_REQUIRED": 1,
+    }
     assert len(response.json()["checklist"]["items"]) == 13
     assert len(response.json()["quiz"]["questions"]) == 5
     checklist = client.get("/api/n31/artifacts/checklist")

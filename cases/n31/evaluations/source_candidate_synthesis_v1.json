@@ -430,7 +430,54 @@
         "SC019",
         "SC026"
       ],
-      "confidence": 0.912,
+      "confidence": 0.862,
+      "confidence_assessment": {
+        "band": "HIGH",
+        "corroboration_bonus": 0.08,
+        "observation_ids": [],
+        "observation_penalty": 0,
+        "rationale": "按证据分类权威性加权audio、pdf、video候选，并加入多源佐证0.08；无已知跨来源负面观察；结果路由到AUTO_VERIFY。",
+        "route": "AUTO_VERIFY",
+        "score": 0.862,
+        "source_components": [
+          {
+            "adjusted_confidence": 0.98,
+            "authority_weight": 0.9,
+            "best_candidate_confidence": 0.98,
+            "candidate_id": "SC026",
+            "classifications": [
+              "EXPERT_ADVICE"
+            ],
+            "review_factor": 1.0,
+            "source_type": "audio",
+            "support_factor": 1.0
+          },
+          {
+            "adjusted_confidence": 0.782,
+            "authority_weight": 1.0,
+            "best_candidate_confidence": 0.92,
+            "candidate_id": "SC019",
+            "classifications": [
+              "SOURCE_FACT"
+            ],
+            "review_factor": 0.85,
+            "source_type": "pdf",
+            "support_factor": 1.0
+          },
+          {
+            "adjusted_confidence": 0.506,
+            "authority_weight": 0.65,
+            "best_candidate_confidence": 0.7,
+            "candidate_id": "SC001",
+            "classifications": [
+              "MODEL_INFERENCE"
+            ],
+            "review_factor": 0.85,
+            "source_type": "video",
+            "support_factor": 0.85
+          }
+        ]
+      },
       "evidence_ids": [
         "E001",
         "E096",
@@ -487,7 +534,54 @@
         "SC019",
         "SC026"
       ],
-      "confidence": 0.917,
+      "confidence": 0.865,
+      "confidence_assessment": {
+        "band": "HIGH",
+        "corroboration_bonus": 0.08,
+        "observation_ids": [],
+        "observation_penalty": 0,
+        "rationale": "按证据分类权威性加权audio、pdf、video候选，并加入多源佐证0.08；无已知跨来源负面观察；结果路由到AUTO_VERIFY。",
+        "route": "AUTO_VERIFY",
+        "score": 0.865,
+        "source_components": [
+          {
+            "adjusted_confidence": 0.98,
+            "authority_weight": 0.9,
+            "best_candidate_confidence": 0.98,
+            "candidate_id": "SC026",
+            "classifications": [
+              "EXPERT_ADVICE"
+            ],
+            "review_factor": 1.0,
+            "source_type": "audio",
+            "support_factor": 1.0
+          },
+          {
+            "adjusted_confidence": 0.782,
+            "authority_weight": 1.0,
+            "best_candidate_confidence": 0.92,
+            "candidate_id": "SC019",
+            "classifications": [
+              "SOURCE_FACT"
+            ],
+            "review_factor": 0.85,
+            "source_type": "pdf",
+            "support_factor": 1.0
+          },
+          {
+            "adjusted_confidence": 0.52,
+            "authority_weight": 0.65,
+            "best_candidate_confidence": 0.72,
+            "candidate_id": "SC002",
+            "classifications": [
+              "MODEL_INFERENCE"
+            ],
+            "review_factor": 0.85,
+            "source_type": "video",
+            "support_factor": 0.85
+          }
+        ]
+      },
       "evidence_ids": [
         "E066",
         "E096",
@@ -542,7 +636,54 @@
         "SC020",
         "SC027"
       ],
-      "confidence": 0.862,
+      "confidence": 0.82,
+      "confidence_assessment": {
+        "band": "MEDIUM",
+        "corroboration_bonus": 0.08,
+        "observation_ids": [],
+        "observation_penalty": 0,
+        "rationale": "按证据分类权威性加权audio、pdf、video候选，并加入多源佐证0.08；无已知跨来源负面观察；结果路由到VERIFIER_QUEUE。",
+        "route": "VERIFIER_QUEUE",
+        "score": 0.82,
+        "source_components": [
+          {
+            "adjusted_confidence": 0.96,
+            "authority_weight": 0.9,
+            "best_candidate_confidence": 0.96,
+            "candidate_id": "SC027",
+            "classifications": [
+              "EXPERT_ADVICE"
+            ],
+            "review_factor": 1.0,
+            "source_type": "audio",
+            "support_factor": 1.0
+          },
+          {
+            "adjusted_confidence": 0.731,
+            "authority_weight": 1.0,
+            "best_candidate_confidence": 0.86,
+            "candidate_id": "SC020",
+            "classifications": [
+              "SOURCE_FACT"
+            ],
+            "review_factor": 0.85,
+            "source_type": "pdf",
+            "support_factor": 1.0
+          },
+          {
+            "adjusted_confidence": 0.448,
+            "authority_weight": 0.65,
+            "best_candidate_confidence": 0.62,
+            "candidate_id": "SC003",
+            "classifications": [
+              "MODEL_INFERENCE"
+            ],
+            "review_factor": 0.85,
+            "source_type": "video",
+            "support_factor": 0.85
+          }
+        ]
+      },
       "evidence_ids": [
         "E009",
         "E099",
@@ -585,7 +726,32 @@
       "candidate_ids": [
         "SC021"
       ],
-      "confidence": 0.94,
+      "confidence": 0.691,
+      "confidence_assessment": {
+        "band": "LOW",
+        "corroboration_bonus": 0.0,
+        "observation_ids": [
+          "NO001"
+        ],
+        "observation_penalty": 0.108,
+        "rationale": "按证据分类权威性加权pdf候选，并加入多源佐证0.00；负面观察=NO001:NOT_VISIBLE；结果路由到HUMAN_REVIEW_REQUIRED。",
+        "route": "HUMAN_REVIEW_REQUIRED",
+        "score": 0.691,
+        "source_components": [
+          {
+            "adjusted_confidence": 0.799,
+            "authority_weight": 1.0,
+            "best_candidate_confidence": 0.94,
+            "candidate_id": "SC021",
+            "classifications": [
+              "SOURCE_FACT"
+            ],
+            "review_factor": 0.85,
+            "source_type": "pdf",
+            "support_factor": 1.0
+          }
+        ]
+      },
       "evidence_ids": [
         "E142"
       ],
@@ -627,7 +793,54 @@
         "SC022",
         "SC028"
       ],
-      "confidence": 0.85,
+      "confidence": 0.808,
+      "confidence_assessment": {
+        "band": "MEDIUM",
+        "corroboration_bonus": 0.08,
+        "observation_ids": [],
+        "observation_penalty": 0,
+        "rationale": "按证据分类权威性加权audio、pdf、video候选，并加入多源佐证0.08；无已知跨来源负面观察；结果路由到VERIFIER_QUEUE。",
+        "route": "VERIFIER_QUEUE",
+        "score": 0.808,
+        "source_components": [
+          {
+            "adjusted_confidence": 0.9,
+            "authority_weight": 0.9,
+            "best_candidate_confidence": 0.9,
+            "candidate_id": "SC028",
+            "classifications": [
+              "EXPERT_ADVICE"
+            ],
+            "review_factor": 1.0,
+            "source_type": "audio",
+            "support_factor": 1.0
+          },
+          {
+            "adjusted_confidence": 0.765,
+            "authority_weight": 1.0,
+            "best_candidate_confidence": 0.9,
+            "candidate_id": "SC022",
+            "classifications": [
+              "SOURCE_FACT"
+            ],
+            "review_factor": 0.85,
+            "source_type": "pdf",
+            "support_factor": 1.0
+          },
+          {
+            "adjusted_confidence": 0.433,
+            "authority_weight": 0.65,
+            "best_candidate_confidence": 0.6,
+            "candidate_id": "SC004",
+            "classifications": [
+              "MODEL_INFERENCE"
+            ],
+            "review_factor": 0.85,
+            "source_type": "video",
+            "support_factor": 0.85
+          }
+        ]
+      },
       "evidence_ids": [
         "E018",
         "E141",
@@ -674,7 +887,54 @@
         "SC022",
         "SC029"
       ],
-      "confidence": 0.898,
+      "confidence": 0.848,
+      "confidence_assessment": {
+        "band": "MEDIUM",
+        "corroboration_bonus": 0.08,
+        "observation_ids": [],
+        "observation_penalty": 0,
+        "rationale": "按证据分类权威性加权audio、pdf、video候选，并加入多源佐证0.08；无已知跨来源负面观察；结果路由到VERIFIER_QUEUE。",
+        "route": "VERIFIER_QUEUE",
+        "score": 0.848,
+        "source_components": [
+          {
+            "adjusted_confidence": 0.96,
+            "authority_weight": 0.9,
+            "best_candidate_confidence": 0.96,
+            "candidate_id": "SC029",
+            "classifications": [
+              "EXPERT_ADVICE"
+            ],
+            "review_factor": 1.0,
+            "source_type": "audio",
+            "support_factor": 1.0
+          },
+          {
+            "adjusted_confidence": 0.765,
+            "authority_weight": 1.0,
+            "best_candidate_confidence": 0.9,
+            "candidate_id": "SC022",
+            "classifications": [
+              "SOURCE_FACT"
+            ],
+            "review_factor": 0.85,
+            "source_type": "pdf",
+            "support_factor": 1.0
+          },
+          {
+            "adjusted_confidence": 0.506,
+            "authority_weight": 0.65,
+            "best_candidate_confidence": 0.7,
+            "candidate_id": "SC006",
+            "classifications": [
+              "MODEL_INFERENCE"
+            ],
+            "review_factor": 0.85,
+            "source_type": "video",
+            "support_factor": 0.85
+          }
+        ]
+      },
       "evidence_ids": [
         "E023",
         "E069",
@@ -722,7 +982,54 @@
         "SC023",
         "SC029"
       ],
-      "confidence": 0.911,
+      "confidence": 0.858,
+      "confidence_assessment": {
+        "band": "HIGH",
+        "corroboration_bonus": 0.08,
+        "observation_ids": [],
+        "observation_penalty": 0,
+        "rationale": "按证据分类权威性加权audio、pdf、video候选，并加入多源佐证0.08；无已知跨来源负面观察；结果路由到AUTO_VERIFY。",
+        "route": "AUTO_VERIFY",
+        "score": 0.858,
+        "source_components": [
+          {
+            "adjusted_confidence": 0.96,
+            "authority_weight": 0.9,
+            "best_candidate_confidence": 0.96,
+            "candidate_id": "SC029",
+            "classifications": [
+              "EXPERT_ADVICE"
+            ],
+            "review_factor": 1.0,
+            "source_type": "audio",
+            "support_factor": 1.0
+          },
+          {
+            "adjusted_confidence": 0.782,
+            "authority_weight": 1.0,
+            "best_candidate_confidence": 0.92,
+            "candidate_id": "SC023",
+            "classifications": [
+              "SOURCE_FACT"
+            ],
+            "review_factor": 0.85,
+            "source_type": "pdf",
+            "support_factor": 1.0
+          },
+          {
+            "adjusted_confidence": 0.52,
+            "authority_weight": 0.65,
+            "best_candidate_confidence": 0.72,
+            "candidate_id": "SC008",
+            "classifications": [
+              "MODEL_INFERENCE"
+            ],
+            "review_factor": 0.85,
+            "source_type": "video",
+            "support_factor": 0.85
+          }
+        ]
+      },
       "evidence_ids": [
         "E029",
         "E074",
@@ -771,7 +1078,54 @@
         "SC023",
         "SC030"
       ],
-      "confidence": 0.917,
+      "confidence": 0.865,
+      "confidence_assessment": {
+        "band": "HIGH",
+        "corroboration_bonus": 0.08,
+        "observation_ids": [],
+        "observation_penalty": 0,
+        "rationale": "按证据分类权威性加权audio、pdf、video候选，并加入多源佐证0.08；无已知跨来源负面观察；结果路由到AUTO_VERIFY。",
+        "route": "AUTO_VERIFY",
+        "score": 0.865,
+        "source_components": [
+          {
+            "adjusted_confidence": 0.98,
+            "authority_weight": 0.9,
+            "best_candidate_confidence": 0.98,
+            "candidate_id": "SC030",
+            "classifications": [
+              "EXPERT_ADVICE"
+            ],
+            "review_factor": 1.0,
+            "source_type": "audio",
+            "support_factor": 1.0
+          },
+          {
+            "adjusted_confidence": 0.782,
+            "authority_weight": 1.0,
+            "best_candidate_confidence": 0.92,
+            "candidate_id": "SC023",
+            "classifications": [
+              "SOURCE_FACT"
+            ],
+            "review_factor": 0.85,
+            "source_type": "pdf",
+            "support_factor": 1.0
+          },
+          {
+            "adjusted_confidence": 0.52,
+            "authority_weight": 0.65,
+            "best_candidate_confidence": 0.72,
+            "candidate_id": "SC010",
+            "classifications": [
+              "MODEL_INFERENCE"
+            ],
+            "review_factor": 0.85,
+            "source_type": "video",
+            "support_factor": 0.85
+          }
+        ]
+      },
       "evidence_ids": [
         "E034",
         "E079",
@@ -821,7 +1175,54 @@
         "SC024",
         "SC031"
       ],
-      "confidence": 0.913,
+      "confidence": 0.864,
+      "confidence_assessment": {
+        "band": "HIGH",
+        "corroboration_bonus": 0.08,
+        "observation_ids": [],
+        "observation_penalty": 0,
+        "rationale": "按证据分类权威性加权audio、pdf、video候选，并加入多源佐证0.08；无已知跨来源负面观察；结果路由到AUTO_VERIFY。",
+        "route": "AUTO_VERIFY",
+        "score": 0.864,
+        "source_components": [
+          {
+            "adjusted_confidence": 0.98,
+            "authority_weight": 0.9,
+            "best_candidate_confidence": 0.98,
+            "candidate_id": "SC031",
+            "classifications": [
+              "EXPERT_ADVICE"
+            ],
+            "review_factor": 1.0,
+            "source_type": "audio",
+            "support_factor": 1.0
+          },
+          {
+            "adjusted_confidence": 0.799,
+            "authority_weight": 1.0,
+            "best_candidate_confidence": 0.94,
+            "candidate_id": "SC024",
+            "classifications": [
+              "SOURCE_FACT"
+            ],
+            "review_factor": 0.85,
+            "source_type": "pdf",
+            "support_factor": 1.0
+          },
+          {
+            "adjusted_confidence": 0.491,
+            "authority_weight": 0.65,
+            "best_candidate_confidence": 0.68,
+            "candidate_id": "SC012",
+            "classifications": [
+              "MODEL_INFERENCE"
+            ],
+            "review_factor": 0.85,
+            "source_type": "video",
+            "support_factor": 0.85
+          }
+        ]
+      },
       "evidence_ids": [
         "E039",
         "E077",
@@ -878,7 +1279,54 @@
         "SC032",
         "SC033"
       ],
-      "confidence": 0.917,
+      "confidence": 0.865,
+      "confidence_assessment": {
+        "band": "HIGH",
+        "corroboration_bonus": 0.08,
+        "observation_ids": [],
+        "observation_penalty": 0,
+        "rationale": "按证据分类权威性加权audio、pdf、video候选，并加入多源佐证0.08；无已知跨来源负面观察；结果路由到AUTO_VERIFY。",
+        "route": "AUTO_VERIFY",
+        "score": 0.865,
+        "source_components": [
+          {
+            "adjusted_confidence": 0.98,
+            "authority_weight": 0.9,
+            "best_candidate_confidence": 0.98,
+            "candidate_id": "SC032",
+            "classifications": [
+              "EXPERT_ADVICE"
+            ],
+            "review_factor": 1.0,
+            "source_type": "audio",
+            "support_factor": 1.0
+          },
+          {
+            "adjusted_confidence": 0.782,
+            "authority_weight": 1.0,
+            "best_candidate_confidence": 0.92,
+            "candidate_id": "SC025",
+            "classifications": [
+              "SOURCE_FACT"
+            ],
+            "review_factor": 0.85,
+            "source_type": "pdf",
+            "support_factor": 1.0
+          },
+          {
+            "adjusted_confidence": 0.52,
+            "authority_weight": 0.65,
+            "best_candidate_confidence": 0.72,
+            "candidate_id": "SC013",
+            "classifications": [
+              "MODEL_INFERENCE"
+            ],
+            "review_factor": 0.85,
+            "source_type": "video",
+            "support_factor": 0.85
+          }
+        ]
+      },
       "evidence_ids": [
         "E044",
         "E104",
@@ -933,7 +1381,54 @@
         "SC025",
         "SC032"
       ],
-      "confidence": 0.889,
+      "confidence": 0.847,
+      "confidence_assessment": {
+        "band": "MEDIUM",
+        "corroboration_bonus": 0.08,
+        "observation_ids": [],
+        "observation_penalty": 0,
+        "rationale": "按证据分类权威性加权audio、pdf、video候选，并加入多源佐证0.08；无已知跨来源负面观察；结果路由到VERIFIER_QUEUE。",
+        "route": "VERIFIER_QUEUE",
+        "score": 0.847,
+        "source_components": [
+          {
+            "adjusted_confidence": 0.98,
+            "authority_weight": 0.9,
+            "best_candidate_confidence": 0.98,
+            "candidate_id": "SC032",
+            "classifications": [
+              "EXPERT_ADVICE"
+            ],
+            "review_factor": 1.0,
+            "source_type": "audio",
+            "support_factor": 1.0
+          },
+          {
+            "adjusted_confidence": 0.782,
+            "authority_weight": 1.0,
+            "best_candidate_confidence": 0.92,
+            "candidate_id": "SC025",
+            "classifications": [
+              "SOURCE_FACT"
+            ],
+            "review_factor": 0.85,
+            "source_type": "pdf",
+            "support_factor": 1.0
+          },
+          {
+            "adjusted_confidence": 0.448,
+            "authority_weight": 0.65,
+            "best_candidate_confidence": 0.62,
+            "candidate_id": "SC014",
+            "classifications": [
+              "MODEL_INFERENCE"
+            ],
+            "review_factor": 0.85,
+            "source_type": "video",
+            "support_factor": 0.85
+          }
+        ]
+      },
       "evidence_ids": [
         "E048",
         "E104",
@@ -988,7 +1483,42 @@
         "SC032",
         "SC033"
       ],
-      "confidence": 0.794,
+      "confidence": 0.797,
+      "confidence_assessment": {
+        "band": "MEDIUM",
+        "corroboration_bonus": 0.04,
+        "observation_ids": [],
+        "observation_penalty": 0,
+        "rationale": "按证据分类权威性加权audio、video候选，并加入多源佐证0.04；无已知跨来源负面观察；结果路由到VERIFIER_QUEUE。",
+        "route": "VERIFIER_QUEUE",
+        "score": 0.797,
+        "source_components": [
+          {
+            "adjusted_confidence": 0.98,
+            "authority_weight": 0.9,
+            "best_candidate_confidence": 0.98,
+            "candidate_id": "SC032",
+            "classifications": [
+              "EXPERT_ADVICE"
+            ],
+            "review_factor": 1.0,
+            "source_type": "audio",
+            "support_factor": 1.0
+          },
+          {
+            "adjusted_confidence": 0.448,
+            "authority_weight": 0.65,
+            "best_candidate_confidence": 0.62,
+            "candidate_id": "SC015",
+            "classifications": [
+              "MODEL_INFERENCE"
+            ],
+            "review_factor": 0.85,
+            "source_type": "video",
+            "support_factor": 0.85
+          }
+        ]
+      },
       "evidence_ids": [
         "E052",
         "E082",
@@ -1037,7 +1567,42 @@
         "SC018",
         "SC033"
       ],
-      "confidence": 0.794,
+      "confidence": 0.797,
+      "confidence_assessment": {
+        "band": "MEDIUM",
+        "corroboration_bonus": 0.04,
+        "observation_ids": [],
+        "observation_penalty": 0,
+        "rationale": "按证据分类权威性加权audio、video候选，并加入多源佐证0.04；无已知跨来源负面观察；结果路由到VERIFIER_QUEUE。",
+        "route": "VERIFIER_QUEUE",
+        "score": 0.797,
+        "source_components": [
+          {
+            "adjusted_confidence": 0.98,
+            "authority_weight": 0.9,
+            "best_candidate_confidence": 0.98,
+            "candidate_id": "SC033",
+            "classifications": [
+              "EXPERT_ADVICE"
+            ],
+            "review_factor": 1.0,
+            "source_type": "audio",
+            "support_factor": 1.0
+          },
+          {
+            "adjusted_confidence": 0.448,
+            "authority_weight": 0.65,
+            "best_candidate_confidence": 0.62,
+            "candidate_id": "SC018",
+            "classifications": [
+              "MODEL_INFERENCE"
+            ],
+            "review_factor": 0.85,
+            "source_type": "video",
+            "support_factor": 0.85
+          }
+        ]
+      },
       "evidence_ids": [
         "E057",
         "E083",
@@ -1701,12 +2266,36 @@
       "support_status": "SUPPORTED"
     }
   ],
+  "source_observations": [
+    {
+      "confidence": 0.9,
+      "evidence_ids": [
+        "E013",
+        "E014",
+        "E015"
+      ],
+      "observation_id": "NO001",
+      "reason": "严格视觉序列复核未看到完整的连接电源和打开电源开关动作，不能把邻近时间窗口当作视觉支持。",
+      "semantic_key": "POWER_ON_DEVICE",
+      "source_ref": "N31_VIDEO_OPERATION_FULL",
+      "source_type": "video",
+      "status": "NOT_VISIBLE"
+    }
+  ],
   "status": "NEEDS_REVIEW",
   "summary": {
     "all_steps_evidence_grounded": true,
     "coarse_candidate_count": 8,
     "coarse_fragment_count": 18,
     "coarse_split_group_count": 10,
+    "confidence_band_counts": {
+      "HIGH": 6,
+      "LOW": 1,
+      "MEDIUM": 6
+    },
+    "conflicted_step_ids": [
+      "S04"
+    ],
     "deduplicated_candidate_ids": [],
     "fine_candidate_count": 8,
     "fine_merge_group_count": 4,
@@ -1715,7 +2304,9 @@
       "S11",
       "S12"
     ],
-    "low_confidence_step_ids": [],
+    "low_confidence_step_ids": [
+      "S04"
+    ],
     "multi_source_step_count": 12,
     "ordered_step_count": 13,
     "phase_counts": {
@@ -1725,6 +2316,11 @@
       "VERIFICATION": 4
     },
     "recovery_step_count": 12,
+    "review_route_counts": {
+      "AUTO_VERIFY": 6,
+      "HUMAN_REVIEW_REQUIRED": 1,
+      "VERIFIER_QUEUE": 6
+    },
     "source_candidate_count": 33,
     "source_candidate_counts": {
       "audio": 8,

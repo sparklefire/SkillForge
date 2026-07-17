@@ -101,6 +101,9 @@ print(
                     "multi_source_step_count": source_candidates["summary"]["multi_source_step_count"],
                     "coarse_candidate_count": source_candidates["summary"]["coarse_candidate_count"],
                     "fine_candidate_count": source_candidates["summary"]["fine_candidate_count"],
+                    "confidence_band_counts": source_candidates["summary"]["confidence_band_counts"],
+                    "review_route_counts": source_candidates["summary"]["review_route_counts"],
+                    "low_confidence_step_ids": source_candidates["summary"]["low_confidence_step_ids"],
                 }
                 if source_candidates is not None
                 else None

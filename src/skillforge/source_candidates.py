@@ -20,6 +20,21 @@ PHASE_ORDER = {
     "VERIFICATION": 2,
     "RESET": 3,
 }
+CLASSIFICATION_AUTHORITY = {
+    "SOURCE_FACT": 1.0,
+    "EXPERT_ADVICE": 0.9,
+    "MODEL_INFERENCE": 0.65,
+}
+REVIEW_FACTORS = {
+    "VERIFIED": 1.0,
+    "UNREVIEWED": 0.85,
+}
+OBSERVATION_PENALTIES = {
+    "NOT_VISIBLE": 0.12,
+    "CONTRADICTED": 0.35,
+    "MISSING_SOURCE": 0.08,
+    "SOURCE_CONFLICT": 0.25,
+}
 
 
 class SourceCandidateError(ValueError):
@@ -224,19 +239,125 @@ def _validate_and_deduplicate_candidates(
     return kept, deduplicated
 
 
-def _group_confidence(candidates: list[dict[str, Any]]) -> float:
-    best_by_source: dict[str, float] = {}
+def _validate_negative_observations(
+    source_plan: dict[str, Any],
+    evidence_by_id: dict[str, dict[str, Any]],
+    canonical_by_key: dict[str, dict[str, Any]],
+) -> list[dict[str, Any]]:
+    observations = copy.deepcopy(source_plan["negative_observations"])
+    seen: set[str] = set()
+    for observation in observations:
+        observation_id = observation["observation_id"]
+        if observation_id in seen:
+            raise SourceCandidateError(f"negative observation ID 重复: {observation_id}")
+        seen.add(observation_id)
+        if observation["semantic_key"] not in canonical_by_key:
+            raise SourceCandidateError(
+                f"{observation_id} 引用了未知 semantic_key: {observation['semantic_key']}"
+            )
+        evidence_ids = observation["evidence_ids"]
+        if observation["status"] == "MISSING_SOURCE" and evidence_ids:
+            raise SourceCandidateError(f"{observation_id} MISSING_SOURCE 不应引用证据")
+        if observation["status"] != "MISSING_SOURCE" and not evidence_ids:
+            raise SourceCandidateError(f"{observation_id} 缺少负面观察证据")
+        for evidence_id in evidence_ids:
+            evidence = evidence_by_id.get(evidence_id)
+            if evidence is None:
+                raise SourceCandidateError(
+                    f"{observation_id} 引用了未知 Evidence ID: {evidence_id}"
+                )
+            if evidence["source_type"] != observation["source_type"]:
+                raise SourceCandidateError(
+                    f"{observation_id} 的 {evidence_id} 来源类型不匹配"
+                )
+            if evidence["source_ref"] != observation["source_ref"]:
+                raise SourceCandidateError(
+                    f"{observation_id} 的 {evidence_id} 来源引用不匹配"
+                )
+    return observations
+
+
+def _confidence_assessment(
+    candidates: list[dict[str, Any]],
+    observations: list[dict[str, Any]],
+    evidence_by_id: dict[str, dict[str, Any]],
+) -> tuple[float, dict[str, Any]]:
+    best_by_source: dict[str, tuple[float, dict[str, Any]]] = {}
     for candidate in candidates:
-        value = float(candidate["confidence"])
-        if candidate["support_status"] == "PARTIAL":
-            value *= 0.85
-        best_by_source[candidate["source_type"]] = max(
-            value,
-            best_by_source.get(candidate["source_type"], 0.0),
+        evidence = [evidence_by_id[item] for item in candidate["evidence_ids"]]
+        classifications = sorted({item["classification"] for item in evidence})
+        authority_weight = min(
+            CLASSIFICATION_AUTHORITY[item] for item in classifications
         )
-    base = sum(best_by_source.values()) / len(best_by_source)
-    corroboration = 0.04 * (len(best_by_source) - 1)
-    return round(min(0.99, base + corroboration), 3)
+        support_factor = 1.0 if candidate["support_status"] == "SUPPORTED" else 0.85
+        review_factor = min(REVIEW_FACTORS[item["review_status"]] for item in evidence)
+        adjusted = round(
+            float(candidate["confidence"]) * support_factor * review_factor,
+            3,
+        )
+        component = {
+            "source_type": candidate["source_type"],
+            "candidate_id": candidate["candidate_id"],
+            "classifications": classifications,
+            "authority_weight": authority_weight,
+            "best_candidate_confidence": float(candidate["confidence"]),
+            "support_factor": support_factor,
+            "review_factor": review_factor,
+            "adjusted_confidence": adjusted,
+        }
+        weighted = adjusted * authority_weight
+        current = best_by_source.get(candidate["source_type"])
+        if current is None or weighted > current[0]:
+            best_by_source[candidate["source_type"]] = (weighted, component)
+
+    components = [best_by_source[key][1] for key in sorted(best_by_source)]
+    authority_total = sum(item["authority_weight"] for item in components)
+    weighted_base = sum(
+        item["adjusted_confidence"] * item["authority_weight"]
+        for item in components
+    ) / authority_total
+    corroboration = round(min(0.08, 0.04 * (len(components) - 1)), 3)
+    observation_penalty = round(
+        min(
+            0.5,
+            sum(
+                OBSERVATION_PENALTIES[item["status"]] * float(item["confidence"])
+                for item in observations
+            ),
+        ),
+        3,
+    )
+    score = round(max(0.0, min(0.99, weighted_base + corroboration - observation_penalty)), 3)
+    if score >= 0.85:
+        band = "HIGH"
+        route = "AUTO_VERIFY"
+    elif score >= 0.7:
+        band = "MEDIUM"
+        route = "VERIFIER_QUEUE"
+    else:
+        band = "LOW"
+        route = "HUMAN_REVIEW_REQUIRED"
+    source_text = "、".join(item["source_type"] for item in components)
+    if observations:
+        observation_text = "；负面观察=" + "、".join(
+            f"{item['observation_id']}:{item['status']}" for item in observations
+        )
+    else:
+        observation_text = "；无已知跨来源负面观察"
+    assessment = {
+        "score": score,
+        "band": band,
+        "source_components": components,
+        "corroboration_bonus": corroboration,
+        "observation_penalty": observation_penalty,
+        "observation_ids": [item["observation_id"] for item in observations],
+        "route": route,
+        "rationale": (
+            f"按证据分类权威性加权{source_text}候选，并加入多源佐证{corroboration:.2f}"
+            f"{observation_text}；结果路由到{route}。"
+        ),
+    }
+    return score, assessment
 
 
 def synthesize_source_candidates(
@@ -266,6 +387,14 @@ def synthesize_source_candidates(
         evidence_by_id,
         canonical_by_key,
     )
+    observations = _validate_negative_observations(
+        source_plan,
+        evidence_by_id,
+        canonical_by_key,
+    )
+    observations_by_key: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for observation in observations:
+        observations_by_key[observation["semantic_key"]].append(observation)
 
     parts_by_key: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for candidate in candidates:
@@ -381,7 +510,11 @@ def synthesize_source_candidates(
             raise SourceCandidateError(
                 f"{canonical_step['step_id']} 仅 RETURN_TO_STEP 可指定恢复目标"
             )
-        confidence = _group_confidence(members)
+        confidence, confidence_assessment = _confidence_assessment(
+            members,
+            observations_by_key[semantic_key],
+            evidence_by_id,
+        )
         ordered_steps.append(
             {
                 "step_id": canonical_step["step_id"],
@@ -402,6 +535,7 @@ def synthesize_source_candidates(
                 "source_types": source_types,
                 "evidence_ids": evidence_ids,
                 "confidence": confidence,
+                "confidence_assessment": confidence_assessment,
                 "status": "NEEDS_REVIEW",
             }
         )
@@ -415,6 +549,17 @@ def synthesize_source_candidates(
                 f"{phase} 阶段适用性应为 {expected}"
             )
     source_counts = Counter(item["source_type"] for item in candidates)
+    confidence_band_counts = Counter(
+        step["confidence_assessment"]["band"] for step in ordered_steps
+    )
+    review_route_counts = Counter(
+        step["confidence_assessment"]["route"] for step in ordered_steps
+    )
+    conflicted_step_ids = [
+        step["step_id"]
+        for step in ordered_steps
+        if step["confidence_assessment"]["observation_ids"]
+    ]
     summary = {
         "source_candidate_count": len(candidates),
         "source_candidate_counts": {
@@ -459,8 +604,18 @@ def synthesize_source_candidates(
         "recovery_step_count": sum(
             step["recovery"]["mode"] != "NOT_REQUIRED" for step in ordered_steps
         ),
+        "confidence_band_counts": {
+            band: confidence_band_counts[band] for band in ("HIGH", "MEDIUM", "LOW")
+        },
+        "review_route_counts": {
+            route: review_route_counts[route]
+            for route in ("AUTO_VERIFY", "VERIFIER_QUEUE", "HUMAN_REVIEW_REQUIRED")
+        },
+        "conflicted_step_ids": conflicted_step_ids,
         "low_confidence_step_ids": [
-            step["step_id"] for step in ordered_steps if step["confidence"] < 0.75
+            step["step_id"]
+            for step in ordered_steps
+            if step["confidence_assessment"]["band"] == "LOW"
         ],
         "all_steps_evidence_grounded": all(
             step["evidence_ids"] for step in ordered_steps
@@ -475,6 +630,7 @@ def synthesize_source_candidates(
         "extraction_mode": source_plan["extraction_mode"],
         "uses_gold_step_text": source_plan["uses_gold_step_text"],
         "source_candidates": candidates,
+        "source_observations": observations,
         "merge_groups": merge_groups,
         "ordered_steps": ordered_steps,
         "phase_applicability": phase_applicability,

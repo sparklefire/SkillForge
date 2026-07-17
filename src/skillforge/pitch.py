@@ -222,6 +222,10 @@ def _check_metrics(root: Path) -> dict[str, Any]:
             item["step_id"] == "S04"
             and item["source_types"] == ["pdf"]
             and "E014" not in item["evidence_ids"]
+            and item["confidence_assessment"]["band"] == "LOW"
+            and item["confidence_assessment"]["route"]
+            == "HUMAN_REVIEW_REQUIRED"
+            and item["confidence_assessment"]["observation_ids"] == ["NO001"]
             for item in source_candidates["ordered_steps"]
         ),
         "video_manifest_bound": video_path.is_file()

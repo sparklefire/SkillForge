@@ -57,7 +57,14 @@ def test_n31_source_candidates_are_split_merged_and_ordered() -> None:
         "three_source_step_count": 10,
         "irreversible_step_ids": ["S11", "S12"],
         "recovery_step_count": 12,
-        "low_confidence_step_ids": [],
+        "confidence_band_counts": {"HIGH": 6, "MEDIUM": 6, "LOW": 1},
+        "review_route_counts": {
+            "AUTO_VERIFY": 6,
+            "VERIFIER_QUEUE": 6,
+            "HUMAN_REVIEW_REQUIRED": 1,
+        },
+        "conflicted_step_ids": ["S04"],
+        "low_confidence_step_ids": ["S04"],
         "all_steps_evidence_grounded": True,
         "graph_acyclic": True,
     }
@@ -68,6 +75,11 @@ def test_n31_source_candidates_are_split_merged_and_ordered() -> None:
     assert s04["source_types"] == ["pdf"]
     assert s04["candidate_ids"] == ["SC021"]
     assert "E014" not in s04["evidence_ids"]
+    assert s04["confidence"] == 0.691
+    assert s04["confidence_assessment"]["band"] == "LOW"
+    assert s04["confidence_assessment"]["route"] == "HUMAN_REVIEW_REQUIRED"
+    assert s04["confidence_assessment"]["observation_ids"] == ["NO001"]
+    assert s04["confidence_assessment"]["observation_penalty"] == 0.108
     assert sop["steps"][0]["parameters"][0]["evidence_ids"] == ["E144"]
     assert sop["steps"][6]["prerequisites"] == ["S04"]
 
@@ -90,6 +102,11 @@ def test_source_candidate_rejects_cross_source_evidence() -> None:
     source_plan, candidate_plan, catalog = _fixture()
     source_plan["candidates"][0]["evidence_ids"] = ["E096"]
 
+    with pytest.raises(SourceCandidateError, match="来源类型不匹配"):
+        synthesize_source_candidates(source_plan, candidate_plan, catalog)
+
+    source_plan, candidate_plan, catalog = _fixture()
+    source_plan["negative_observations"][0]["evidence_ids"] = ["E142"]
     with pytest.raises(SourceCandidateError, match="来源类型不匹配"):
         synthesize_source_candidates(source_plan, candidate_plan, catalog)
 

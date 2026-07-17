@@ -12,6 +12,7 @@
     "extraction_mode",
     "uses_gold_step_text",
     "source_candidates",
+    "source_observations",
     "merge_groups",
     "ordered_steps",
     "phase_applicability",
@@ -31,6 +32,10 @@
       "type": "array",
       "minItems": 3,
       "items": {"$ref": "source_candidate_plan.schema.json#/$defs/candidate"}
+    },
+    "source_observations": {
+      "type": "array",
+      "items": {"$ref": "source_candidate_plan.schema.json#/$defs/negativeObservation"}
     },
     "merge_groups": {
       "type": "array",
@@ -159,6 +164,7 @@
         "source_types",
         "evidence_ids",
         "confidence",
+        "confidence_assessment",
         "status"
       ],
       "properties": {
@@ -211,7 +217,72 @@
           "items": {"type": "string", "pattern": "^E[0-9]{3}$"}
         },
         "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+        "confidence_assessment": {"$ref": "#/$defs/confidenceAssessment"},
         "status": {"enum": ["NEEDS_REVIEW", "VERIFIED"]}
+      }
+    },
+    "sourceComponent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_type",
+        "candidate_id",
+        "classifications",
+        "authority_weight",
+        "best_candidate_confidence",
+        "support_factor",
+        "review_factor",
+        "adjusted_confidence"
+      ],
+      "properties": {
+        "source_type": {"enum": ["video", "pdf", "audio"]},
+        "candidate_id": {"type": "string", "pattern": "^SC[0-9]{3}$"},
+        "classifications": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"enum": ["SOURCE_FACT", "EXPERT_ADVICE", "MODEL_INFERENCE"]}
+        },
+        "authority_weight": {"type": "number", "minimum": 0, "maximum": 1},
+        "best_candidate_confidence": {"type": "number", "minimum": 0, "maximum": 1},
+        "support_factor": {"type": "number", "minimum": 0, "maximum": 1},
+        "review_factor": {"type": "number", "minimum": 0, "maximum": 1},
+        "adjusted_confidence": {"type": "number", "minimum": 0, "maximum": 1}
+      }
+    },
+    "confidenceAssessment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "score",
+        "band",
+        "source_components",
+        "corroboration_bonus",
+        "observation_penalty",
+        "observation_ids",
+        "route",
+        "rationale"
+      ],
+      "properties": {
+        "score": {"type": "number", "minimum": 0, "maximum": 1},
+        "band": {"enum": ["HIGH", "MEDIUM", "LOW"]},
+        "source_components": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 3,
+          "items": {"$ref": "#/$defs/sourceComponent"}
+        },
+        "corroboration_bonus": {"type": "number", "minimum": 0, "maximum": 0.08},
+        "observation_penalty": {"type": "number", "minimum": 0, "maximum": 0.5},
+        "observation_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^NO[0-9]{3}$"}
+        },
+        "route": {
+          "enum": ["AUTO_VERIFY", "VERIFIER_QUEUE", "HUMAN_REVIEW_REQUIRED"]
+        },
+        "rationale": {"type": "string", "minLength": 1}
       }
     },
     "summary": {
@@ -233,6 +304,9 @@
         "three_source_step_count",
         "irreversible_step_ids",
         "recovery_step_count",
+        "confidence_band_counts",
+        "review_route_counts",
+        "conflicted_step_ids",
         "low_confidence_step_ids",
         "all_steps_evidence_grounded",
         "graph_acyclic"
@@ -280,6 +354,31 @@
           "items": {"type": "string", "pattern": "^S[0-9]{2}$"}
         },
         "recovery_step_count": {"type": "integer", "minimum": 0},
+        "confidence_band_counts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["HIGH", "MEDIUM", "LOW"],
+          "properties": {
+            "HIGH": {"type": "integer", "minimum": 0},
+            "MEDIUM": {"type": "integer", "minimum": 0},
+            "LOW": {"type": "integer", "minimum": 0}
+          }
+        },
+        "review_route_counts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["AUTO_VERIFY", "VERIFIER_QUEUE", "HUMAN_REVIEW_REQUIRED"],
+          "properties": {
+            "AUTO_VERIFY": {"type": "integer", "minimum": 0},
+            "VERIFIER_QUEUE": {"type": "integer", "minimum": 0},
+            "HUMAN_REVIEW_REQUIRED": {"type": "integer", "minimum": 0}
+          }
+        },
+        "conflicted_step_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^S[0-9]{2}$"}
+        },
         "low_confidence_step_ids": {
           "type": "array",
           "uniqueItems": true,

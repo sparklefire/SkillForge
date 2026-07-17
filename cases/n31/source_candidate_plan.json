@@ -21,6 +21,18 @@
       "reason": "标准成功路径结束时打印机应保持可打印状态，无独立复位步骤；异常回退由各步骤 recovery 明确记录。"
     }
   },
+  "negative_observations": [
+    {
+      "observation_id": "NO001",
+      "semantic_key": "POWER_ON_DEVICE",
+      "source_type": "video",
+      "source_ref": "N31_VIDEO_OPERATION_FULL",
+      "status": "NOT_VISIBLE",
+      "evidence_ids": ["E013", "E014", "E015"],
+      "confidence": 0.9,
+      "reason": "严格视觉序列复核未看到完整的连接电源和打开电源开关动作，不能把邻近时间窗口当作视觉支持。"
+    }
+  ],
   "candidates": [
     {
       "candidate_id": "SC001",

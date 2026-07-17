@@ -49,7 +49,7 @@
         },
         {
           "artifact_id": "SOURCE_CANDIDATES",
-          "detail": "48802 bytes · sha256=98bf59c2fdd56a3551f71dbe04acf17c546624935adc0f736e20ed4c1af9fc24",
+          "detail": "68264 bytes · sha256=28708602befa289bb6a8ce97436b43384a2569a3de79c1b104011815d3c68ec3",
           "path": "cases/n31/evaluations/source_candidate_synthesis_v1.json",
           "status": "PASSED"
         },
@@ -140,7 +140,7 @@
   ],
   "contains_credentials": false,
   "contains_raw_media": false,
-  "generated_at": "2026-07-17T06:43:09.500305+00:00",
+  "generated_at": "2026-07-17T06:51:09.308752+00:00",
   "pending_human_gates": [
     "TRAINING_VIDEO_FULL_WATCH",
     "FINAL_STAGE_REHEARSAL",

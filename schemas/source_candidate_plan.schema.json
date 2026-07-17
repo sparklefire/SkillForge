@@ -10,6 +10,7 @@
     "extraction_mode",
     "uses_gold_step_text",
     "candidates",
+    "negative_observations",
     "phase_applicability"
   ],
   "properties": {
@@ -23,6 +24,10 @@
       "type": "array",
       "minItems": 3,
       "items": {"$ref": "#/$defs/candidate"}
+    },
+    "negative_observations": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/negativeObservation"}
     },
     "phase_applicability": {
       "type": "object",
@@ -88,6 +93,36 @@
         },
         "confidence": {"type": "number", "minimum": 0, "maximum": 1},
         "support_status": {"enum": ["SUPPORTED", "PARTIAL"]}
+      }
+    },
+    "negativeObservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "observation_id",
+        "semantic_key",
+        "source_type",
+        "source_ref",
+        "status",
+        "evidence_ids",
+        "confidence",
+        "reason"
+      ],
+      "properties": {
+        "observation_id": {"type": "string", "pattern": "^NO[0-9]{3}$"},
+        "semantic_key": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]+$"},
+        "source_type": {"enum": ["video", "pdf", "audio"]},
+        "source_ref": {"type": "string", "minLength": 1},
+        "status": {
+          "enum": ["NOT_VISIBLE", "CONTRADICTED", "MISSING_SOURCE", "SOURCE_CONFLICT"]
+        },
+        "evidence_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^E[0-9]{3}$"}
+        },
+        "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+        "reason": {"type": "string", "minLength": 1}
       }
     }
   }
