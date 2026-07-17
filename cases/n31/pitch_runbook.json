@@ -167,6 +167,27 @@
       "status": "PENDING",
       "blocking_for_submission": true,
       "evidence_path": null
+    },
+    {
+      "gate_id": "FINAL_RECORDING_REVIEW",
+      "label": "完成有声字幕兜底录屏并复核隐私、声音和播放",
+      "status": "PENDING",
+      "blocking_for_submission": true,
+      "evidence_path": null
+    },
+    {
+      "gate_id": "TEAM_ELIGIBILITY_CONFIRMED",
+      "label": "确认报名队伍满足2至5人且成员信息一致",
+      "status": "PENDING",
+      "blocking_for_submission": true,
+      "evidence_path": null
+    },
+    {
+      "gate_id": "OFFICIAL_RULES_VERIFIED",
+      "label": "按官方规则讲义核对评分、提交、外部API、开源和视频要求",
+      "status": "PENDING",
+      "blocking_for_submission": true,
+      "evidence_path": null
     }
   ]
 }

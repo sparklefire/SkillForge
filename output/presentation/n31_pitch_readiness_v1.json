@@ -119,10 +119,13 @@
   ],
   "contains_credentials": false,
   "contains_raw_media": false,
-  "generated_at": "2026-07-17T04:52:53.860419+00:00",
+  "generated_at": "2026-07-17T05:09:39.206246+00:00",
   "pending_human_gates": [
     "TRAINING_VIDEO_FULL_WATCH",
-    "FINAL_STAGE_REHEARSAL"
+    "FINAL_STAGE_REHEARSAL",
+    "FINAL_RECORDING_REVIEW",
+    "TEAM_ELIGIBILITY_CONFIRMED",
+    "OFFICIAL_RULES_VERIFIED"
   ],
   "status": "READY_WITH_HUMAN_GATES",
   "total_duration_ms": 180000,

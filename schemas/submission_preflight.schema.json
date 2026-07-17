@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/submission_preflight.schema.json",
+  "title": "SkillForge Submission Preflight",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "case_id",
+    "generated_at",
+    "status",
+    "source_commit",
+    "source_branch",
+    "source_worktree_clean",
+    "automatic_checks",
+    "pending_human_gates",
+    "data_policy"
+  ],
+  "properties": {
+    "version": {"const": 1},
+    "case_id": {"const": "n31_media_change"},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "status": {
+      "enum": [
+        "NOT_READY",
+        "DEVELOPMENT_CHECK",
+        "READY_WITH_HUMAN_GATES",
+        "READY_FOR_SUBMISSION"
+      ]
+    },
+    "source_commit": {
+      "anyOf": [
+        {"type": "null"},
+        {"type": "string", "pattern": "^[0-9a-f]{7,40}$"}
+      ]
+    },
+    "source_branch": {
+      "anyOf": [
+        {"type": "null"},
+        {"type": "string", "minLength": 1}
+      ]
+    },
+    "source_worktree_clean": {
+      "anyOf": [{"type": "null"}, {"type": "boolean"}]
+    },
+    "automatic_checks": {
+      "type": "array",
+      "minItems": 8,
+      "items": {"$ref": "#/$defs/check"}
+    },
+    "pending_human_gates": {
+      "type": "array",
+      "items": {"type": "string", "pattern": "^[A-Z0-9_]+$"},
+      "uniqueItems": true
+    },
+    "data_policy": {
+      "const": {
+        "contains_credentials": false,
+        "contains_raw_media": false,
+        "contains_absolute_paths": false
+      }
+    }
+  },
+  "$defs": {
+    "check": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["check_id", "status", "details"],
+      "properties": {
+        "check_id": {"type": "string", "pattern": "^[A-Z0-9_]+$"},
+        "status": {"enum": ["PASSED", "FAILED", "SKIPPED"]},
+        "details": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "string", "minLength": 1}
+        }
+      }
+    }
+  }
+}
