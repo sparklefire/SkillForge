@@ -92,12 +92,13 @@
       "start_ms": 140000,
       "end_ms": 160000,
       "surface": "PPT",
-      "speaker_script": "真实N31 Gold评测中，必要步骤覆盖率和证据覆盖率都从90%恢复到100%，严重错误从5降到0。手册单源只有80%，口述单源90%，两种以上来源联合才达到100%。",
+      "speaker_script": "真实Gold评测中，步骤和证据覆盖从90%升至100%，严重错误从5降到0；DGX上20次结构化现场重算中位约45毫秒。多源消融显示，手册80%、口述90%，联合才到100%。",
       "operator_action": "切回结果页，强调前后指标和多源消融。",
       "proof_points": [
         "required_step_coverage 90%→100%",
         "evidence_supported_required_steps 90%→100%",
-        "manual_only 80%，expert_audio_only 90%，two_or_more_source_types 100%"
+        "manual_only 80%，expert_audio_only 90%，two_or_more_source_types 100%",
+        "DGX WEB_LIVE_RERUN 20次中位44.800毫秒；不包含原始素材预处理"
       ],
       "fallback": "直接口述三组数值；它们同时保存在Gold summary与多源评测JSON中。"
     },
@@ -145,6 +146,7 @@
     {"artifact_id": "GOLD_SOP", "path": "cases/n31/gold/gold_sop.json", "kind": "JSON", "required": true},
     {"artifact_id": "MULTISOURCE_EVAL", "path": "cases/n31/evaluations/multisource_comparison_v1.json", "kind": "JSON", "required": true},
     {"artifact_id": "DGX_VISUAL", "path": "cases/n31/evaluations/dgx_visual_compute_v1.json", "kind": "JSON", "required": true},
+    {"artifact_id": "RUNTIME_BENCHMARK", "path": "output/evaluation/runtime_benchmark_dgx.json", "kind": "JSON", "required": true},
     {"artifact_id": "POSTER", "path": "output/pdf/n31_a4_training_poster.pdf", "kind": "PDF", "required": true},
     {"artifact_id": "TRAINING_VIDEO", "path": "output/video/n31_training_video_v1.mp4", "kind": "MP4", "required": true},
     {"artifact_id": "TRAINING_VIDEO_MANIFEST", "path": "output/video/n31_training_video_manifest_v1.json", "kind": "JSON", "required": true},

@@ -1,0 +1,120 @@
+{
+  "benchmarks": [
+    {
+      "assertions": {
+        "external_model_calls": 0,
+        "gold_status": "GOLD",
+        "metrics_status": "FINAL",
+        "revision_count": 4,
+        "severe_after": 0,
+        "severe_before": 5,
+        "workflow_state": "COMPLETED"
+      },
+      "benchmark_id": "GOLD_WORKFLOW",
+      "mean_output_bytes": 234237,
+      "samples_ms": [
+        37.703,
+        37.642,
+        37.613,
+        37.532,
+        37.473,
+        37.543,
+        37.49,
+        37.724,
+        37.638,
+        37.756,
+        37.534,
+        37.605,
+        37.669,
+        37.649,
+        37.796,
+        37.731,
+        37.607,
+        37.661,
+        37.573,
+        37.608
+      ],
+      "timing_ms": {
+        "maximum": 37.796,
+        "mean": 37.627,
+        "median": 37.626,
+        "minimum": 37.473,
+        "p95": 37.758
+      },
+      "transport": "DIRECT_PYTHON"
+    },
+    {
+      "assertions": {
+        "external_model_calls": 0,
+        "gold_status": "GOLD",
+        "metrics_status": "FINAL",
+        "revision_count": 4,
+        "severe_after": 0,
+        "severe_before": 5,
+        "workflow_state": "COMPLETED"
+      },
+      "benchmark_id": "WEB_LIVE_RERUN",
+      "mean_output_bytes": 234237,
+      "samples_ms": [
+        44.797,
+        59.932,
+        46.542,
+        44.803,
+        43.84,
+        45.01,
+        44.828,
+        43.309,
+        44.85,
+        44.881,
+        44.152,
+        55.835,
+        45.045,
+        44.974,
+        44.344,
+        43.012,
+        43.899,
+        43.759,
+        43.816,
+        43.424
+      ],
+      "timing_ms": {
+        "maximum": 59.932,
+        "mean": 45.753,
+        "median": 44.8,
+        "minimum": 43.012,
+        "p95": 56.04
+      },
+      "transport": "IN_PROCESS_HTTP"
+    }
+  ],
+  "case_id": "n31_media_change",
+  "configuration": {
+    "measured_iterations": 20,
+    "warmup_iterations": 2
+  },
+  "data_policy": {
+    "contains_absolute_paths": false,
+    "credentials_accessed": false,
+    "external_model_calls": 0,
+    "network_transport": "IN_PROCESS_ONLY",
+    "raw_media_processed": false
+  },
+  "environment": {
+    "accelerator": "NVIDIA GB10",
+    "architecture": "aarch64",
+    "cpu_logical_count": 20,
+    "os": "Linux",
+    "python_version": "3.12.3"
+  },
+  "execution_location": "DGX_SPARK",
+  "generated_at": "2026-07-17T04:51:24.437748+00:00",
+  "report_id": "RUNTIME_BENCHMARK_V1",
+  "resources": {
+    "cpu_system_seconds": 0.031956,
+    "cpu_user_seconds": 1.798331,
+    "measurement_scope": "BENCHMARK_PROCESS_HIGH_WATERMARK",
+    "process_peak_rss_bytes": 86491136
+  },
+  "status": "COMPLETED",
+  "version": 1
+}

@@ -166,6 +166,56 @@ def _check_metrics(root: Path) -> dict[str, Any]:
     }
 
 
+def _check_runtime_benchmark(root: Path) -> dict[str, Any]:
+    report = validate_document(
+        _read_json(root / "output/evaluation/runtime_benchmark_dgx.json"),
+        "runtime_benchmark.schema.json",
+    )
+    benchmarks = {item["benchmark_id"]: item for item in report["benchmarks"]}
+    gold = benchmarks.get("GOLD_WORKFLOW", {})
+    web = benchmarks.get("WEB_LIVE_RERUN", {})
+    expected_assertions = {
+        "gold_status": "GOLD",
+        "metrics_status": "FINAL",
+        "workflow_state": "COMPLETED",
+        "severe_before": 5,
+        "severe_after": 0,
+        "revision_count": 4,
+        "external_model_calls": 0,
+    }
+    assertions = {
+        "dgx_environment": report["execution_location"] == "DGX_SPARK"
+        and report["environment"]["architecture"] == "aarch64"
+        and report["environment"]["accelerator"] == "NVIDIA GB10",
+        "twenty_measured_runs": report["configuration"]["measured_iterations"] == 20
+        and len(gold.get("samples_ms", [])) == 20
+        and len(web.get("samples_ms", [])) == 20,
+        "gold_workflow_measured": gold.get("timing_ms", {}).get("median", 0) > 0
+        and gold.get("assertions") == expected_assertions,
+        "web_live_rerun_measured": web.get("timing_ms", {}).get("median", 0) > 0
+        and web.get("assertions") == expected_assertions,
+        "resource_recorded": report["resources"]["process_peak_rss_bytes"] > 0,
+        "safe_measurement_scope": report["data_policy"]
+        == {
+            "external_model_calls": 0,
+            "raw_media_processed": False,
+            "credentials_accessed": False,
+            "network_transport": "IN_PROCESS_ONLY",
+            "contains_absolute_paths": False,
+        },
+    }
+    return {
+        "check_id": "RUNTIME_BENCHMARK",
+        "status": "PASSED" if all(assertions.values()) else "FAILED",
+        "assertions": assertions,
+        "metrics": {
+            "gold_workflow_median_ms": gold.get("timing_ms", {}).get("median"),
+            "web_live_rerun_median_ms": web.get("timing_ms", {}).get("median"),
+            "process_peak_rss_bytes": report["resources"]["process_peak_rss_bytes"],
+        },
+    }
+
+
 def _check_demo_modes(runbook: dict[str, Any], root: Path) -> dict[str, Any]:
     ordered_modes = [
         item["mode"]
@@ -213,6 +263,7 @@ def build_readiness(
         _check_timeline(runbook),
         _check_artifacts(runbook, root),
         _check_metrics(root),
+        _check_runtime_benchmark(root),
         _check_demo_modes(runbook, root),
     ]
     checks_passed = all(check["status"] == "PASSED" for check in checks)

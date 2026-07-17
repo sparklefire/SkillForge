@@ -1,0 +1,167 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/runtime_benchmark.schema.json",
+  "title": "SkillForge Runtime Benchmark",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "case_id",
+    "report_id",
+    "generated_at",
+    "status",
+    "execution_location",
+    "environment",
+    "configuration",
+    "benchmarks",
+    "resources",
+    "data_policy"
+  ],
+  "properties": {
+    "version": {"const": 1},
+    "case_id": {"const": "n31_media_change"},
+    "report_id": {"const": "RUNTIME_BENCHMARK_V1"},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "status": {"const": "COMPLETED"},
+    "execution_location": {"enum": ["LOCAL_DEVELOPMENT", "DGX_SPARK"]},
+    "environment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["os", "architecture", "python_version", "cpu_logical_count", "accelerator"],
+      "properties": {
+        "os": {"type": "string", "minLength": 1},
+        "architecture": {"type": "string", "minLength": 1},
+        "python_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+        "cpu_logical_count": {"type": "integer", "minimum": 1},
+        "accelerator": {"type": "string", "minLength": 1}
+      }
+    },
+    "configuration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["warmup_iterations", "measured_iterations"],
+      "properties": {
+        "warmup_iterations": {"type": "integer", "minimum": 0, "maximum": 20},
+        "measured_iterations": {"type": "integer", "minimum": 1, "maximum": 100}
+      }
+    },
+    "benchmarks": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {"$ref": "#/$defs/benchmark"},
+      "allOf": [
+        {
+          "contains": {
+            "type": "object",
+            "required": ["benchmark_id"],
+            "properties": {"benchmark_id": {"const": "GOLD_WORKFLOW"}}
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": ["benchmark_id"],
+            "properties": {"benchmark_id": {"const": "WEB_LIVE_RERUN"}}
+          },
+          "minContains": 1,
+          "maxContains": 1
+        }
+      ]
+    },
+    "resources": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "measurement_scope",
+        "process_peak_rss_bytes",
+        "cpu_user_seconds",
+        "cpu_system_seconds"
+      ],
+      "properties": {
+        "measurement_scope": {"const": "BENCHMARK_PROCESS_HIGH_WATERMARK"},
+        "process_peak_rss_bytes": {"type": "integer", "minimum": 1},
+        "cpu_user_seconds": {"type": "number", "minimum": 0},
+        "cpu_system_seconds": {"type": "number", "minimum": 0}
+      }
+    },
+    "data_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "external_model_calls",
+        "raw_media_processed",
+        "credentials_accessed",
+        "network_transport",
+        "contains_absolute_paths"
+      ],
+      "properties": {
+        "external_model_calls": {"const": 0},
+        "raw_media_processed": {"const": false},
+        "credentials_accessed": {"const": false},
+        "network_transport": {"const": "IN_PROCESS_ONLY"},
+        "contains_absolute_paths": {"const": false}
+      }
+    }
+  },
+  "$defs": {
+    "benchmark": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "benchmark_id",
+        "transport",
+        "samples_ms",
+        "timing_ms",
+        "mean_output_bytes",
+        "assertions"
+      ],
+      "properties": {
+        "benchmark_id": {"enum": ["GOLD_WORKFLOW", "WEB_LIVE_RERUN"]},
+        "transport": {"enum": ["DIRECT_PYTHON", "IN_PROCESS_HTTP"]},
+        "samples_ms": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "number", "exclusiveMinimum": 0}
+        },
+        "timing_ms": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["minimum", "median", "p95", "maximum", "mean"],
+          "properties": {
+            "minimum": {"type": "number", "exclusiveMinimum": 0},
+            "median": {"type": "number", "exclusiveMinimum": 0},
+            "p95": {"type": "number", "exclusiveMinimum": 0},
+            "maximum": {"type": "number", "exclusiveMinimum": 0},
+            "mean": {"type": "number", "exclusiveMinimum": 0}
+          }
+        },
+        "mean_output_bytes": {"type": "integer", "minimum": 1},
+        "assertions": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "gold_status",
+            "metrics_status",
+            "workflow_state",
+            "severe_before",
+            "severe_after",
+            "revision_count",
+            "external_model_calls"
+          ],
+          "properties": {
+            "gold_status": {"const": "GOLD"},
+            "metrics_status": {"const": "FINAL"},
+            "workflow_state": {"const": "COMPLETED"},
+            "severe_before": {"const": 5},
+            "severe_after": {"const": 0},
+            "revision_count": {"const": 4},
+            "external_model_calls": {"const": 0}
+          }
+        }
+      }
+    }
+  }
+}

@@ -36,6 +36,12 @@
           "status": "PASSED"
         },
         {
+          "artifact_id": "RUNTIME_BENCHMARK",
+          "detail": "2638 bytes · sha256=185cccd7f26edc54815d240698c996fcc04c6dbd4f5262a56cbdf1d6ebe57ca2",
+          "path": "output/evaluation/runtime_benchmark_dgx.json",
+          "status": "PASSED"
+        },
+        {
           "artifact_id": "POSTER",
           "detail": "130442 bytes · sha256=d87dd874dc332d8057f0a1106b5b42085f6127f87ddeaa8f4b8a79eee08a8fba",
           "path": "output/pdf/n31_a4_training_poster.pdf",
@@ -83,6 +89,23 @@
     },
     {
       "assertions": {
+        "dgx_environment": true,
+        "gold_workflow_measured": true,
+        "resource_recorded": true,
+        "safe_measurement_scope": true,
+        "twenty_measured_runs": true,
+        "web_live_rerun_measured": true
+      },
+      "check_id": "RUNTIME_BENCHMARK",
+      "metrics": {
+        "gold_workflow_median_ms": 37.626,
+        "process_peak_rss_bytes": 86491136,
+        "web_live_rerun_median_ms": 44.8
+      },
+      "status": "PASSED"
+    },
+    {
+      "assertions": {
         "entry_script": true,
         "health": true,
         "live_rerun": true,
@@ -96,7 +119,7 @@
   ],
   "contains_credentials": false,
   "contains_raw_media": false,
-  "generated_at": "2026-07-17T04:30:08.819034+00:00",
+  "generated_at": "2026-07-17T04:52:53.860419+00:00",
   "pending_human_gates": [
     "TRAINING_VIDEO_FULL_WATCH",
     "FINAL_STAGE_REHEARSAL"

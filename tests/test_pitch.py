@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 
 from skillforge.contracts import validate_document
-from skillforge.pitch import PHASE_ORDER, _check_timeline
+from skillforge.pitch import PHASE_ORDER, _check_runtime_benchmark, _check_timeline
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -47,3 +47,13 @@ def test_pitch_keeps_human_review_as_a_submission_gate() -> None:
     video_gate = gates["TRAINING_VIDEO_FULL_WATCH"]
     assert video_gate["status"] == "PENDING"
     assert video_gate["blocking_for_submission"] is True
+
+
+def test_pitch_requires_dgx_runtime_benchmark() -> None:
+    artifact_ids = {item["artifact_id"] for item in _runbook()["required_artifacts"]}
+    assert "RUNTIME_BENCHMARK" in artifact_ids
+    result = _check_runtime_benchmark(ROOT)
+    assert result["status"] == "PASSED"
+    assert result["assertions"]["twenty_measured_runs"] is True
+    assert result["metrics"]["gold_workflow_median_ms"] > 0
+    assert result["metrics"]["web_live_rerun_median_ms"] > 0
