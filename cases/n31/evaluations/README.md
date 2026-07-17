@@ -4,5 +4,8 @@
 
 - `visual_sequence_review_v1.json`：Step 3.7 对13个Gold步骤附近安全关键帧序列的严格视觉复核。
 - `multisource_comparison_v1.json`：手册、视频、专家口述和多源组合的覆盖消融，以及质检修订前后对比。
+- `dgx_visual_compute_v1.json`：DGX Spark GB10 对6段自摄安全派生视频执行原生 CUDA 特征计算和场景变化候选筛选的可复现指标。
 
 视觉复核是 `MODEL_INFERENCE`，不能覆盖手册事实或实际操作者确认。`PARTIAL` 和 `NOT_VISIBLE` 表示当前抽帧不足，不等价于Gold步骤错误。
+
+DGX视觉计算只输出来源ID、源文件哈希、视频时间点和数值特征，不保存关键帧路径。它的语义范围固定为 `CANDIDATE_SELECTION_ONLY`：可以证明视频帧确实在DGX上经过GPU计算，但不能自动证明某个SOP动作已经完成。

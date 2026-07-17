@@ -1,0 +1,591 @@
+{
+  "version": 1,
+  "case_id": "n31_media_change",
+  "run_id": "dgx-visual-2026-07-17T022400.483802+0000",
+  "generated_at": "2026-07-17T02:24:00.483802+00:00",
+  "status": "COMPLETED",
+  "processing_location": "DGX_SPARK_LOCAL",
+  "backend": "CUDA_NATIVE",
+  "actual_gpu_compute": true,
+  "semantic_claim_scope": "CANDIDATE_SELECTION_ONLY",
+  "source_policy": {
+    "external_api_processing_authorized": false,
+    "dgx_processing_authorized": true,
+    "accepted_privacy_status": "LOCAL_QA_PASSED",
+    "processed_source_count": 6,
+    "excluded_source_count": 2,
+    "third_party_reference_processed": false
+  },
+  "gpu": {
+    "device_name": "NVIDIA GB10",
+    "compute_capability": "12.1",
+    "cuda_runtime": "13.0",
+    "compiled_arch": "sm_121",
+    "total_global_memory_bytes": 128524251136
+  },
+  "configuration": {
+    "sample_interval_seconds": 1.0,
+    "resize_width": 320,
+    "scene_change_threshold": 0.08,
+    "selected_frame_limit": 12,
+    "timestamp_basis": "FFMPEG_SHOWINFO_PTS"
+  },
+  "sources": [
+    {
+      "source_id": "N31_VIDEO_OPERATION_FULL",
+      "sha256": "ae9c2b9b524c928a036373a0927546a972be46d0419453a953510c33f4d1510b",
+      "duration_ms": 327400,
+      "sampled_frame_count": 327,
+      "gpu_kernel_ms": 42.692905,
+      "selected_frames": [
+        {
+          "frame_index": 1,
+          "timestamp_ms": 0,
+          "scene_change_score": 0.0,
+          "mean_luma": 111.068993,
+          "contrast": 53.222716,
+          "edge_energy": 5.220026,
+          "selection_reason": "BOUNDARY_FIRST"
+        },
+        {
+          "frame_index": 42,
+          "timestamp_ms": 41000,
+          "scene_change_score": 0.137366,
+          "mean_luma": 109.719444,
+          "contrast": 50.966149,
+          "edge_energy": 4.749128,
+          "selection_reason": "SCENE_CHANGE"
+        },
+        {
+          "frame_index": 45,
+          "timestamp_ms": 44000,
+          "scene_change_score": 0.100747,
+          "mean_luma": 110.731024,
+          "contrast": 52.520221,
+          "edge_energy": 5.067986,
+          "selection_reason": "SCENE_CHANGE"
+        },
+        {
+          "frame_index": 63,
+          "timestamp_ms": 62000,
+          "scene_change_score": 0.111745,
+          "mean_luma": 95.964115,
+          "contrast": 50.653524,
+          "edge_energy": 5.279922,
+          "selection_reason": "SCENE_CHANGE"
+        },
+        {
+          "frame_index": 64,
+          "timestamp_ms": 63000,
+          "scene_change_score": 0.106053,
+          "mean_luma": 102.313559,
+          "contrast": 50.327441,
+          "edge_energy": 6.131866,
+          "selection_reason": "SCENE_CHANGE"
+        },
+        {
+          "frame_index": 68,
+          "timestamp_ms": 67000,
+          "scene_change_score": 0.130412,
+          "mean_luma": 109.091615,
+          "contrast": 52.573119,
+          "edge_energy": 5.093601,
+          "selection_reason": "SCENE_CHANGE"
+        },
+        {
+          "frame_index": 96,
+          "timestamp_ms": 95000,
+          "scene_change_score": 0.134988,
+          "mean_luma": 99.327743,
+          "contrast": 50.198324,
+          "edge_energy": 5.86313,
+          "selection_reason": "SCENE_CHANGE"
+        },
+        {
+          "frame_index": 135,
+          "timestamp_ms": 134000,
+          "scene_change_score": 0.115297,
+          "mean_luma": 106.52809,
+          "contrast": 55.498993,
+          "edge_energy": 5.036548,
+          "selection_reason": "SCENE_CHANGE"
+        },
+        {
+          "frame_index": 153,
+          "timestamp_ms": 152000,
+          "scene_change_score": 0.105527,
+          "mean_luma": 102.11066,
+          "contrast": 51.136345,
+          "edge_energy": 5.243993,
+          "selection_reason": "SCENE_CHANGE"
+        },
+        {
+          "frame_index": 179,
+          "timestamp_ms": 178000,
+          "scene_change_score": 0.123805,
+          "mean_luma": 107.397622,
+          "contrast": 57.128666,
+          "edge_energy": 4.709058,
+          "selection_reason": "SCENE_CHANGE"
+        },
+        {
+          "frame_index": 304,
+          "timestamp_ms": 303000,
+          "scene_change_score": 0.138395,
+          "mean_luma": 76.203802,
+          "contrast": 66.078955,
+          "edge_energy": 3.848431,
+          "selection_reason": "SCENE_CHANGE"
+        },
+        {
+          "frame_index": 327,
+          "timestamp_ms": 326000,
+          "scene_change_score": 0.00272,
+          "mean_luma": 71.853767,
+          "contrast": 64.122011,
+          "edge_energy": 3.738666,
+          "selection_reason": "BOUNDARY_LAST"
+        }
+      ]
+    },
+    {
+      "source_id": "N31_VIDEO_MEDIA_TYPE",
+      "sha256": "b7068a0db31704aeffb564793dfd80809485f4884cb0aea82cda8a1894be8a31",
+      "duration_ms": 13000,
+      "sampled_frame_count": 13,
+      "gpu_kernel_ms": 1.752832,
+      "selected_frames": [
+        {
+          "frame_index": 1,
+          "timestamp_ms": 0,
+          "scene_change_score": 0.0,
+          "mean_luma": 113.905347,
+          "contrast": 53.584134,
+          "edge_energy": 3.590907,
+          "selection_reason": "BOUNDARY_FIRST"
+        },
+        {
+          "frame_index": 7,
+          "timestamp_ms": 6000,
+          "scene_change_score": 0.081579,
+          "mean_luma": 117.487743,
+          "contrast": 56.101916,
+          "edge_energy": 2.828945,
+          "selection_reason": "SCENE_CHANGE"
+        },
+        {
+          "frame_index": 9,
+          "timestamp_ms": 8000,
+          "scene_change_score": 0.158951,
+          "mean_luma": 114.562639,
+          "contrast": 55.487756,
+          "edge_energy": 1.818779,
+          "selection_reason": "SCENE_CHANGE"
+        },
+        {
+          "frame_index": 10,
+          "timestamp_ms": 9000,
+          "scene_change_score": 0.171769,
+          "mean_luma": 128.281389,
+          "contrast": 50.081743,
+          "edge_energy": 2.803679,
+          "selection_reason": "SCENE_CHANGE"
+        },
+        {
+          "frame_index": 13,
+          "timestamp_ms": 12000,
+          "scene_change_score": 0.054183,
+          "mean_luma": 127.867691,
+          "contrast": 51.157892,
+          "edge_energy": 2.53143,
+          "selection_reason": "BOUNDARY_LAST"
+        }
+      ]
+    },
+    {
+      "source_id": "N31_VIDEO_GUIDES",
+      "sha256": "5343b2e177174e37ccd859368a07c45f710a11a43c51bfceca5ddd53f7c5a9cf",
+      "duration_ms": 37600,
+      "sampled_frame_count": 38,
+      "gpu_kernel_ms": 4.999872,
+      "selected_frames": [
+        {
+          "frame_index": 1,
+          "timestamp_ms": 0,
+          "scene_change_score": 0.0,
+          "mean_luma": 103.541024,
+          "contrast": 55.43724,
+          "edge_energy": 4.671822,
+          "selection_reason": "BOUNDARY_FIRST"
+        },
+        {
+          "frame_index": 6,
+          "timestamp_ms": 5000,
+          "scene_change_score": 0.264277,
+          "mean_luma": 112.348733,
+          "contrast": 61.155837,
+          "edge_energy": 6.205711,
+          "selection_reason": "SCENE_CHANGE"
+        },
+        {
+          "frame_index": 7,
+          "timestamp_ms": 6000,
+          "scene_change_score": 0.156428,
+          "mean_luma": 124.067795,
+          "contrast": 54.921395,
+          "edge_energy": 6.915397,
+          "selection_reason": "SCENE_CHANGE"
+        },
+        {
+          "frame_index": 20,
+          "timestamp_ms": 19000,
+          "scene_change_score": 0.163511,
+          "mean_luma": 121.383247,
+          "contrast": 56.892803,
+          "edge_energy": 5.392729,
+          "selection_reason": "SCENE_CHANGE"
+        },
+        {
+          "frame_index": 21,
+          "timestamp_ms": 20000,
+          "scene_change_score": 0.09574,
+          "mean_luma": 119.125035,
+          "contrast": 58.001368,
+          "edge_energy": 5.178344,
+          "selection_reason": "SCENE_CHANGE"
+        },
+        {
+          "frame_index": 22,
+          "timestamp_ms": 21000,
+          "scene_change_score": 0.170815,
+          "mean_luma": 111.805885,
+          "contrast": 59.547563,
+          "edge_energy": 6.189032,
+          "selection_reason": "SCENE_CHANGE"
+        },
+        {
+          "frame_index": 23,
+          "timestamp_ms": 22000,
+          "scene_change_score": 0.137384,
+          "mean_luma": 107.278142,
+          "contrast": 56.166312,
+          "edge_energy": 6.963557,
+          "selection_reason": "SCENE_CHANGE"
+        },
+        {
+          "frame_index": 24,
+          "timestamp_ms": 23000,
+          "scene_change_score": 0.119377,
+          "mean_luma": 121.055937,
+          "contrast": 53.544293,
+          "edge_energy": 6.4149,
+          "selection_reason": "SCENE_CHANGE"
+        },
+        {
+          "frame_index": 25,
+          "timestamp_ms": 24000,
+          "scene_change_score": 0.109015,
+          "mean_luma": 115.478212,
+          "contrast": 53.150966,
+          "edge_energy": 5.859956,
+          "selection_reason": "SCENE_CHANGE"
+        },
+        {
+          "frame_index": 34,
+          "timestamp_ms": 33000,
+          "scene_change_score": 0.1861,
+          "mean_luma": 127.798385,
+          "contrast": 56.812495,
+          "edge_energy": 5.405109,
+          "selection_reason": "SCENE_CHANGE"
+        },
+        {
+          "frame_index": 35,
+          "timestamp_ms": 34000,
+          "scene_change_score": 0.13114,
+          "mean_luma": 109.012882,
+          "contrast": 55.278449,
+          "edge_energy": 5.12095,
+          "selection_reason": "SCENE_CHANGE"
+        },
+        {
+          "frame_index": 38,
+          "timestamp_ms": 37000,
+          "scene_change_score": 0.078362,
+          "mean_luma": 107.049618,
+          "contrast": 54.5045,
+          "edge_energy": 4.365955,
+          "selection_reason": "BOUNDARY_LAST"
+        }
+      ]
+    },
+    {
+      "source_id": "N31_VIDEO_LEARNING",
+      "sha256": "efccdc08963c11df93ef518146ea5dfcc9900848847edb0c8beb0a661c260741",
+      "duration_ms": 9870,
+      "sampled_frame_count": 10,
+      "gpu_kernel_ms": 1.345632,
+      "selected_frames": [
+        {
+          "frame_index": 1,
+          "timestamp_ms": 0,
+          "scene_change_score": 0.0,
+          "mean_luma": 137.445712,
+          "contrast": 40.845474,
+          "edge_energy": 1.984874,
+          "selection_reason": "BOUNDARY_FIRST"
+        },
+        {
+          "frame_index": 2,
+          "timestamp_ms": 1000,
+          "scene_change_score": 0.101001,
+          "mean_luma": 142.376163,
+          "contrast": 27.060002,
+          "edge_energy": 1.297759,
+          "selection_reason": "SCENE_CHANGE"
+        },
+        {
+          "frame_index": 3,
+          "timestamp_ms": 2000,
+          "scene_change_score": 0.094779,
+          "mean_luma": 144.908229,
+          "contrast": 32.525496,
+          "edge_energy": 2.545963,
+          "selection_reason": "SCENE_CHANGE"
+        },
+        {
+          "frame_index": 4,
+          "timestamp_ms": 3000,
+          "scene_change_score": 0.111944,
+          "mean_luma": 131.018681,
+          "contrast": 49.473703,
+          "edge_energy": 3.552241,
+          "selection_reason": "SCENE_CHANGE"
+        },
+        {
+          "frame_index": 5,
+          "timestamp_ms": 4000,
+          "scene_change_score": 0.15131,
+          "mean_luma": 112.075972,
+          "contrast": 51.668641,
+          "edge_energy": 2.676748,
+          "selection_reason": "SCENE_CHANGE"
+        },
+        {
+          "frame_index": 6,
+          "timestamp_ms": 5000,
+          "scene_change_score": 0.197256,
+          "mean_luma": 131.113177,
+          "contrast": 63.72573,
+          "edge_energy": 3.57959,
+          "selection_reason": "SCENE_CHANGE"
+        },
+        {
+          "frame_index": 7,
+          "timestamp_ms": 6000,
+          "scene_change_score": 0.184385,
+          "mean_luma": 133.667465,
+          "contrast": 53.887279,
+          "edge_energy": 3.553173,
+          "selection_reason": "SCENE_CHANGE"
+        },
+        {
+          "frame_index": 8,
+          "timestamp_ms": 7000,
+          "scene_change_score": 0.199068,
+          "mean_luma": 115.772535,
+          "contrast": 65.934379,
+          "edge_energy": 3.464394,
+          "selection_reason": "SCENE_CHANGE"
+        },
+        {
+          "frame_index": 9,
+          "timestamp_ms": 8000,
+          "scene_change_score": 0.167467,
+          "mean_luma": 125.843177,
+          "contrast": 63.572363,
+          "edge_energy": 3.737855,
+          "selection_reason": "SCENE_CHANGE"
+        },
+        {
+          "frame_index": 10,
+          "timestamp_ms": 9000,
+          "scene_change_score": 0.064472,
+          "mean_luma": 122.271406,
+          "contrast": 61.675125,
+          "edge_energy": 3.765527,
+          "selection_reason": "BOUNDARY_LAST"
+        }
+      ]
+    },
+    {
+      "source_id": "N31_VIDEO_MEDIA_FEED",
+      "sha256": "f6e19429d6d69a09b33f8d8bc9c77b0655ae171e279f61506e45bbb7fc211888",
+      "duration_ms": 15100,
+      "sampled_frame_count": 15,
+      "gpu_kernel_ms": 2.013408,
+      "selected_frames": [
+        {
+          "frame_index": 1,
+          "timestamp_ms": 0,
+          "scene_change_score": 0.0,
+          "mean_luma": 121.449184,
+          "contrast": 63.176362,
+          "edge_energy": 3.643304,
+          "selection_reason": "BOUNDARY_FIRST"
+        },
+        {
+          "frame_index": 6,
+          "timestamp_ms": 5000,
+          "scene_change_score": 0.136571,
+          "mean_luma": 119.918767,
+          "contrast": 55.509084,
+          "edge_energy": 3.465519,
+          "selection_reason": "SCENE_CHANGE"
+        },
+        {
+          "frame_index": 7,
+          "timestamp_ms": 6000,
+          "scene_change_score": 0.081399,
+          "mean_luma": 118.089618,
+          "contrast": 58.147442,
+          "edge_energy": 3.468038,
+          "selection_reason": "SCENE_CHANGE"
+        },
+        {
+          "frame_index": 10,
+          "timestamp_ms": 9000,
+          "scene_change_score": 0.099255,
+          "mean_luma": 124.798229,
+          "contrast": 55.857866,
+          "edge_energy": 2.911857,
+          "selection_reason": "SCENE_CHANGE"
+        },
+        {
+          "frame_index": 11,
+          "timestamp_ms": 10000,
+          "scene_change_score": 0.119366,
+          "mean_luma": 122.053628,
+          "contrast": 59.960662,
+          "edge_energy": 3.360915,
+          "selection_reason": "SCENE_CHANGE"
+        },
+        {
+          "frame_index": 13,
+          "timestamp_ms": 12000,
+          "scene_change_score": 0.10592,
+          "mean_luma": 127.274618,
+          "contrast": 59.967063,
+          "edge_energy": 3.361203,
+          "selection_reason": "SCENE_CHANGE"
+        },
+        {
+          "frame_index": 14,
+          "timestamp_ms": 13000,
+          "scene_change_score": 0.086764,
+          "mean_luma": 132.102639,
+          "contrast": 57.627198,
+          "edge_energy": 3.03068,
+          "selection_reason": "SCENE_CHANGE"
+        },
+        {
+          "frame_index": 15,
+          "timestamp_ms": 14000,
+          "scene_change_score": 0.143034,
+          "mean_luma": 128.336198,
+          "contrast": 67.459228,
+          "edge_energy": 3.001656,
+          "selection_reason": "BOUNDARY_LAST"
+        }
+      ]
+    },
+    {
+      "source_id": "N31_VIDEO_PRINT_RESULT",
+      "sha256": "c38bc37dd4855dc25af0defd6f0c356900dde5e44d8a774dbbb7655cf4bd2fd5",
+      "duration_ms": 17410,
+      "sampled_frame_count": 17,
+      "gpu_kernel_ms": 2.25744,
+      "selected_frames": [
+        {
+          "frame_index": 1,
+          "timestamp_ms": 0,
+          "scene_change_score": 0.0,
+          "mean_luma": 69.143628,
+          "contrast": 52.698721,
+          "edge_energy": 3.061046,
+          "selection_reason": "BOUNDARY_FIRST"
+        },
+        {
+          "frame_index": 11,
+          "timestamp_ms": 10000,
+          "scene_change_score": 0.073477,
+          "mean_luma": 71.113715,
+          "contrast": 55.863311,
+          "edge_energy": 2.796164,
+          "selection_reason": "TOP_CHANGE_FALLBACK"
+        },
+        {
+          "frame_index": 17,
+          "timestamp_ms": 16000,
+          "scene_change_score": 0.042045,
+          "mean_luma": 69.465295,
+          "contrast": 53.136203,
+          "edge_energy": 3.037105,
+          "selection_reason": "BOUNDARY_LAST"
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "processed_video_count": 6,
+    "sampled_frame_count": 420,
+    "selected_frame_count": 50,
+    "gpu_kernel_ms": 55.062089,
+    "end_to_end_elapsed_seconds": 13.13414,
+    "end_to_end_frames_per_second": 31.977732,
+    "max_scene_change_score": 0.264277,
+    "semantic_model_used": false
+  },
+  "agent_trace": [
+    {
+      "event_id": "T01",
+      "agent": "PERCEPTION_AGENT",
+      "action": "FILTER_AUTHORIZED_SOURCES",
+      "tool": "INGEST_MANIFEST_POLICY_GATE",
+      "decision": "只接收LOCAL_QA_PASSED的自摄安全派生视频",
+      "outcome": "接收6个来源，排除2个其他来源"
+    },
+    {
+      "event_id": "T02",
+      "agent": "PERCEPTION_AGENT",
+      "action": "EXTRACT_TIMESTAMPED_FRAMES",
+      "tool": "FFMPEG_SHOWINFO",
+      "decision": "按固定间隔生成灰度帧并保留真实PTS",
+      "outcome": "生成420帧"
+    },
+    {
+      "event_id": "T03",
+      "agent": "PERCEPTION_AGENT",
+      "action": "COMPUTE_VISUAL_FEATURES",
+      "tool": "CUDA_NATIVE_GB10",
+      "decision": "在DGX本地计算亮度、对比度、边缘能量和相邻帧变化",
+      "outcome": "GPU核耗时55.062毫秒"
+    },
+    {
+      "event_id": "T04",
+      "agent": "PERCEPTION_AGENT",
+      "action": "RANK_SCENE_CANDIDATES",
+      "tool": "DETERMINISTIC_SCENE_SELECTOR",
+      "decision": "保留首尾帧及超过阈值的最强场景变化帧",
+      "outcome": "选择50个候选帧"
+    },
+    {
+      "event_id": "T05",
+      "agent": "VERIFIER_AGENT",
+      "action": "LIMIT_SEMANTIC_SCOPE",
+      "tool": "CLAIM_SCOPE_GATE",
+      "decision": "GPU特征只用于候选帧筛选，不自动证明SOP动作成立",
+      "outcome": "未新增任何语义支持结论，候选帧仍需视觉模型或人工复核"
+    }
+  ]
+}

@@ -25,6 +25,7 @@ dev = [
 
 [project.scripts]
 skillforge-demo = "skillforge.demo:main"
+skillforge-dgx-visual = "skillforge.dgx_visual:main"
 skillforge-case-ingest = "skillforge.case_ingest:main"
 skillforge-candidate-sop = "skillforge.candidate_sop:main"
 skillforge-ingest = "skillforge.ingest:main"

@@ -126,6 +126,14 @@ bash scripts/run_n31_visual.sh
 
 该流程按 Gold 步骤组合直接关键帧和同源相邻帧，锁定 Evidence ID、来源和时间点，非法 JSON、未知引用或中途失败不会发布为评测结果。当前13步基线为12步 `PARTIAL`、1步 `NOT_VISIBLE`、0步 `CONTRADICTED`；它证明当前稀疏关键帧可观察大部分动作，但不能替代手册和操作者确认。
 
+在 DGX Spark 上对6段自摄安全派生视频执行原生 CUDA 场景变化筛选：
+
+```bash
+bash scripts/run_n31_dgx_visual.sh
+```
+
+该命令只接受案例清单中 `LOCAL_QA_PASSED` 的视频，并且必须显式开启 DGX 安全派生素材门禁。FFmpeg保留真实帧时间戳，GB10 CUDA内核计算亮度、对比度、边缘能量和相邻帧变化，结果写入 `cases/n31/evaluations/dgx_visual_compute_v1.json`。第三方教程、手册、真实面单和私有照片不参与；GPU结果只筛选候选帧，不自动产生SOP语义结论。
+
 三种 Web 演示模式：
 
 ```bash
@@ -203,9 +211,10 @@ P0 能力只有五项：
 - Web Demo 已接入 `GOLD / FINAL`、多源对比、视觉复核和现场重跑，同时保留候选、模拟与无素材离线回退。
 - Web 成果区直接展示13项手机检查清单和5题培训测验，并只允许下载最终SOP、清单、测验、A4海报和修订审计；任意其他文件名返回404。
 - 已从 Gold SOP 生成单页A4培训海报，150 dpi渲染检查无裁切、重叠、乱码或越界文字。
-- 本机和DGX Python 3.12均已通过36项自动测试；DGX可重新生成标准A4海报并通过Web下载，未同步任何原始素材。
-- 尚待增强场景变化抽帧、连续动作语义合并、DGX外部访问与重启恢复，并录制最终演示视频。
+- DGX已用原生CUDA实际处理6段自摄安全派生视频的420帧，筛出50个场景候选时间点；Web展示GPU指标和5步Agent决策/工具轨迹，外部API仍未获准处理这些视频。
+- 本机和DGX Python 3.12均已通过38项自动测试；DGX可重新生成标准A4海报并通过Web下载，未同步第三方教程、手册、真实面单、私有照片或原始复盘视频。
+- 尚待完成连续动作语义合并、DGX外部访问与重启恢复，并生成60–90秒培训视频和最终有声演示。
 
 ## 冻结的 P0 运行路线
 
-P0 直接在 DGX Spark 上使用 Python 虚拟环境和用户级 FFmpeg 运行，不依赖 Docker、GPU 容器或 `nvcc`。Docker 仅在后续明确采用本地 GPU 模型或 NVIDIA VSS 时再启用，当前权限问题不阻塞主链路。
+P0 核心闭环直接在 DGX Spark 上使用 Python 虚拟环境和用户级 FFmpeg 运行，不依赖 Docker或GPU容器。场景候选筛选使用机器已有但未加入PATH的 CUDA 13 `nvcc` 编译小型、可审计的原生内核；即使该增强不可用，仓库内结构化Gold离线演示仍可运行。Docker仅在后续明确采用本地GPU模型或 NVIDIA VSS 时再启用，当前权限问题不阻塞主链路。

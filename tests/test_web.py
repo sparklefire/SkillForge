@@ -59,6 +59,11 @@ def test_web_accepts_operator_reviewed_gold_result(tmp_path) -> None:
         == 1.0
     )
     assert response.json()["visual_review"]["summary"]["contradicted_count"] == 0
+    dgx_path = ROOT / "cases/n31/evaluations/dgx_visual_compute_v1.json"
+    if dgx_path.is_file():
+        dgx = response.json()["dgx_visual_compute"]
+        assert dgx["actual_gpu_compute"] is True
+        assert dgx["semantic_claim_scope"] == "CANDIDATE_SELECTION_ONLY"
     assert len(response.json()["checklist"]["items"]) == 13
     assert len(response.json()["quiz"]["questions"]) == 5
     checklist = client.get("/api/n31/artifacts/checklist")

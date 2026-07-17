@@ -34,7 +34,11 @@ ssh \
   else
     echo "ffmpeg=missing"
   fi
-  command -v nvcc >/dev/null 2>&1 && nvcc --version | tail -n 1 || echo "nvcc=missing"
+  NVCC="$(command -v nvcc 2>/dev/null || true)"
+  if [[ -z "$NVCC" && -x /usr/local/cuda-13.0/bin/nvcc ]]; then
+    NVCC=/usr/local/cuda-13.0/bin/nvcc
+  fi
+  [[ -n "$NVCC" ]] && "$NVCC" --version | tail -n 1 | sed "s#^#nvcc=$NVCC #" || echo "nvcc=missing"
   echo "docker_service=$(systemctl is-active docker 2>/dev/null || true)"
   stat -c "docker_socket=%A:%U:%G" /var/run/docker.sock 2>/dev/null || echo "docker_socket=missing"
   if docker info >/dev/null 2>&1; then

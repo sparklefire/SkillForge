@@ -1,0 +1,191 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/dgx_visual_compute.schema.json",
+  "title": "SkillForge DGX Visual Compute Report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "case_id",
+    "run_id",
+    "generated_at",
+    "status",
+    "processing_location",
+    "backend",
+    "actual_gpu_compute",
+    "semantic_claim_scope",
+    "source_policy",
+    "gpu",
+    "configuration",
+    "sources",
+    "summary",
+    "agent_trace"
+  ],
+  "properties": {
+    "version": {"const": 1},
+    "case_id": {"type": "string", "minLength": 1},
+    "run_id": {"type": "string", "minLength": 1},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "status": {"const": "COMPLETED"},
+    "processing_location": {"const": "DGX_SPARK_LOCAL"},
+    "backend": {"const": "CUDA_NATIVE"},
+    "actual_gpu_compute": {"const": true},
+    "semantic_claim_scope": {"const": "CANDIDATE_SELECTION_ONLY"},
+    "source_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "external_api_processing_authorized",
+        "dgx_processing_authorized",
+        "accepted_privacy_status",
+        "processed_source_count",
+        "excluded_source_count",
+        "third_party_reference_processed"
+      ],
+      "properties": {
+        "external_api_processing_authorized": {"type": "boolean"},
+        "dgx_processing_authorized": {"const": true},
+        "accepted_privacy_status": {"const": "LOCAL_QA_PASSED"},
+        "processed_source_count": {"type": "integer", "minimum": 1},
+        "excluded_source_count": {"type": "integer", "minimum": 0},
+        "third_party_reference_processed": {"const": false}
+      }
+    },
+    "gpu": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "device_name",
+        "compute_capability",
+        "cuda_runtime",
+        "compiled_arch",
+        "total_global_memory_bytes"
+      ],
+      "properties": {
+        "device_name": {"type": "string", "minLength": 1},
+        "compute_capability": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+$"},
+        "cuda_runtime": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+$"},
+        "compiled_arch": {"type": "string", "pattern": "^sm_[0-9]+$"},
+        "total_global_memory_bytes": {"type": "integer", "minimum": 1}
+      }
+    },
+    "configuration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sample_interval_seconds",
+        "resize_width",
+        "scene_change_threshold",
+        "selected_frame_limit",
+        "timestamp_basis"
+      ],
+      "properties": {
+        "sample_interval_seconds": {"type": "number", "exclusiveMinimum": 0},
+        "resize_width": {"type": "integer", "minimum": 64},
+        "scene_change_threshold": {"type": "number", "minimum": 0, "maximum": 1},
+        "selected_frame_limit": {"type": "integer", "minimum": 2},
+        "timestamp_basis": {"const": "FFMPEG_SHOWINFO_PTS"}
+      }
+    },
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "source_id",
+          "sha256",
+          "duration_ms",
+          "sampled_frame_count",
+          "gpu_kernel_ms",
+          "selected_frames"
+        ],
+        "properties": {
+          "source_id": {"type": "string", "minLength": 1},
+          "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+          "duration_ms": {"type": "integer", "minimum": 1},
+          "sampled_frame_count": {"type": "integer", "minimum": 1},
+          "gpu_kernel_ms": {"type": "number", "minimum": 0},
+          "selected_frames": {
+            "type": "array",
+            "minItems": 1,
+            "items": {"$ref": "#/$defs/selectedFrame"}
+          }
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "processed_video_count",
+        "sampled_frame_count",
+        "selected_frame_count",
+        "gpu_kernel_ms",
+        "end_to_end_elapsed_seconds",
+        "end_to_end_frames_per_second",
+        "max_scene_change_score",
+        "semantic_model_used"
+      ],
+      "properties": {
+        "processed_video_count": {"type": "integer", "minimum": 1},
+        "sampled_frame_count": {"type": "integer", "minimum": 1},
+        "selected_frame_count": {"type": "integer", "minimum": 1},
+        "gpu_kernel_ms": {"type": "number", "minimum": 0},
+        "end_to_end_elapsed_seconds": {"type": "number", "exclusiveMinimum": 0},
+        "end_to_end_frames_per_second": {"type": "number", "minimum": 0},
+        "max_scene_change_score": {"type": "number", "minimum": 0, "maximum": 1},
+        "semantic_model_used": {"const": false}
+      }
+    },
+    "agent_trace": {
+      "type": "array",
+      "minItems": 4,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["event_id", "agent", "action", "tool", "decision", "outcome"],
+        "properties": {
+          "event_id": {"type": "string", "pattern": "^T[0-9]{2}$"},
+          "agent": {"enum": ["PERCEPTION_AGENT", "VERIFIER_AGENT"]},
+          "action": {"type": "string", "minLength": 1},
+          "tool": {"type": "string", "minLength": 1},
+          "decision": {"type": "string", "minLength": 1},
+          "outcome": {"type": "string", "minLength": 1}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "selectedFrame": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "frame_index",
+        "timestamp_ms",
+        "scene_change_score",
+        "mean_luma",
+        "contrast",
+        "edge_energy",
+        "selection_reason"
+      ],
+      "properties": {
+        "frame_index": {"type": "integer", "minimum": 1},
+        "timestamp_ms": {"type": "integer", "minimum": 0},
+        "scene_change_score": {"type": "number", "minimum": 0, "maximum": 1},
+        "mean_luma": {"type": "number", "minimum": 0, "maximum": 255},
+        "contrast": {"type": "number", "minimum": 0, "maximum": 128},
+        "edge_energy": {"type": "number", "minimum": 0, "maximum": 255},
+        "selection_reason": {
+          "enum": [
+            "BOUNDARY_FIRST",
+            "BOUNDARY_LAST",
+            "SCENE_CHANGE",
+            "TOP_CHANGE_FALLBACK"
+          ]
+        }
+      }
+    }
+  }
+}
