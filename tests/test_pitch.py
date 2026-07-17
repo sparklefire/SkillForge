@@ -131,3 +131,4 @@ def test_pitch_requires_safe_evidence_navigation_and_operator_review() -> None:
     assert result["status"] == "PASSED"
     assert result["assertions"]["evidence_locator_safe"] is True
     assert result["assertions"]["operator_review_controls"] is True
+    assert result["assertions"]["workflow_checkpoint_safe"] is True

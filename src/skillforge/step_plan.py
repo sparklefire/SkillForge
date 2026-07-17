@@ -6,6 +6,7 @@ import json
 import os
 import subprocess
 import tempfile
+import time
 from collections.abc import Callable
 from pathlib import Path
 from typing import Any
@@ -21,6 +22,23 @@ ROOT = Path(__file__).resolve().parents[2]
 
 class StepPlanError(RuntimeError):
     """A sanitized Step Plan request or response failure."""
+
+
+class StepPlanTransportError(StepPlanError):
+    """A classified transport failure that is safe to log and retry."""
+
+    def __init__(
+        self,
+        message: str,
+        *,
+        category: str,
+        retryable: bool,
+        status_code: int | None = None,
+    ) -> None:
+        super().__init__(message)
+        self.category = category
+        self.retryable = retryable
+        self.status_code = status_code
 
 
 def load_dotenv(path: Path | None = None) -> None:
@@ -43,6 +61,7 @@ class StepPlanClient:
         logger: StructuredLogger | None = None,
         timeout_seconds: int = 90,
         transport: Callable[[dict[str, Any]], dict[str, Any]] | None = None,
+        retry_sleep: Callable[[float], None] = time.sleep,
     ) -> None:
         load_dotenv()
         self.api_key = os.getenv("STEP_API_KEY", "")
@@ -54,6 +73,7 @@ class StepPlanClient:
         self.logger = logger or StructuredLogger()
         self.timeout_seconds = timeout_seconds
         self.transport = transport or self._curl_transport
+        self.retry_sleep = retry_sleep
         self.call_count = 0
 
     def _curl_transport(self, payload: dict[str, Any]) -> dict[str, Any]:
@@ -80,6 +100,8 @@ class StepPlanClient:
                     "15",
                     "--max-time",
                     str(self.timeout_seconds),
+                    "--write-out",
+                    "\n%{http_code}",
                     "--header",
                     f"@{header_path}",
                     "--data-binary",
@@ -91,17 +113,62 @@ class StepPlanClient:
                 text=True,
                 check=False,
             )
-            if completed.returncode != 0:
-                detail = (completed.stdout or completed.stderr or "unknown error")[:1200]
-                raise StepPlanError(f"Step Plan HTTP 请求失败: {redact(detail)}")
-            parsed = json.loads(completed.stdout)
+            body = completed.stdout
+            status_code: int | None = None
+            if "\n" in body:
+                possible_body, possible_status = body.rsplit("\n", 1)
+                if possible_status.isdigit() and len(possible_status) == 3:
+                    body = possible_body
+                    status_code = int(possible_status)
+            if completed.returncode != 0 or (status_code is not None and status_code >= 400):
+                if completed.returncode == 28 or status_code == 408:
+                    category = "TIMEOUT"
+                    retryable = True
+                elif status_code == 429:
+                    category = "RATE_LIMIT"
+                    retryable = True
+                elif status_code is not None and 500 <= status_code <= 599:
+                    category = "SERVICE_UNAVAILABLE"
+                    retryable = True
+                elif status_code is None or status_code == 0:
+                    category = "CONNECTION"
+                    retryable = completed.returncode in {5, 6, 7, 18, 28, 52, 55, 56}
+                else:
+                    category = "HTTP_CLIENT_ERROR"
+                    retryable = False
+                detail = redact((completed.stderr or "").strip())
+                suffix = f"；curl={completed.returncode}"
+                if detail:
+                    suffix += f"；detail={str(detail)[:300]}"
+                raise StepPlanTransportError(
+                    f"Step Plan传输失败：{category}{suffix}",
+                    category=category,
+                    retryable=retryable,
+                    status_code=status_code,
+                )
+            try:
+                parsed = json.loads(body)
+            except json.JSONDecodeError as exc:
+                raise StepPlanTransportError(
+                    "Step Plan HTTP响应不是合法JSON",
+                    category="INVALID_HTTP_JSON",
+                    retryable=True,
+                    status_code=status_code,
+                ) from exc
             if not isinstance(parsed, dict):
-                raise StepPlanError("Step Plan 响应不是 JSON 对象")
+                raise StepPlanTransportError(
+                    "Step Plan HTTP响应不是JSON对象",
+                    category="INVALID_HTTP_JSON",
+                    retryable=True,
+                    status_code=status_code,
+                )
             return parsed
         except subprocess.TimeoutExpired as exc:
-            raise StepPlanError("Step Plan 请求超时") from exc
-        except json.JSONDecodeError as exc:
-            raise StepPlanError("Step Plan HTTP 响应不是合法 JSON") from exc
+            raise StepPlanTransportError(
+                "Step Plan子进程请求超时",
+                category="TIMEOUT",
+                retryable=True,
+            ) from exc
         finally:
             if header_path:
                 Path(header_path).unlink(missing_ok=True)
@@ -130,8 +197,10 @@ class StepPlanClient:
         selected = self.router.reasoning(route)
         working_messages = list(messages)
         last_error: Exception | None = None
+        attempts_used = 0
 
         for attempt in range(1, max_attempts + 1):
+            attempts_used = attempt
             payload = {
                 "model": selected["model"],
                 "messages": working_messages,
@@ -147,9 +216,73 @@ class StepPlanClient:
                 message_count=len(working_messages),
             )
             self.call_count += 1
-            response = self.transport(payload)
             try:
-                document = parse_and_validate(self._content(response), schema_name)
+                response = self.transport(payload)
+                if not isinstance(response, dict):
+                    raise StepPlanTransportError(
+                        "Step Plan传输返回值不是JSON对象",
+                        category="INVALID_HTTP_JSON",
+                        retryable=True,
+                    )
+            except (TimeoutError, ConnectionError) as exc:
+                transport_error = StepPlanTransportError(
+                    "Step Plan连接或请求超时",
+                    category=("TIMEOUT" if isinstance(exc, TimeoutError) else "CONNECTION"),
+                    retryable=True,
+                )
+                last_error = transport_error
+                self.logger.emit(
+                    "step_plan.transport_error",
+                    model=selected["model"],
+                    schema=schema_name,
+                    attempt=attempt,
+                    category=transport_error.category,
+                    retryable=True,
+                    status_code=None,
+                )
+                if attempt < max_attempts:
+                    delay = min(2.0, 0.5 * (2 ** (attempt - 1)))
+                    self.logger.emit(
+                        "step_plan.retry",
+                        model=selected["model"],
+                        schema=schema_name,
+                        attempt=attempt,
+                        next_attempt=attempt + 1,
+                        reason=transport_error.category,
+                        delay_seconds=delay,
+                    )
+                    self.retry_sleep(delay)
+                    continue
+                break
+            except StepPlanTransportError as exc:
+                last_error = exc
+                self.logger.emit(
+                    "step_plan.transport_error",
+                    model=selected["model"],
+                    schema=schema_name,
+                    attempt=attempt,
+                    category=exc.category,
+                    retryable=exc.retryable,
+                    status_code=exc.status_code,
+                )
+                if exc.retryable and attempt < max_attempts:
+                    delay = min(2.0, 0.5 * (2 ** (attempt - 1)))
+                    self.logger.emit(
+                        "step_plan.retry",
+                        model=selected["model"],
+                        schema=schema_name,
+                        attempt=attempt,
+                        next_attempt=attempt + 1,
+                        reason=exc.category,
+                        delay_seconds=delay,
+                    )
+                    self.retry_sleep(delay)
+                    continue
+                break
+            content: Any = None
+            try:
+                content = self._content(response)
+                document = parse_and_validate(content, schema_name)
                 usage = response.get("usage") or {}
                 self.logger.emit(
                     "step_plan.success",
@@ -159,7 +292,7 @@ class StepPlanClient:
                     total_tokens=usage.get("total_tokens"),
                 )
                 return document
-            except (ValueError, TypeError, ContractValidationError) as exc:
+            except (ValueError, TypeError, ContractValidationError, StepPlanError) as exc:
                 last_error = exc
                 self.logger.emit(
                     "step_plan.invalid_json",
@@ -171,7 +304,7 @@ class StepPlanClient:
                     finish_reason=(
                         (response.get("choices") or [{}])[0].get("finish_reason")
                     ),
-                    content_length=len(str(self._content(response))),
+                    content_length=len(str(content)) if content is not None else 0,
                 )
                 if attempt < max_attempts:
                     working_messages.append(
@@ -186,6 +319,10 @@ class StepPlanClient:
                     )
 
         assert last_error is not None
+        if isinstance(last_error, StepPlanTransportError):
+            raise StepPlanError(
+                f"Step Plan传输在{attempts_used}次尝试内未成功：{last_error.category}"
+            ) from last_error
         raise StepPlanError(
             f"模型输出连续 {max_attempts} 次未通过 {schema_name} 校验: "
             f"{type(last_error).__name__}"

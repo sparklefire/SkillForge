@@ -572,6 +572,18 @@ def _check_demo_modes(runbook: dict[str, Any], root: Path) -> dict[str, Any]:
         and offline_bundle.get("contains_credentials") is False,
         "offline_payload": payload.status_code == 200
         and payload.json()["summary"].get("gold_status") == "GOLD",
+        "workflow_checkpoint_safe": payload.status_code == 200
+        and payload.json().get("workflow", {}).get("version") == 1
+        and payload.json().get("workflow", {}).get("state") == "COMPLETED"
+        and payload.json().get("workflow", {}).get("stage_attempts", {}).get(
+            "VERIFYING"
+        )
+        == 2
+        and payload.json().get("workflow", {}).get("last_failure") is None
+        and payload.json().get("workflow", {}).get("data_policy", {}).get(
+            "contains_credentials"
+        )
+        is False,
         "live_rerun": rerun.status_code == 200
         and rerun.json().get("before", {}).get("severe_error_count") == 5
         and rerun.json().get("after", {}).get("severe_error_count") == 0

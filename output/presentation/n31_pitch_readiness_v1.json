@@ -13,7 +13,7 @@
       "items": [
         {
           "artifact_id": "DEMO_BUNDLE",
-          "detail": "2268 bytes · sha256=880cc672242d3e17741f8851e250f1dd25ed416a5f93f260f4bc56d3ebe2a19a",
+          "detail": "2268 bytes · sha256=71336a58115c2e76e44238df663449ade2aade75257fbacf03d95ceacd227755",
           "path": "cases/n31/demo_bundle/bundle.json",
           "status": "PASSED"
         },
@@ -73,7 +73,7 @@
         },
         {
           "artifact_id": "SELECTIVE_REBUILD",
-          "detail": "5669 bytes · sha256=c3876fffc5072f042a87e420eaacfe99bcdf858a9f85f1174fcc1059aee4a279",
+          "detail": "5669 bytes · sha256=3c8515030d1175e66bea7d9a36da8527f68ca858117c6d364f10015d88aa8d76",
           "path": "cases/n31/evaluations/selective_rebuild_v1.json",
           "status": "PASSED"
         },
@@ -164,7 +164,8 @@
         "mode_priority": true,
         "offline_bundle_safe": true,
         "offline_payload": true,
-        "operator_review_controls": true
+        "operator_review_controls": true,
+        "workflow_checkpoint_safe": true
       },
       "check_id": "DEMO_FALLBACKS",
       "status": "PASSED"
@@ -172,7 +173,7 @@
   ],
   "contains_credentials": false,
   "contains_raw_media": false,
-  "generated_at": "2026-07-17T13:12:52.495581+00:00",
+  "generated_at": "2026-07-17T13:48:56.474248+00:00",
   "pending_human_gates": [
     "TRAINING_VIDEO_FULL_WATCH",
     "FINAL_STAGE_REHEARSAL",

@@ -1,59 +1,104 @@
 {
+  "data_policy": {
+    "contains_credentials": false
+  },
   "history": [
     {
+      "attempt": 1,
+      "event_type": "TRANSITION",
       "from_state": "UPLOADED",
+      "invalidated_states": [],
       "reason": "载入实际操作者审核的Gold SOP",
-      "timestamp": "2026-07-17T07:37:33.525529+00:00",
+      "timestamp": "2026-07-17T13:37:34.599676+00:00",
       "to_state": "INGESTING"
     },
     {
+      "attempt": 1,
+      "event_type": "TRANSITION",
       "from_state": "INGESTING",
+      "invalidated_states": [],
       "reason": "载入视频、手册和专家口述证据",
-      "timestamp": "2026-07-17T07:37:33.541401+00:00",
+      "timestamp": "2026-07-17T13:37:34.614101+00:00",
       "to_state": "EXTRACTING"
     },
     {
+      "attempt": 1,
+      "event_type": "TRANSITION",
       "from_state": "EXTRACTING",
+      "invalidated_states": [],
       "reason": "载入13步Gold SOP",
-      "timestamp": "2026-07-17T07:37:33.541547+00:00",
+      "timestamp": "2026-07-17T13:37:34.614271+00:00",
       "to_state": "PLANNING"
     },
     {
+      "attempt": 1,
+      "event_type": "TRANSITION",
       "from_state": "PLANNING",
+      "invalidated_states": [],
       "reason": "冻结受控错误草稿",
-      "timestamp": "2026-07-17T07:37:33.550524+00:00",
+      "timestamp": "2026-07-17T13:37:34.623792+00:00",
       "to_state": "CREATING"
     },
     {
+      "attempt": 1,
+      "event_type": "TRANSITION",
       "from_state": "CREATING",
+      "invalidated_states": [],
       "reason": "执行Gold约束的确定性质检",
-      "timestamp": "2026-07-17T07:37:33.551569+00:00",
+      "timestamp": "2026-07-17T13:37:34.624863+00:00",
       "to_state": "VERIFYING"
     },
     {
+      "attempt": 1,
+      "event_type": "TRANSITION",
       "from_state": "VERIFYING",
+      "invalidated_states": [],
       "reason": "引用Gold证据执行局部修订",
-      "timestamp": "2026-07-17T07:37:33.558186+00:00",
+      "timestamp": "2026-07-17T13:37:34.633678+00:00",
       "to_state": "REVISING"
     },
     {
+      "attempt": 2,
+      "event_type": "TRANSITION",
       "from_state": "REVISING",
+      "invalidated_states": [],
       "reason": "重新执行Gold约束质检",
-      "timestamp": "2026-07-17T07:37:33.570127+00:00",
+      "timestamp": "2026-07-17T13:37:34.645683+00:00",
       "to_state": "VERIFYING"
     },
     {
+      "attempt": 1,
+      "event_type": "TRANSITION",
       "from_state": "VERIFYING",
+      "invalidated_states": [],
       "reason": "生成Gold检查清单和测验",
-      "timestamp": "2026-07-17T07:37:33.575868+00:00",
+      "timestamp": "2026-07-17T13:37:34.652181+00:00",
       "to_state": "RENDERING"
     },
     {
+      "attempt": 1,
+      "event_type": "TRANSITION",
       "from_state": "RENDERING",
+      "invalidated_states": [],
       "reason": "Gold真实案例闭环评测完成",
-      "timestamp": "2026-07-17T07:37:33.603025+00:00",
+      "timestamp": "2026-07-17T13:37:34.680430+00:00",
       "to_state": "COMPLETED"
     }
   ],
-  "state": "COMPLETED"
+  "last_failure": null,
+  "stage_attempts": {
+    "COMPLETED": 1,
+    "CREATING": 1,
+    "EXTRACTING": 1,
+    "FAILED": 0,
+    "INGESTING": 1,
+    "NEEDS_REVIEW": 0,
+    "PLANNING": 1,
+    "RENDERING": 1,
+    "REVISING": 1,
+    "UPLOADED": 1,
+    "VERIFYING": 2
+  },
+  "state": "COMPLETED",
+  "version": 1
 }

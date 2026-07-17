@@ -56,6 +56,10 @@ def test_builds_asset_free_gold_bundle(tmp_path) -> None:
     assert selective["status"] == "PASSED"
     assert selective["summary"]["quiz_question_count"] == 1
     assert selective["summary"]["video_scene_count"] == 7
+    workflow = json.loads((output / "workflow.json").read_text(encoding="utf-8"))
+    validate_document(workflow, "workflow_run.schema.json")
+    assert workflow["state"] == "COMPLETED"
+    assert workflow["stage_attempts"]["VERIFYING"] == 2
 
 
 def test_rejects_stale_optional_artifact_before_publication(tmp_path) -> None:
@@ -68,3 +72,19 @@ def test_rejects_stale_optional_artifact_before_publication(tmp_path) -> None:
 
     with pytest.raises(ValueError, match="artifact_type"):
         build_bundle(source, tmp_path / "output")
+
+
+def test_rejects_selective_report_bound_to_different_audit(tmp_path) -> None:
+    source = tmp_path / "source"
+    shutil.copytree(ROOT / "cases/n31/output/gold_rehearsal_v1", source)
+    audit_path = source / "revision_audit.json"
+    audit = json.loads(audit_path.read_text(encoding="utf-8"))
+    audit["completed_at"] = "2026-01-01T00:00:00+00:00"
+    audit_path.write_text(json.dumps(audit, ensure_ascii=False), encoding="utf-8")
+
+    with pytest.raises(ValueError, match="revision_audit_sha256"):
+        build_bundle(
+            source,
+            tmp_path / "bundle",
+            selective_rebuild=ROOT / "cases/n31/evaluations/selective_rebuild_v1.json",
+        )

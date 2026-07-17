@@ -58,17 +58,15 @@
     {
       "action": "REMOVE",
       "after": null,
-      "before": [
-        {
-          "evidence_ids": [],
-          "name": "走纸键按压力",
-          "unit": "N",
-          "value": 20
-        }
-      ],
+      "before": {
+        "evidence_ids": [],
+        "name": "走纸键按压力",
+        "unit": "N",
+        "value": 20
+      },
       "conflict_id": "C004",
       "evidence_ids": [],
-      "path": "/steps/S10/parameters",
+      "path": "/steps/S10/parameters/0",
       "reason": "参数“走纸键按压力”没有有效来源依据"
     },
     {
@@ -76,7 +74,14 @@
       "after": null,
       "before": "扭矩扳手",
       "conflict_id": "C005",
-      "evidence_ids": [],
+      "evidence_ids": [
+        "E052",
+        "E082",
+        "E150",
+        "E152",
+        "E153",
+        "E154"
+      ],
       "path": "/steps/S12/tools",
       "reason": "工具“扭矩扳手”没有来源依据"
     },
@@ -130,7 +135,7 @@
       "reason": "步骤 S07 必须先于 S08"
     }
   ],
-  "completed_at": "2026-07-17T07:37:33.567841+00:00",
+  "completed_at": "2026-07-17T13:37:34.643497+00:00",
   "iteration": 1,
-  "started_at": "2026-07-17T07:37:33.558255+00:00"
+  "started_at": "2026-07-17T13:37:34.633814+00:00"
 }

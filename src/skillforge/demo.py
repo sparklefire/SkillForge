@@ -91,7 +91,7 @@ def run_demo(case_dir: Path, output_dir: Path) -> dict[str, Any]:
         "after": after_metrics,
         "revision_count": len(audit["changes"]) if audit else 0,
     }
-    write_json(output_dir / "workflow.json", workflow.snapshot())
+    workflow.write_checkpoint(output_dir / "workflow.json")
     write_json(output_dir / "summary.json", summary)
     return summary
 

@@ -1,0 +1,149 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/workflow_run.schema.json",
+  "title": "SkillForge Recoverable Workflow Run",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "state",
+    "history",
+    "stage_attempts",
+    "last_failure",
+    "data_policy"
+  ],
+  "properties": {
+    "version": {"const": 1},
+    "state": {"$ref": "#/$defs/state"},
+    "history": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "from_state",
+          "to_state",
+          "timestamp",
+          "reason",
+          "event_type",
+          "attempt",
+          "invalidated_states"
+        ],
+        "properties": {
+          "from_state": {"$ref": "#/$defs/state"},
+          "to_state": {"$ref": "#/$defs/state"},
+          "timestamp": {"type": "string", "format": "date-time"},
+          "reason": {"type": "string"},
+          "event_type": {"enum": ["TRANSITION", "FAILURE", "RERUN"]},
+          "attempt": {"type": "integer", "minimum": 1},
+          "invalidated_states": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {"$ref": "#/$defs/active_state"}
+          }
+        }
+      }
+    },
+    "stage_attempts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "UPLOADED",
+        "INGESTING",
+        "EXTRACTING",
+        "PLANNING",
+        "CREATING",
+        "VERIFYING",
+        "REVISING",
+        "RENDERING",
+        "COMPLETED",
+        "FAILED",
+        "NEEDS_REVIEW"
+      ],
+      "properties": {
+        "UPLOADED": {"type": "integer", "minimum": 0},
+        "INGESTING": {"type": "integer", "minimum": 0},
+        "EXTRACTING": {"type": "integer", "minimum": 0},
+        "PLANNING": {"type": "integer", "minimum": 0},
+        "CREATING": {"type": "integer", "minimum": 0},
+        "VERIFYING": {"type": "integer", "minimum": 0},
+        "REVISING": {"type": "integer", "minimum": 0},
+        "RENDERING": {"type": "integer", "minimum": 0},
+        "COMPLETED": {"type": "integer", "minimum": 0},
+        "FAILED": {"type": "integer", "minimum": 0},
+        "NEEDS_REVIEW": {"type": "integer", "minimum": 0}
+      }
+    },
+    "last_failure": {
+      "oneOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "from_state",
+            "error_type",
+            "message",
+            "retryable",
+            "timestamp"
+          ],
+          "properties": {
+            "from_state": {"$ref": "#/$defs/active_state"},
+            "error_type": {"type": "string", "minLength": 1},
+            "message": {"type": "string", "minLength": 1, "maxLength": 500},
+            "retryable": {"type": "boolean"},
+            "timestamp": {"type": "string", "format": "date-time"}
+          }
+        }
+      ]
+    },
+    "data_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["contains_credentials"],
+      "properties": {
+        "contains_credentials": {"const": false}
+      }
+    }
+  },
+  "$defs": {
+    "state": {
+      "enum": [
+        "UPLOADED",
+        "INGESTING",
+        "EXTRACTING",
+        "PLANNING",
+        "CREATING",
+        "VERIFYING",
+        "REVISING",
+        "RENDERING",
+        "COMPLETED",
+        "FAILED",
+        "NEEDS_REVIEW"
+      ]
+    },
+    "rerunnable_state": {
+      "enum": [
+        "INGESTING",
+        "EXTRACTING",
+        "PLANNING",
+        "CREATING",
+        "VERIFYING",
+        "REVISING",
+        "RENDERING"
+      ]
+    },
+    "active_state": {
+      "enum": [
+        "UPLOADED",
+        "INGESTING",
+        "EXTRACTING",
+        "PLANNING",
+        "CREATING",
+        "VERIFYING",
+        "REVISING",
+        "RENDERING"
+      ]
+    }
+  }
+}

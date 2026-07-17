@@ -33,6 +33,7 @@ OPTIONAL_SCHEMAS = {
     "sop_views": "sop_views.schema.json",
     "checklist": "mobile_checklist.schema.json",
     "quiz": "training_quiz.schema.json",
+    "workflow": "workflow_run.schema.json",
     "grounding_gate": "grounding_gate_report.schema.json",
     "semantic_review": "semantic_review_report.schema.json",
     "selective_rebuild": "selective_rebuild_report.schema.json",
@@ -53,6 +54,11 @@ def _write(path: Path, payload: Any) -> None:
 
 def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _canonical_sha256(payload: Any) -> str:
+    encoded = json.dumps(payload, ensure_ascii=False, sort_keys=True).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
 
 
 def _compact_sop(payload: dict[str, Any]) -> dict[str, Any]:
@@ -79,6 +85,23 @@ def _validate_optional(name: str, payload: dict[str, Any]) -> dict[str, Any]:
     ):
         raise ValueError("只允许发布通过边界验证的选择性重建报告")
     return document
+
+
+def _validate_cross_bindings(output: Path) -> None:
+    selective_path = output / "selective_rebuild.json"
+    if not selective_path.is_file():
+        return
+    report = _read(selective_path)
+    bindings = report["source_bindings"]
+    sources = {
+        "before_sop_sha256": output / "before_sop.json",
+        "after_sop_sha256": output / "after_sop.json",
+        "revision_audit_sha256": output / "revision_audit.json",
+    }
+    for binding, path in sources.items():
+        actual = _canonical_sha256(_read(path))
+        if bindings[binding] != actual:
+            raise ValueError(f"选择性重建报告的{binding}与离线包内容不一致")
 
 
 def build_bundle(
@@ -112,6 +135,7 @@ def build_bundle(
     if selective_rebuild is not None:
         rebuild = _validate_optional("selective_rebuild", _read(selective_rebuild))
         _write(output / "selective_rebuild.json", rebuild)
+    _validate_cross_bindings(output)
     summary = _read(output / "summary.json")
     if (
         summary.get("gold_status") != "GOLD"

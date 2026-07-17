@@ -111,7 +111,7 @@ def run_gold_rehearsal(
         ],
         "human_review_required": False,
     }
-    write_json(output_dir / "workflow.json", workflow.snapshot())
+    workflow.write_checkpoint(output_dir / "workflow.json")
     write_json(output_dir / "summary.json", summary)
     return summary
 

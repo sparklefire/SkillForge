@@ -209,7 +209,7 @@
   "source_bindings": {
     "after_sop_sha256": "1274a8575eaad45dbaae5484aff7ee0c69e700622e4142b7fc0cc5d4331e642f",
     "before_sop_sha256": "e88c0c839ac88906ab27c7e29ece3050eb93db10014906126b8ac3598529a9de",
-    "revision_audit_sha256": "703d689dbd547e04039bfa1cc0fea6991003cae04482d501270ac82577332469",
+    "revision_audit_sha256": "bf03f511cb7fa08250c1c9a711c38ef1bc7e18f3b4e60d3789bd0a49cca4c3ba",
     "storyboard_sha256": "b10d5439848ad16b3dad1034cf32eca743019804320c4c0e0c0c46d460cd109e"
   },
   "status": "PASSED",

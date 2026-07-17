@@ -64,10 +64,15 @@ def test_web_accepts_operator_reviewed_gold_result(tmp_path) -> None:
     assert "操作者 SOP 审核台" in home.text
     assert "单步重建" in home.text
     assert "/api/n31/evidence/" in home.text
+    assert "可恢复工作流检查点" in home.text
     response = client.get("/api/n31")
     assert response.status_code == 200
     assert response.json()["summary"]["gold_status"] == "GOLD"
     assert response.json()["summary"]["metrics_status"] == "FINAL"
+    assert response.json()["workflow"]["version"] == 1
+    assert response.json()["workflow"]["state"] == "COMPLETED"
+    assert response.json()["workflow"]["stage_attempts"]["VERIFYING"] == 2
+    assert response.json()["workflow"]["last_failure"] is None
     assert (
         response.json()["multisource_comparison"]["source_ablation"][
             "two_or_more_source_types"

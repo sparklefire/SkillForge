@@ -446,7 +446,17 @@
       "automatic": true,
       "conflict_id": "C004",
       "details": {
+        "globally_allowed": false,
+        "matches_reference": false,
+        "parameter": {
+          "evidence_ids": [],
+          "name": "走纸键按压力",
+          "unit": "N",
+          "value": 20
+        },
+        "parameter_index": 0,
         "parameter_name": "走纸键按压力",
+        "reference_parameter": null,
         "step_id": "S10"
       },
       "evidence": [],
@@ -463,10 +473,102 @@
       "automatic": true,
       "conflict_id": "C005",
       "details": {
+        "globally_allowed": false,
+        "reference_tools": [
+          "本地计算机或已配置的打印终端"
+        ],
         "step_id": "S12",
+        "supported_in_step": false,
         "tool": "扭矩扳手"
       },
-      "evidence": [],
+      "evidence": [
+        {
+          "claim": "CONTINUOUS_OPERATION 关键帧候选；等待授权后的视觉理解或人工确认动作、部件和设备状态。",
+          "classification": "MODEL_INFERENCE",
+          "confidence": 0.5,
+          "evidence_id": "E052",
+          "locator": {
+            "end_ms": 260000,
+            "keyframe": "derived/video/N31_VIDEO_OPERATION_FULL/frames/frame_000052.jpg",
+            "start_ms": 255000
+          },
+          "relevance": 0.65,
+          "review_status": "UNREVIEWED",
+          "source_ref": "N31_VIDEO_OPERATION_FULL",
+          "source_type": "video"
+        },
+        {
+          "claim": "PRINT_SUCCESS_CHECK 关键帧候选；等待授权后的视觉理解或人工确认动作、部件和设备状态。",
+          "classification": "MODEL_INFERENCE",
+          "confidence": 0.5,
+          "evidence_id": "E082",
+          "locator": {
+            "end_ms": 5000,
+            "keyframe": "derived/video/N31_VIDEO_PRINT_RESULT/frames/frame_000001.jpg",
+            "start_ms": 0
+          },
+          "relevance": 0.65,
+          "review_status": "UNREVIEWED",
+          "source_ref": "N31_VIDEO_PRINT_RESULT",
+          "source_type": "video"
+        },
+        {
+          "claim": "换纸后最低要求是一次单张走纸和一次实际测试标签打印；自检页用于首次配置、规格变化或异常，同规格换纸可按现场规则决定。",
+          "classification": "EXPERT_ADVICE",
+          "confidence": 0.95,
+          "evidence_id": "E150",
+          "locator": {
+            "end_ms": 260400,
+            "start_ms": 227680
+          },
+          "relevance": 0.95,
+          "review_status": "VERIFIED",
+          "source_ref": "N31_EXPERT_INTERVIEW",
+          "source_type": "audio"
+        },
+        {
+          "claim": "不得在进纸或打印时强推强拉扭纸，不送入褶皱破损纸，不把缝标纸按黑标学习，不让导纸夹挤压纸边，不暴力处理卡纸或用硬物刮擦胶辊、传感器和热敏区。",
+          "classification": "EXPERT_ADVICE",
+          "confidence": 0.95,
+          "evidence_id": "E152",
+          "locator": {
+            "end_ms": 331760,
+            "start_ms": 300400
+          },
+          "relevance": 0.95,
+          "review_status": "VERIFIED",
+          "source_ref": "N31_EXPERT_INTERVIEW",
+          "source_type": "audio"
+        },
+        {
+          "claim": "新手常漏掉介质定位方式判断、内外导纸夹调整，以及装纸后的学习、单张走纸和测试打印。",
+          "classification": "EXPERT_ADVICE",
+          "confidence": 0.95,
+          "evidence_id": "E153",
+          "locator": {
+            "end_ms": 357600,
+            "start_ms": 331760
+          },
+          "relevance": 0.95,
+          "review_status": "VERIFIED",
+          "source_ref": "N31_EXPERT_INTERVIEW",
+          "source_type": "audio"
+        },
+        {
+          "claim": "成功标准为稳定吸纸，单张走纸只送一张并停在边界附近，测试标签完整且基本居中，无连续跳纸、明显偏斜、卡纸或报警；公开演示不得显示个人信息、编码和唯一编号。",
+          "classification": "EXPERT_ADVICE",
+          "confidence": 0.95,
+          "evidence_id": "E154",
+          "locator": {
+            "end_ms": 386400,
+            "start_ms": 357600
+          },
+          "relevance": 0.95,
+          "review_status": "VERIFIED",
+          "source_ref": "N31_EXPERT_INTERVIEW",
+          "source_type": "audio"
+        }
+      ],
       "kind": "UNSUPPORTED_TOOL",
       "message": "工具“扭矩扳手”没有来源依据",
       "proposed_action": "REMOVE",
