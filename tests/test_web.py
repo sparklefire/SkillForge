@@ -52,6 +52,9 @@ def test_web_prefers_explicitly_labelled_n31_rehearsal(tmp_path) -> None:
     review = client.post("/api/n31/review/sessions")
     assert review.status_code == 409
     assert "只有Gold最终结果" in review.json()["detail"]
+    asr_correction = client.post("/api/n31/asr-corrections/sessions")
+    assert asr_correction.status_code == 409
+    assert "只有Gold最终结果" in asr_correction.json()["detail"]
 
 
 def test_web_accepts_operator_reviewed_gold_result(tmp_path) -> None:
@@ -66,6 +69,8 @@ def test_web_accepts_operator_reviewed_gold_result(tmp_path) -> None:
     assert "受影响范围与选择性重建" in home.text
     assert "/api/n31/artifacts/selective-rebuild" in home.text
     assert "操作者 SOP 审核台" in home.text
+    assert "专家口述 ASR 快速修正" in home.text
+    assert "重新计算Evidence绑定摘要" in home.text
     assert "冲突裁决与最终采用" in home.text
     assert "安全声明、缺失证据、无效证据" in home.text
     assert "单步重建" in home.text
@@ -251,6 +256,57 @@ def test_web_accepts_operator_reviewed_gold_result(tmp_path) -> None:
         "/api/n31/checklist/previews/S"
     )
     assert client.get("/api/n31/evidence/E999").status_code == 404
+
+    asr_session = client.post("/api/n31/asr-corrections/sessions")
+    assert asr_session.status_code == 200
+    asr_session_id = asr_session.json()["session_id"]
+    assert asr_session.json()["status"] == "OPEN"
+    assert asr_session.json()["summary"] == {
+        "answer_count": 12,
+        "corrected_answer_count": 0,
+        "correction_event_count": 0,
+        "evidence_binding_count": 12,
+    }
+    q02 = next(
+        item
+        for item in asr_session.json()["answers"]
+        if item["question_id"] == "Q02"
+    )
+    corrected = client.patch(
+        f"/api/n31/asr-corrections/sessions/{asr_session_id}/answers/Q02",
+        json={
+            "corrected_text": q02["effective_corrected_text"] + " 人工复听确认。",
+            "operator": "实际操作者",
+            "reason": "复听后补充确认",
+        },
+    )
+    assert corrected.status_code == 200
+    corrected_q02 = next(
+        item for item in corrected.json()["answers"] if item["question_id"] == "Q02"
+    )
+    assert corrected.json()["status"] == "CORRECTED"
+    assert corrected.json()["summary"]["corrected_answer_count"] == 1
+    assert corrected_q02["correction_count"] == 1
+    assert corrected_q02["latest_operator"] == "实际操作者"
+    assert (
+        corrected_q02["evidence_binding"]["current_sha256"]
+        != corrected_q02["evidence_binding"]["baseline_sha256"]
+    )
+    persisted_asr = client.get(
+        f"/api/n31/asr-corrections/sessions/{asr_session_id}"
+    )
+    assert persisted_asr.status_code == 200
+    invalid_asr = client.patch(
+        f"/api/n31/asr-corrections/sessions/{asr_session_id}/answers/Q02",
+        json={
+            "corrected_text": "删除全部必要术语",
+            "operator": "实际操作者",
+            "reason": "错误尝试",
+        },
+    )
+    assert invalid_asr.status_code == 400
+    assert "必要术语" in invalid_asr.json()["detail"]
+    assert client.get("/api/n31/asr-corrections/sessions/not-found").status_code == 404
 
     conflict_session = client.post("/api/n31/conflicts/sessions")
     assert conflict_session.status_code == 200

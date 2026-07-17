@@ -158,6 +158,7 @@
     {
       "assertions": {
         "artifact_stage_rerun": true,
+        "asr_correction_auditable": true,
         "conflict_decision_auditable": true,
         "entry_script": true,
         "evidence_locator_safe": true,
@@ -176,7 +177,7 @@
   ],
   "contains_credentials": false,
   "contains_raw_media": false,
-  "generated_at": "2026-07-17T14:43:33.431498+00:00",
+  "generated_at": "2026-07-17T15:10:31.515622+00:00",
   "pending_human_gates": [
     "TRAINING_VIDEO_FULL_WATCH",
     "FINAL_STAGE_REHEARSAL",

@@ -1,0 +1,229 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/asr_correction_session.schema.json",
+  "title": "SkillForge ASR Correction Session",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "artifact_type",
+    "version",
+    "session_id",
+    "case_id",
+    "source_ref",
+    "created_at",
+    "updated_at",
+    "status",
+    "source_bindings",
+    "answers",
+    "summary",
+    "events",
+    "data_policy"
+  ],
+  "properties": {
+    "artifact_type": {"const": "ASR_CORRECTION_SESSION"},
+    "version": {"const": 1},
+    "session_id": {"type": "string", "pattern": "^[a-f0-9]{32}$"},
+    "case_id": {"type": "string", "minLength": 1},
+    "source_ref": {"type": "string", "minLength": 1},
+    "created_at": {"type": "string", "format": "date-time"},
+    "updated_at": {"type": "string", "format": "date-time"},
+    "status": {"enum": ["OPEN", "CORRECTED"]},
+    "source_bindings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "expert_transcript_sha256",
+        "gold_sop_sha256",
+        "raw_transcription_sha256"
+      ],
+      "properties": {
+        "expert_transcript_sha256": {"$ref": "#/$defs/sha256"},
+        "gold_sop_sha256": {"$ref": "#/$defs/sha256"},
+        "raw_transcription_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "answers": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "question_id",
+          "topic",
+          "start_ms",
+          "end_ms",
+          "evidence_id",
+          "raw_asr_text",
+          "baseline_corrected_text",
+          "effective_corrected_text",
+          "required_terms",
+          "correction_state",
+          "correction_count",
+          "evidence_binding",
+          "latest_operator",
+          "latest_reason",
+          "latest_corrected_at",
+          "corrections"
+        ],
+        "properties": {
+          "question_id": {"type": "string", "pattern": "^Q[0-9]{2}$"},
+          "topic": {"type": "string", "minLength": 1, "maxLength": 200},
+          "start_ms": {"type": "integer", "minimum": 0},
+          "end_ms": {"type": "integer", "minimum": 1},
+          "evidence_id": {"type": "string", "pattern": "^E[0-9]{3}$"},
+          "raw_asr_text": {"type": "string", "minLength": 1, "maxLength": 5000},
+          "baseline_corrected_text": {"type": "string", "minLength": 1, "maxLength": 5000},
+          "effective_corrected_text": {"type": "string", "minLength": 1, "maxLength": 5000},
+          "required_terms": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {"type": "string", "minLength": 1, "maxLength": 100}
+          },
+          "correction_state": {"enum": ["UNCHANGED", "CORRECTED"]},
+          "correction_count": {"type": "integer", "minimum": 0},
+          "evidence_binding": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "source_ref",
+              "claim",
+              "locator",
+              "baseline_sha256",
+              "current_sha256"
+            ],
+            "properties": {
+              "source_ref": {"type": "string", "minLength": 1},
+              "claim": {"type": "string", "minLength": 1},
+              "locator": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["start_ms", "end_ms"],
+                "properties": {
+                  "start_ms": {"type": "integer", "minimum": 0},
+                  "end_ms": {"type": "integer", "minimum": 1}
+                }
+              },
+              "baseline_sha256": {"$ref": "#/$defs/sha256"},
+              "current_sha256": {"$ref": "#/$defs/sha256"}
+            }
+          },
+          "latest_operator": {
+            "oneOf": [
+              {"type": "null"},
+              {"type": "string", "minLength": 1, "maxLength": 80}
+            ]
+          },
+          "latest_reason": {
+            "oneOf": [
+              {"type": "null"},
+              {"type": "string", "minLength": 1, "maxLength": 500}
+            ]
+          },
+          "latest_corrected_at": {
+            "oneOf": [
+              {"type": "null"},
+              {"type": "string", "format": "date-time"}
+            ]
+          },
+          "corrections": {
+            "type": "array",
+            "items": {"$ref": "#/$defs/correction"}
+          }
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "answer_count",
+        "corrected_answer_count",
+        "correction_event_count",
+        "evidence_binding_count"
+      ],
+      "properties": {
+        "answer_count": {"type": "integer", "minimum": 1},
+        "corrected_answer_count": {"type": "integer", "minimum": 0},
+        "correction_event_count": {"type": "integer", "minimum": 0},
+        "evidence_binding_count": {"type": "integer", "minimum": 1}
+      }
+    },
+    "events": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "event_id",
+          "event_type",
+          "question_id",
+          "actor",
+          "detail",
+          "recorded_at"
+        ],
+        "properties": {
+          "event_id": {"type": "string", "pattern": "^[a-f0-9]{32}$"},
+          "event_type": {"enum": ["SESSION_CREATED", "ANSWER_CORRECTED"]},
+          "question_id": {
+            "oneOf": [
+              {"type": "null"},
+              {"type": "string", "pattern": "^Q[0-9]{2}$"}
+            ]
+          },
+          "actor": {"enum": ["SYSTEM", "OPERATOR"]},
+          "detail": {"type": "string", "minLength": 1, "maxLength": 500},
+          "recorded_at": {"type": "string", "format": "date-time"}
+        }
+      }
+    },
+    "data_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "storage_scope",
+        "external_model_calls",
+        "contains_raw_transcript_snippets",
+        "contains_raw_media",
+        "contains_credentials",
+        "contains_absolute_paths"
+      ],
+      "properties": {
+        "storage_scope": {"const": "LOCAL_PRIVATE_ONLY"},
+        "external_model_calls": {"const": 0},
+        "contains_raw_transcript_snippets": {"const": true},
+        "contains_raw_media": {"const": false},
+        "contains_credentials": {"const": false},
+        "contains_absolute_paths": {"const": false}
+      }
+    }
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "correction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "correction_id",
+        "before_text",
+        "after_text",
+        "operator",
+        "reason",
+        "recorded_at",
+        "previous_evidence_binding_sha256",
+        "evidence_binding_sha256"
+      ],
+      "properties": {
+        "correction_id": {"type": "string", "pattern": "^[a-f0-9]{32}$"},
+        "before_text": {"type": "string", "minLength": 1, "maxLength": 5000},
+        "after_text": {"type": "string", "minLength": 1, "maxLength": 5000},
+        "operator": {"type": "string", "minLength": 1, "maxLength": 80},
+        "reason": {"type": "string", "minLength": 1, "maxLength": 500},
+        "recorded_at": {"type": "string", "format": "date-time"},
+        "previous_evidence_binding_sha256": {"$ref": "#/$defs/sha256"},
+        "evidence_binding_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    }
+  }
+}

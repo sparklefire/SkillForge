@@ -16,6 +16,7 @@ from fastapi import Body, FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from starlette.concurrency import run_in_threadpool
 
+from .asr_corrections import AsrCorrectionStore
 from .demo import ROOT, run_demo
 from .checklist_sessions import ChecklistSessionStore
 from .conflict_adjudication import ConflictDecisionStore
@@ -127,6 +128,7 @@ HTML = """<!doctype html>
   <section class="panel" id="semantic-panel" hidden><h2>高推理语义质检</h2><div id="semantic-metrics" class="grid"></div><p id="semantic-note"></p><div id="semantic-assessments"></div></section>
   <section class="panel" id="selective-panel" hidden><h2>受影响范围与选择性重建</h2><div id="selective-metrics" class="grid"></div><p id="selective-note"></p><div id="selective-plans"></div></section>
   <section class="panel" id="review-panel" hidden><h2>操作者 SOP 审核台</h2><p>审核记录只保存在本机忽略目录。锁定后才能确认；安全重排会校验前置依赖和锁定位置；单步重建不调用外部模型。</p><button id="review-start">开始新的审核会话</button><span id="review-status"></span><div id="review-summary" class="notice" hidden></div><div id="review-steps"></div><div id="review-rebuild-result"></div></section>
+  <section class="panel" id="asr-correction-panel" hidden><h2>专家口述 ASR 快速修正</h2><p>原始ASR、基线校正文本和每次人工修正全部保留；修正后重新计算Evidence绑定摘要。会话只写入Git忽略的本机私有目录，不调用外部模型，也不会直接覆盖Gold文件。</p><label>操作者<input id="asr-correction-operator" maxlength="80" value="实际操作者"></label><button id="asr-correction-start">载入12段专家口述</button><span id="asr-correction-status"></span><div id="asr-correction-summary" class="notice" hidden></div><div id="asr-correction-answers"></div></section>
   <section class="panel" id="evidence-panel" hidden><h2>Evidence 安全定位</h2><div id="evidence-detail"></div></section>
   <section class="panel"><h2>发现问题 → 展示证据</h2><div id="issues"></div></section>
   <section class="panel" id="conflict-decision-panel" hidden><h2>冲突裁决与最终采用</h2><p>确定性冲突可自动采用并记录原因；安全声明、缺失证据、无效证据和 REVIEW 动作强制进入人工确认，即使 Verifier 标记为 automatic=true 也不能绕过。</p><button id="conflict-decision-start">生成当前冲突裁决</button><span id="conflict-decision-status"></span><div id="conflict-decision-summary" class="notice" hidden></div><div id="conflict-decisions"></div></section>
@@ -140,7 +142,7 @@ HTML = """<!doctype html>
 <script>
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const pct=v=>`${(Number(v)*100).toFixed(0)}%`;
-let activeDemo=null,checklistIndex=0,checklistSession=null,sopView='concise',reviewSession=null,conflictSession=null;
+let activeDemo=null,checklistIndex=0,checklistSession=null,sopView='concise',reviewSession=null,conflictSession=null,asrCorrectionSession=null;
 const locator=e=>e.locator.page?`PDF第${e.locator.page}页${e.locator.paragraph?' · '+e.locator.paragraph:''}`:`${(e.locator.start_ms/1000).toFixed(1)}–${(e.locator.end_ms/1000).toFixed(1)}秒`;
 const quizAnswer=q=>q.answer===true?'正确':q.answer===false?'错误':Array.isArray(q.answer)?q.answer.join(q.category==='ORDERING'?' → ':'、'):q.answer;
 const evidenceButtons=ids=>(ids||[]).map(id=>`<button class="evidence-link" data-evidence="${esc(id)}" title="点击查看安全定位">${esc(id)}</button>`).join('')||'无';
@@ -150,8 +152,11 @@ function renderChecklist(){if(!activeDemo?.checklist)return;const items=activeDe
 async function apiJson(url,options={}){const r=await fetch(url,options),d=await r.json();if(!r.ok)throw new Error(d.detail||`请求失败 ${r.status}`);return d}
 function renderReview(){const panel=document.querySelector('#review-panel'),summary=document.querySelector('#review-summary'),steps=document.querySelector('#review-steps');if(!reviewSession){summary.hidden=true;steps.innerHTML='';return}const confirmed=reviewSession.steps.filter(x=>x.confirmed).length,locked=reviewSession.steps.filter(x=>x.locked).length;summary.hidden=false;summary.textContent=`会话 ${reviewSession.session_id.slice(0,8)} · ${reviewSession.status} · 已锁定 ${locked}/13 · 已确认 ${confirmed}/13 · 审计事件 ${reviewSession.events.length}`;steps.innerHTML=reviewSession.steps.map(x=>`<div class="step review-step"><strong>${x.position}</strong><div><b>${esc(x.step_id)} ${esc(x.title)}</b><div class="muted">前置：${esc(x.prerequisites.join(', ')||'无')} · 重建${x.rebuild_count}次 · ${x.locked?'已锁定':'未锁定'} · ${x.confirmed?'已确认':'待确认'}</div></div><div class="review-actions"><button class="secondary" data-review-action="up" data-step="${esc(x.step_id)}" data-position="${x.position}" ${x.position===1||x.locked?'disabled':''}>上移</button><button class="secondary" data-review-action="down" data-step="${esc(x.step_id)}" data-position="${x.position}" ${x.position===reviewSession.steps.length||x.locked?'disabled':''}>下移</button><button class="secondary" data-review-action="rebuild" data-step="${esc(x.step_id)}" ${x.locked?'disabled':''}>单步重建</button><button data-review-action="lock" data-step="${esc(x.step_id)}" ${x.confirmed?'disabled':''}>${x.locked?'解锁':'锁定'}</button><button data-review-action="confirm" data-step="${esc(x.step_id)}" ${!x.locked?'disabled':''}>${x.confirmed?'撤回确认':'人工确认'}</button></div></div>`).join('');panel.hidden=false}
 function renderConflictDecisions(){const panel=document.querySelector('#conflict-decision-panel'),summary=document.querySelector('#conflict-decision-summary'),items=document.querySelector('#conflict-decisions');if(!conflictSession){summary.hidden=true;items.innerHTML='';return}const f=conflictSession.finalization;summary.hidden=false;summary.textContent=`会话 ${conflictSession.session_id.slice(0,8)} · ${conflictSession.status} · 已采用 ${f.adopted_conflict_count} · 待人工 ${f.pending_conflict_count} · 拒绝 ${f.rejected_conflict_count} · ${f.publishable?'最终SOP可发布':'最终SOP不可发布'}`;items.innerHTML=conflictSession.decisions.map(x=>`<div class="${x.route==='HUMAN'?'issue':'change'}"><b>${esc(x.conflict_id)} · ${esc(x.kind)} · ${esc(x.route)}</b><div>${esc(x.message)}</div><div>${esc(x.route_reason)}</div><div class="evidence">建议：${esc(x.proposed_action)}｜最终：${esc(x.final_result)}｜变更：${esc(x.change_paths.join(', ')||'由关联变更解决')}｜Evidence：${evidenceButtons(x.evidence_ids)}</div>${x.human_decision==='PENDING'?`<div class="controls"><button data-conflict-action="APPROVED" data-conflict="${esc(x.conflict_id)}">人工批准</button><button class="secondary" data-conflict-action="REJECTED" data-conflict="${esc(x.conflict_id)}">拒绝并保留原内容</button></div>`:''}${x.comment?`<div class="muted">操作者说明：${esc(x.comment)}</div>`:''}</div>`).join('');panel.hidden=false}
+function renderAsrCorrections(){const panel=document.querySelector('#asr-correction-panel'),summary=document.querySelector('#asr-correction-summary'),items=document.querySelector('#asr-correction-answers');if(!asrCorrectionSession){summary.hidden=true;items.innerHTML='';return}const s=asrCorrectionSession.summary;summary.hidden=false;summary.textContent=`会话 ${asrCorrectionSession.session_id.slice(0,8)} · ${asrCorrectionSession.status} · 当前修正 ${s.corrected_answer_count}/${s.answer_count} 段 · 历史事件 ${s.correction_event_count} · Evidence绑定 ${s.evidence_binding_count}`;items.innerHTML=asrCorrectionSession.answers.map(x=>`<div class="${x.correction_state==='CORRECTED'?'change':'step'}"><b>${esc(x.question_id)} · ${esc(x.topic)} · ${(x.start_ms/1000).toFixed(1)}–${(x.end_ms/1000).toFixed(1)}秒</b><details><summary>查看原始ASR与基线文本</summary><div>原始ASR：${esc(x.raw_asr_text)}</div><div>基线校正：${esc(x.baseline_corrected_text)}</div></details><label>当前校正文本<textarea maxlength="5000" data-asr-text="${esc(x.question_id)}">${esc(x.effective_corrected_text)}</textarea></label><label>本次修正原因<input maxlength="500" data-asr-reason="${esc(x.question_id)}" placeholder="例如：复听后修正设备术语"></label><button data-asr-save="${esc(x.question_id)}">保存本段修正</button><div class="evidence">${evidenceButtons([x.evidence_id])} · 摘要 ${esc(x.evidence_binding.current_sha256.slice(0,12))} · 修正${x.correction_count}次 · 必要术语：${esc(x.required_terms.join('、'))}</div>${x.latest_operator?`<div class="muted">最近由 ${esc(x.latest_operator)} 于 ${esc(x.latest_corrected_at)} 修正：${esc(x.latest_reason)}</div>`:''}</div>`).join('');panel.hidden=false}
 async function startConflictDecisions(){const status=document.querySelector('#conflict-decision-status');status.textContent=' 生成中…';try{conflictSession=await apiJson('/api/n31/conflicts/sessions',{method:'POST'});status.textContent=' 已生成并绑定当前Gold结果';renderConflictDecisions()}catch(e){status.textContent=` ${e.message}`}}
 async function decideConflict(button){if(!conflictSession)return;const choice=button.dataset.conflictAction,conflictId=button.dataset.conflict,comment=window.prompt(choice==='APPROVED'?'请填写批准依据':'请填写拒绝原因');if(comment===null)return;const status=document.querySelector('#conflict-decision-status');status.textContent=' 保存裁决中…';try{conflictSession=await apiJson(`/api/n31/conflicts/sessions/${conflictSession.session_id}/decisions/${conflictId}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({human_decision:choice,comment})});status.textContent=' 人工裁决已保存在本机';renderConflictDecisions()}catch(e){status.textContent=` ${e.message}`}}
+async function startAsrCorrections(){const status=document.querySelector('#asr-correction-status');status.textContent=' 载入中…';try{asrCorrectionSession=await apiJson('/api/n31/asr-corrections/sessions',{method:'POST'});status.textContent=' 已绑定当前转写与Gold Evidence';renderAsrCorrections()}catch(e){status.textContent=` ${e.message}`}}
+async function saveAsrCorrection(button){if(!asrCorrectionSession)return;const questionId=button.dataset.asrSave,status=document.querySelector('#asr-correction-status'),text=document.querySelector(`[data-asr-text="${questionId}"]`).value,reason=document.querySelector(`[data-asr-reason="${questionId}"]`).value,operator=document.querySelector('#asr-correction-operator').value;status.textContent=' 保存并重绑Evidence中…';try{asrCorrectionSession=await apiJson(`/api/n31/asr-corrections/sessions/${asrCorrectionSession.session_id}/answers/${questionId}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({corrected_text:text,operator,reason})});status.textContent=' 修正历史和Evidence摘要已保存在本机';renderAsrCorrections()}catch(e){status.textContent=` ${e.message}`}}
 async function startReview(){const status=document.querySelector('#review-status');status.textContent=' 创建中…';try{reviewSession=await apiJson('/api/n31/review/sessions',{method:'POST'});status.textContent=' 审核会话已创建';renderReview()}catch(e){status.textContent=` ${e.message}`}}
 async function reviewAction(button){if(!reviewSession)return;const action=button.dataset.reviewAction,stepId=button.dataset.step,status=document.querySelector('#review-status');status.textContent=' 保存中…';try{const current=reviewSession.steps.find(x=>x.step_id===stepId);if(action==='up'||action==='down'){const target=Number(button.dataset.position)+(action==='up'?-1:1);reviewSession=await apiJson(`/api/n31/review/sessions/${reviewSession.session_id}/reorder`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({step_id:stepId,target_position:target})})}else if(action==='lock'){reviewSession=await apiJson(`/api/n31/review/sessions/${reviewSession.session_id}/steps/${stepId}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({locked:!current.locked})})}else if(action==='confirm'){reviewSession=await apiJson(`/api/n31/review/sessions/${reviewSession.session_id}/steps/${stepId}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({confirmed:!current.confirmed})})}else if(action==='rebuild'){const d=await apiJson(`/api/n31/review/sessions/${reviewSession.session_id}/steps/${stepId}/rebuild`,{method:'POST'});reviewSession=await apiJson(`/api/n31/review/sessions/${reviewSession.session_id}`);document.querySelector('#review-rebuild-result').innerHTML=`<div class="change"><b>${esc(d.step_id)} 单步重建 #${esc(d.rebuild_number)}</b><div>只重建三种SOP视图、1个检查卡和测验 ${esc(d.scope.quiz_question_ids.join(', ')||'无关联题')}；其余${esc(d.scope.unchanged_step_count)}步保持不变。</div><div class="evidence">Evidence：${evidenceButtons(d.evidence_ids)}｜外部模型调用 ${esc(d.scope.external_model_calls)}</div></div>`}status.textContent=' 已保存';renderReview()}catch(e){status.textContent=` ${e.message}`}}
 async function showEvidence(evidenceId){const panel=document.querySelector('#evidence-panel'),detail=document.querySelector('#evidence-detail');panel.hidden=false;detail.innerHTML='<div class="notice">正在读取安全定位…</div>';panel.scrollIntoView({behavior:'smooth',block:'start'});try{const d=await apiJson(`/api/n31/evidence/${evidenceId}`);detail.innerHTML=`<div class="result"><b>${esc(d.evidence_id)} · ${esc(d.navigation.label)}</b><div>${esc(d.claim)}</div><div class="evidence">${esc(d.source_type)} · ${esc(d.source_ref)} · ${esc(d.classification)} · ${esc(d.review_status)} · 绑定步骤 ${esc(d.step_ids.join(', ')||'无')}</div>${d.navigation.safe_preview_url?`<img src="${esc(d.navigation.safe_preview_url)}" alt="${esc(d.evidence_id)}安全预览">`:''}<div class="notice">仅显示结构化页码或时间点${d.navigation.safe_preview_url?'及已审核安全预览':''}；不提供原始素材链接。</div></div>`}catch(e){detail.innerHTML=`<div class="notice">${esc(e.message)}</div>`}}
@@ -160,7 +165,7 @@ document.querySelector('#metrics-title').textContent=isGold?'N31 真实素材 Go
 document.querySelector('#basis').textContent=isGold?'实际操作者口述审核 · Gold v1 · 最终评测指标。':isReal?'候选基准 · 非 Gold · 指标仅用于证明闭环可运行，等待操作者审核后重跑最终评测。':'明确标注的无版权模拟数据，不作为真实案例评测。';
 document.querySelector('#metrics').innerHTML=[['必要步骤',`${pct(b.required_step_coverage)} → ${pct(a.required_step_coverage)}`],['证据覆盖',`${pct(b.evidence_supported_required_steps)} → ${pct(a.evidence_supported_required_steps)}`],['严重错误',`${b.severe_error_count} → ${a.severe_error_count}`],['局部修改',d.summary.revision_count],['状态',isReal?d.summary.gold_status||'NOT_GOLD':d.summary.workflow_state]].map(x=>`<div class="metric"><span class="muted">${esc(x[0])}</span><strong>${esc(x[1])}</strong></div>`).join('');
 if(d.workflow){const w=d.workflow,attempts=w.stage_attempts,events=w.history,failures=events.filter(x=>x.event_type==='FAILURE').length,reruns=events.filter(x=>x.event_type==='RERUN').length,sr=d.stage_run,reused=sr?sr.stages.filter(x=>x.execution==='REUSED').length:0,rebuilt=sr?sr.stages.filter(x=>x.execution==='REBUILT').length:0;document.querySelector('#workflow-panel').hidden=false;document.querySelector('#workflow-metrics').innerHTML=[['当前状态',w.state],['执行阶段',Object.values(attempts).filter(x=>x>0).length],['质检轮次',attempts.VERIFYING],['复用/重建',sr?`${reused}/${rebuilt}`:'离线包'],['阶段重跑',reruns]].map(x=>`<div class="metric"><span class="muted">${esc(x[0])}</span><strong>${esc(x[1])}</strong></div>`).join('');document.querySelector('#workflow-note').textContent=sr?`当前发布 ${sr.run_id.slice(0,8)} · 从${sr.start_stage}执行 · 发布摘要 ${sr.release_digest.slice(0,12)}；阶段产物已逐文件校验，失败版本不切换当前指针。`:'离线兜底包含已校验工作流检查点；点击完整运行后可演示真实产物阶段重跑。';document.querySelector('#workflow-events').innerHTML=events.slice(-6).map(x=>`<div class="change"><b>${esc(x.event_type)} · ${esc(x.from_state)} → ${esc(x.to_state)} · 第${esc(x.attempt)}次</b><div>${esc(x.reason||'无补充说明')}</div>${x.invalidated_states.length?`<div class="evidence">下游失效：${esc(x.invalidated_states.join(', '))}</div>`:''}</div>`).join('')}
-document.querySelector('#review-panel').hidden=!isGold;document.querySelector('#conflict-decision-panel').hidden=!isGold;if(isGold){renderReview();renderConflictDecisions()}
+document.querySelector('#review-panel').hidden=!isGold;document.querySelector('#asr-correction-panel').hidden=!isGold;document.querySelector('#conflict-decision-panel').hidden=!isGold;if(isGold){renderReview();renderAsrCorrections();renderConflictDecisions()}
 if(d.dgx_visual_compute){const g=d.dgx_visual_compute,s=g.summary;document.querySelector('#dgx-panel').hidden=false;document.querySelector('#dgx-metrics').innerHTML=[['GPU',g.gpu.device_name],['本地视频',s.processed_video_count],['GPU处理帧',s.sampled_frame_count],['候选帧',s.selected_frame_count],['CUDA核耗时',`${Number(s.gpu_kernel_ms).toFixed(1)}ms`]].map(x=>`<div class="metric"><span class="muted">${esc(x[0])}</span><strong>${esc(x[1])}</strong></div>`).join('');document.querySelector('#agent-trace').innerHTML=g.agent_trace.map(x=>`<div class="change"><b>${esc(x.event_id)} · ${esc(x.agent)} · ${esc(x.action)}</b><div>${esc(x.decision)}</div><div class="evidence">工具：${esc(x.tool)}｜结果：${esc(x.outcome)}</div></div>`).join('')}
 if(d.temporal_action_windows){const t=d.temporal_action_windows,s=t.summary;document.querySelector('#temporal-panel').hidden=false;document.querySelector('#temporal-metrics').innerHTML=[['Gold步骤',s.step_count],['连续窗口',s.window_count],['视频来源',s.source_count],['DGX候选命中窗口',s.window_with_dgx_candidate_count],['独立DGX候选',s.unique_dgx_candidate_count]].map(x=>`<div class="metric"><span class="muted">${esc(x[0])}</span><strong>${esc(x[1])}</strong></div>`).join('');document.querySelector('#temporal-note').textContent='窗口只把同一视频时间线内的相邻Evidence区间合并，并绑定附近DGX场景候选；它用于定位人工/模型复核范围，不自动证明动作完成。';document.querySelector('#temporal-windows').innerHTML=t.windows.slice(0,6).map(w=>`<div class="change"><b>${esc(w.window_id)} · ${esc(w.title)}</b><div>${esc(w.source_ref)}｜${(w.start_ms/1000).toFixed(1)}–${(w.end_ms/1000).toFixed(1)}秒｜视觉${esc(w.visual_verdict)}</div><div class="evidence">Evidence：${esc(w.evidence_ids.join(', '))}｜DGX候选：${esc(w.dgx_candidate_timestamps_ms.map(v=>(v/1000).toFixed(1)+'s').join(', ')||'无')}</div></div>`).join('')}
 if(d.pdf_structure){const p=d.pdf_structure,s=p.summary;document.querySelector('#pdf-panel').hidden=false;document.querySelector('#pdf-metrics').innerHTML=[['手册',s.source_count],['页数',s.page_count],['结构块',s.block_count],['OCR处理页',s.ocr_applied_page_count],['待OCR页',s.needs_ocr_page_count],['检索验证',`${s.passed_query_count}/${s.query_count}`]].map(x=>`<div class="metric"><span class="muted">${esc(x[0])}</span><strong>${esc(x[1])}</strong></div>`).join('');document.querySelector('#pdf-note').textContent='原始手册、页面图和含正文检索索引只保存在本地；Web只展示不含正文的页码级验证报告。';document.querySelector('#pdf-queries').innerHTML=p.queries.map(q=>{const h=q.top_hits[0];return `<div class="change"><b>${esc(q.query_id)} · ${esc(q.query)}</b><div>${esc(q.status)}｜精确命中${esc(q.exact_match_count)}条</div><div class="evidence">${h?`首条：${esc(h.source_ref)} PDF第${esc(h.page)}页｜${esc(h.kind)}`:'无检索结果'}</div></div>`}).join('')}
@@ -178,7 +183,7 @@ async function loadDemo(){let r=await fetch('/api/n31');if(r.ok){renderDemo(awai
 document.querySelector('#rerun').addEventListener('click',async()=>{const s=document.querySelector('#rerun-status');s.textContent=' 运行中…';const r=await fetch('/api/n31/run',{method:'POST'});const d=await r.json();s.textContent=r.ok?` 完成：严重错误 ${d.before.severe_error_count} → ${d.after.severe_error_count}`:` 失败：${d.detail||'未知错误'}`;if(r.ok)await loadDemo()});
 document.querySelector('#stage-rerun').addEventListener('click',async()=>{const s=document.querySelector('#rerun-status'),stage=document.querySelector('#stage-select').value;s.textContent=` 从 ${stage} 重跑中…`;const r=await fetch(`/api/n31/stages/${stage}/rerun`,{method:'POST'}),d=await r.json();s.textContent=r.ok?` 完成：复用 ${d.reused_stages.length} 阶段，重建 ${d.rebuilt_stages.length} 阶段`:` 失败：${d.detail||'未知错误'}`;if(r.ok)await loadDemo()});
 document.querySelectorAll('.sop-tab').forEach(b=>b.addEventListener('click',()=>{sopView=b.dataset.view;renderSopView()}));document.querySelector('#check-prev').addEventListener('click',()=>{if(checklistIndex>0){checklistIndex--;renderChecklist()}});document.querySelector('#check-next').addEventListener('click',()=>{if(checklistIndex<(activeDemo?.checklist.items.length||1)-1){checklistIndex++;renderChecklist()}});document.querySelector('#feedback-submit').addEventListener('click',async()=>{const status=document.querySelector('#checklist-status'),comment=document.querySelector('#feedback-comment').value.trim(),item=activeDemo.checklist.items[checklistIndex];if(!comment){status.textContent=' 请先填写问题';return}status.textContent=' 保存中…';try{const session=await ensureChecklistSession();const r=await fetch(`/api/n31/checklist/sessions/${session.session_id}/items/${item.step_id}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({feedback_category:document.querySelector('#feedback-category').value,feedback_comment:comment})});const d=await r.json();if(!r.ok)throw new Error(d.detail||'保存失败');checklistSession=d;document.querySelector('#feedback-comment').value='';status.textContent=' 反馈已保存在本机';renderChecklist()}catch(e){status.textContent=` ${e.message}`}});
-document.querySelector('#review-start').addEventListener('click',startReview);document.querySelector('#conflict-decision-start').addEventListener('click',startConflictDecisions);document.addEventListener('click',e=>{const evidence=e.target.closest('[data-evidence]');if(evidence){showEvidence(evidence.dataset.evidence);return}const conflict=e.target.closest('[data-conflict-action]');if(conflict){decideConflict(conflict);return}const review=e.target.closest('[data-review-action]');if(review)reviewAction(review)});
+document.querySelector('#review-start').addEventListener('click',startReview);document.querySelector('#asr-correction-start').addEventListener('click',startAsrCorrections);document.querySelector('#conflict-decision-start').addEventListener('click',startConflictDecisions);document.addEventListener('click',e=>{const evidence=e.target.closest('[data-evidence]');if(evidence){showEvidence(evidence.dataset.evidence);return}const asr=e.target.closest('[data-asr-save]');if(asr){saveAsrCorrection(asr);return}const conflict=e.target.closest('[data-conflict-action]');if(conflict){decideConflict(conflict);return}const review=e.target.closest('[data-review-action]');if(review)reviewAction(review)});
 document.querySelector('#upload').addEventListener('submit',async e=>{e.preventDefault();const status=document.querySelector('#status');status.textContent='处理中…';const r=await fetch('/api/ingest',{method:'POST',body:new FormData(e.target)});const d=await r.json();status.textContent=r.ok?'完成':'失败';document.querySelector('#ingest').textContent=JSON.stringify(d,null,2)});loadDemo();
 </script></body></html>"""
 
@@ -360,6 +365,7 @@ def create_app(
     checklist_sessions = ChecklistSessionStore(root / "checklist_sessions")
     review_sessions = SopReviewSessionStore(root / "sop_review_sessions")
     conflict_decisions = ConflictDecisionStore(root / "conflict_decisions")
+    asr_corrections = AsrCorrectionStore(root / "asr_correction_sessions")
     app = FastAPI(title="SkillForge", version="0.1.0")
 
     def active_n31_sop() -> dict[str, Any]:
@@ -398,6 +404,15 @@ def create_app(
         audit = validate_document(payload["revision_audit"], "revision_audit.schema.json")
         final = validate_document(payload["final_conflicts"], "conflict.schema.json")
         return initial, audit, active_n31_sop(), final
+
+    def active_asr_sources() -> tuple[dict[str, Any], dict[str, Any]]:
+        path = ROOT / "cases/n31/gold/expert_transcript.json"
+        if not path.is_file():
+            raise HTTPException(status_code=404, detail="N31专家转写尚未生成")
+        transcript = _read_json(path)
+        if not isinstance(transcript, dict):
+            raise HTTPException(status_code=409, detail="N31专家转写格式无效")
+        return transcript, active_n31_sop()
 
     @app.get("/", response_class=HTMLResponse)
     def index() -> str:
@@ -563,6 +578,50 @@ def create_app(
     @app.post("/api/n31/review/sessions")
     def create_review_session() -> dict[str, Any]:
         return review_sessions.create(active_n31_sop())
+
+    @app.post("/api/n31/asr-corrections/sessions")
+    def create_asr_correction_session() -> dict[str, Any]:
+        try:
+            return asr_corrections.create(*active_asr_sources())
+        except ValueError as exc:
+            raise HTTPException(status_code=409, detail=f"ASR修正来源校验失败: {str(exc)[:300]}") from exc
+
+    @app.get("/api/n31/asr-corrections/sessions/{session_id}")
+    def get_asr_correction_session(session_id: str) -> dict[str, Any]:
+        try:
+            return asr_corrections.get_bound(session_id, *active_asr_sources())
+        except FileNotFoundError as exc:
+            raise HTTPException(status_code=404, detail="ASR修正会话不存在") from exc
+        except ValueError as exc:
+            raise HTTPException(status_code=409, detail=str(exc)) from exc
+
+    @app.patch(
+        "/api/n31/asr-corrections/sessions/{session_id}/answers/{question_id}"
+    )
+    def correct_asr_answer(
+        session_id: str,
+        question_id: str,
+        payload: dict[str, Any] = Body(...),
+    ) -> dict[str, Any]:
+        if set(payload) != {"corrected_text", "operator", "reason"} or any(
+            not isinstance(payload[key], str) for key in payload
+        ):
+            raise HTTPException(status_code=400, detail="ASR修正请求字段无效")
+        try:
+            sources = active_asr_sources()
+            return asr_corrections.correct(
+                session_id,
+                question_id,
+                corrected_text=payload["corrected_text"],
+                operator=payload["operator"],
+                reason=payload["reason"],
+                transcript=sources[0],
+                gold_sop=sources[1],
+            )
+        except FileNotFoundError as exc:
+            raise HTTPException(status_code=404, detail="ASR修正会话不存在") from exc
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
 
     @app.post("/api/n31/conflicts/sessions")
     def create_conflict_decision_session() -> dict[str, Any]:

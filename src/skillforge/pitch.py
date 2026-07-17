@@ -523,6 +523,42 @@ def _check_demo_modes(runbook: dict[str, Any], root: Path) -> dict[str, Any]:
     health = client.get("/health")
     payload = client.get("/api/n31")
     conflict_session = client.post("/api/n31/conflicts/sessions")
+    asr_session = client.post("/api/n31/asr-corrections/sessions")
+    asr_session_payload = asr_session.json() if asr_session.status_code == 200 else {}
+    asr_q02 = next(
+        (
+            item
+            for item in asr_session_payload.get("answers", [])
+            if item.get("question_id") == "Q02"
+        ),
+        None,
+    )
+    asr_correction = (
+        client.patch(
+            f"/api/n31/asr-corrections/sessions/{asr_session_payload['session_id']}/answers/Q02",
+            json={
+                "corrected_text": asr_q02["effective_corrected_text"]
+                + " 人工复听确认。",
+                "operator": "路演自动验收操作者",
+                "reason": "验证ASR修正历史和Evidence摘要重绑",
+            },
+        )
+        if asr_q02 is not None
+        else None
+    )
+    asr_correction_payload = (
+        asr_correction.json()
+        if asr_correction is not None and asr_correction.status_code == 200
+        else {}
+    )
+    asr_corrected_q02 = next(
+        (
+            item
+            for item in asr_correction_payload.get("answers", [])
+            if item.get("question_id") == "Q02"
+        ),
+        None,
+    )
     safety_probe = dict(payload.json()["initial_conflicts"]["conflicts"][0])
     safety_probe.update(
         {
@@ -632,6 +668,28 @@ def _check_demo_modes(runbook: dict[str, Any], root: Path) -> dict[str, Any]:
             "MISSING_EVIDENCE",
             "INVALID_EVIDENCE",
         ],
+        "asr_correction_auditable": asr_session.status_code == 200
+        and asr_q02 is not None
+        and asr_correction is not None
+        and asr_correction.status_code == 200
+        and asr_corrected_q02 is not None
+        and asr_correction_payload.get("status") == "CORRECTED"
+        and asr_correction_payload.get("summary", {}).get("corrected_answer_count")
+        == 1
+        and asr_correction_payload.get("summary", {}).get("correction_event_count")
+        == 1
+        and asr_corrected_q02["raw_asr_text"] == asr_q02["raw_asr_text"]
+        and asr_corrected_q02["evidence_binding"]["current_sha256"]
+        != asr_q02["evidence_binding"]["baseline_sha256"]
+        and asr_correction_payload.get("data_policy")
+        == {
+            "storage_scope": "LOCAL_PRIVATE_ONLY",
+            "external_model_calls": 0,
+            "contains_raw_transcript_snippets": True,
+            "contains_raw_media": False,
+            "contains_credentials": False,
+            "contains_absolute_paths": False,
+        },
         "workflow_checkpoint_safe": payload.status_code == 200
         and payload.json().get("workflow", {}).get("version") == 1
         and payload.json().get("workflow", {}).get("state") == "COMPLETED"
