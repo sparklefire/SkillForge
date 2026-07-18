@@ -17,6 +17,11 @@ from typing import Any, Iterable
 
 from .contracts import ContractValidationError, validate_document
 from .demo import ROOT
+from .final_rehearsal import (
+    FinalRehearsalError,
+    final_rehearsal_qa_issue,
+    verify_final_rehearsal,
+)
 from .human_gates import HumanGateStore
 from .pitch import build_readiness
 from .project_board import ProjectBoardError, build_project_board_status
@@ -379,6 +384,73 @@ def _check_team_roster_private_state(
     )
 
 
+def _check_final_rehearsal_private_state(
+    root: Path,
+    confirmed_gate_ids: set[str] | None = None,
+    rehearsal_path: Path | None = None,
+    qa_path: Path | None = None,
+) -> dict[str, Any]:
+    confirmed_gate_ids = confirmed_gate_ids or set()
+    rehearsal_path = (
+        rehearsal_path.resolve()
+        if rehearsal_path is not None
+        else (root / "outputs/submission/final_stage_rehearsal.json").resolve()
+    )
+    qa_path = (
+        qa_path.resolve()
+        if qa_path is not None
+        else rehearsal_path.parent / "final_stage_rehearsal_qa.json"
+    )
+    if not rehearsal_path.exists():
+        if qa_path.exists() or "FINAL_STAGE_REHEARSAL" in confirmed_gate_ids:
+            return _check(
+                "FINAL_REHEARSAL_PRIVATE_STATE",
+                "FAILED",
+                "彩排QA或人工确认存在，但绑定的私有计时记录缺失",
+            )
+        return _check(
+            "FINAL_REHEARSAL_PRIVATE_STATE",
+            "PASSED",
+            "私有180秒彩排记录状态=ABSENT；彩排人工门禁保持待确认",
+        )
+    try:
+        report = verify_final_rehearsal(
+            rehearsal_path,
+            runbook_path=root / "cases/n31/pitch_runbook.json",
+            policy_path=root / "config/final_rehearsal_policy.json",
+            private_root=rehearsal_path.parent,
+        )
+        issue = final_rehearsal_qa_issue(
+            qa_path,
+            {
+                "kind": "LOCAL_FILE",
+                "locator": str(rehearsal_path),
+                "sha256": report["record_sha256"],
+                "size_bytes": report["record_bytes"],
+            },
+            runbook_path=root / "cases/n31/pitch_runbook.json",
+            policy_path=root / "config/final_rehearsal_policy.json",
+        )
+        if issue:
+            raise FinalRehearsalError(issue)
+    except (OSError, FinalRehearsalError, ContractValidationError) as exc:
+        return _check(
+            "FINAL_REHEARSAL_PRIVATE_STATE",
+            "FAILED",
+            f"私有彩排记录不完整或已失效；错误类型={type(exc).__name__}",
+        )
+    return _check(
+        "FINAL_REHEARSAL_PRIVATE_STATE",
+        "PASSED",
+        (
+            f"私有彩排机器检查通过；分段={report['phase_count']}; "
+            f"总时长={report['duration']['actual_ms']}毫秒; "
+            "彩排人工门禁="
+            f"{'CONFIRMED' if 'FINAL_STAGE_REHEARSAL' in confirmed_gate_ids else 'PENDING'}"
+        ),
+    )
+
+
 def _check_pitch_package(
     root: Path,
     confirmed_gate_ids: set[str],
@@ -546,6 +618,8 @@ def build_submission_preflight(
     allow_missing_git: bool = False,
     confirmations_path: Path | None = None,
     team_roster_path: Path | None = None,
+    final_rehearsal_path: Path | None = None,
+    final_rehearsal_qa_path: Path | None = None,
 ) -> dict[str, Any]:
     root = root.resolve()
     confirmation_check, confirmed_gate_ids = _check_human_gate_confirmations(
@@ -568,6 +642,12 @@ def build_submission_preflight(
             root,
             confirmed_gate_ids,
             roster_path=team_roster_path,
+        ),
+        _check_final_rehearsal_private_state(
+            root,
+            confirmed_gate_ids,
+            rehearsal_path=final_rehearsal_path,
+            qa_path=final_rehearsal_qa_path,
         ),
         confirmation_check,
         pitch_check,

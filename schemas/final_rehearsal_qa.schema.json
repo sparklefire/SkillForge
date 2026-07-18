@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/final_rehearsal_qa.schema.json",
+  "title": "SkillForge Private Final Stage Rehearsal QA",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "case_id", "artifact_type", "checked_at", "status", "record_sha256", "record_bytes", "runbook_sha256", "policy_sha256", "duration", "phase_count", "checks", "human_gate_status", "official_rules_boundary", "data_policy"],
+  "properties": {
+    "version": {"const": 1},
+    "case_id": {"const": "n31_media_change"},
+    "artifact_type": {"const": "FINAL_STAGE_REHEARSAL_QA"},
+    "checked_at": {"type": "string", "format": "date-time"},
+    "status": {"const": "READY_FOR_HUMAN_CONFIRMATION"},
+    "record_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "record_bytes": {"type": "integer", "minimum": 1},
+    "runbook_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "policy_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "duration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["actual_ms", "minimum_ms", "maximum_ms", "headroom_ms"],
+      "properties": {
+        "actual_ms": {"type": "integer", "minimum": 175000, "maximum": 180000},
+        "minimum_ms": {"const": 175000},
+        "maximum_ms": {"const": 180000},
+        "headroom_ms": {"type": "integer", "minimum": 0, "maximum": 5000}
+      }
+    },
+    "phase_count": {"const": 7},
+    "checks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["phase_order_matches_runbook", "planned_timeline_matches_runbook", "actual_timeline_contiguous", "actual_total_matches", "duration_within_internal_target", "all_scripts_completed", "all_operator_actions_completed", "all_proof_points_verified", "all_fallbacks_ready", "full_sequence_completed", "no_unrecovered_failure", "no_sensitive_material_shown"],
+      "properties": {
+        "phase_order_matches_runbook": {"const": true},
+        "planned_timeline_matches_runbook": {"const": true},
+        "actual_timeline_contiguous": {"const": true},
+        "actual_total_matches": {"const": true},
+        "duration_within_internal_target": {"const": true},
+        "all_scripts_completed": {"const": true},
+        "all_operator_actions_completed": {"const": true},
+        "all_proof_points_verified": {"const": true},
+        "all_fallbacks_ready": {"const": true},
+        "full_sequence_completed": {"const": true},
+        "no_unrecovered_failure": {"const": true},
+        "no_sensitive_material_shown": {"const": true}
+      }
+    },
+    "human_gate_status": {"const": "PENDING"},
+    "official_rules_boundary": {
+      "const": {
+        "policy_basis": "INTERNAL_STAGE_REHEARSAL_TARGET_NOT_OFFICIAL_RULE",
+        "official_video_requirements_verified": false
+      }
+    },
+    "data_policy": {
+      "const": {
+        "private_local_state": true,
+        "contains_personal_data": false,
+        "contains_notes": false,
+        "contains_credentials": false,
+        "contains_absolute_paths": false,
+        "human_confirmation_generated": false
+      }
+    }
+  }
+}

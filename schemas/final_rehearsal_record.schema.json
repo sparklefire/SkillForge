@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/final_rehearsal_record.schema.json",
+  "title": "SkillForge Private Final Stage Rehearsal Record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "case_id", "updated_at", "status", "performed_at", "run_number", "timer_source", "total_duration_ms", "segments", "completion", "notes", "data_policy"],
+  "properties": {
+    "version": {"const": 1},
+    "case_id": {"const": "n31_media_change"},
+    "updated_at": {"type": "string", "format": "date-time"},
+    "status": {"enum": ["PENDING_INPUT", "READY_FOR_CHECK"]},
+    "performed_at": {"anyOf": [{"type": "null"}, {"type": "string", "format": "date-time"}]},
+    "run_number": {"anyOf": [{"type": "null"}, {"type": "integer", "minimum": 1, "maximum": 999}]},
+    "timer_source": {"anyOf": [{"type": "null"}, {"enum": ["STOPWATCH", "SCREEN_RECORDING", "OTHER_MONOTONIC_TIMER"]}]},
+    "total_duration_ms": {"anyOf": [{"type": "null"}, {"type": "integer", "minimum": 1, "maximum": 600000}]},
+    "segments": {
+      "type": "array",
+      "minItems": 7,
+      "maxItems": 7,
+      "items": {"$ref": "#/$defs/segment"}
+    },
+    "completion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["full_sequence_completed", "no_unrecovered_failure", "no_sensitive_material_shown"],
+      "properties": {
+        "full_sequence_completed": {"type": "boolean"},
+        "no_unrecovered_failure": {"type": "boolean"},
+        "no_sensitive_material_shown": {"type": "boolean"}
+      }
+    },
+    "notes": {"type": "string", "maxLength": 2000},
+    "data_policy": {
+      "const": {
+        "private_local_state": true,
+        "contains_personal_data": false,
+        "contains_credentials": false,
+        "git_tracked": false
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"status": {"const": "READY_FOR_CHECK"}}},
+      "then": {
+        "properties": {
+          "performed_at": {"type": "string", "format": "date-time"},
+          "run_number": {"type": "integer", "minimum": 1},
+          "timer_source": {"enum": ["STOPWATCH", "SCREEN_RECORDING", "OTHER_MONOTONIC_TIMER"]},
+          "total_duration_ms": {"type": "integer", "minimum": 1},
+          "segments": {
+            "items": {
+              "properties": {
+                "actual_start_ms": {"type": "integer", "minimum": 0},
+                "actual_end_ms": {"type": "integer", "minimum": 1},
+                "script_completed": {"const": true},
+                "operator_action_completed": {"const": true},
+                "proof_points_verified": {"const": true},
+                "fallback_ready": {"const": true}
+              }
+            }
+          },
+          "completion": {
+            "properties": {
+              "full_sequence_completed": {"const": true},
+              "no_unrecovered_failure": {"const": true},
+              "no_sensitive_material_shown": {"const": true}
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "phase": {"enum": ["PROBLEM", "INPUTS", "LOCAL_EXTRACTION", "VERIFY_AND_REVISE", "OUTPUTS", "METRICS", "PLATFORM_VALUE"]},
+    "segment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["phase", "planned_start_ms", "planned_end_ms", "actual_start_ms", "actual_end_ms", "script_completed", "operator_action_completed", "proof_points_verified", "fallback_ready"],
+      "properties": {
+        "phase": {"$ref": "#/$defs/phase"},
+        "planned_start_ms": {"type": "integer", "minimum": 0, "maximum": 180000},
+        "planned_end_ms": {"type": "integer", "minimum": 1, "maximum": 180000},
+        "actual_start_ms": {"anyOf": [{"type": "null"}, {"type": "integer", "minimum": 0, "maximum": 600000}]},
+        "actual_end_ms": {"anyOf": [{"type": "null"}, {"type": "integer", "minimum": 1, "maximum": 600000}]},
+        "script_completed": {"type": "boolean"},
+        "operator_action_completed": {"type": "boolean"},
+        "proof_points_verified": {"type": "boolean"},
+        "fallback_ready": {"type": "boolean"}
+      }
+    }
+  }
+}

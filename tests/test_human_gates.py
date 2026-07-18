@@ -9,9 +9,17 @@ import pytest
 import skillforge.final_recording as final_recording_module
 from skillforge.contracts import validate_document
 from skillforge.final_recording import evaluate_final_recording, write_private_report
+from skillforge.final_rehearsal import (
+    _write_private_json as _write_rehearsal_json,
+    initialize_final_rehearsal,
+    verify_final_rehearsal,
+)
 from skillforge.human_gates import HumanGateError, HumanGateStore
 from skillforge.submission import build_submission_preflight
-from skillforge.team_roster import _write_private_json, initialize_team_roster
+from skillforge.team_roster import (
+    _write_private_json as _write_roster_json,
+    initialize_team_roster,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -67,10 +75,65 @@ def _ready_recording(private: Path) -> Path:
     return recording
 
 
+def _ready_rehearsal(private: Path, runbook: Path = RUNBOOK) -> Path:
+    record = private / "final_stage_rehearsal.json"
+    initialize_final_rehearsal(record, runbook_path=runbook, private_root=private)
+    runbook_document = json.loads(runbook.read_text(encoding="utf-8"))
+    boundaries = [0, 20000, 40000, 70000, 110000, 140000, 160000, 178000]
+    document = {
+        "version": 1,
+        "case_id": "n31_media_change",
+        "updated_at": "2026-07-19T01:00:00+00:00",
+        "status": "READY_FOR_CHECK",
+        "performed_at": "2026-07-19T00:30:00+00:00",
+        "run_number": 1,
+        "timer_source": "STOPWATCH",
+        "total_duration_ms": boundaries[-1],
+        "segments": [
+            {
+                "phase": segment["phase"],
+                "planned_start_ms": segment["start_ms"],
+                "planned_end_ms": segment["end_ms"],
+                "actual_start_ms": boundaries[index],
+                "actual_end_ms": boundaries[index + 1],
+                "script_completed": True,
+                "operator_action_completed": True,
+                "proof_points_verified": True,
+                "fallback_ready": True,
+            }
+            for index, segment in enumerate(runbook_document["segments"])
+        ],
+        "completion": {
+            "full_sequence_completed": True,
+            "no_unrecovered_failure": True,
+            "no_sensitive_material_shown": True,
+        },
+        "notes": "",
+        "data_policy": {
+            "private_local_state": True,
+            "contains_personal_data": False,
+            "contains_credentials": False,
+            "git_tracked": False,
+        },
+    }
+    _write_rehearsal_json(document, record, private_root=private)
+    report = verify_final_rehearsal(
+        record,
+        runbook_path=runbook,
+        private_root=private,
+    )
+    _write_rehearsal_json(
+        report,
+        private / "final_stage_rehearsal_qa.json",
+        private_root=private,
+    )
+    return record
+
+
 def _ready_team_roster(private: Path) -> Path:
     roster_path = private / "team_roster.json"
     initialize_team_roster(roster_path, private_root=private)
-    _write_private_json(
+    _write_roster_json(
         {
             "version": 1,
             "case_id": "n31_media_change",
@@ -151,18 +214,20 @@ def test_confirmation_is_private_hash_bound_and_revocable(tmp_path: Path) -> Non
 
 def test_changed_evidence_invalidates_confirmation(tmp_path: Path) -> None:
     runbook = _copied_runbook(tmp_path)
-    evidence = tmp_path / "rehearsal.txt"
-    evidence.write_text("180秒", encoding="utf-8")
-    store = HumanGateStore(tmp_path / "private" / "state.json", runbook_path=runbook)
+    private = tmp_path / "private"
+    evidence = _ready_rehearsal(private, runbook)
+    store = HumanGateStore(private / "state.json", runbook_path=runbook)
     store.confirm(GATE_IDS[1], reviewer="审核人", evidence_file=evidence)
 
-    evidence.write_text("181秒", encoding="utf-8")
+    document = json.loads(evidence.read_text(encoding="utf-8"))
+    document["notes"] = "彩排记录已变化"
+    _write_rehearsal_json(document, evidence, private_root=private)
     audit = store.audit()
 
     assert audit["valid"] is False
     assert audit["store_state"] == "INVALID"
     assert audit["confirmed_gate_ids"] == []
-    assert audit["issues"] == [f"EVIDENCE_HASH_CHANGED:{GATE_IDS[1]}"]
+    assert audit["issues"] == [f"EVIDENCE_SIZE_CHANGED:{GATE_IDS[1]}"]
 
 
 def test_missing_evidence_invalidates_confirmation(tmp_path: Path) -> None:
@@ -230,7 +295,7 @@ def test_team_gate_requires_and_binds_current_private_roster(tmp_path: Path) -> 
 
     roster = json.loads(roster_path.read_text(encoding="utf-8"))
     roster["members"][0]["organization"] = "变更后的测试单位"
-    _write_private_json(roster, roster_path, private_root=private)
+    _write_roster_json(roster, roster_path, private_root=private)
     stale = store.audit()
     assert stale["valid"] is False
     assert stale["confirmed_gate_ids"] == []
@@ -239,9 +304,9 @@ def test_team_gate_requires_and_binds_current_private_roster(tmp_path: Path) -> 
 
 def test_changed_runbook_makes_all_private_confirmations_stale(tmp_path: Path) -> None:
     runbook = _copied_runbook(tmp_path)
-    evidence = tmp_path / "recording.txt"
-    evidence.write_text("recording sha evidence", encoding="utf-8")
-    store = HumanGateStore(tmp_path / "private" / "state.json", runbook_path=runbook)
+    private = tmp_path / "private"
+    evidence = _ready_rehearsal(private, runbook)
+    store = HumanGateStore(private / "state.json", runbook_path=runbook)
     store.confirm(GATE_IDS[1], reviewer="审核人", evidence_file=evidence)
 
     payload = json.loads(runbook.read_text(encoding="utf-8"))
@@ -320,6 +385,7 @@ def test_valid_private_confirmations_remove_only_human_gates_from_preflight(
     evidence.write_text("explicit human confirmation", encoding="utf-8")
     private = tmp_path / "private"
     recording = _ready_recording(private)
+    rehearsal = _ready_rehearsal(private)
     roster_path = _ready_team_roster(private)
     store_path = private / "human_gate_confirmations.json"
     store = HumanGateStore(store_path, runbook_path=RUNBOOK)
@@ -327,7 +393,11 @@ def test_valid_private_confirmations_remove_only_human_gates_from_preflight(
         store.confirm(
             gate_id,
             reviewer="测试审核人",
-            evidence_file=recording if gate_id == GATE_IDS[2] else evidence,
+            evidence_file=(
+                rehearsal
+                if gate_id == GATE_IDS[1]
+                else recording if gate_id == GATE_IDS[2] else evidence
+            ),
         )
 
     report = build_submission_preflight(
@@ -337,6 +407,8 @@ def test_valid_private_confirmations_remove_only_human_gates_from_preflight(
         allow_missing_git=True,
         confirmations_path=store_path,
         team_roster_path=roster_path,
+        final_rehearsal_path=rehearsal,
+        final_rehearsal_qa_path=private / "final_stage_rehearsal_qa.json",
     )
     checks = {item["check_id"]: item for item in report["automatic_checks"]}
 
@@ -344,6 +416,8 @@ def test_valid_private_confirmations_remove_only_human_gates_from_preflight(
     assert report["status"] == "DEVELOPMENT_CHECK"
     assert checks["HUMAN_GATE_CONFIRMATIONS"]["status"] == "PASSED"
     assert checks["TEAM_ROSTER_PRIVATE_STATE"]["status"] == "PASSED"
+    assert checks["FINAL_REHEARSAL_PRIVATE_STATE"]["status"] == "PASSED"
+    assert "人工门禁=CONFIRMED" in checks["FINAL_REHEARSAL_PRIVATE_STATE"]["details"][0]
     assert "人工门禁=CONFIRMED" in checks["TEAM_ROSTER_PRIVATE_STATE"]["details"][0]
     assert "人工门禁有效=5/5" in checks["HUMAN_GATE_CONFIRMATIONS"]["details"][0]
     serialized = json.dumps(report, ensure_ascii=False)
@@ -373,6 +447,36 @@ def test_final_recording_gate_requires_matching_private_machine_qa(
             reviewer="审核人",
             evidence_url="https://example.com/final-recording.mp4",
         )
+
+
+def test_final_rehearsal_gate_requires_current_timed_record_and_qa(
+    tmp_path: Path,
+) -> None:
+    runbook = _copied_runbook(tmp_path)
+    private = tmp_path / "private"
+    private.mkdir(mode=0o700)
+    private.chmod(0o700)
+    unverified = private / "final_stage_rehearsal.json"
+    unverified.write_text("{}", encoding="utf-8")
+    unverified.chmod(0o600)
+    store = HumanGateStore(private / "state.json", runbook_path=runbook)
+
+    with pytest.raises(HumanGateError, match="FINAL_REHEARSAL_QA_MISSING"):
+        store.confirm(GATE_IDS[1], reviewer="审核人", evidence_file=unverified)
+    with pytest.raises(HumanGateError, match="FINAL_REHEARSAL_REQUIRES_LOCAL_FILE"):
+        store.confirm(
+            GATE_IDS[1],
+            reviewer="审核人",
+            evidence_url="https://example.com/rehearsal.json",
+        )
+
+    unverified.unlink()
+    rehearsal = _ready_rehearsal(private, runbook)
+    store.confirm(GATE_IDS[1], reviewer="审核人", evidence_file=rehearsal)
+    (private / "final_stage_rehearsal_qa.json").unlink()
+    audit = store.audit()
+    assert audit["valid"] is False
+    assert audit["issues"] == [f"FINAL_REHEARSAL_QA_MISSING:{GATE_IDS[1]}"]
 
 
 def test_final_recording_confirmation_tracks_qa_and_policy_state(

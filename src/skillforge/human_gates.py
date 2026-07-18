@@ -16,6 +16,7 @@ from urllib.parse import urlsplit
 from .contracts import validate_document
 from .demo import ROOT
 from .final_recording import final_recording_qa_issue
+from .final_rehearsal import final_rehearsal_qa_issue
 from .team_roster import TeamRosterError, verify_team_roster
 
 
@@ -105,6 +106,7 @@ class HumanGateStore:
         *,
         runbook_path: Path = DEFAULT_RUNBOOK,
         final_recording_qa_path: Path | None = None,
+        final_rehearsal_qa_path: Path | None = None,
         team_roster_path: Path | None = None,
     ) -> None:
         self.path = path.expanduser().resolve()
@@ -113,6 +115,11 @@ class HumanGateStore:
             final_recording_qa_path.expanduser().resolve()
             if final_recording_qa_path is not None
             else self.path.parent / "final_recording_qa.json"
+        )
+        self.final_rehearsal_qa_path = (
+            final_rehearsal_qa_path.expanduser().resolve()
+            if final_rehearsal_qa_path is not None
+            else self.path.parent / "final_stage_rehearsal_qa.json"
         )
         self.team_roster_path = (
             team_roster_path.expanduser().resolve()
@@ -211,9 +218,15 @@ class HumanGateStore:
         gate_id: str,
         evidence: dict[str, Any],
     ) -> str | None:
-        if gate_id != "FINAL_RECORDING_REVIEW":
-            return None
-        return final_recording_qa_issue(self.final_recording_qa_path, evidence)
+        if gate_id == "FINAL_STAGE_REHEARSAL":
+            return final_rehearsal_qa_issue(
+                self.final_rehearsal_qa_path,
+                evidence,
+                runbook_path=self.runbook_path,
+            )
+        if gate_id == "FINAL_RECORDING_REVIEW":
+            return final_recording_qa_issue(self.final_recording_qa_path, evidence)
+        return None
 
     def _team_roster_report(self) -> dict[str, Any]:
         try:

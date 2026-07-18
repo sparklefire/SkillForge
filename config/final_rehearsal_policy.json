@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "case_id": "n31_media_change",
+  "policy_basis": "INTERNAL_STAGE_REHEARSAL_TARGET_NOT_OFFICIAL_RULE",
+  "official_video_requirements_verified": false,
+  "duration": {
+    "minimum_ms": 175000,
+    "maximum_ms": 180000
+  },
+  "required_phase_count": 7,
+  "required_checks": {
+    "full_sequence_completed": true,
+    "no_unrecovered_failure": true,
+    "no_sensitive_material_shown": true,
+    "all_scripts_completed": true,
+    "all_operator_actions_completed": true,
+    "all_proof_points_verified": true,
+    "all_fallbacks_ready": true
+  }
+}

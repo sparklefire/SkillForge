@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/final_rehearsal_policy.schema.json",
+  "title": "SkillForge Final Stage Rehearsal Policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "case_id", "policy_basis", "official_video_requirements_verified", "duration", "required_phase_count", "required_checks"],
+  "properties": {
+    "version": {"const": 1},
+    "case_id": {"const": "n31_media_change"},
+    "policy_basis": {"const": "INTERNAL_STAGE_REHEARSAL_TARGET_NOT_OFFICIAL_RULE"},
+    "official_video_requirements_verified": {"const": false},
+    "duration": {
+      "const": {"minimum_ms": 175000, "maximum_ms": 180000}
+    },
+    "required_phase_count": {"const": 7},
+    "required_checks": {
+      "const": {
+        "full_sequence_completed": true,
+        "no_unrecovered_failure": true,
+        "no_sensitive_material_shown": true,
+        "all_scripts_completed": true,
+        "all_operator_actions_completed": true,
+        "all_proof_points_verified": true,
+        "all_fallbacks_ready": true
+      }
+    }
+  }
+}
