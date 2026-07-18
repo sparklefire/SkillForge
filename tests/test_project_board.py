@@ -2,11 +2,12 @@ from __future__ import annotations
 
 import json
 from copy import deepcopy
-from datetime import date
+from datetime import date, datetime
 from pathlib import Path
 
 import pytest
 
+import skillforge.project_board as project_board_module
 from skillforge.contracts import ContractValidationError, validate_document
 from skillforge.project_board import ProjectBoardError, build_project_board_status
 
@@ -33,6 +34,20 @@ def test_tracked_board_is_on_track_and_does_not_mark_goal_blocked() -> None:
     assert report["awaiting_human_count"] == 7
     assert report["awaiting_external_count"] == 1
     assert report["accepted_non_blocking_risk_count"] == 1
+
+
+def test_default_date_uses_contest_timezone_not_machine_timezone(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    class FrozenDatetime:
+        @classmethod
+        def now(cls, timezone):
+            assert getattr(timezone, "key", None) == "Asia/Shanghai"
+            return datetime(2026, 7, 19, 3, 30, tzinfo=timezone)
+
+    monkeypatch.setattr(project_board_module, "datetime", FrozenDatetime)
+    report = build_project_board_status()
+    assert report["as_of"] == "2026-07-19"
 
 
 def test_overdue_and_deadline_states_are_explicit_not_blocked() -> None:

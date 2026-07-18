@@ -4,9 +4,10 @@ from __future__ import annotations
 
 import argparse
 import json
-from datetime import date
+from datetime import date, datetime
 from pathlib import Path
 from typing import Any
+from zoneinfo import ZoneInfo
 
 from .contracts import ContractValidationError, validate_document
 from .demo import ROOT
@@ -14,6 +15,7 @@ from .demo import ROOT
 
 DEFAULT_BOARD = ROOT / "config/project_board.json"
 DEFAULT_RUNBOOK = ROOT / "cases/n31/pitch_runbook.json"
+CONTEST_TIMEZONE = ZoneInfo("Asia/Shanghai")
 EXPECTED_ROLES = {"TECHNICAL_OWNER", "EVIDENCE_OWNER", "CONTENT_OWNER", "DEMO_OPERATOR", "SUBMISSION_OWNER", "FINAL_REVIEWER"}
 EXPECTED_TASK_IDS = {
     "TECHNICAL_PACKAGE_FREEZE", "TRAINING_VIDEO_FULL_WATCH", "TEAM_ROSTER_AND_ELIGIBILITY",
@@ -82,7 +84,7 @@ def build_project_board_status(
     if docker_risk["status"] != "ACCEPTED" or docker_risk["blocking_scope"] != "NON_BLOCKING":
         raise ProjectBoardError("Docker权限必须保持非阻塞已接受风险")
 
-    current = as_of or date.today()
+    current = as_of or datetime.now(CONTEST_TIMEZONE).date()
     incomplete = [item for item in tasks if item["status"] != "COMPLETED"]
     overdue = sorted(
         item["task_id"]
