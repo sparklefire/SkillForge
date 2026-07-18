@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/submission_receipt_qa.schema.json",
+  "title": "SkillForge Private Submission Receipt QA",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "case_id", "artifact_type", "checked_at", "status", "review_sha256", "review_bytes", "submission_reference_sha256", "receipt_source", "final_preflight", "release_manifest", "publication_links", "checks", "data_policy"],
+  "properties": {
+    "version": {"const": 1},
+    "case_id": {"const": "n31_media_change"},
+    "artifact_type": {"const": "SUBMISSION_RECEIPT_QA"},
+    "checked_at": {"type": "string", "format": "date-time"},
+    "status": {"const": "READY_FOR_ARCHIVE"},
+    "review_sha256": {"$ref": "#/$defs/sha256"},
+    "review_bytes": {"type": "integer", "minimum": 1},
+    "submission_reference_sha256": {"$ref": "#/$defs/sha256"},
+    "receipt_source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "locator_sha256", "content_sha256", "bytes"],
+      "properties": {
+        "kind": {"enum": ["IMAGE", "PDF"]},
+        "locator_sha256": {"$ref": "#/$defs/sha256"},
+        "content_sha256": {"$ref": "#/$defs/sha256"},
+        "bytes": {"type": "integer", "minimum": 1}
+      }
+    },
+    "final_preflight": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sha256", "generated_at", "source_commit", "source_branch", "automatic_check_count"],
+      "properties": {
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "generated_at": {"type": "string", "format": "date-time"},
+        "source_commit": {"type": "string", "pattern": "^[a-f0-9]{7,40}$"},
+        "source_branch": {"type": "string", "minLength": 1},
+        "automatic_check_count": {"type": "integer", "minimum": 16}
+      }
+    },
+    "release_manifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sha256", "technical_freeze_digest", "artifact_count"],
+      "properties": {
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "technical_freeze_digest": {"$ref": "#/$defs/sha256"},
+        "artifact_count": {"const": 18}
+      }
+    },
+    "publication_links": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["input_sha256", "qa_sha256", "checked_at", "target_count"],
+      "properties": {
+        "input_sha256": {"$ref": "#/$defs/sha256"},
+        "qa_sha256": {"$ref": "#/$defs/sha256"},
+        "checked_at": {"type": "string", "format": "date-time"},
+        "target_count": {"const": 3}
+      }
+    },
+    "checks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["receipt_source_current", "final_preflight_schema_valid", "final_preflight_ready", "final_preflight_precedes_submission", "release_manifest_current", "publication_links_qa_schema_valid", "publication_links_qa_passed", "publication_links_input_current", "publication_links_checked_after_submission", "submission_success_visible", "project_identity_matches", "submission_reference_recorded", "final_version_confirmed", "project_page_reopened", "public_links_rechecked", "receipt_contains_no_credentials"],
+      "properties": {
+        "receipt_source_current": {"const": true},
+        "final_preflight_schema_valid": {"const": true},
+        "final_preflight_ready": {"const": true},
+        "final_preflight_precedes_submission": {"const": true},
+        "release_manifest_current": {"const": true},
+        "publication_links_qa_schema_valid": {"const": true},
+        "publication_links_qa_passed": {"const": true},
+        "publication_links_input_current": {"const": true},
+        "publication_links_checked_after_submission": {"const": true},
+        "submission_success_visible": {"const": true},
+        "project_identity_matches": {"const": true},
+        "submission_reference_recorded": {"const": true},
+        "final_version_confirmed": {"const": true},
+        "project_page_reopened": {"const": true},
+        "public_links_rechecked": {"const": true},
+        "receipt_contains_no_credentials": {"const": true}
+      }
+    },
+    "data_policy": {
+      "const": {
+        "private_local_state": true,
+        "contains_receipt_content": false,
+        "contains_submission_reference": false,
+        "contains_urls": false,
+        "contains_personal_data": false,
+        "contains_credentials": false,
+        "contains_absolute_paths": false,
+        "human_confirmation_generated": false
+      }
+    }
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+  }
+}

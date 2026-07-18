@@ -253,6 +253,8 @@ bash scripts/check_submission.sh
 
 预检会运行全量测试并核对项目身份、9份说明文档、18项成果、Git工作树、跟踪文件边界、`.env`忽略与600权限、本地密钥值泄漏、成果绝对路径、私有成片观看/彩排/官方规则审核记录及人工确认有效性。报告和确认目录均由Git忽略；报告只写门禁汇总，不记录密钥值、确认人、规则结论、来源网址、说明、私有备注或证据路径。只有 `READY_FOR_SUBMISSION` 返回0；`NOT_READY`返回1，`DEVELOPMENT_CHECK`或 `READY_WITH_HUMAN_GATES` 返回2。开发中可显式使用 `--allow-dirty`，但不能得到正式提交结论。
 
+实际提交成功后的回执不进入Git。五项人工门禁全部关闭后，先用 `bash scripts/check_submission.sh --output outputs/submission/submission_preflight_final.json` 固定最终干净预检；上传并通过公开链接QA后，再用 `bash scripts/check_submission_receipt.sh --init` 建立私有审核表并绑定成功截图或PDF。回执检查器同时核对最终预检、18项发布冻结、提交后公开链接QA、提交编号哈希和七项人工复查；安全QA不复制截图、编号、网址、个人信息或绝对路径。
+
 受证据约束的高推理语义复核需要显式确认允许发送结构化Gold步骤和Evidence陈述；它不会发送原始媒体、完整转写、手册页面、本地路径或凭证：
 
 ```bash

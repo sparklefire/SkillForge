@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/submission_receipt_review.schema.json",
+  "title": "SkillForge Private Submission Receipt Review",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "case_id", "updated_at", "status", "submitted_at", "reviewed_at", "platform", "submission_reference", "receipt_source", "checks", "notes", "data_policy"],
+  "properties": {
+    "version": {"const": 1},
+    "case_id": {"const": "n31_media_change"},
+    "updated_at": {"type": "string", "format": "date-time"},
+    "status": {"enum": ["PENDING_INPUT", "READY_FOR_CHECK"]},
+    "submitted_at": {"anyOf": [{"type": "null"}, {"type": "string", "format": "date-time"}]},
+    "reviewed_at": {"anyOf": [{"type": "null"}, {"type": "string", "format": "date-time"}]},
+    "platform": {"const": "NVIDIA_DGX_SPARK_HACKATHON_2"},
+    "submission_reference": {"type": "string", "maxLength": 1000},
+    "receipt_source": {"anyOf": [{"type": "null"}, {"$ref": "#/$defs/source"}]},
+    "checks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["submission_success_visible", "project_identity_matches", "submission_reference_recorded", "final_version_confirmed", "project_page_reopened", "public_links_rechecked", "receipt_contains_no_credentials"],
+      "properties": {
+        "submission_success_visible": {"type": "boolean"},
+        "project_identity_matches": {"type": "boolean"},
+        "submission_reference_recorded": {"type": "boolean"},
+        "final_version_confirmed": {"type": "boolean"},
+        "project_page_reopened": {"type": "boolean"},
+        "public_links_rechecked": {"type": "boolean"},
+        "receipt_contains_no_credentials": {"type": "boolean"}
+      }
+    },
+    "notes": {"type": "string", "maxLength": 3000},
+    "data_policy": {
+      "const": {
+        "private_local_state": true,
+        "contains_submission_reference": true,
+        "contains_receipt_content": false,
+        "contains_personal_data": true,
+        "contains_credentials": false,
+        "git_tracked": false
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"status": {"const": "READY_FOR_CHECK"}}},
+      "then": {
+        "properties": {
+          "submitted_at": {"type": "string", "format": "date-time"},
+          "reviewed_at": {"type": "string", "format": "date-time"},
+          "submission_reference": {"type": "string", "minLength": 1},
+          "receipt_source": {"$ref": "#/$defs/source"},
+          "checks": {
+            "properties": {
+              "submission_success_visible": {"const": true},
+              "project_identity_matches": {"const": true},
+              "submission_reference_recorded": {"const": true},
+              "final_version_confirmed": {"const": true},
+              "project_page_reopened": {"const": true},
+              "public_links_rechecked": {"const": true},
+              "receipt_contains_no_credentials": {"const": true}
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "relative_path", "sha256", "bytes"],
+      "properties": {
+        "kind": {"enum": ["IMAGE", "PDF"]},
+        "relative_path": {"type": "string", "pattern": "^submission_receipt_sources/submission_receipt\\.(png|jpg|jpeg|pdf)$"},
+        "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "bytes": {"type": "integer", "minimum": 1}
+      }
+    }
+  }
+}
