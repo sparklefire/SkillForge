@@ -273,7 +273,7 @@ def _check_official_rules_status(root: Path) -> dict[str, Any]:
     audit = status["public_access_audit"]
     current_snapshot_ok = (
         status["verification_status"] == "OFFICIAL_DETAIL_REQUIRED"
-        and status["checked_at"] == "2026-07-18"
+        and status["checked_at"] == "2026-07-19"
         and confirmed == EXPECTED_PUBLIC_RULE_FACTS
         and unresolved == EXPECTED_UNRESOLVED_RULE_REQUIREMENTS
         and len(status["sources"]) == len(sources)
@@ -290,7 +290,7 @@ def _check_official_rules_status(root: Path) -> dict[str, Any]:
         return _check(
             "OFFICIAL_RULES_STATUS",
             "FAILED",
-            "规则核验状态与2026-07-18公开访问复核结论不一致；必须重新核验后更新代码与快照",
+            "规则核验状态与2026-07-19公开访问复核结论不一致；必须重新核验后更新代码与快照",
         )
     return _check(
         "OFFICIAL_RULES_STATUS",
