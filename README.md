@@ -254,6 +254,15 @@ bash scripts/build_public_release_bundle.sh --verify-only
 
 命令生成Git忽略的 `outputs/release/skillforge_n31_public_release_v1.zip` 和同目录QA。ZIP固定包含18项成果、发布冻结清单和包内清单共20个成员，保留项目相对路径并使用固定时间戳、固定0644成员权限和无压缩存储，重复构建必须得到相同SHA-256。构建器会重新校验当前冻结清单、来源大小/哈希、绝对路径、本机密钥值、重复/多余成员、路径穿越和符号链接；本地目录权限700、归档与QA权限600。它只是不含原始素材和私有提交状态的技术交付/录屏兜底，状态明确保留五项人工门禁，也不声称符合尚未取得的官方上传格式。
 
+统一查看从技术包到提交回执的收尾状态：
+
+```bash
+bash scripts/check_submission_closeout.sh
+bash scripts/check_submission_closeout.sh --verify-only
+```
+
+状态器按固定顺序检查技术交付包、五项人工/外部门禁、最终干净预检、上传、三个公开入口和提交回执共10个阶段，并只给出下一项安全动作。它是只读协调器：不会联网、不会上传、不会初始化或确认人工门禁，也不会把等待人工写成实现目标受阻。私有报告保存为Git忽略的 `outputs/submission/submission_closeout_status.json`，目录700、文件600，不包含姓名、单位、网址、证据路径、私有备注、凭证或原始媒体。`READY_FOR_ARCHIVE` 返回0，证据失效或次序异常返回1，其余安全待办状态返回2。
+
 最终提交预检：
 
 ```bash

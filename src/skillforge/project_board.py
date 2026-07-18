@@ -26,6 +26,7 @@ EXPECTED_RISK_IDS = {
 }
 EXPECTED_DAILY_COMMANDS = {
     "bash scripts/check_project_board.sh", "bash scripts/check_submission.sh",
+    "bash scripts/check_submission_closeout.sh",
     "bash scripts/check_pitch.sh", "bash scripts/build_release_manifest.sh --verify-only",
     "bash scripts/manage_human_gates.sh status", "bash scripts/dgx_demo_tunnel.sh --smoke",
 }

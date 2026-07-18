@@ -49,6 +49,8 @@ def test_board_covers_each_human_gate_exactly_once() -> None:
     board = validate_document(json.loads(BOARD.read_text(encoding="utf-8")), "project_board.schema.json")
     runbook = validate_document(json.loads(RUNBOOK.read_text(encoding="utf-8")), "pitch_runbook.schema.json")
     assert {item["human_gate_id"] for item in board["tasks"] if item["human_gate_id"]} == {item["gate_id"] for item in runbook["human_gates"]}
+    assert len(board["daily_commands"]) == 7
+    assert "bash scripts/check_submission_closeout.sh" in board["daily_commands"]
 
 
 def test_duplicate_task_or_missing_gate_is_rejected(tmp_path: Path) -> None:
