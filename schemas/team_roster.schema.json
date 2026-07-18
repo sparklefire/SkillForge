@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/team_roster.schema.json",
+  "title": "SkillForge Private Team Roster",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "case_id", "updated_at", "status", "members", "role_assignments", "data_policy"],
+  "properties": {
+    "version": {"const": 1},
+    "case_id": {"const": "n31_media_change"},
+    "updated_at": {"type": "string", "format": "date-time"},
+    "status": {"enum": ["PENDING_INPUT", "READY_FOR_CHECK"]},
+    "members": {
+      "type": "array",
+      "minItems": 0,
+      "maxItems": 5,
+      "items": {"$ref": "#/$defs/member"}
+    },
+    "role_assignments": {
+      "type": "array",
+      "minItems": 0,
+      "maxItems": 6,
+      "items": {"$ref": "#/$defs/roleAssignment"}
+    },
+    "data_policy": {
+      "const": {
+        "private_local_state": true,
+        "contains_personal_data": true,
+        "git_tracked": false
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"status": {"const": "READY_FOR_CHECK"}}},
+      "then": {
+        "properties": {
+          "members": {"minItems": 2, "maxItems": 5},
+          "role_assignments": {
+            "minItems": 6,
+            "maxItems": 6,
+            "items": {
+              "properties": {
+                "member_id": {"type": "string", "pattern": "^M[1-5]$"}
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "roleId": {
+      "enum": ["TECHNICAL_OWNER", "EVIDENCE_OWNER", "CONTENT_OWNER", "DEMO_OPERATOR", "SUBMISSION_OWNER", "FINAL_REVIEWER"]
+    },
+    "member": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["member_id", "name", "organization", "primary_contact", "registration_confirmed", "one_team_only_confirmed"],
+      "properties": {
+        "member_id": {"type": "string", "pattern": "^M[1-5]$"},
+        "name": {"type": "string", "minLength": 1, "maxLength": 100},
+        "organization": {"type": "string", "minLength": 1, "maxLength": 200},
+        "primary_contact": {"type": "boolean"},
+        "registration_confirmed": {"type": "boolean"},
+        "one_team_only_confirmed": {"type": "boolean"}
+      }
+    },
+    "roleAssignment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["role_id", "member_id"],
+      "properties": {
+        "role_id": {"$ref": "#/$defs/roleId"},
+        "member_id": {
+          "anyOf": [
+            {"type": "null"},
+            {"type": "string", "pattern": "^M[1-5]$"}
+          ]
+        }
+      }
+    }
+  }
+}

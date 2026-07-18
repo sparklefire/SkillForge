@@ -20,6 +20,7 @@ from .demo import ROOT
 from .human_gates import HumanGateStore
 from .pitch import build_readiness
 from .release_manifest import ReleaseManifestError, verify_release_manifest
+from .team_roster import TeamRosterError, verify_team_roster
 
 
 REQUIRED_DOCUMENTS = [
@@ -310,6 +311,49 @@ def _check_release_manifest(root: Path) -> dict[str, Any]:
     )
 
 
+def _check_team_roster_private_state(
+    root: Path,
+    confirmed_gate_ids: set[str] | None = None,
+    roster_path: Path | None = None,
+) -> dict[str, Any]:
+    confirmed_gate_ids = confirmed_gate_ids or set()
+    roster_path = (
+        roster_path.resolve()
+        if roster_path is not None
+        else (root / "outputs/submission/team_roster.json").resolve()
+    )
+    private_root = roster_path.parent
+    if not roster_path.exists():
+        if "TEAM_ELIGIBILITY_CONFIRMED" in confirmed_gate_ids:
+            return _check(
+                "TEAM_ROSTER_PRIVATE_STATE",
+                "FAILED",
+                "团队资格已确认，但2–5人私有名单和六类职责映射缺失",
+            )
+        return _check(
+            "TEAM_ROSTER_PRIVATE_STATE",
+            "PASSED",
+            "私有团队名单状态=ABSENT；2–5人资格人工门禁保持待确认",
+        )
+    try:
+        report = verify_team_roster(roster_path, private_root=private_root)
+    except (OSError, TeamRosterError, ContractValidationError) as exc:
+        return _check(
+            "TEAM_ROSTER_PRIVATE_STATE",
+            "FAILED",
+            f"私有团队名单不完整或无效；错误类型={type(exc).__name__}",
+        )
+    return _check(
+        "TEAM_ROSTER_PRIVATE_STATE",
+        "PASSED",
+        (
+            f"私有团队名单机器检查通过；成员={report['team_size']}; "
+            f"角色={report['role_assignment_count']}; 团队资格人工门禁="
+            f"{'CONFIRMED' if 'TEAM_ELIGIBILITY_CONFIRMED' in confirmed_gate_ids else 'PENDING'}"
+        ),
+    )
+
+
 def _check_pitch_package(
     root: Path,
     confirmed_gate_ids: set[str],
@@ -476,6 +520,7 @@ def build_submission_preflight(
     allow_dirty: bool = False,
     allow_missing_git: bool = False,
     confirmations_path: Path | None = None,
+    team_roster_path: Path | None = None,
 ) -> dict[str, Any]:
     root = root.resolve()
     confirmation_check, confirmed_gate_ids = _check_human_gate_confirmations(
@@ -493,6 +538,11 @@ def build_submission_preflight(
         _check_required_documents(root),
         _check_official_rules_status(root),
         _check_release_manifest(root),
+        _check_team_roster_private_state(
+            root,
+            confirmed_gate_ids,
+            roster_path=team_roster_path,
+        ),
         confirmation_check,
         pitch_check,
         _check_public_artifacts(root, values),

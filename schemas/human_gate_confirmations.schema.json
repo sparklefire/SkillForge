@@ -53,7 +53,22 @@
         "reviewer": {"type": "string", "minLength": 1, "maxLength": 200},
         "confirmed_at": {"type": "string", "format": "date-time"},
         "note": {"type": "string", "maxLength": 1000},
-        "evidence": {"$ref": "#/$defs/evidence"}
+        "evidence": {"$ref": "#/$defs/evidence"},
+        "gate_context": {
+          "oneOf": [
+            {"type": "null"},
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["kind", "roster_sha256", "qa_status"],
+              "properties": {
+                "kind": {"const": "TEAM_ROSTER"},
+                "roster_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+                "qa_status": {"const": "READY_FOR_HUMAN_CONFIRMATION"}
+              }
+            }
+          ]
+        }
       }
     },
     "evidence": {

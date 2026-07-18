@@ -16,6 +16,7 @@ from urllib.parse import urlsplit
 from .contracts import validate_document
 from .demo import ROOT
 from .final_recording import final_recording_qa_issue
+from .team_roster import TeamRosterError, verify_team_roster
 
 
 DEFAULT_RUNBOOK = ROOT / "cases/n31/pitch_runbook.json"
@@ -104,6 +105,7 @@ class HumanGateStore:
         *,
         runbook_path: Path = DEFAULT_RUNBOOK,
         final_recording_qa_path: Path | None = None,
+        team_roster_path: Path | None = None,
     ) -> None:
         self.path = path.expanduser().resolve()
         self.runbook_path = runbook_path.expanduser().resolve()
@@ -111,6 +113,11 @@ class HumanGateStore:
             final_recording_qa_path.expanduser().resolve()
             if final_recording_qa_path is not None
             else self.path.parent / "final_recording_qa.json"
+        )
+        self.team_roster_path = (
+            team_roster_path.expanduser().resolve()
+            if team_roster_path is not None
+            else self.path.parent / "team_roster.json"
         )
 
     def _runbook(self) -> tuple[dict[str, Any], str]:
@@ -208,6 +215,44 @@ class HumanGateStore:
             return None
         return final_recording_qa_issue(self.final_recording_qa_path, evidence)
 
+    def _team_roster_report(self) -> dict[str, Any]:
+        try:
+            return verify_team_roster(
+                self.team_roster_path,
+                private_root=self.team_roster_path.parent,
+            )
+        except (OSError, TeamRosterError, ValueError) as exc:
+            raise HumanGateError("团队资格确认需要先通过私有团队名单QA") from exc
+
+    def _gate_context_for_confirmation(self, gate_id: str) -> dict[str, Any] | None:
+        if gate_id != "TEAM_ELIGIBILITY_CONFIRMED":
+            return None
+        report = self._team_roster_report()
+        return {
+            "kind": "TEAM_ROSTER",
+            "roster_sha256": report["roster_sha256"],
+            "qa_status": report["status"],
+        }
+
+    def _gate_context_issue(
+        self,
+        gate_id: str,
+        context: dict[str, Any] | None,
+    ) -> str | None:
+        if gate_id != "TEAM_ELIGIBILITY_CONFIRMED":
+            return "UNEXPECTED_GATE_CONTEXT" if context is not None else None
+        if not context or context.get("kind") != "TEAM_ROSTER":
+            return "TEAM_ROSTER_BINDING_MISSING"
+        try:
+            report = self._team_roster_report()
+        except HumanGateError:
+            return "TEAM_ROSTER_QA_INVALID"
+        if context.get("qa_status") != report["status"]:
+            return "TEAM_ROSTER_QA_STATUS_CHANGED"
+        if context.get("roster_sha256") != report["roster_sha256"]:
+            return "TEAM_ROSTER_HASH_CHANGED"
+        return None
+
     def audit(self) -> dict[str, Any]:
         runbook, runbook_sha256 = self._runbook()
         gates = {item["gate_id"]: item for item in runbook["human_gates"]}
@@ -271,6 +316,12 @@ class HumanGateStore:
             )
             if gate_evidence_issue:
                 issues.append(f"{gate_evidence_issue}:{item['gate_id']}")
+                continue
+            gate_context_issue = self._gate_context_issue(
+                item["gate_id"], item.get("gate_context")
+            )
+            if gate_context_issue:
+                issues.append(f"{gate_context_issue}:{item['gate_id']}")
                 continue
             effective.add(item["gate_id"])
         return self._audit_result(
@@ -346,6 +397,7 @@ class HumanGateStore:
             raise HumanGateError(
                 f"人工门禁证据未满足专用QA要求：{gate_evidence_issue}"
             )
+        gate_context = self._gate_context_for_confirmation(gate_id)
         if self.path.exists():
             if self._security_issue():
                 raise HumanGateError("人工门禁确认记录权限不安全，拒绝写入")
@@ -368,6 +420,7 @@ class HumanGateStore:
             "confirmed_at": confirmed_at,
             "note": note,
             "evidence": evidence,
+            "gate_context": gate_context,
         }
         document["confirmations"] = [
             item for item in document["confirmations"] if item["gate_id"] != gate_id

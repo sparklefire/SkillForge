@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/team_roster_qa.schema.json",
+  "title": "SkillForge Private Team Roster QA",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "case_id", "artifact_type", "checked_at", "status", "roster_sha256", "team_size", "role_assignment_count", "human_gate_status", "checks", "data_policy"],
+  "properties": {
+    "version": {"const": 1},
+    "case_id": {"const": "n31_media_change"},
+    "artifact_type": {"const": "TEAM_ROSTER_QA"},
+    "checked_at": {"type": "string", "format": "date-time"},
+    "status": {"const": "READY_FOR_HUMAN_CONFIRMATION"},
+    "roster_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "team_size": {"type": "integer", "minimum": 2, "maximum": 5},
+    "role_assignment_count": {"const": 6},
+    "human_gate_status": {"const": "PENDING"},
+    "checks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["team_size_valid", "member_ids_unique", "member_fields_nonblank", "one_primary_contact", "all_members_registration_confirmed", "all_members_one_team_only_confirmed", "all_roles_assigned_once", "role_members_exist"],
+      "properties": {
+        "team_size_valid": {"const": true},
+        "member_ids_unique": {"const": true},
+        "member_fields_nonblank": {"const": true},
+        "one_primary_contact": {"const": true},
+        "all_members_registration_confirmed": {"const": true},
+        "all_members_one_team_only_confirmed": {"const": true},
+        "all_roles_assigned_once": {"const": true},
+        "role_members_exist": {"const": true}
+      }
+    },
+    "data_policy": {
+      "const": {
+        "private_local_state": true,
+        "contains_personal_data": false,
+        "contains_member_names": false,
+        "contains_organizations": false,
+        "contains_member_ids": false,
+        "human_confirmation_generated": false
+      }
+    }
+  }
+}

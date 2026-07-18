@@ -11,6 +11,7 @@ from skillforge.contracts import validate_document
 from skillforge.final_recording import evaluate_final_recording, write_private_report
 from skillforge.human_gates import HumanGateError, HumanGateStore
 from skillforge.submission import build_submission_preflight
+from skillforge.team_roster import _write_private_json, initialize_team_roster
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -64,6 +65,53 @@ def _ready_recording(private: Path) -> Path:
     )
     write_private_report(report, private / "final_recording_qa.json")
     return recording
+
+
+def _ready_team_roster(private: Path) -> Path:
+    roster_path = private / "team_roster.json"
+    initialize_team_roster(roster_path, private_root=private)
+    _write_private_json(
+        {
+            "version": 1,
+            "case_id": "n31_media_change",
+            "updated_at": "2026-07-18T00:00:00+00:00",
+            "status": "READY_FOR_CHECK",
+            "members": [
+                {
+                    "member_id": "M1",
+                    "name": "测试成员甲",
+                    "organization": "测试单位甲",
+                    "primary_contact": True,
+                    "registration_confirmed": True,
+                    "one_team_only_confirmed": True,
+                },
+                {
+                    "member_id": "M2",
+                    "name": "测试成员乙",
+                    "organization": "测试单位乙",
+                    "primary_contact": False,
+                    "registration_confirmed": True,
+                    "one_team_only_confirmed": True,
+                },
+            ],
+            "role_assignments": [
+                {"role_id": "TECHNICAL_OWNER", "member_id": "M1"},
+                {"role_id": "EVIDENCE_OWNER", "member_id": "M2"},
+                {"role_id": "CONTENT_OWNER", "member_id": "M1"},
+                {"role_id": "DEMO_OPERATOR", "member_id": "M2"},
+                {"role_id": "SUBMISSION_OWNER", "member_id": "M1"},
+                {"role_id": "FINAL_REVIEWER", "member_id": "M2"},
+            ],
+            "data_policy": {
+                "private_local_state": True,
+                "contains_personal_data": True,
+                "git_tracked": False,
+            },
+        },
+        roster_path,
+        private_root=private,
+    )
+    return roster_path
 
 
 def test_confirmation_is_private_hash_bound_and_revocable(tmp_path: Path) -> None:
@@ -136,6 +184,7 @@ def test_duplicate_confirmation_requires_explicit_replace(tmp_path: Path) -> Non
     evidence = tmp_path / "team.txt"
     evidence.write_text("team evidence", encoding="utf-8")
     store_path = tmp_path / "private" / "state.json"
+    _ready_team_roster(store_path.parent)
     store = HumanGateStore(store_path, runbook_path=runbook)
     store.confirm(GATE_IDS[3], reviewer="审核人", evidence_file=evidence)
 
@@ -158,6 +207,34 @@ def test_duplicate_confirmation_requires_explicit_replace(tmp_path: Path) -> Non
         "CONFIRMED",
         "CONFIRMED",
     ]
+
+
+def test_team_gate_requires_and_binds_current_private_roster(tmp_path: Path) -> None:
+    runbook = _copied_runbook(tmp_path)
+    private = tmp_path / "private"
+    evidence = tmp_path / "registration-proof.txt"
+    evidence.write_text("registration proof", encoding="utf-8")
+    store = HumanGateStore(private / "state.json", runbook_path=runbook)
+
+    with pytest.raises(HumanGateError, match="团队名单QA"):
+        store.confirm(GATE_IDS[3], reviewer="审核人", evidence_file=evidence)
+
+    roster_path = _ready_team_roster(private)
+    confirmed = store.confirm(GATE_IDS[3], reviewer="审核人", evidence_file=evidence)
+    assert confirmed["summary"]["passed"] == 1
+    document = json.loads(store.path.read_text(encoding="utf-8"))
+    context = document["confirmations"][0]["gate_context"]
+    assert context["kind"] == "TEAM_ROSTER"
+    assert context["roster_sha256"]
+    assert "测试成员" not in json.dumps(confirmed, ensure_ascii=False)
+
+    roster = json.loads(roster_path.read_text(encoding="utf-8"))
+    roster["members"][0]["organization"] = "变更后的测试单位"
+    _write_private_json(roster, roster_path, private_root=private)
+    stale = store.audit()
+    assert stale["valid"] is False
+    assert stale["confirmed_gate_ids"] == []
+    assert stale["issues"] == [f"TEAM_ROSTER_HASH_CHANGED:{GATE_IDS[3]}"]
 
 
 def test_changed_runbook_makes_all_private_confirmations_stale(tmp_path: Path) -> None:
@@ -185,6 +262,7 @@ def test_insecure_store_mode_is_rejected(tmp_path: Path) -> None:
     evidence = tmp_path / "team.txt"
     evidence.write_text("team check", encoding="utf-8")
     store_path = tmp_path / "private" / "state.json"
+    _ready_team_roster(store_path.parent)
     store = HumanGateStore(store_path, runbook_path=runbook)
     store.confirm(GATE_IDS[3], reviewer="审核人", evidence_file=evidence)
     store_path.chmod(0o644)
@@ -242,6 +320,7 @@ def test_valid_private_confirmations_remove_only_human_gates_from_preflight(
     evidence.write_text("explicit human confirmation", encoding="utf-8")
     private = tmp_path / "private"
     recording = _ready_recording(private)
+    roster_path = _ready_team_roster(private)
     store_path = private / "human_gate_confirmations.json"
     store = HumanGateStore(store_path, runbook_path=RUNBOOK)
     for gate_id in GATE_IDS:
@@ -257,12 +336,15 @@ def test_valid_private_confirmations_remove_only_human_gates_from_preflight(
         allow_dirty=True,
         allow_missing_git=True,
         confirmations_path=store_path,
+        team_roster_path=roster_path,
     )
     checks = {item["check_id"]: item for item in report["automatic_checks"]}
 
     assert report["pending_human_gates"] == []
     assert report["status"] == "DEVELOPMENT_CHECK"
     assert checks["HUMAN_GATE_CONFIRMATIONS"]["status"] == "PASSED"
+    assert checks["TEAM_ROSTER_PRIVATE_STATE"]["status"] == "PASSED"
+    assert "人工门禁=CONFIRMED" in checks["TEAM_ROSTER_PRIVATE_STATE"]["details"][0]
     assert "人工门禁有效=5/5" in checks["HUMAN_GATE_CONFIRMATIONS"]["details"][0]
     serialized = json.dumps(report, ensure_ascii=False)
     assert str(evidence.resolve()) not in serialized
