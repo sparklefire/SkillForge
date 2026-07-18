@@ -7,23 +7,36 @@ from pathlib import Path
 import pytest
 
 from skillforge.contracts import ContractValidationError, validate_document
+from skillforge.final_rehearsal import initialize_final_rehearsal
+from skillforge.official_rules_review import initialize_official_rules_review
 from skillforge.submission import (
     _check_official_rules_status,
     _find_secret_value_leaks,
     _find_sensitive_tracked_paths,
     build_submission_preflight,
 )
+from skillforge.team_roster import initialize_team_roster
+from skillforge.training_video_review import initialize_training_video_review
 
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def test_submission_preflight_preserves_human_gates() -> None:
+def test_submission_preflight_preserves_human_gates(tmp_path: Path) -> None:
+    absent = tmp_path / "absent"
     report = build_submission_preflight(
         root=ROOT,
         run_tests=False,
         allow_dirty=True,
         allow_missing_git=True,
+        confirmations_path=absent / "human_gate_confirmations.json",
+        team_roster_path=absent / "team_roster.json",
+        final_rehearsal_path=absent / "final_stage_rehearsal.json",
+        final_rehearsal_qa_path=absent / "final_stage_rehearsal_qa.json",
+        training_video_review_path=absent / "training_video_review.json",
+        training_video_review_qa_path=absent / "training_video_review_qa.json",
+        official_rules_review_path=absent / "official_rules_review.json",
+        official_rules_review_qa_path=absent / "official_rules_review_qa.json",
     )
     validate_document(report, "submission_preflight.schema.json")
     checks = {item["check_id"]: item for item in report["automatic_checks"]}
@@ -61,6 +74,79 @@ def test_submission_preflight_preserves_human_gates() -> None:
     }
     assert report["data_policy"]["contains_credentials"] is False
     assert report["data_policy"]["contains_raw_media"] is False
+
+
+def test_initialized_private_templates_are_pending_not_technical_failures(
+    tmp_path: Path,
+) -> None:
+    private = tmp_path / "submission"
+    private.mkdir(mode=0o700)
+    initialize_training_video_review(
+        private / "training_video_review.json",
+        manifest_path=ROOT / "output/video/n31_training_video_manifest_v1.json",
+        video_path=ROOT / "output/video/n31_training_video_v1.mp4",
+        private_root=private,
+    )
+    initialize_final_rehearsal(
+        private / "final_stage_rehearsal.json",
+        runbook_path=ROOT / "cases/n31/pitch_runbook.json",
+        private_root=private,
+    )
+    initialize_team_roster(private / "team_roster.json", private_root=private)
+    initialize_official_rules_review(
+        private / "official_rules_review.json",
+        public_snapshot_path=ROOT / "config/official_rules_status.json",
+        private_root=private,
+    )
+
+    report = build_submission_preflight(
+        root=ROOT,
+        run_tests=False,
+        allow_dirty=True,
+        allow_missing_git=True,
+        confirmations_path=private / "human_gate_confirmations.json",
+        team_roster_path=private / "team_roster.json",
+        final_rehearsal_path=private / "final_stage_rehearsal.json",
+        final_rehearsal_qa_path=private / "final_stage_rehearsal_qa.json",
+        training_video_review_path=private / "training_video_review.json",
+        training_video_review_qa_path=private / "training_video_review_qa.json",
+        official_rules_review_path=private / "official_rules_review.json",
+        official_rules_review_qa_path=private / "official_rules_review_qa.json",
+    )
+    checks = {item["check_id"]: item for item in report["automatic_checks"]}
+    for check_id in (
+        "OFFICIAL_RULES_REVIEW_PRIVATE_STATE",
+        "TEAM_ROSTER_PRIVATE_STATE",
+        "TRAINING_VIDEO_REVIEW_PRIVATE_STATE",
+        "FINAL_REHEARSAL_PRIVATE_STATE",
+    ):
+        assert checks[check_id]["status"] == "PASSED"
+        assert "PENDING_INPUT" in checks[check_id]["details"][0]
+    assert report["status"] == "DEVELOPMENT_CHECK"
+    assert len(report["pending_human_gates"]) == 5
+
+    orphan_qa = private / "team_roster_qa.json"
+    orphan_qa.write_text("{}\n", encoding="utf-8")
+    orphan_qa.chmod(0o600)
+    failed = build_submission_preflight(
+        root=ROOT,
+        run_tests=False,
+        allow_dirty=True,
+        allow_missing_git=True,
+        confirmations_path=private / "human_gate_confirmations.json",
+        team_roster_path=private / "team_roster.json",
+        final_rehearsal_path=private / "final_stage_rehearsal.json",
+        final_rehearsal_qa_path=private / "final_stage_rehearsal_qa.json",
+        training_video_review_path=private / "training_video_review.json",
+        training_video_review_qa_path=private / "training_video_review_qa.json",
+        official_rules_review_path=private / "official_rules_review.json",
+        official_rules_review_qa_path=private / "official_rules_review_qa.json",
+    )
+    failed_check = {
+        item["check_id"]: item for item in failed["automatic_checks"]
+    }["TEAM_ROSTER_PRIVATE_STATE"]
+    assert failed_check["status"] == "FAILED"
+    assert failed["status"] == "NOT_READY"
 
 
 def test_official_rules_status_is_strict_and_does_not_close_gate() -> None:

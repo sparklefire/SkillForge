@@ -351,10 +351,59 @@ def _check_project_board(root: Path) -> dict[str, Any]:
     )
 
 
+def _check_pending_private_draft(
+    input_path: Path,
+    qa_path: Path,
+    *,
+    schema_name: str,
+    check_id: str,
+    gate_id: str,
+    confirmed_gate_ids: set[str],
+    label: str,
+) -> dict[str, Any] | None:
+    """Accept a valid unfilled template without treating it as human evidence."""
+
+    try:
+        input_safe = (
+            input_path.is_file()
+            and stat.S_IMODE(input_path.stat().st_mode) == 0o600
+            and stat.S_IMODE(input_path.parent.stat().st_mode) == 0o700
+        )
+        if not input_safe:
+            raise ValueError("unsafe private draft permissions")
+        document = validate_document(_read_json(input_path), schema_name)
+    except (
+        OSError,
+        UnicodeDecodeError,
+        json.JSONDecodeError,
+        ContractValidationError,
+        ValueError,
+    ) as exc:
+        return _check(
+            check_id,
+            "FAILED",
+            f"{label}无法读取、权限不安全或不符合Schema；错误类型={type(exc).__name__}",
+        )
+    if document["status"] != "PENDING_INPUT":
+        return None
+    if qa_path.exists() or gate_id in confirmed_gate_ids:
+        return _check(
+            check_id,
+            "FAILED",
+            f"{label}仍为PENDING_INPUT，但QA或人工确认已经存在",
+        )
+    return _check(
+        check_id,
+        "PASSED",
+        f"{label}状态=PENDING_INPUT；模板已安全初始化，人工门禁保持待确认",
+    )
+
+
 def _check_team_roster_private_state(
     root: Path,
     confirmed_gate_ids: set[str] | None = None,
     roster_path: Path | None = None,
+    qa_path: Path | None = None,
 ) -> dict[str, Any]:
     confirmed_gate_ids = confirmed_gate_ids or set()
     roster_path = (
@@ -363,18 +412,34 @@ def _check_team_roster_private_state(
         else (root / "outputs/submission/team_roster.json").resolve()
     )
     private_root = roster_path.parent
+    qa_path = (
+        qa_path.resolve()
+        if qa_path is not None
+        else private_root / "team_roster_qa.json"
+    )
     if not roster_path.exists():
-        if "TEAM_ELIGIBILITY_CONFIRMED" in confirmed_gate_ids:
+        if qa_path.exists() or "TEAM_ELIGIBILITY_CONFIRMED" in confirmed_gate_ids:
             return _check(
                 "TEAM_ROSTER_PRIVATE_STATE",
                 "FAILED",
-                "团队资格已确认，但2–5人私有名单和六类职责映射缺失",
+                "团队名单QA或人工确认存在，但2–5人私有名单和六类职责映射缺失",
             )
         return _check(
             "TEAM_ROSTER_PRIVATE_STATE",
             "PASSED",
             "私有团队名单状态=ABSENT；2–5人资格人工门禁保持待确认",
         )
+    draft = _check_pending_private_draft(
+        roster_path,
+        qa_path,
+        schema_name="team_roster.schema.json",
+        check_id="TEAM_ROSTER_PRIVATE_STATE",
+        gate_id="TEAM_ELIGIBILITY_CONFIRMED",
+        confirmed_gate_ids=confirmed_gate_ids,
+        label="私有团队名单",
+    )
+    if draft is not None:
+        return draft
     try:
         report = verify_team_roster(roster_path, private_root=private_root)
     except (OSError, TeamRosterError, ContractValidationError) as exc:
@@ -423,6 +488,17 @@ def _check_final_rehearsal_private_state(
             "PASSED",
             "私有180秒彩排记录状态=ABSENT；彩排人工门禁保持待确认",
         )
+    draft = _check_pending_private_draft(
+        rehearsal_path,
+        qa_path,
+        schema_name="final_rehearsal_record.schema.json",
+        check_id="FINAL_REHEARSAL_PRIVATE_STATE",
+        gate_id="FINAL_STAGE_REHEARSAL",
+        confirmed_gate_ids=confirmed_gate_ids,
+        label="私有180秒彩排记录",
+    )
+    if draft is not None:
+        return draft
     try:
         report = verify_final_rehearsal(
             rehearsal_path,
@@ -490,6 +566,17 @@ def _check_training_video_review_private_state(
             "PASSED",
             "私有80秒成片观看记录状态=ABSENT；完整观看人工门禁保持待确认",
         )
+    draft = _check_pending_private_draft(
+        review_path,
+        qa_path,
+        schema_name="training_video_review.schema.json",
+        check_id="TRAINING_VIDEO_REVIEW_PRIVATE_STATE",
+        gate_id="TRAINING_VIDEO_FULL_WATCH",
+        confirmed_gate_ids=confirmed_gate_ids,
+        label="私有80秒成片观看记录",
+    )
+    if draft is not None:
+        return draft
     try:
         report = verify_training_video_review(
             review_path,
@@ -556,6 +643,17 @@ def _check_official_rules_review_private_state(
             "PASSED",
             "私有官方规则六项审核状态=ABSENT；官方规则人工门禁保持待确认",
         )
+    draft = _check_pending_private_draft(
+        review_path,
+        qa_path,
+        schema_name="official_rules_review.schema.json",
+        check_id="OFFICIAL_RULES_REVIEW_PRIVATE_STATE",
+        gate_id="OFFICIAL_RULES_VERIFIED",
+        confirmed_gate_ids=confirmed_gate_ids,
+        label="私有官方规则六项审核",
+    )
+    if draft is not None:
+        return draft
     try:
         report = verify_official_rules_review(
             review_path,

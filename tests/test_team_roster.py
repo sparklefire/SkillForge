@@ -132,7 +132,7 @@ def test_roster_permission_drift_is_rejected(tmp_path: Path) -> None:
         verify_team_roster(path, private_root=private)
 
 
-def test_submission_check_is_safe_for_absent_valid_and_invalid_roster(
+def test_submission_check_is_safe_for_absent_draft_and_valid_roster(
     tmp_path: Path,
 ) -> None:
     root = tmp_path / "root"
@@ -143,9 +143,10 @@ def test_submission_check_is_safe_for_absent_valid_and_invalid_roster(
 
     path = private / "team_roster.json"
     initialize_team_roster(path, private_root=private)
-    invalid = _check_team_roster_private_state(root)
-    assert invalid["status"] == "FAILED"
-    assert "测试成员" not in json.dumps(invalid, ensure_ascii=False)
+    draft = _check_team_roster_private_state(root)
+    assert draft["status"] == "PASSED"
+    assert "PENDING_INPUT" in draft["details"][0]
+    assert "测试成员" not in json.dumps(draft, ensure_ascii=False)
 
     _write_private_json(_ready_document(), path, private_root=private)
     valid = _check_team_roster_private_state(root)
