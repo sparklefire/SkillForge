@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/project_board.schema.json",
+  "title": "SkillForge P0 Project Board",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "case_id", "deadline", "status_vocabulary", "tasks", "risks", "daily_commands", "data_policy"],
+  "properties": {
+    "version": {"const": 1},
+    "case_id": {"const": "n31_media_change"},
+    "deadline": {"const": "2026-07-22"},
+    "status_vocabulary": {"const": ["COMPLETED", "READY", "AWAITING_HUMAN", "AWAITING_EXTERNAL"]},
+    "tasks": {"type": "array", "minItems": 10, "maxItems": 10, "items": {"$ref": "#/$defs/task"}},
+    "risks": {"type": "array", "minItems": 7, "maxItems": 7, "items": {"$ref": "#/$defs/risk"}},
+    "daily_commands": {"type": "array", "minItems": 6, "maxItems": 6, "uniqueItems": true, "items": {"type": "string", "pattern": "^bash scripts/[A-Za-z0-9_./ -]+$"}},
+    "data_policy": {"const": {"contains_credentials": false, "contains_personal_data": false, "contains_absolute_paths": false, "goal_blocked": false}}
+  },
+  "$defs": {
+    "role": {"enum": ["TECHNICAL_OWNER", "EVIDENCE_OWNER", "CONTENT_OWNER", "DEMO_OPERATOR", "SUBMISSION_OWNER", "FINAL_REVIEWER"]},
+    "task": {
+      "type": "object", "additionalProperties": false,
+      "required": ["task_id", "title", "priority", "owner_role", "due_date", "status", "blocking_scope", "human_gate_id", "next_action", "evidence"],
+      "properties": {
+        "task_id": {"type": "string", "pattern": "^[A-Z0-9_]+$"}, "title": {"type": "string", "minLength": 1, "maxLength": 100}, "priority": {"const": "P0"}, "owner_role": {"$ref": "#/$defs/role"}, "due_date": {"type": "string", "format": "date"}, "status": {"enum": ["COMPLETED", "READY", "AWAITING_HUMAN", "AWAITING_EXTERNAL"]}, "blocking_scope": {"enum": ["NONE", "FORMAL_SUBMISSION"]}, "human_gate_id": {"anyOf": [{"type": "null"}, {"type": "string", "pattern": "^[A-Z0-9_]+$"}]}, "next_action": {"type": "string", "minLength": 1, "maxLength": 300}, "evidence": {"type": "string", "minLength": 1, "maxLength": 300}
+      }
+    },
+    "risk": {
+      "type": "object", "additionalProperties": false,
+      "required": ["risk_id", "owner_role", "probability", "impact", "status", "blocking_scope", "trigger", "mitigation"],
+      "properties": {
+        "risk_id": {"type": "string", "pattern": "^[A-Z0-9_]+$"}, "owner_role": {"$ref": "#/$defs/role"}, "probability": {"enum": ["LOW", "MEDIUM", "HIGH"]}, "impact": {"enum": ["LOW", "MEDIUM", "HIGH"]}, "status": {"enum": ["OPEN", "ACCEPTED"]}, "blocking_scope": {"enum": ["FORMAL_SUBMISSION", "DEMO_ONLY", "NON_BLOCKING"]}, "trigger": {"type": "string", "minLength": 1, "maxLength": 300}, "mitigation": {"type": "string", "minLength": 1, "maxLength": 500}
+      }
+    }
+  }
+}

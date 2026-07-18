@@ -19,6 +19,7 @@ from .contracts import ContractValidationError, validate_document
 from .demo import ROOT
 from .human_gates import HumanGateStore
 from .pitch import build_readiness
+from .project_board import ProjectBoardError, build_project_board_status
 from .release_manifest import ReleaseManifestError, verify_release_manifest
 from .team_roster import TeamRosterError, verify_team_roster
 
@@ -311,6 +312,30 @@ def _check_release_manifest(root: Path) -> dict[str, Any]:
     )
 
 
+def _check_project_board(root: Path) -> dict[str, Any]:
+    try:
+        report = build_project_board_status(
+            board_path=root / "config/project_board.json",
+            runbook_path=root / "cases/n31/pitch_runbook.json",
+        )
+    except (OSError, ProjectBoardError, ContractValidationError) as exc:
+        return _check(
+            "PROJECT_BOARD_STATUS",
+            "FAILED",
+            f"P0任务看板缺失或无效；错误类型={type(exc).__name__}",
+        )
+    return _check(
+        "PROJECT_BOARD_STATUS",
+        "PASSED" if report["status"] == "ON_TRACK" else "FAILED",
+        (
+            f"状态={report['status']}; 完成={report['completed_count']}; "
+            f"技术就绪={report['ready_count']}; 等待人={report['awaiting_human_count']}; "
+            f"等待外部={report['awaiting_external_count']}; "
+            f"实现目标受阻={str(report['implementation_goal_blocked']).lower()}"
+        ),
+    )
+
+
 def _check_team_roster_private_state(
     root: Path,
     confirmed_gate_ids: set[str] | None = None,
@@ -538,6 +563,7 @@ def build_submission_preflight(
         _check_required_documents(root),
         _check_official_rules_status(root),
         _check_release_manifest(root),
+        _check_project_board(root),
         _check_team_roster_private_state(
             root,
             confirmed_gate_ids,

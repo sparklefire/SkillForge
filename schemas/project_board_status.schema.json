@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/project_board_status.schema.json",
+  "title": "SkillForge Project Board Status",
+  "type": "object", "additionalProperties": false,
+  "required": ["version", "case_id", "artifact_type", "as_of", "deadline", "status", "implementation_goal_blocked", "task_count", "completed_count", "ready_count", "awaiting_human_count", "awaiting_external_count", "submission_blocking_task_count", "overdue_task_ids", "next_due_date", "open_risk_count", "accepted_non_blocking_risk_count", "data_policy"],
+  "properties": {
+    "version": {"const": 1}, "case_id": {"const": "n31_media_change"}, "artifact_type": {"const": "PROJECT_BOARD_STATUS"}, "as_of": {"type": "string", "format": "date"}, "deadline": {"const": "2026-07-22"}, "status": {"enum": ["ON_TRACK", "ATTENTION_REQUIRED", "DEADLINE_MISSED"]}, "implementation_goal_blocked": {"const": false}, "task_count": {"const": 10}, "completed_count": {"type": "integer", "minimum": 0, "maximum": 10}, "ready_count": {"type": "integer", "minimum": 0, "maximum": 10}, "awaiting_human_count": {"type": "integer", "minimum": 0, "maximum": 10}, "awaiting_external_count": {"type": "integer", "minimum": 0, "maximum": 10}, "submission_blocking_task_count": {"type": "integer", "minimum": 0, "maximum": 10}, "overdue_task_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^[A-Z0-9_]+$"}}, "next_due_date": {"anyOf": [{"type": "null"}, {"type": "string", "format": "date"}]}, "open_risk_count": {"type": "integer", "minimum": 0, "maximum": 7}, "accepted_non_blocking_risk_count": {"type": "integer", "minimum": 0, "maximum": 7},
+    "data_policy": {"const": {"contains_credentials": false, "contains_personal_data": false, "contains_absolute_paths": false}}
+  }
+}

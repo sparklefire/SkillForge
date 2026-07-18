@@ -35,6 +35,9 @@ def test_submission_preflight_preserves_human_gates() -> None:
     assert "待官方细则=6项" in checks["OFFICIAL_RULES_STATUS"]["details"][0]
     assert checks["RELEASE_FREEZE_MANIFEST"]["status"] == "PASSED"
     assert "18项成果" in checks["RELEASE_FREEZE_MANIFEST"]["details"][0]
+    assert checks["PROJECT_BOARD_STATUS"]["status"] == "PASSED"
+    assert "状态=ON_TRACK" in checks["PROJECT_BOARD_STATUS"]["details"][0]
+    assert "实现目标受阻=false" in checks["PROJECT_BOARD_STATUS"]["details"][0]
     assert checks["TEAM_ROSTER_PRIVATE_STATE"]["status"] == "PASSED"
     assert "ABSENT" in checks["TEAM_ROSTER_PRIVATE_STATE"]["details"][0]
     assert checks["HUMAN_GATE_CONFIRMATIONS"]["status"] == "PASSED"
