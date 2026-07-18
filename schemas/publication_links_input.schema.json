@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/publication_links_input.schema.json",
+  "title": "SkillForge Private Publication Links Input",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "case_id", "updated_at", "status", "targets", "data_policy"],
+  "properties": {
+    "version": {"const": 1},
+    "case_id": {"const": "n31_media_change"},
+    "updated_at": {"type": "string", "format": "date-time"},
+    "status": {"enum": ["PENDING_INPUT", "READY_FOR_CHECK"]},
+    "targets": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["target_id", "expected_surface", "public_url"],
+        "properties": {
+          "target_id": {"enum": ["PROJECT_PAGE", "CODE_REPOSITORY", "FINAL_RECORDING"]},
+          "expected_surface": {"enum": ["HTML", "HTML_OR_VIDEO"]},
+          "public_url": {
+            "anyOf": [
+              {"type": "null"},
+              {"type": "string", "format": "uri", "maxLength": 4096}
+            ]
+          }
+        }
+      }
+    },
+    "data_policy": {
+      "const": {
+        "private_local_state": true,
+        "contains_credentials": false,
+        "contains_personal_data": false
+      }
+    }
+  }
+}

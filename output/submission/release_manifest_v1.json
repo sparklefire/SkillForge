@@ -1,0 +1,358 @@
+{
+  "artifact_count": 18,
+  "artifact_type": "RELEASE_FREEZE_MANIFEST",
+  "artifacts": [
+    {
+      "artifact_id": "DEMO_BUNDLE",
+      "bytes": 2268,
+      "final_checker_role": "FINAL_REVIEWER",
+      "kind": "JSON",
+      "path": "cases/n31/demo_bundle/bundle.json",
+      "release_channels": [
+        "CODE_REPOSITORY",
+        "DEMO_RUNTIME"
+      ],
+      "responsible_role": "TECHNICAL_OWNER",
+      "sha256": "6fb8a9608b983de64374ce14128b3c03b20bf6fe07074837da36439daf94c92b",
+      "status": "FROZEN_MACHINE_VERIFIED"
+    },
+    {
+      "artifact_id": "GOLD_SOP",
+      "bytes": 99953,
+      "final_checker_role": "FINAL_REVIEWER",
+      "kind": "JSON",
+      "path": "cases/n31/gold/gold_sop.json",
+      "release_channels": [
+        "CODE_REPOSITORY",
+        "DEMO_RUNTIME"
+      ],
+      "responsible_role": "EVIDENCE_OWNER",
+      "sha256": "a8f111a52f496f93e9934cedd493630d73732ad73e6e4e79832f0133c31c6f8a",
+      "status": "FROZEN_MACHINE_VERIFIED"
+    },
+    {
+      "artifact_id": "SOP_VIEWS",
+      "bytes": 90630,
+      "final_checker_role": "EVIDENCE_OWNER",
+      "kind": "JSON",
+      "path": "cases/n31/demo_bundle/sop_views.json",
+      "release_channels": [
+        "CODE_REPOSITORY",
+        "DEMO_RUNTIME"
+      ],
+      "responsible_role": "CONTENT_OWNER",
+      "sha256": "7c18ecbf1be02bbfd91cd245335343b515fcedf3261e8571263a698ae0036397",
+      "status": "FROZEN_MACHINE_VERIFIED"
+    },
+    {
+      "artifact_id": "MULTISOURCE_EVAL",
+      "bytes": 3859,
+      "final_checker_role": "TECHNICAL_OWNER",
+      "kind": "JSON",
+      "path": "cases/n31/evaluations/multisource_comparison_v1.json",
+      "release_channels": [
+        "CODE_REPOSITORY"
+      ],
+      "responsible_role": "EVIDENCE_OWNER",
+      "sha256": "f0adc9b6dbfd1f34d1e3e57ec3588d60b96562bea5b6b167fd05408040aac7af",
+      "status": "FROZEN_MACHINE_VERIFIED"
+    },
+    {
+      "artifact_id": "DGX_VISUAL",
+      "bytes": 17979,
+      "final_checker_role": "EVIDENCE_OWNER",
+      "kind": "JSON",
+      "path": "cases/n31/evaluations/dgx_visual_compute_v1.json",
+      "release_channels": [
+        "CODE_REPOSITORY"
+      ],
+      "responsible_role": "TECHNICAL_OWNER",
+      "sha256": "b475c03d34b4a5db8c423b97f72fdfc11d1d5e99e28c699ed2cac6fc912ab9fb",
+      "status": "FROZEN_MACHINE_VERIFIED"
+    },
+    {
+      "artifact_id": "TEMPORAL_WINDOWS",
+      "bytes": 12958,
+      "final_checker_role": "TECHNICAL_OWNER",
+      "kind": "JSON",
+      "path": "cases/n31/evaluations/temporal_action_windows_v1.json",
+      "release_channels": [
+        "CODE_REPOSITORY"
+      ],
+      "responsible_role": "EVIDENCE_OWNER",
+      "sha256": "d1025f1337517194fbd245be9d005cd74986792348a9a1b797008a80f3694847",
+      "status": "FROZEN_MACHINE_VERIFIED"
+    },
+    {
+      "artifact_id": "PDF_STRUCTURE",
+      "bytes": 5948,
+      "final_checker_role": "TECHNICAL_OWNER",
+      "kind": "JSON",
+      "path": "cases/n31/evaluations/pdf_structure_v1.json",
+      "release_channels": [
+        "CODE_REPOSITORY"
+      ],
+      "responsible_role": "EVIDENCE_OWNER",
+      "sha256": "0e40aea7fbdc3440a4c99e97e2a3db2e37f02b6e6a930445808ab2aee850aa97",
+      "status": "FROZEN_MACHINE_VERIFIED"
+    },
+    {
+      "artifact_id": "SOURCE_CANDIDATES",
+      "bytes": 68264,
+      "final_checker_role": "FINAL_REVIEWER",
+      "kind": "JSON",
+      "path": "cases/n31/evaluations/source_candidate_synthesis_v1.json",
+      "release_channels": [
+        "CODE_REPOSITORY"
+      ],
+      "responsible_role": "EVIDENCE_OWNER",
+      "sha256": "28708602befa289bb6a8ce97436b43384a2569a3de79c1b104011815d3c68ec3",
+      "status": "FROZEN_MACHINE_VERIFIED"
+    },
+    {
+      "artifact_id": "GROUNDING_GATE",
+      "bytes": 5821,
+      "final_checker_role": "FINAL_REVIEWER",
+      "kind": "JSON",
+      "path": "cases/n31/evaluations/deterministic_grounding_gate_v1.json",
+      "release_channels": [
+        "CODE_REPOSITORY"
+      ],
+      "responsible_role": "EVIDENCE_OWNER",
+      "sha256": "469a6c83f1fa22cb1616a8a12f5aee36fc61813350028d3e77abd430621ab1c1",
+      "status": "FROZEN_MACHINE_VERIFIED"
+    },
+    {
+      "artifact_id": "SEMANTIC_REVIEW",
+      "bytes": 11170,
+      "final_checker_role": "FINAL_REVIEWER",
+      "kind": "JSON",
+      "path": "cases/n31/evaluations/semantic_review_v1.json",
+      "release_channels": [
+        "CODE_REPOSITORY"
+      ],
+      "responsible_role": "EVIDENCE_OWNER",
+      "sha256": "7cc4676d14bc12aec676e7f34ec126edc8c88e52abeb7df128eaf41ffed04b6f",
+      "status": "FROZEN_MACHINE_VERIFIED"
+    },
+    {
+      "artifact_id": "SELECTIVE_REBUILD",
+      "bytes": 5669,
+      "final_checker_role": "EVIDENCE_OWNER",
+      "kind": "JSON",
+      "path": "cases/n31/evaluations/selective_rebuild_v1.json",
+      "release_channels": [
+        "CODE_REPOSITORY"
+      ],
+      "responsible_role": "TECHNICAL_OWNER",
+      "sha256": "5d6b06f6fac263cfdad71e4aea687fb1ad1501e904e4169e0d4ad6ae396c568c",
+      "status": "FROZEN_MACHINE_VERIFIED"
+    },
+    {
+      "artifact_id": "AGENT_TOOL_TRACE",
+      "bytes": 20750,
+      "final_checker_role": "EVIDENCE_OWNER",
+      "kind": "JSON",
+      "path": "cases/n31/evaluations/agent_tool_trace_v1.json",
+      "release_channels": [
+        "CODE_REPOSITORY",
+        "DEMO_RUNTIME"
+      ],
+      "responsible_role": "TECHNICAL_OWNER",
+      "sha256": "739adef1d1e5e14c818433e87ec416cda80b562fc2eba70512e2c0aa254468a5",
+      "status": "FROZEN_MACHINE_VERIFIED"
+    },
+    {
+      "artifact_id": "RUNTIME_BENCHMARK",
+      "bytes": 2638,
+      "final_checker_role": "FINAL_REVIEWER",
+      "kind": "JSON",
+      "path": "output/evaluation/runtime_benchmark_dgx.json",
+      "release_channels": [
+        "CODE_REPOSITORY",
+        "SUBMISSION_ATTACHMENT"
+      ],
+      "responsible_role": "TECHNICAL_OWNER",
+      "sha256": "185cccd7f26edc54815d240698c996fcc04c6dbd4f5262a56cbdf1d6ebe57ca2",
+      "status": "FROZEN_MACHINE_VERIFIED"
+    },
+    {
+      "artifact_id": "POSTER",
+      "bytes": 130442,
+      "final_checker_role": "FINAL_REVIEWER",
+      "kind": "PDF",
+      "path": "output/pdf/n31_a4_training_poster.pdf",
+      "release_channels": [
+        "SUBMISSION_ATTACHMENT",
+        "DEMO_RUNTIME"
+      ],
+      "responsible_role": "CONTENT_OWNER",
+      "sha256": "d87dd874dc332d8057f0a1106b5b42085f6127f87ddeaa8f4b8a79eee08a8fba",
+      "status": "FROZEN_MACHINE_VERIFIED"
+    },
+    {
+      "artifact_id": "TRAINING_VIDEO",
+      "bytes": 35194451,
+      "final_checker_role": "FINAL_REVIEWER",
+      "kind": "MP4",
+      "path": "output/video/n31_training_video_v1.mp4",
+      "release_channels": [
+        "SUBMISSION_ATTACHMENT",
+        "DEMO_RUNTIME"
+      ],
+      "responsible_role": "CONTENT_OWNER",
+      "sha256": "61ec74826befc89889a6025a9acdb217adbd32af589a9c1f4bb4be1958ff695f",
+      "status": "FROZEN_MACHINE_VERIFIED"
+    },
+    {
+      "artifact_id": "TRAINING_VIDEO_MANIFEST",
+      "bytes": 3677,
+      "final_checker_role": "EVIDENCE_OWNER",
+      "kind": "JSON",
+      "path": "output/video/n31_training_video_manifest_v1.json",
+      "release_channels": [
+        "CODE_REPOSITORY"
+      ],
+      "responsible_role": "TECHNICAL_OWNER",
+      "sha256": "457dc6d3c4baecde0643d75bf3e3b62f7cc9b2b2787100a44aeaf653e8632a3a",
+      "status": "FROZEN_MACHINE_VERIFIED"
+    },
+    {
+      "artifact_id": "TRAINING_VIDEO_EVIDENCE",
+      "bytes": 20726,
+      "final_checker_role": "FINAL_REVIEWER",
+      "kind": "JSON",
+      "path": "output/video/n31_training_video_evidence_pack_v1.json",
+      "release_channels": [
+        "CODE_REPOSITORY"
+      ],
+      "responsible_role": "EVIDENCE_OWNER",
+      "sha256": "c0e826a98f650282f908a182e4620ce440bcc9017bc467d6310d711bb9895f52",
+      "status": "FROZEN_MACHINE_VERIFIED"
+    },
+    {
+      "artifact_id": "PITCH_DECK",
+      "bytes": 1464192,
+      "final_checker_role": "FINAL_REVIEWER",
+      "kind": "PPTX",
+      "path": "output/presentation/SkillForge_三分钟路演_v1.pptx",
+      "release_channels": [
+        "SUBMISSION_ATTACHMENT",
+        "DEMO_RUNTIME"
+      ],
+      "responsible_role": "DEMO_OPERATOR",
+      "sha256": "5178e64c947b5965f82f98acfb0d13bb304e14d7cf7c0ac5c3d63609c2d73c66",
+      "status": "FROZEN_MACHINE_VERIFIED"
+    }
+  ],
+  "branch_policy": {
+    "freeze_requires_clean_worktree": true,
+    "local_commit_required": true,
+    "protected_branch": "main",
+    "push_allowed": false,
+    "regenerate_on_artifact_change": true,
+    "remote_configuration_allowed": false,
+    "review_required_for_p0_changes": true
+  },
+  "case_id": "n31_media_change",
+  "data_policy": {
+    "contains_absolute_paths": false,
+    "contains_artifact_content": false,
+    "contains_credentials": false,
+    "contains_personal_data": false,
+    "contains_public_urls": false
+  },
+  "generated_at": "2026-07-18T15:33:41.368052+00:00",
+  "human_gates": [
+    {
+      "blocking_for_submission": true,
+      "gate_id": "TRAINING_VIDEO_FULL_WATCH",
+      "status": "PENDING"
+    },
+    {
+      "blocking_for_submission": true,
+      "gate_id": "FINAL_STAGE_REHEARSAL",
+      "status": "PENDING"
+    },
+    {
+      "blocking_for_submission": true,
+      "gate_id": "FINAL_RECORDING_REVIEW",
+      "status": "PENDING"
+    },
+    {
+      "blocking_for_submission": true,
+      "gate_id": "TEAM_ELIGIBILITY_CONFIRMED",
+      "status": "PENDING"
+    },
+    {
+      "blocking_for_submission": true,
+      "gate_id": "OFFICIAL_RULES_VERIFIED",
+      "status": "PENDING"
+    }
+  ],
+  "identity_assignment": {
+    "contains_personal_data": false,
+    "mapping_storage": "PRIVATE_SUBMISSION_STATE",
+    "status": "PENDING_TEAM_ROSTER"
+  },
+  "publication_targets": [
+    {
+      "final_checker_role": "FINAL_REVIEWER",
+      "owner_role": "SUBMISSION_OWNER",
+      "public_url": null,
+      "status": "PENDING_SUBMISSION",
+      "target_id": "PROJECT_PAGE"
+    },
+    {
+      "final_checker_role": "FINAL_REVIEWER",
+      "owner_role": "TECHNICAL_OWNER",
+      "public_url": null,
+      "status": "PENDING_OFFICIAL_RULES",
+      "target_id": "CODE_REPOSITORY"
+    },
+    {
+      "final_checker_role": "FINAL_REVIEWER",
+      "owner_role": "DEMO_OPERATOR",
+      "public_url": null,
+      "status": "PENDING_HUMAN_REVIEW",
+      "target_id": "FINAL_RECORDING"
+    }
+  ],
+  "role_config_sha256": "53ff734a3848343d0cacb5b96519fc05c20d09ecde6612861c8180a106210d04",
+  "roles": [
+    {
+      "label": "技术负责人",
+      "responsibility": "维护原生Python工作流、DGX运行、Schema、测试和可复现构建。",
+      "role_id": "TECHNICAL_OWNER"
+    },
+    {
+      "label": "证据负责人",
+      "responsibility": "核对Gold、Evidence定位、质检结论、修订边界和评测口径。",
+      "role_id": "EVIDENCE_OWNER"
+    },
+    {
+      "label": "内容负责人",
+      "responsibility": "维护SOP视图、海报、培训视频和对外文案的一致性。",
+      "role_id": "CONTENT_OWNER"
+    },
+    {
+      "label": "演示操作者",
+      "responsibility": "维护三分钟PPT、切屏顺序、现场操作和录屏候选。",
+      "role_id": "DEMO_OPERATOR"
+    },
+    {
+      "label": "提交负责人",
+      "responsibility": "填写赛事页面、上传附件、保存回执并维护最终公开链接。",
+      "role_id": "SUBMISSION_OWNER"
+    },
+    {
+      "label": "最终检查人",
+      "responsibility": "在提交前复核隐私、规则、成员、链接和全部人工门禁。",
+      "role_id": "FINAL_REVIEWER"
+    }
+  ],
+  "runbook_sha256": "a176edcef575d79b45f7758165c1f8fc06eb54ce35e2def184d3f0140818b11b",
+  "status": "TECHNICAL_ARTIFACTS_FROZEN_HUMAN_GATES_PENDING",
+  "technical_freeze_digest": "4d736bf81016f687ef3376231e9f5e29092ae10675d42186192d02cd2a868b0a",
+  "version": 1
+}

@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/release_roles.schema.json",
+  "title": "SkillForge Release Roles",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "case_id", "roles", "artifact_assignments", "publication_targets", "branch_policy", "identity_assignment", "data_policy"],
+  "properties": {
+    "version": {"const": 1},
+    "case_id": {"const": "n31_media_change"},
+    "roles": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["role_id", "label", "responsibility"],
+        "properties": {
+          "role_id": {"enum": ["TECHNICAL_OWNER", "EVIDENCE_OWNER", "CONTENT_OWNER", "DEMO_OPERATOR", "SUBMISSION_OWNER", "FINAL_REVIEWER"]},
+          "label": {"type": "string", "minLength": 1, "maxLength": 30},
+          "responsibility": {"type": "string", "minLength": 1, "maxLength": 300}
+        }
+      }
+    },
+    "artifact_assignments": {
+      "type": "array",
+      "minItems": 18,
+      "maxItems": 18,
+      "items": {"$ref": "#/$defs/artifactAssignment"}
+    },
+    "publication_targets": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {"$ref": "#/$defs/publicationTarget"}
+    },
+    "branch_policy": {
+      "const": {
+        "protected_branch": "main",
+        "local_commit_required": true,
+        "review_required_for_p0_changes": true,
+        "freeze_requires_clean_worktree": true,
+        "regenerate_on_artifact_change": true,
+        "remote_configuration_allowed": false,
+        "push_allowed": false
+      }
+    },
+    "identity_assignment": {
+      "const": {
+        "status": "PENDING_TEAM_ROSTER",
+        "mapping_storage": "PRIVATE_SUBMISSION_STATE",
+        "contains_personal_data": false
+      }
+    },
+    "data_policy": {
+      "const": {
+        "contains_credentials": false,
+        "contains_personal_data": false,
+        "contains_absolute_paths": false,
+        "contains_public_urls": false
+      }
+    }
+  },
+  "$defs": {
+    "roleId": {"enum": ["TECHNICAL_OWNER", "EVIDENCE_OWNER", "CONTENT_OWNER", "DEMO_OPERATOR", "SUBMISSION_OWNER", "FINAL_REVIEWER"]},
+    "artifactAssignment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["artifact_id", "responsible_role", "final_checker_role", "release_channels"],
+      "properties": {
+        "artifact_id": {"type": "string", "pattern": "^[A-Z0-9_]+$"},
+        "responsible_role": {"$ref": "#/$defs/roleId"},
+        "final_checker_role": {"$ref": "#/$defs/roleId"},
+        "release_channels": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"enum": ["CODE_REPOSITORY", "SUBMISSION_ATTACHMENT", "DEMO_RUNTIME"]}
+        }
+      }
+    },
+    "publicationTarget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["target_id", "owner_role", "final_checker_role", "status"],
+      "properties": {
+        "target_id": {"enum": ["PROJECT_PAGE", "CODE_REPOSITORY", "FINAL_RECORDING"]},
+        "owner_role": {"$ref": "#/$defs/roleId"},
+        "final_checker_role": {"$ref": "#/$defs/roleId"},
+        "status": {"enum": ["PENDING_SUBMISSION", "PENDING_OFFICIAL_RULES", "PENDING_HUMAN_REVIEW"]}
+      }
+    }
+  }
+}

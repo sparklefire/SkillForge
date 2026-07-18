@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/release_manifest.schema.json",
+  "title": "SkillForge Release Freeze Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "case_id", "artifact_type", "generated_at", "status", "runbook_sha256", "role_config_sha256", "technical_freeze_digest", "artifact_count", "roles", "artifacts", "publication_targets", "human_gates", "branch_policy", "identity_assignment", "data_policy"],
+  "properties": {
+    "version": {"const": 1},
+    "case_id": {"const": "n31_media_change"},
+    "artifact_type": {"const": "RELEASE_FREEZE_MANIFEST"},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "status": {"const": "TECHNICAL_ARTIFACTS_FROZEN_HUMAN_GATES_PENDING"},
+    "runbook_sha256": {"$ref": "#/$defs/sha256"},
+    "role_config_sha256": {"$ref": "#/$defs/sha256"},
+    "technical_freeze_digest": {"$ref": "#/$defs/sha256"},
+    "artifact_count": {"const": 18},
+    "roles": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["role_id", "label", "responsibility"],
+        "properties": {
+          "role_id": {"type": "string", "pattern": "^[A-Z0-9_]+$"},
+          "label": {"type": "string", "minLength": 1},
+          "responsibility": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "minItems": 18,
+      "maxItems": 18,
+      "items": {"$ref": "#/$defs/artifact"}
+    },
+    "publication_targets": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {"$ref": "#/$defs/publicationTarget"}
+    },
+    "human_gates": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["gate_id", "status", "blocking_for_submission"],
+        "properties": {
+          "gate_id": {"type": "string", "pattern": "^[A-Z0-9_]+$"},
+          "status": {"const": "PENDING"},
+          "blocking_for_submission": {"const": true}
+        }
+      }
+    },
+    "branch_policy": {
+      "const": {
+        "protected_branch": "main",
+        "local_commit_required": true,
+        "review_required_for_p0_changes": true,
+        "freeze_requires_clean_worktree": true,
+        "regenerate_on_artifact_change": true,
+        "remote_configuration_allowed": false,
+        "push_allowed": false
+      }
+    },
+    "identity_assignment": {
+      "const": {
+        "status": "PENDING_TEAM_ROSTER",
+        "mapping_storage": "PRIVATE_SUBMISSION_STATE",
+        "contains_personal_data": false
+      }
+    },
+    "data_policy": {
+      "const": {
+        "contains_credentials": false,
+        "contains_personal_data": false,
+        "contains_absolute_paths": false,
+        "contains_public_urls": false,
+        "contains_artifact_content": false
+      }
+    }
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["artifact_id", "path", "kind", "sha256", "bytes", "responsible_role", "final_checker_role", "release_channels", "status"],
+      "properties": {
+        "artifact_id": {"type": "string", "pattern": "^[A-Z0-9_]+$"},
+        "path": {"type": "string", "minLength": 1, "not": {"pattern": "(^/|(^|/)\\.\\.(/|$))"}},
+        "kind": {"enum": ["JSON", "PDF", "MP4", "PPTX"]},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "bytes": {"type": "integer", "minimum": 1},
+        "responsible_role": {"type": "string", "pattern": "^[A-Z0-9_]+$"},
+        "final_checker_role": {"type": "string", "pattern": "^[A-Z0-9_]+$"},
+        "release_channels": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["CODE_REPOSITORY", "SUBMISSION_ATTACHMENT", "DEMO_RUNTIME"]}},
+        "status": {"const": "FROZEN_MACHINE_VERIFIED"}
+      }
+    },
+    "publicationTarget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["target_id", "owner_role", "final_checker_role", "status", "public_url"],
+      "properties": {
+        "target_id": {"enum": ["PROJECT_PAGE", "CODE_REPOSITORY", "FINAL_RECORDING"]},
+        "owner_role": {"type": "string", "pattern": "^[A-Z0-9_]+$"},
+        "final_checker_role": {"type": "string", "pattern": "^[A-Z0-9_]+$"},
+        "status": {"enum": ["PENDING_SUBMISSION", "PENDING_OFFICIAL_RULES", "PENDING_HUMAN_REVIEW"]},
+        "public_url": {"type": "null"}
+      }
+    }
+  }
+}

@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/publication_links_qa.schema.json",
+  "title": "SkillForge Publication Links QA",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "case_id", "artifact_type", "checked_at", "status", "input_sha256", "target_count", "targets", "data_policy"],
+  "properties": {
+    "version": {"const": 1},
+    "case_id": {"const": "n31_media_change"},
+    "artifact_type": {"const": "PUBLICATION_LINKS_QA"},
+    "checked_at": {"type": "string", "format": "date-time"},
+    "status": {"enum": ["FAILED", "PASSED"]},
+    "input_sha256": {"$ref": "#/$defs/sha256"},
+    "target_count": {"const": 3},
+    "targets": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {"$ref": "#/$defs/target"}
+    },
+    "data_policy": {
+      "const": {
+        "private_local_state": true,
+        "contains_credentials": false,
+        "contains_urls": false,
+        "contains_response_body": false,
+        "anonymous_requests_only": true,
+        "authorization_headers_sent": false,
+        "cookies_sent": false
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"status": {"const": "PASSED"}}},
+      "then": {
+        "properties": {
+          "targets": {
+            "items": {
+              "properties": {
+                "status": {"const": "PASSED"},
+                "checks": {
+                  "properties": {
+                    "input_url_safe": {"const": true},
+                    "anonymous_reachable": {"const": true},
+                    "content_type_matches": {"const": true},
+                    "final_url_safe": {"const": true},
+                    "remote_ip_public": {"const": true}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["target_id", "expected_surface", "url_sha256", "final_url_sha256", "http_status", "content_type", "redirect_count", "status", "checks"],
+      "properties": {
+        "target_id": {"enum": ["PROJECT_PAGE", "CODE_REPOSITORY", "FINAL_RECORDING"]},
+        "expected_surface": {"enum": ["HTML", "HTML_OR_VIDEO"]},
+        "url_sha256": {"$ref": "#/$defs/sha256"},
+        "final_url_sha256": {"anyOf": [{"$ref": "#/$defs/sha256"}, {"type": "null"}]},
+        "http_status": {"type": "integer", "minimum": 0, "maximum": 599},
+        "content_type": {"type": ["string", "null"], "maxLength": 200},
+        "redirect_count": {"type": "integer", "minimum": 0},
+        "status": {"enum": ["FAILED", "PASSED"]},
+        "checks": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["input_url_safe", "anonymous_reachable", "content_type_matches", "final_url_safe", "remote_ip_public"],
+          "properties": {
+            "input_url_safe": {"type": "boolean"},
+            "anonymous_reachable": {"type": "boolean"},
+            "content_type_matches": {"type": "boolean"},
+            "final_url_safe": {"type": "boolean"},
+            "remote_ip_public": {"type": "boolean"}
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "version": 1,
+  "case_id": "n31_media_change",
+  "roles": [
+    {
+      "role_id": "TECHNICAL_OWNER",
+      "label": "技术负责人",
+      "responsibility": "维护原生Python工作流、DGX运行、Schema、测试和可复现构建。"
+    },
+    {
+      "role_id": "EVIDENCE_OWNER",
+      "label": "证据负责人",
+      "responsibility": "核对Gold、Evidence定位、质检结论、修订边界和评测口径。"
+    },
+    {
+      "role_id": "CONTENT_OWNER",
+      "label": "内容负责人",
+      "responsibility": "维护SOP视图、海报、培训视频和对外文案的一致性。"
+    },
+    {
+      "role_id": "DEMO_OPERATOR",
+      "label": "演示操作者",
+      "responsibility": "维护三分钟PPT、切屏顺序、现场操作和录屏候选。"
+    },
+    {
+      "role_id": "SUBMISSION_OWNER",
+      "label": "提交负责人",
+      "responsibility": "填写赛事页面、上传附件、保存回执并维护最终公开链接。"
+    },
+    {
+      "role_id": "FINAL_REVIEWER",
+      "label": "最终检查人",
+      "responsibility": "在提交前复核隐私、规则、成员、链接和全部人工门禁。"
+    }
+  ],
+  "artifact_assignments": [
+    {"artifact_id": "DEMO_BUNDLE", "responsible_role": "TECHNICAL_OWNER", "final_checker_role": "FINAL_REVIEWER", "release_channels": ["CODE_REPOSITORY", "DEMO_RUNTIME"]},
+    {"artifact_id": "GOLD_SOP", "responsible_role": "EVIDENCE_OWNER", "final_checker_role": "FINAL_REVIEWER", "release_channels": ["CODE_REPOSITORY", "DEMO_RUNTIME"]},
+    {"artifact_id": "SOP_VIEWS", "responsible_role": "CONTENT_OWNER", "final_checker_role": "EVIDENCE_OWNER", "release_channels": ["CODE_REPOSITORY", "DEMO_RUNTIME"]},
+    {"artifact_id": "MULTISOURCE_EVAL", "responsible_role": "EVIDENCE_OWNER", "final_checker_role": "TECHNICAL_OWNER", "release_channels": ["CODE_REPOSITORY"]},
+    {"artifact_id": "DGX_VISUAL", "responsible_role": "TECHNICAL_OWNER", "final_checker_role": "EVIDENCE_OWNER", "release_channels": ["CODE_REPOSITORY"]},
+    {"artifact_id": "TEMPORAL_WINDOWS", "responsible_role": "EVIDENCE_OWNER", "final_checker_role": "TECHNICAL_OWNER", "release_channels": ["CODE_REPOSITORY"]},
+    {"artifact_id": "PDF_STRUCTURE", "responsible_role": "EVIDENCE_OWNER", "final_checker_role": "TECHNICAL_OWNER", "release_channels": ["CODE_REPOSITORY"]},
+    {"artifact_id": "SOURCE_CANDIDATES", "responsible_role": "EVIDENCE_OWNER", "final_checker_role": "FINAL_REVIEWER", "release_channels": ["CODE_REPOSITORY"]},
+    {"artifact_id": "GROUNDING_GATE", "responsible_role": "EVIDENCE_OWNER", "final_checker_role": "FINAL_REVIEWER", "release_channels": ["CODE_REPOSITORY"]},
+    {"artifact_id": "SEMANTIC_REVIEW", "responsible_role": "EVIDENCE_OWNER", "final_checker_role": "FINAL_REVIEWER", "release_channels": ["CODE_REPOSITORY"]},
+    {"artifact_id": "SELECTIVE_REBUILD", "responsible_role": "TECHNICAL_OWNER", "final_checker_role": "EVIDENCE_OWNER", "release_channels": ["CODE_REPOSITORY"]},
+    {"artifact_id": "AGENT_TOOL_TRACE", "responsible_role": "TECHNICAL_OWNER", "final_checker_role": "EVIDENCE_OWNER", "release_channels": ["CODE_REPOSITORY", "DEMO_RUNTIME"]},
+    {"artifact_id": "RUNTIME_BENCHMARK", "responsible_role": "TECHNICAL_OWNER", "final_checker_role": "FINAL_REVIEWER", "release_channels": ["CODE_REPOSITORY", "SUBMISSION_ATTACHMENT"]},
+    {"artifact_id": "POSTER", "responsible_role": "CONTENT_OWNER", "final_checker_role": "FINAL_REVIEWER", "release_channels": ["SUBMISSION_ATTACHMENT", "DEMO_RUNTIME"]},
+    {"artifact_id": "TRAINING_VIDEO", "responsible_role": "CONTENT_OWNER", "final_checker_role": "FINAL_REVIEWER", "release_channels": ["SUBMISSION_ATTACHMENT", "DEMO_RUNTIME"]},
+    {"artifact_id": "TRAINING_VIDEO_MANIFEST", "responsible_role": "TECHNICAL_OWNER", "final_checker_role": "EVIDENCE_OWNER", "release_channels": ["CODE_REPOSITORY"]},
+    {"artifact_id": "TRAINING_VIDEO_EVIDENCE", "responsible_role": "EVIDENCE_OWNER", "final_checker_role": "FINAL_REVIEWER", "release_channels": ["CODE_REPOSITORY"]},
+    {"artifact_id": "PITCH_DECK", "responsible_role": "DEMO_OPERATOR", "final_checker_role": "FINAL_REVIEWER", "release_channels": ["SUBMISSION_ATTACHMENT", "DEMO_RUNTIME"]}
+  ],
+  "publication_targets": [
+    {"target_id": "PROJECT_PAGE", "owner_role": "SUBMISSION_OWNER", "final_checker_role": "FINAL_REVIEWER", "status": "PENDING_SUBMISSION"},
+    {"target_id": "CODE_REPOSITORY", "owner_role": "TECHNICAL_OWNER", "final_checker_role": "FINAL_REVIEWER", "status": "PENDING_OFFICIAL_RULES"},
+    {"target_id": "FINAL_RECORDING", "owner_role": "DEMO_OPERATOR", "final_checker_role": "FINAL_REVIEWER", "status": "PENDING_HUMAN_REVIEW"}
+  ],
+  "branch_policy": {
+    "protected_branch": "main",
+    "local_commit_required": true,
+    "review_required_for_p0_changes": true,
+    "freeze_requires_clean_worktree": true,
+    "regenerate_on_artifact_change": true,
+    "remote_configuration_allowed": false,
+    "push_allowed": false
+  },
+  "identity_assignment": {
+    "status": "PENDING_TEAM_ROSTER",
+    "mapping_storage": "PRIVATE_SUBMISSION_STATE",
+    "contains_personal_data": false
+  },
+  "data_policy": {
+    "contains_credentials": false,
+    "contains_personal_data": false,
+    "contains_absolute_paths": false,
+    "contains_public_urls": false
+  }
+}

@@ -19,6 +19,7 @@ from .contracts import ContractValidationError, validate_document
 from .demo import ROOT
 from .human_gates import HumanGateStore
 from .pitch import build_readiness
+from .release_manifest import ReleaseManifestError, verify_release_manifest
 
 
 REQUIRED_DOCUMENTS = [
@@ -284,6 +285,31 @@ def _check_official_rules_status(root: Path) -> dict[str, Any]:
     )
 
 
+def _check_release_manifest(root: Path) -> dict[str, Any]:
+    try:
+        manifest = verify_release_manifest(
+            root / "output/submission/release_manifest_v1.json",
+            root=root,
+            config_path=root / "config/release_roles.json",
+            runbook_path=root / "cases/n31/pitch_runbook.json",
+        )
+    except (OSError, ReleaseManifestError, ContractValidationError) as exc:
+        return _check(
+            "RELEASE_FREEZE_MANIFEST",
+            "FAILED",
+            f"发布冻结清单缺失、过期或无效；错误类型={type(exc).__name__}",
+        )
+    return _check(
+        "RELEASE_FREEZE_MANIFEST",
+        "PASSED",
+        (
+            f"{manifest['artifact_count']}项成果完成角色、终检和哈希冻结；"
+            f"角色={len(manifest['roles'])}; 公开入口={len(manifest['publication_targets'])}; "
+            "成员姓名与链接仍为私有待填写"
+        ),
+    )
+
+
 def _check_pitch_package(
     root: Path,
     confirmed_gate_ids: set[str],
@@ -466,6 +492,7 @@ def build_submission_preflight(
         _check_project_identity(root),
         _check_required_documents(root),
         _check_official_rules_status(root),
+        _check_release_manifest(root),
         confirmation_check,
         pitch_check,
         _check_public_artifacts(root, values),
