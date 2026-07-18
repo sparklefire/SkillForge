@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/release_bundle_qa.schema.json",
+  "title": "SkillForge Public Technical Release Bundle QA",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "case_id",
+    "artifact_type",
+    "status",
+    "bundle_name",
+    "archive_sha256",
+    "archive_bytes",
+    "bundle_manifest_sha256",
+    "release_manifest_sha256",
+    "technical_freeze_digest",
+    "artifact_count",
+    "archive_member_count",
+    "checks",
+    "data_policy"
+  ],
+  "properties": {
+    "version": {"const": 1},
+    "case_id": {"const": "n31_media_change"},
+    "artifact_type": {"const": "PUBLIC_TECHNICAL_RELEASE_BUNDLE_QA"},
+    "status": {"const": "PASSED"},
+    "bundle_name": {"const": "skillforge_n31_public_release_v1.zip"},
+    "archive_sha256": {"$ref": "#/$defs/sha256"},
+    "archive_bytes": {"type": "integer", "minimum": 1},
+    "bundle_manifest_sha256": {"$ref": "#/$defs/sha256"},
+    "release_manifest_sha256": {"$ref": "#/$defs/sha256"},
+    "technical_freeze_digest": {"$ref": "#/$defs/sha256"},
+    "artifact_count": {"const": 18},
+    "archive_member_count": {"const": 20},
+    "checks": {
+      "const": {
+        "release_manifest_current": true,
+        "exact_artifact_set": true,
+        "source_hashes_match": true,
+        "member_hashes_match": true,
+        "deterministic_zip_metadata": true,
+        "safe_member_paths": true,
+        "no_duplicate_or_extra_members": true,
+        "public_artifact_boundary_clean": true,
+        "human_gate_boundary_preserved": true
+      }
+    },
+    "data_policy": {
+      "const": {
+        "contains_credentials": false,
+        "contains_personal_data": false,
+        "contains_absolute_paths": false,
+        "contains_private_submission_urls": false,
+        "public_reference_urls_may_be_present": true,
+        "contains_raw_media": false,
+        "contains_public_safe_derived_media": true,
+        "contains_private_submission_state": false,
+        "official_upload_format_claimed": false
+      }
+    }
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+  }
+}

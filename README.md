@@ -245,6 +245,15 @@ bash scripts/run_runtime_benchmark.sh dgx
 
 基准执行2次预热和20次测量，分别覆盖直接 Python Gold 闭环和 Web 现场重算。当前 DGX 报告中位数为37.626毫秒和44.800毫秒，基准进程高水位RSS为86,491,136字节。该数字只描述已审核结构化Gold的确定性质检、局部修订和输出，不包含原始视频、PDF、录音预处理，也不调用外部模型。报告见 [运行时评测说明](./output/evaluation/README.md)。
 
+18项冻结成果的可复现公开技术交付包：
+
+```bash
+bash scripts/build_public_release_bundle.sh
+bash scripts/build_public_release_bundle.sh --verify-only
+```
+
+命令生成Git忽略的 `outputs/release/skillforge_n31_public_release_v1.zip` 和同目录QA。ZIP固定包含18项成果、发布冻结清单和包内清单共20个成员，保留项目相对路径并使用固定时间戳、固定0644成员权限和无压缩存储，重复构建必须得到相同SHA-256。构建器会重新校验当前冻结清单、来源大小/哈希、绝对路径、本机密钥值、重复/多余成员、路径穿越和符号链接；本地目录权限700、归档与QA权限600。它只是不含原始素材和私有提交状态的技术交付/录屏兜底，状态明确保留五项人工门禁，也不声称符合尚未取得的官方上传格式。
+
 最终提交预检：
 
 ```bash

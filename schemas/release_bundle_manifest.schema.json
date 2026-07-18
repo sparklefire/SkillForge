@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/release_bundle_manifest.schema.json",
+  "title": "SkillForge Public Technical Release Bundle Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "case_id",
+    "artifact_type",
+    "status",
+    "bundle_name",
+    "bundle_root",
+    "technical_freeze_digest",
+    "release_manifest",
+    "artifact_count",
+    "archive_member_count",
+    "artifacts",
+    "data_policy"
+  ],
+  "properties": {
+    "version": {"const": 1},
+    "case_id": {"const": "n31_media_change"},
+    "artifact_type": {"const": "PUBLIC_TECHNICAL_RELEASE_BUNDLE_MANIFEST"},
+    "status": {"const": "TECHNICAL_BUNDLE_VERIFIED_HUMAN_GATES_PENDING"},
+    "bundle_name": {"const": "skillforge_n31_public_release_v1.zip"},
+    "bundle_root": {"const": "skillforge_n31_public_release_v1"},
+    "technical_freeze_digest": {"$ref": "#/$defs/sha256"},
+    "release_manifest": {"$ref": "#/$defs/member"},
+    "artifact_count": {"const": 18},
+    "archive_member_count": {"const": 20},
+    "artifacts": {
+      "type": "array",
+      "minItems": 18,
+      "maxItems": 18,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["artifact_id", "kind", "source_path", "archive_path", "sha256", "bytes"],
+        "properties": {
+          "artifact_id": {"type": "string", "pattern": "^[A-Z0-9_]+$"},
+          "kind": {"enum": ["JSON", "PDF", "MP4", "PPTX"]},
+          "source_path": {"$ref": "#/$defs/safePath"},
+          "archive_path": {"$ref": "#/$defs/bundlePath"},
+          "sha256": {"$ref": "#/$defs/sha256"},
+          "bytes": {"type": "integer", "minimum": 1}
+        }
+      }
+    },
+    "data_policy": {
+      "const": {
+        "contains_credentials": false,
+        "contains_personal_data": false,
+        "contains_absolute_paths": false,
+        "contains_private_submission_urls": false,
+        "public_reference_urls_may_be_present": true,
+        "contains_raw_media": false,
+        "contains_public_safe_derived_media": true,
+        "requires_human_gates_before_submission": true,
+        "official_upload_format_claimed": false
+      }
+    }
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "safePath": {
+      "type": "string",
+      "minLength": 1,
+      "not": {"pattern": "(^/|(^|/)\\.\\.(/|$)|\\\\)"}
+    },
+    "bundlePath": {
+      "type": "string",
+      "pattern": "^skillforge_n31_public_release_v1/.+",
+      "not": {"pattern": "(^/|(^|/)\\.\\.(/|$)|\\\\)"}
+    },
+    "member": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["archive_path", "sha256", "bytes"],
+      "properties": {
+        "archive_path": {"$ref": "#/$defs/bundlePath"},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "bytes": {"type": "integer", "minimum": 1}
+      }
+    }
+  }
+}
