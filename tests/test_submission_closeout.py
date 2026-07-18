@@ -320,11 +320,22 @@ def test_cli_output_is_safe_pending_signal_and_default_report_is_ignored() -> No
     assert DEFAULT_OUTPUT.is_file()
     assert stat.S_IMODE(DEFAULT_OUTPUT.parent.stat().st_mode) == 0o700
     assert stat.S_IMODE(DEFAULT_OUTPUT.stat().st_mode) == 0o600
-    ignored = subprocess.run(
-        ["git", "check-ignore", "-q", str(DEFAULT_OUTPUT.relative_to(ROOT))],
+    git_state = subprocess.run(
+        ["git", "rev-parse", "--is-inside-work-tree"],
         cwd=ROOT,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
+        text=True,
         check=False,
     )
-    assert ignored.returncode == 0
+    if git_state.returncode == 0:
+        ignored = subprocess.run(
+            ["git", "check-ignore", "-q", str(DEFAULT_OUTPUT.relative_to(ROOT))],
+            cwd=ROOT,
+            check=False,
+        )
+        assert ignored.returncode == 0
+    else:
+        assert "outputs/*" in (ROOT / ".gitignore").read_text(encoding="utf-8")
     script = ROOT / "scripts/check_submission_closeout.sh"
     assert script.is_file() and script.stat().st_mode & 0o111
