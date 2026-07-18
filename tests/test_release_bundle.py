@@ -230,12 +230,28 @@ def test_default_runtime_outputs_are_git_ignored_and_script_is_executable() -> N
     script = ROOT / "scripts/build_public_release_bundle.sh"
     assert script.is_file()
     assert script.stat().st_mode & 0o111
-    result = subprocess.run(
-        ["git", "check-ignore", "-q", str(DEFAULT_ARCHIVE.relative_to(ROOT))],
+    git_state = subprocess.run(
+        ["git", "rev-parse", "--is-inside-work-tree"],
         cwd=ROOT,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
+        text=True,
         check=False,
     )
-    assert result.returncode == 0
+    if git_state.returncode == 0:
+        ignored = subprocess.run(
+            [
+                "git",
+                "check-ignore",
+                "-q",
+                str(DEFAULT_ARCHIVE.relative_to(ROOT)),
+            ],
+            cwd=ROOT,
+            check=False,
+        )
+        assert ignored.returncode == 0
+    else:
+        assert "outputs/*" in (ROOT / ".gitignore").read_text(encoding="utf-8")
     assert stat.S_IMODE(DEFAULT_ARCHIVE.parent.stat().st_mode) == 0o700
     assert stat.S_IMODE(DEFAULT_ARCHIVE.stat().st_mode) == 0o600
     assert stat.S_IMODE(DEFAULT_REPORT.stat().st_mode) == 0o600
