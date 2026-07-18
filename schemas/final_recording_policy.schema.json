@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/final_recording_policy.schema.json",
+  "title": "SkillForge Final Recording Internal QA Policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "case_id",
+    "policy_basis",
+    "official_video_requirements_verified",
+    "private_storage",
+    "duration",
+    "video",
+    "audio",
+    "screen",
+    "human_checks",
+    "data_policy"
+  ],
+  "properties": {
+    "version": {"const": 1},
+    "case_id": {"const": "n31_media_change"},
+    "policy_basis": {"const": "INTERNAL_REHEARSAL_TARGET_NOT_OFFICIAL_RULE"},
+    "official_video_requirements_verified": {"const": false},
+    "private_storage": {
+      "const": {
+        "relative_directory": "outputs/submission",
+        "required_filename": "skillforge_final_recording.mp4",
+        "required_file_mode": "0600",
+        "required_directory_mode": "0700",
+        "allowed_extensions": [".mp4"]
+      }
+    },
+    "duration": {"const": {"minimum_ms": 175000, "maximum_ms": 180500}},
+    "video": {
+      "const": {
+        "width": 1920,
+        "height": 1080,
+        "minimum_fps": 29.0,
+        "maximum_fps": 31.0,
+        "allowed_codecs": ["h264"]
+      }
+    },
+    "audio": {
+      "const": {
+        "required": true,
+        "allowed_codecs": ["aac"],
+        "minimum_sample_rate": 44100,
+        "minimum_integrated_lufs": -30.0,
+        "maximum_integrated_lufs": -10.0,
+        "maximum_true_peak_dbtp": -0.5,
+        "silence_threshold_db": -40,
+        "silence_minimum_ms": 500,
+        "maximum_silence_ratio": 0.25,
+        "maximum_contiguous_silence_ms": 7000
+      }
+    },
+    "screen": {
+      "const": {
+        "black_pixel_threshold": 0.1,
+        "black_picture_ratio": 0.98,
+        "black_minimum_ms": 300,
+        "maximum_black_ratio": 0.05,
+        "maximum_contiguous_black_ms": 3000
+      }
+    },
+    "human_checks": {
+      "const": [
+        "SUBTITLES_PRESENT_AND_READABLE",
+        "NO_PRIVATE_CONTENT_OR_PERSONAL_UI",
+        "FULL_PLAYBACK_COMPLETED",
+        "NARRATION_AND_DEMO_IN_SYNC"
+      ]
+    },
+    "data_policy": {
+      "const": {
+        "external_model_calls": 0,
+        "contains_credentials": false,
+        "contains_media": false,
+        "contains_absolute_paths": false
+      }
+    }
+  }
+}

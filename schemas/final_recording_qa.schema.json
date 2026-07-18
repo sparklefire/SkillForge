@@ -1,0 +1,184 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/final_recording_qa.schema.json",
+  "title": "SkillForge Final Recording QA Report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "case_id",
+    "artifact_type",
+    "generated_at",
+    "status",
+    "policy_sha256",
+    "media",
+    "measurements",
+    "checks",
+    "human_review",
+    "official_rules_boundary",
+    "data_policy"
+  ],
+  "properties": {
+    "version": {"const": 1},
+    "case_id": {"const": "n31_media_change"},
+    "artifact_type": {"const": "FINAL_RECORDING_QA"},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "status": {"enum": ["MACHINE_QA_FAILED", "READY_FOR_HUMAN_REVIEW"]},
+    "policy_sha256": {"$ref": "#/$defs/sha256"},
+    "media": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "filename",
+        "sha256",
+        "bytes",
+        "file_mode",
+        "duration_ms",
+        "width",
+        "height",
+        "fps",
+        "video_codec",
+        "audio_codec",
+        "audio_sample_rate",
+        "audio_channels"
+      ],
+      "properties": {
+        "filename": {"const": "skillforge_final_recording.mp4"},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "bytes": {"type": "integer", "minimum": 1},
+        "file_mode": {"type": "string", "pattern": "^[0-7]{4}$"},
+        "duration_ms": {"type": ["integer", "null"], "minimum": 1},
+        "width": {"type": ["integer", "null"], "minimum": 1},
+        "height": {"type": ["integer", "null"], "minimum": 1},
+        "fps": {"type": ["number", "null"], "exclusiveMinimum": 0},
+        "video_codec": {"type": ["string", "null"]},
+        "audio_codec": {"type": ["string", "null"]},
+        "audio_sample_rate": {"type": ["integer", "null"], "minimum": 1},
+        "audio_channels": {"type": ["integer", "null"], "minimum": 1}
+      }
+    },
+    "measurements": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "integrated_lufs",
+        "true_peak_dbtp",
+        "silence_total_ms",
+        "silence_ratio",
+        "maximum_contiguous_silence_ms",
+        "black_total_ms",
+        "black_ratio",
+        "maximum_contiguous_black_ms"
+      ],
+      "properties": {
+        "integrated_lufs": {"type": ["number", "null"]},
+        "true_peak_dbtp": {"type": ["number", "null"]},
+        "silence_total_ms": {"type": ["integer", "null"], "minimum": 0},
+        "silence_ratio": {"type": ["number", "null"], "minimum": 0, "maximum": 1},
+        "maximum_contiguous_silence_ms": {"type": ["integer", "null"], "minimum": 0},
+        "black_total_ms": {"type": ["integer", "null"], "minimum": 0},
+        "black_ratio": {"type": ["number", "null"], "minimum": 0, "maximum": 1},
+        "maximum_contiguous_black_ms": {"type": ["integer", "null"], "minimum": 0}
+      }
+    },
+    "checks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "private_storage_passed",
+        "container_passed",
+        "duration_passed",
+        "video_stream_passed",
+        "dimensions_passed",
+        "fps_passed",
+        "video_codec_passed",
+        "audio_stream_passed",
+        "audio_codec_passed",
+        "audio_sample_rate_passed",
+        "loudness_passed",
+        "true_peak_passed",
+        "silence_ratio_passed",
+        "maximum_silence_passed",
+        "black_ratio_passed",
+        "maximum_black_passed"
+      ],
+      "properties": {
+        "private_storage_passed": {"type": "boolean"},
+        "container_passed": {"type": "boolean"},
+        "duration_passed": {"type": "boolean"},
+        "video_stream_passed": {"type": "boolean"},
+        "dimensions_passed": {"type": "boolean"},
+        "fps_passed": {"type": "boolean"},
+        "video_codec_passed": {"type": "boolean"},
+        "audio_stream_passed": {"type": "boolean"},
+        "audio_codec_passed": {"type": "boolean"},
+        "audio_sample_rate_passed": {"type": "boolean"},
+        "loudness_passed": {"type": "boolean"},
+        "true_peak_passed": {"type": "boolean"},
+        "silence_ratio_passed": {"type": "boolean"},
+        "maximum_silence_passed": {"type": "boolean"},
+        "black_ratio_passed": {"type": "boolean"},
+        "maximum_black_passed": {"type": "boolean"}
+      }
+    },
+    "human_review": {
+      "const": {
+        "required": true,
+        "status": "PENDING",
+        "checks": [
+          "SUBTITLES_PRESENT_AND_READABLE",
+          "NO_PRIVATE_CONTENT_OR_PERSONAL_UI",
+          "FULL_PLAYBACK_COMPLETED",
+          "NARRATION_AND_DEMO_IN_SYNC"
+        ]
+      }
+    },
+    "official_rules_boundary": {
+      "const": {
+        "policy_basis": "INTERNAL_REHEARSAL_TARGET_NOT_OFFICIAL_RULE",
+        "official_video_requirements_verified": false
+      }
+    },
+    "data_policy": {
+      "const": {
+        "private_local_state": true,
+        "contains_media": false,
+        "contains_credentials": false,
+        "contains_absolute_paths": false,
+        "external_model_calls": 0
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"status": {"const": "READY_FOR_HUMAN_REVIEW"}}},
+      "then": {
+        "properties": {
+          "checks": {
+            "properties": {
+              "private_storage_passed": {"const": true},
+              "container_passed": {"const": true},
+              "duration_passed": {"const": true},
+              "video_stream_passed": {"const": true},
+              "dimensions_passed": {"const": true},
+              "fps_passed": {"const": true},
+              "video_codec_passed": {"const": true},
+              "audio_stream_passed": {"const": true},
+              "audio_codec_passed": {"const": true},
+              "audio_sample_rate_passed": {"const": true},
+              "loudness_passed": {"const": true},
+              "true_peak_passed": {"const": true},
+              "silence_ratio_passed": {"const": true},
+              "maximum_silence_passed": {"const": true},
+              "black_ratio_passed": {"const": true},
+              "maximum_black_passed": {"const": true}
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+  }
+}

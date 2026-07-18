@@ -15,6 +15,7 @@ from urllib.parse import urlsplit
 
 from .contracts import validate_document
 from .demo import ROOT
+from .final_recording import final_recording_qa_issue
 
 
 DEFAULT_RUNBOOK = ROOT / "cases/n31/pitch_runbook.json"
@@ -102,9 +103,15 @@ class HumanGateStore:
         path: Path = DEFAULT_STORE,
         *,
         runbook_path: Path = DEFAULT_RUNBOOK,
+        final_recording_qa_path: Path | None = None,
     ) -> None:
         self.path = path.expanduser().resolve()
         self.runbook_path = runbook_path.expanduser().resolve()
+        self.final_recording_qa_path = (
+            final_recording_qa_path.expanduser().resolve()
+            if final_recording_qa_path is not None
+            else self.path.parent / "final_recording_qa.json"
+        )
 
     def _runbook(self) -> tuple[dict[str, Any], str]:
         if not self.runbook_path.is_file():
@@ -192,6 +199,15 @@ class HumanGateStore:
             return "EVIDENCE_HASH_CHANGED"
         return None
 
+    def _gate_evidence_issue(
+        self,
+        gate_id: str,
+        evidence: dict[str, Any],
+    ) -> str | None:
+        if gate_id != "FINAL_RECORDING_REVIEW":
+            return None
+        return final_recording_qa_issue(self.final_recording_qa_path, evidence)
+
     def audit(self) -> dict[str, Any]:
         runbook, runbook_sha256 = self._runbook()
         gates = {item["gate_id"]: item for item in runbook["human_gates"]}
@@ -249,6 +265,12 @@ class HumanGateStore:
             evidence_issue = self._evidence_issue(item["evidence"])
             if evidence_issue:
                 issues.append(f"{evidence_issue}:{item['gate_id']}")
+                continue
+            gate_evidence_issue = self._gate_evidence_issue(
+                item["gate_id"], item["evidence"]
+            )
+            if gate_evidence_issue:
+                issues.append(f"{gate_evidence_issue}:{item['gate_id']}")
                 continue
             effective.add(item["gate_id"])
         return self._audit_result(
@@ -319,6 +341,11 @@ class HumanGateStore:
             if evidence_file is not None
             else _evidence_from_url(evidence_url or "")
         )
+        gate_evidence_issue = self._gate_evidence_issue(gate_id, evidence)
+        if gate_evidence_issue:
+            raise HumanGateError(
+                f"人工门禁证据未满足专用QA要求：{gate_evidence_issue}"
+            )
         if self.path.exists():
             if self._security_issue():
                 raise HumanGateError("人工门禁确认记录权限不安全，拒绝写入")

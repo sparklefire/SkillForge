@@ -6,7 +6,9 @@ from pathlib import Path
 
 import pytest
 
+import skillforge.final_recording as final_recording_module
 from skillforge.contracts import validate_document
+from skillforge.final_recording import evaluate_final_recording, write_private_report
 from skillforge.human_gates import HumanGateError, HumanGateStore
 from skillforge.submission import build_submission_preflight
 
@@ -26,6 +28,42 @@ def _copied_runbook(tmp_path: Path) -> Path:
     path = tmp_path / "pitch_runbook.json"
     path.write_bytes(RUNBOOK.read_bytes())
     return path
+
+
+def _ready_recording(private: Path) -> Path:
+    private.mkdir(parents=True, exist_ok=True, mode=0o700)
+    private.chmod(0o700)
+    recording = private / "skillforge_final_recording.mp4"
+    recording.write_bytes(b"private synthetic final recording")
+    recording.chmod(0o600)
+    report = evaluate_final_recording(
+        recording,
+        private_root=private,
+        probe_fn=lambda _: {
+            "duration_ms": 178000,
+            "video_streams": [
+                {"codec": "h264", "width": 1920, "height": 1080, "fps": 30.0}
+            ],
+            "audio_streams": [
+                {"codec": "aac", "sample_rate": 48000, "channels": 2}
+            ],
+        },
+        loudness_fn=lambda _: {
+            "integrated_lufs": -18.0,
+            "loudness_range_lu": 3.0,
+            "true_peak_dbtp": -1.0,
+        },
+        interruption_fn=lambda *_: {
+            "silence_total_ms": 4000,
+            "silence_ratio": 0.022472,
+            "maximum_contiguous_silence_ms": 1500,
+            "black_total_ms": 500,
+            "black_ratio": 0.002809,
+            "maximum_contiguous_black_ms": 500,
+        },
+    )
+    write_private_report(report, private / "final_recording_qa.json")
+    return recording
 
 
 def test_confirmation_is_private_hash_bound_and_revocable(tmp_path: Path) -> None:
@@ -81,9 +119,9 @@ def test_changed_evidence_invalidates_confirmation(tmp_path: Path) -> None:
 
 def test_missing_evidence_invalidates_confirmation(tmp_path: Path) -> None:
     runbook = _copied_runbook(tmp_path)
-    evidence = tmp_path / "recording.mp4"
-    evidence.write_bytes(b"safe test recording")
-    store = HumanGateStore(tmp_path / "private" / "state.json", runbook_path=runbook)
+    private = tmp_path / "private"
+    evidence = _ready_recording(private)
+    store = HumanGateStore(private / "state.json", runbook_path=runbook)
     store.confirm(GATE_IDS[2], reviewer="审核人", evidence_file=evidence)
 
     evidence.unlink()
@@ -127,7 +165,7 @@ def test_changed_runbook_makes_all_private_confirmations_stale(tmp_path: Path) -
     evidence = tmp_path / "recording.txt"
     evidence.write_text("recording sha evidence", encoding="utf-8")
     store = HumanGateStore(tmp_path / "private" / "state.json", runbook_path=runbook)
-    store.confirm(GATE_IDS[2], reviewer="审核人", evidence_file=evidence)
+    store.confirm(GATE_IDS[1], reviewer="审核人", evidence_file=evidence)
 
     payload = json.loads(runbook.read_text(encoding="utf-8"))
     payload["human_gates"][2]["label"] += "（修订）"
@@ -202,10 +240,16 @@ def test_valid_private_confirmations_remove_only_human_gates_from_preflight(
 ) -> None:
     evidence = tmp_path / "evidence.txt"
     evidence.write_text("explicit human confirmation", encoding="utf-8")
-    store_path = tmp_path / "private" / "human_gate_confirmations.json"
+    private = tmp_path / "private"
+    recording = _ready_recording(private)
+    store_path = private / "human_gate_confirmations.json"
     store = HumanGateStore(store_path, runbook_path=RUNBOOK)
     for gate_id in GATE_IDS:
-        store.confirm(gate_id, reviewer="测试审核人", evidence_file=evidence)
+        store.confirm(
+            gate_id,
+            reviewer="测试审核人",
+            evidence_file=recording if gate_id == GATE_IDS[2] else evidence,
+        )
 
     report = build_submission_preflight(
         root=ROOT,
@@ -223,6 +267,60 @@ def test_valid_private_confirmations_remove_only_human_gates_from_preflight(
     serialized = json.dumps(report, ensure_ascii=False)
     assert str(evidence.resolve()) not in serialized
     assert "测试审核人" not in serialized
+
+
+def test_final_recording_gate_requires_matching_private_machine_qa(
+    tmp_path: Path,
+) -> None:
+    private = tmp_path / "private"
+    private.mkdir(mode=0o700)
+    private.chmod(0o700)
+    recording = private / "skillforge_final_recording.mp4"
+    recording.write_bytes(b"recording without QA")
+    recording.chmod(0o600)
+    store = HumanGateStore(
+        private / "state.json",
+        runbook_path=_copied_runbook(tmp_path),
+    )
+
+    with pytest.raises(HumanGateError, match="FINAL_RECORDING_QA_MISSING"):
+        store.confirm(GATE_IDS[2], reviewer="审核人", evidence_file=recording)
+    with pytest.raises(HumanGateError, match="FINAL_RECORDING_REQUIRES_LOCAL_FILE"):
+        store.confirm(
+            GATE_IDS[2],
+            reviewer="审核人",
+            evidence_url="https://example.com/final-recording.mp4",
+        )
+
+
+def test_final_recording_confirmation_tracks_qa_and_policy_state(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    private = tmp_path / "private"
+    recording = _ready_recording(private)
+    store = HumanGateStore(
+        private / "state.json",
+        runbook_path=_copied_runbook(tmp_path),
+    )
+    store.confirm(GATE_IDS[2], reviewer="审核人", evidence_file=recording)
+
+    (private / "final_recording_qa.json").unlink()
+    missing = store.audit()
+    assert missing["valid"] is False
+    assert missing["issues"] == [
+        f"FINAL_RECORDING_QA_MISSING:{GATE_IDS[2]}"
+    ]
+
+    _ready_recording(private)
+    changed_policy = tmp_path / "changed-policy.json"
+    changed_policy.write_text("changed internal policy", encoding="utf-8")
+    monkeypatch.setattr(final_recording_module, "DEFAULT_POLICY", changed_policy)
+    changed = store.audit()
+    assert changed["valid"] is False
+    assert changed["issues"] == [
+        f"FINAL_RECORDING_QA_POLICY_CHANGED:{GATE_IDS[2]}"
+    ]
 
 
 def test_human_gate_script_is_executable() -> None:
