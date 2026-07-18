@@ -1,0 +1,148 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/official_rules_status.schema.json",
+  "title": "SkillForge Official Rules Status",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "event_id",
+    "checked_at",
+    "verification_status",
+    "publicly_confirmed",
+    "unresolved_requirements",
+    "public_access_audit",
+    "sources",
+    "data_policy"
+  ],
+  "properties": {
+    "version": {"const": 1},
+    "event_id": {"const": "nvidia-dgx-spark-hackathon-2"},
+    "checked_at": {"type": "string", "format": "date"},
+    "verification_status": {
+      "enum": ["OFFICIAL_DETAIL_REQUIRED", "OFFICIAL_DETAIL_OBTAINED"]
+    },
+    "publicly_confirmed": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "EVENT_THEME",
+          "MULTIMODAL_AGENT_SCOPE",
+          "DGX_SPARK_PLATFORM",
+          "TEAM_SIZE_2_TO_5",
+          "ONE_TEAM_PER_PERSON",
+          "SUBMISSION_DEADLINE_2026_07_22",
+          "JUDGING_2026_07_23_TO_26",
+          "FINAL_2026_08_02"
+        ]
+      }
+    },
+    "unresolved_requirements": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "SCORING_WEIGHTS",
+          "SUBMISSION_FIELDS",
+          "VIDEO_REQUIREMENTS",
+          "EXTERNAL_API_POLICY",
+          "OPEN_SOURCE_POLICY",
+          "ON_SITE_RUNTIME_REQUIREMENT"
+        ]
+      }
+    },
+    "public_access_audit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "event_summary_public",
+        "rules_session_listed",
+        "public_rule_material_available",
+        "official_detail_obtained",
+        "technical_lecture_download_count",
+        "inspection_method",
+        "authentication_or_organizer_material_required"
+      ],
+      "properties": {
+        "event_summary_public": {"type": "boolean"},
+        "rules_session_listed": {"type": "boolean"},
+        "public_rule_material_available": {"type": "boolean"},
+        "official_detail_obtained": {"type": "boolean"},
+        "technical_lecture_download_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "inspection_method": {
+          "enum": [
+            "ANONYMOUS_INTERACTIVE_PAGE",
+            "PARTICIPANT_PROVIDED_OFFICIAL_MATERIAL"
+          ]
+        },
+        "authentication_or_organizer_material_required": {"type": "boolean"}
+      }
+    },
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source_id", "publisher", "url", "access_scope"],
+        "properties": {
+          "source_id": {"type": "string", "pattern": "^[A-Z0-9_]+$"},
+          "publisher": {"type": "string", "minLength": 1},
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "pattern": "^https://"
+          },
+          "access_scope": {
+            "enum": ["PUBLIC_EVENT_SUMMARY", "PUBLIC_TRAINING_AGENDA", "OFFICIAL_RULE_MATERIAL"]
+          }
+        }
+      }
+    },
+    "data_policy": {
+      "const": {
+        "contains_credentials": false,
+        "contains_personal_registration_data": false,
+        "contains_signed_urls": false
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {"verification_status": {"const": "OFFICIAL_DETAIL_REQUIRED"}}
+      },
+      "then": {
+        "properties": {
+          "unresolved_requirements": {"minItems": 1},
+          "public_access_audit": {
+            "properties": {
+              "official_detail_obtained": {"const": false}
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {"verification_status": {"const": "OFFICIAL_DETAIL_OBTAINED"}}
+      },
+      "then": {
+        "properties": {
+          "unresolved_requirements": {"maxItems": 0},
+          "public_access_audit": {
+            "properties": {
+              "official_detail_obtained": {"const": true}
+            }
+          }
+        }
+      }
+    }
+  ]
+}

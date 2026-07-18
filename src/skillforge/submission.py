@@ -15,7 +15,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
 
-from .contracts import validate_document
+from .contracts import ContractValidationError, validate_document
 from .demo import ROOT
 from .human_gates import HumanGateStore
 from .pitch import build_readiness
@@ -40,6 +40,30 @@ PRIVATE_NAME_MARKERS = (
     "previous_shipping_label",
     "面单_sf",
 )
+EXPECTED_PUBLIC_RULE_FACTS = {
+    "EVENT_THEME",
+    "MULTIMODAL_AGENT_SCOPE",
+    "DGX_SPARK_PLATFORM",
+    "TEAM_SIZE_2_TO_5",
+    "ONE_TEAM_PER_PERSON",
+    "SUBMISSION_DEADLINE_2026_07_22",
+    "JUDGING_2026_07_23_TO_26",
+    "FINAL_2026_08_02",
+}
+EXPECTED_UNRESOLVED_RULE_REQUIREMENTS = {
+    "SCORING_WEIGHTS",
+    "SUBMISSION_FIELDS",
+    "VIDEO_REQUIREMENTS",
+    "EXTERNAL_API_POLICY",
+    "OPEN_SOURCE_POLICY",
+    "ON_SITE_RUNTIME_REQUIREMENT",
+}
+EXPECTED_RULE_SOURCES = {
+    "NVIDIA_CSDN_EVENT_PAGE": "https://nvidia.csdn.net/6a4476b3662f9a54cb87233d.html",
+    "NVIDIA_TRAINING_PAGE": (
+        "https://scrm.nvidia.cn/lp/dgx-spark-hackathon-multi-agents-20260712"
+    ),
+}
 
 
 def _read_json(path: Path) -> dict[str, Any]:
@@ -209,6 +233,54 @@ def _check_required_documents(root: Path) -> dict[str, Any]:
         f"{len(REQUIRED_DOCUMENTS)}份说明文档存在且非空"
         if not missing
         else f"缺少文档: {','.join(missing)}",
+    )
+
+
+def _check_official_rules_status(root: Path) -> dict[str, Any]:
+    try:
+        status = validate_document(
+            _read_json(root / "config/official_rules_status.json"),
+            "official_rules_status.schema.json",
+        )
+    except (OSError, json.JSONDecodeError, ContractValidationError) as exc:
+        return _check(
+            "OFFICIAL_RULES_STATUS",
+            "FAILED",
+            f"官方规则核验快照缺失或无效；错误类型={type(exc).__name__}",
+        )
+
+    confirmed = set(status["publicly_confirmed"])
+    unresolved = set(status["unresolved_requirements"])
+    sources = {item["source_id"]: item["url"] for item in status["sources"]}
+    audit = status["public_access_audit"]
+    current_snapshot_ok = (
+        status["verification_status"] == "OFFICIAL_DETAIL_REQUIRED"
+        and status["checked_at"] == "2026-07-18"
+        and confirmed == EXPECTED_PUBLIC_RULE_FACTS
+        and unresolved == EXPECTED_UNRESOLVED_RULE_REQUIREMENTS
+        and len(status["sources"]) == len(sources)
+        and sources == EXPECTED_RULE_SOURCES
+        and audit["event_summary_public"] is True
+        and audit["rules_session_listed"] is True
+        and audit["public_rule_material_available"] is False
+        and audit["official_detail_obtained"] is False
+        and audit["technical_lecture_download_count"] == 3
+        and audit["inspection_method"] == "ANONYMOUS_INTERACTIVE_PAGE"
+        and audit["authentication_or_organizer_material_required"] is True
+    )
+    if not current_snapshot_ok:
+        return _check(
+            "OFFICIAL_RULES_STATUS",
+            "FAILED",
+            "规则核验状态与2026-07-18公开访问复核结论不一致；必须重新核验后更新代码与快照",
+        )
+    return _check(
+        "OFFICIAL_RULES_STATUS",
+        "PASSED",
+        (
+            f"公开确认={len(confirmed)}项；待官方细则={len(unresolved)}项；"
+            "规则人工门禁保持待确认"
+        ),
     )
 
 
@@ -393,6 +465,7 @@ def build_submission_preflight(
     checks = [
         _check_project_identity(root),
         _check_required_documents(root),
+        _check_official_rules_status(root),
         confirmation_check,
         pitch_check,
         _check_public_artifacts(root, values),
