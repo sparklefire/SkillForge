@@ -169,21 +169,21 @@
       "label": "参赛者完整观看80秒成片并确认旁白节奏",
       "status": "PENDING",
       "blocking_for_submission": true,
-      "evidence_path": "output/video/n31_training_video_manifest_v1.json"
+      "evidence_path": "outputs/submission/training_video_review.json"
     },
     {
       "gate_id": "FINAL_STAGE_REHEARSAL",
       "label": "按180秒脚本完成一次人工计时彩排",
       "status": "PENDING",
       "blocking_for_submission": true,
-      "evidence_path": null
+      "evidence_path": "outputs/submission/final_stage_rehearsal.json"
     },
     {
       "gate_id": "FINAL_RECORDING_REVIEW",
       "label": "完成有声字幕兜底录屏并复核隐私、声音和播放",
       "status": "PENDING",
       "blocking_for_submission": true,
-      "evidence_path": null
+      "evidence_path": "outputs/submission/skillforge_final_recording.mp4"
     },
     {
       "gate_id": "TEAM_ELIGIBILITY_CONFIRMED",

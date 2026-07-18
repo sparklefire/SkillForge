@@ -27,6 +27,11 @@ from .pitch import build_readiness
 from .project_board import ProjectBoardError, build_project_board_status
 from .release_manifest import ReleaseManifestError, verify_release_manifest
 from .team_roster import TeamRosterError, verify_team_roster
+from .training_video_review import (
+    TrainingVideoReviewError,
+    training_video_review_qa_issue,
+    verify_training_video_review,
+)
 
 
 REQUIRED_DOCUMENTS = [
@@ -451,6 +456,72 @@ def _check_final_rehearsal_private_state(
     )
 
 
+def _check_training_video_review_private_state(
+    root: Path,
+    confirmed_gate_ids: set[str] | None = None,
+    review_path: Path | None = None,
+    qa_path: Path | None = None,
+) -> dict[str, Any]:
+    confirmed_gate_ids = confirmed_gate_ids or set()
+    review_path = (
+        review_path.resolve()
+        if review_path is not None
+        else (root / "outputs/submission/training_video_review.json").resolve()
+    )
+    qa_path = (
+        qa_path.resolve()
+        if qa_path is not None
+        else review_path.parent / "training_video_review_qa.json"
+    )
+    if not review_path.exists():
+        if qa_path.exists() or "TRAINING_VIDEO_FULL_WATCH" in confirmed_gate_ids:
+            return _check(
+                "TRAINING_VIDEO_REVIEW_PRIVATE_STATE",
+                "FAILED",
+                "观看QA或人工确认存在，但绑定的私有完整观看记录缺失",
+            )
+        return _check(
+            "TRAINING_VIDEO_REVIEW_PRIVATE_STATE",
+            "PASSED",
+            "私有80秒成片观看记录状态=ABSENT；完整观看人工门禁保持待确认",
+        )
+    try:
+        report = verify_training_video_review(
+            review_path,
+            manifest_path=root / "output/video/n31_training_video_manifest_v1.json",
+            video_path=root / "output/video/n31_training_video_v1.mp4",
+            private_root=review_path.parent,
+        )
+        issue = training_video_review_qa_issue(
+            qa_path,
+            {
+                "kind": "LOCAL_FILE",
+                "locator": str(review_path),
+                "sha256": report["review_sha256"],
+                "size_bytes": report["review_bytes"],
+            },
+            manifest_path=root / "output/video/n31_training_video_manifest_v1.json",
+            video_path=root / "output/video/n31_training_video_v1.mp4",
+        )
+        if issue:
+            raise TrainingVideoReviewError(issue)
+    except (OSError, TrainingVideoReviewError, ContractValidationError) as exc:
+        return _check(
+            "TRAINING_VIDEO_REVIEW_PRIVATE_STATE",
+            "FAILED",
+            f"私有完整观看记录不完整或已失效；错误类型={type(exc).__name__}",
+        )
+    return _check(
+        "TRAINING_VIDEO_REVIEW_PRIVATE_STATE",
+        "PASSED",
+        (
+            f"当前80秒成片完整观看机器检查通过；时长={report['video']['duration_ms']}毫秒; "
+            "观看人工门禁="
+            f"{'CONFIRMED' if 'TRAINING_VIDEO_FULL_WATCH' in confirmed_gate_ids else 'PENDING'}"
+        ),
+    )
+
+
 def _check_pitch_package(
     root: Path,
     confirmed_gate_ids: set[str],
@@ -483,6 +554,10 @@ def _check_human_gate_confirmations(
     store = HumanGateStore(
         confirmations_path,
         runbook_path=root / "cases/n31/pitch_runbook.json",
+        training_video_manifest_path=(
+            root / "output/video/n31_training_video_manifest_v1.json"
+        ),
+        training_video_path=root / "output/video/n31_training_video_v1.mp4",
     )
     audit = store.audit()
     if audit["valid"]:
@@ -620,6 +695,8 @@ def build_submission_preflight(
     team_roster_path: Path | None = None,
     final_rehearsal_path: Path | None = None,
     final_rehearsal_qa_path: Path | None = None,
+    training_video_review_path: Path | None = None,
+    training_video_review_qa_path: Path | None = None,
 ) -> dict[str, Any]:
     root = root.resolve()
     confirmation_check, confirmed_gate_ids = _check_human_gate_confirmations(
@@ -642,6 +719,12 @@ def build_submission_preflight(
             root,
             confirmed_gate_ids,
             roster_path=team_roster_path,
+        ),
+        _check_training_video_review_private_state(
+            root,
+            confirmed_gate_ids,
+            review_path=training_video_review_path,
+            qa_path=training_video_review_qa_path,
         ),
         _check_final_rehearsal_private_state(
             root,

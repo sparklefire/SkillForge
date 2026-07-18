@@ -40,6 +40,8 @@ def test_submission_preflight_preserves_human_gates() -> None:
     assert "实现目标受阻=false" in checks["PROJECT_BOARD_STATUS"]["details"][0]
     assert checks["TEAM_ROSTER_PRIVATE_STATE"]["status"] == "PASSED"
     assert "ABSENT" in checks["TEAM_ROSTER_PRIVATE_STATE"]["details"][0]
+    assert checks["TRAINING_VIDEO_REVIEW_PRIVATE_STATE"]["status"] == "PASSED"
+    assert "ABSENT" in checks["TRAINING_VIDEO_REVIEW_PRIVATE_STATE"]["details"][0]
     assert checks["FINAL_REHEARSAL_PRIVATE_STATE"]["status"] == "PASSED"
     assert "ABSENT" in checks["FINAL_REHEARSAL_PRIVATE_STATE"]["details"][0]
     assert checks["HUMAN_GATE_CONFIRMATIONS"]["status"] == "PASSED"

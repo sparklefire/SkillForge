@@ -20,6 +20,11 @@ from skillforge.team_roster import (
     _write_private_json as _write_roster_json,
     initialize_team_roster,
 )
+from skillforge.training_video_review import (
+    _write_private_json as _write_video_review_json,
+    initialize_training_video_review,
+    verify_training_video_review,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -73,6 +78,49 @@ def _ready_recording(private: Path) -> Path:
     )
     write_private_report(report, private / "final_recording_qa.json")
     return recording
+
+
+def _ready_training_video_review(
+    private: Path,
+    *,
+    manifest: Path | None = None,
+    video: Path | None = None,
+) -> Path:
+    manifest = manifest or ROOT / "output/video/n31_training_video_manifest_v1.json"
+    video = video or ROOT / "output/video/n31_training_video_v1.mp4"
+    review = private / "training_video_review.json"
+    initialize_training_video_review(
+        review,
+        manifest_path=manifest,
+        video_path=video,
+        private_root=private,
+    )
+    manifest_document = json.loads(manifest.read_text(encoding="utf-8"))
+    template = json.loads(review.read_text(encoding="utf-8"))
+    template.update(
+        {
+            "updated_at": "2026-07-19T03:00:00+00:00",
+            "status": "READY_FOR_CHECK",
+            "watched_at": "2026-07-19T02:30:00+00:00",
+            "playback_method": "LOCAL_PLAYER",
+            "notes": "",
+        }
+    )
+    template["video"]["duration_ms"] = manifest_document["output"]["duration_ms"]
+    template["checks"] = {key: True for key in template["checks"]}
+    _write_video_review_json(template, review, private_root=private)
+    report = verify_training_video_review(
+        review,
+        manifest_path=manifest,
+        video_path=video,
+        private_root=private,
+    )
+    _write_video_review_json(
+        report,
+        private / "training_video_review_qa.json",
+        private_root=private,
+    )
+    return review
 
 
 def _ready_rehearsal(private: Path, runbook: Path = RUNBOOK) -> Path:
@@ -180,15 +228,15 @@ def _ready_team_roster(private: Path) -> Path:
 def test_confirmation_is_private_hash_bound_and_revocable(tmp_path: Path) -> None:
     runbook = _copied_runbook(tmp_path)
     evidence = tmp_path / "review-note.txt"
-    evidence.write_text("完整观看并核对旁白节奏", encoding="utf-8")
+    evidence.write_text("官方规则核对证据", encoding="utf-8")
     store_path = tmp_path / "private" / "human_gate_confirmations.json"
     store = HumanGateStore(store_path, runbook_path=runbook)
 
     result = store.confirm(
-        GATE_IDS[0],
+        GATE_IDS[4],
         reviewer="仅私有审核名",
         evidence_file=evidence,
-        note="已从头到尾观看",
+        note="已核对官方规则",
     )
 
     assert result["valid"] is True
@@ -198,15 +246,15 @@ def test_confirmation_is_private_hash_bound_and_revocable(tmp_path: Path) -> Non
     document = json.loads(store_path.read_text(encoding="utf-8"))
     validate_document(document, "human_gate_confirmations.schema.json")
     assert document["confirmations"][0]["evidence"]["sha256"]
-    assert "完整观看并核对旁白节奏" not in store_path.read_text(encoding="utf-8")
+    assert "官方规则核对证据" not in store_path.read_text(encoding="utf-8")
     serialized_status = json.dumps(result, ensure_ascii=False)
     assert str(evidence.resolve()) not in serialized_status
     assert "仅私有审核名" not in serialized_status
 
     revoked = store.revoke(
-        GATE_IDS[0],
+        GATE_IDS[4],
         reviewer="仅私有审核名",
-        note="需要重新观看修订版",
+        note="规则材料更新，需要重新核对",
     )
     assert revoked["summary"] == {"passed": 0, "pending": 5, "total": 5}
     assert json.loads(store_path.read_text(encoding="utf-8"))["history"][-1]["action"] == "REVOKED"
@@ -384,6 +432,7 @@ def test_valid_private_confirmations_remove_only_human_gates_from_preflight(
     evidence = tmp_path / "evidence.txt"
     evidence.write_text("explicit human confirmation", encoding="utf-8")
     private = tmp_path / "private"
+    video_review = _ready_training_video_review(private)
     recording = _ready_recording(private)
     rehearsal = _ready_rehearsal(private)
     roster_path = _ready_team_roster(private)
@@ -394,7 +443,9 @@ def test_valid_private_confirmations_remove_only_human_gates_from_preflight(
             gate_id,
             reviewer="测试审核人",
             evidence_file=(
-                rehearsal
+                video_review
+                if gate_id == GATE_IDS[0]
+                else rehearsal
                 if gate_id == GATE_IDS[1]
                 else recording if gate_id == GATE_IDS[2] else evidence
             ),
@@ -409,6 +460,8 @@ def test_valid_private_confirmations_remove_only_human_gates_from_preflight(
         team_roster_path=roster_path,
         final_rehearsal_path=rehearsal,
         final_rehearsal_qa_path=private / "final_stage_rehearsal_qa.json",
+        training_video_review_path=video_review,
+        training_video_review_qa_path=private / "training_video_review_qa.json",
     )
     checks = {item["check_id"]: item for item in report["automatic_checks"]}
 
@@ -417,6 +470,8 @@ def test_valid_private_confirmations_remove_only_human_gates_from_preflight(
     assert checks["HUMAN_GATE_CONFIRMATIONS"]["status"] == "PASSED"
     assert checks["TEAM_ROSTER_PRIVATE_STATE"]["status"] == "PASSED"
     assert checks["FINAL_REHEARSAL_PRIVATE_STATE"]["status"] == "PASSED"
+    assert checks["TRAINING_VIDEO_REVIEW_PRIVATE_STATE"]["status"] == "PASSED"
+    assert "人工门禁=CONFIRMED" in checks["TRAINING_VIDEO_REVIEW_PRIVATE_STATE"]["details"][0]
     assert "人工门禁=CONFIRMED" in checks["FINAL_REHEARSAL_PRIVATE_STATE"]["details"][0]
     assert "人工门禁=CONFIRMED" in checks["TEAM_ROSTER_PRIVATE_STATE"]["details"][0]
     assert "人工门禁有效=5/5" in checks["HUMAN_GATE_CONFIRMATIONS"]["details"][0]
@@ -477,6 +532,40 @@ def test_final_rehearsal_gate_requires_current_timed_record_and_qa(
     audit = store.audit()
     assert audit["valid"] is False
     assert audit["issues"] == [f"FINAL_REHEARSAL_QA_MISSING:{GATE_IDS[1]}"]
+
+
+def test_training_video_gate_requires_current_full_watch_record_and_qa(
+    tmp_path: Path,
+) -> None:
+    private = tmp_path / "private"
+    private.mkdir(mode=0o700)
+    private.chmod(0o700)
+    unverified = private / "training_video_review.json"
+    unverified.write_text("{}", encoding="utf-8")
+    unverified.chmod(0o600)
+    store = HumanGateStore(
+        private / "state.json",
+        runbook_path=_copied_runbook(tmp_path),
+    )
+
+    with pytest.raises(HumanGateError, match="TRAINING_VIDEO_REVIEW_QA_MISSING"):
+        store.confirm(GATE_IDS[0], reviewer="审核人", evidence_file=unverified)
+    with pytest.raises(
+        HumanGateError, match="TRAINING_VIDEO_REVIEW_REQUIRES_LOCAL_FILE"
+    ):
+        store.confirm(
+            GATE_IDS[0],
+            reviewer="审核人",
+            evidence_url="https://example.com/video-review.json",
+        )
+
+    unverified.unlink()
+    review = _ready_training_video_review(private)
+    store.confirm(GATE_IDS[0], reviewer="审核人", evidence_file=review)
+    (private / "training_video_review_qa.json").unlink()
+    audit = store.audit()
+    assert audit["valid"] is False
+    assert audit["issues"] == [f"TRAINING_VIDEO_REVIEW_QA_MISSING:{GATE_IDS[0]}"]
 
 
 def test_final_recording_confirmation_tracks_qa_and_policy_state(

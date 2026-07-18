@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/training_video_review.schema.json",
+  "title": "SkillForge Private Training Video Full-Watch Review",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "case_id", "updated_at", "status", "watched_at", "playback_method", "video", "manifest_sha256", "checks", "notes", "data_policy"],
+  "properties": {
+    "version": {"const": 1},
+    "case_id": {"const": "n31_media_change"},
+    "updated_at": {"type": "string", "format": "date-time"},
+    "status": {"enum": ["PENDING_INPUT", "READY_FOR_CHECK"]},
+    "watched_at": {"anyOf": [{"type": "null"}, {"type": "string", "format": "date-time"}]},
+    "playback_method": {"anyOf": [{"type": "null"}, {"enum": ["WEB_DEMO", "LOCAL_PLAYER", "OTHER_FULL_PLAYBACK"]}]},
+    "video": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["filename", "sha256", "bytes", "duration_ms"],
+      "properties": {
+        "filename": {"const": "n31_training_video_v1.mp4"},
+        "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "bytes": {"type": "integer", "minimum": 1},
+        "duration_ms": {"type": "integer", "minimum": 60000, "maximum": 90000}
+      }
+    },
+    "manifest_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "checks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["full_playback_completed", "narration_audible", "narration_pacing_acceptable", "visuals_and_narration_in_sync", "all_steps_understandable", "no_sensitive_content_observed", "no_playback_corruption", "final_cut_accepted"],
+      "properties": {
+        "full_playback_completed": {"type": "boolean"},
+        "narration_audible": {"type": "boolean"},
+        "narration_pacing_acceptable": {"type": "boolean"},
+        "visuals_and_narration_in_sync": {"type": "boolean"},
+        "all_steps_understandable": {"type": "boolean"},
+        "no_sensitive_content_observed": {"type": "boolean"},
+        "no_playback_corruption": {"type": "boolean"},
+        "final_cut_accepted": {"type": "boolean"}
+      }
+    },
+    "notes": {"type": "string", "maxLength": 2000},
+    "data_policy": {
+      "const": {
+        "private_local_state": true,
+        "contains_personal_data": false,
+        "contains_credentials": false,
+        "git_tracked": false
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"status": {"const": "READY_FOR_CHECK"}}},
+      "then": {
+        "properties": {
+          "watched_at": {"type": "string", "format": "date-time"},
+          "playback_method": {"enum": ["WEB_DEMO", "LOCAL_PLAYER", "OTHER_FULL_PLAYBACK"]},
+          "checks": {
+            "properties": {
+              "full_playback_completed": {"const": true},
+              "narration_audible": {"const": true},
+              "narration_pacing_acceptable": {"const": true},
+              "visuals_and_narration_in_sync": {"const": true},
+              "all_steps_understandable": {"const": true},
+              "no_sensitive_content_observed": {"const": true},
+              "no_playback_corruption": {"const": true},
+              "final_cut_accepted": {"const": true}
+            }
+          }
+        }
+      }
+    }
+  ]
+}

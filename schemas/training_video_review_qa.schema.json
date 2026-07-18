@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/training_video_review_qa.schema.json",
+  "title": "SkillForge Private Training Video Review QA",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "case_id", "artifact_type", "checked_at", "status", "review_sha256", "review_bytes", "manifest_sha256", "video", "checks", "human_gate_status", "data_policy"],
+  "properties": {
+    "version": {"const": 1},
+    "case_id": {"const": "n31_media_change"},
+    "artifact_type": {"const": "TRAINING_VIDEO_FULL_WATCH_QA"},
+    "checked_at": {"type": "string", "format": "date-time"},
+    "status": {"const": "READY_FOR_HUMAN_CONFIRMATION"},
+    "review_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "review_bytes": {"type": "integer", "minimum": 1},
+    "manifest_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "video": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["filename", "sha256", "bytes", "duration_ms"],
+      "properties": {
+        "filename": {"const": "n31_training_video_v1.mp4"},
+        "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "bytes": {"type": "integer", "minimum": 1},
+        "duration_ms": {"type": "integer", "minimum": 60000, "maximum": 90000}
+      }
+    },
+    "checks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["manifest_schema_valid", "manifest_ready_for_human_review", "automated_qa_passed", "visual_review_passed", "video_matches_manifest", "review_matches_current_artifacts", "full_playback_completed", "narration_audible", "narration_pacing_acceptable", "visuals_and_narration_in_sync", "all_steps_understandable", "no_sensitive_content_observed", "no_playback_corruption", "final_cut_accepted"],
+      "properties": {
+        "manifest_schema_valid": {"const": true},
+        "manifest_ready_for_human_review": {"const": true},
+        "automated_qa_passed": {"const": true},
+        "visual_review_passed": {"const": true},
+        "video_matches_manifest": {"const": true},
+        "review_matches_current_artifacts": {"const": true},
+        "full_playback_completed": {"const": true},
+        "narration_audible": {"const": true},
+        "narration_pacing_acceptable": {"const": true},
+        "visuals_and_narration_in_sync": {"const": true},
+        "all_steps_understandable": {"const": true},
+        "no_sensitive_content_observed": {"const": true},
+        "no_playback_corruption": {"const": true},
+        "final_cut_accepted": {"const": true}
+      }
+    },
+    "human_gate_status": {"const": "PENDING"},
+    "data_policy": {
+      "const": {
+        "private_local_state": true,
+        "contains_personal_data": false,
+        "contains_notes": false,
+        "contains_credentials": false,
+        "contains_absolute_paths": false,
+        "contains_media": false,
+        "human_confirmation_generated": false
+      }
+    }
+  }
+}

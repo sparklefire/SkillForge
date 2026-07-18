@@ -206,6 +206,10 @@ bash scripts/check_pitch.sh
 ```bash
 bash scripts/manage_human_gates.sh status
 
+# 实际完整观看当前80秒成片后，填写私有审核表并做机器检查
+bash scripts/check_training_video_review.sh --init
+bash scripts/check_training_video_review.sh
+
 # 180秒真人彩排前初始化私有计时记录；填写并完成彩排后先做机器检查
 bash scripts/check_final_rehearsal.sh --init
 bash scripts/check_final_rehearsal.sh
@@ -214,9 +218,11 @@ bash scripts/check_final_rehearsal.sh
 bash scripts/manage_human_gates.sh confirm \
   --gate TRAINING_VIDEO_FULL_WATCH \
   --reviewer "确认人姓名" \
-  --evidence-file output/video/n31_training_video_v1.mp4 \
+  --evidence-file outputs/submission/training_video_review.json \
   --note "已完整观看并确认旁白节奏"
 ```
+
+观看审核模板预绑定当前成片和生成清单SHA-256。只有完整播放、旁白可听、节奏可接受、音画同步、步骤可理解、无敏感内容、无播放损坏且接受最终剪辑全部确认后才生成安全QA；通过后仍是 `READY_FOR_HUMAN_CONFIRMATION`。成片、清单或私有记录变化后旧确认自动失效。
 
 彩排模板和QA报告位于Git忽略的 `outputs/submission/`。机器检查要求7段顺序与冻结运行单一致、实际时间连续、总时长处于内部175–180秒目标内，并逐段确认讲解、操作、证明点和故障兜底；通过后仍是 `READY_FOR_HUMAN_CONFIRMATION`。`FINAL_STAGE_REHEARSAL` 只能绑定这份本地计时记录，记录、运行单或内部策略变化后旧确认自动失效。
 
@@ -238,7 +244,7 @@ bash scripts/run_runtime_benchmark.sh dgx
 bash scripts/check_submission.sh
 ```
 
-预检会运行全量测试并核对项目身份、9份说明文档、18项成果、Git工作树、跟踪文件边界、`.env`忽略与600权限、本地密钥值泄漏、成果绝对路径、私有彩排记录及人工确认有效性。报告和确认目录均由Git忽略；报告只写门禁汇总，不记录密钥值、确认人、说明、私有备注或证据路径。只有 `READY_FOR_SUBMISSION` 返回0；`NOT_READY`返回1，`DEVELOPMENT_CHECK`或 `READY_WITH_HUMAN_GATES` 返回2。开发中可显式使用 `--allow-dirty`，但不能得到正式提交结论。
+预检会运行全量测试并核对项目身份、9份说明文档、18项成果、Git工作树、跟踪文件边界、`.env`忽略与600权限、本地密钥值泄漏、成果绝对路径、私有成片观看/彩排记录及人工确认有效性。报告和确认目录均由Git忽略；报告只写门禁汇总，不记录密钥值、确认人、说明、私有备注或证据路径。只有 `READY_FOR_SUBMISSION` 返回0；`NOT_READY`返回1，`DEVELOPMENT_CHECK`或 `READY_WITH_HUMAN_GATES` 返回2。开发中可显式使用 `--allow-dirty`，但不能得到正式提交结论。
 
 受证据约束的高推理语义复核需要显式确认允许发送结构化Gold步骤和Evidence陈述；它不会发送原始媒体、完整转写、手册页面、本地路径或凭证：
 

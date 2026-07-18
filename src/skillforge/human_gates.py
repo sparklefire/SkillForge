@@ -18,6 +18,7 @@ from .demo import ROOT
 from .final_recording import final_recording_qa_issue
 from .final_rehearsal import final_rehearsal_qa_issue
 from .team_roster import TeamRosterError, verify_team_roster
+from .training_video_review import training_video_review_qa_issue
 
 
 DEFAULT_RUNBOOK = ROOT / "cases/n31/pitch_runbook.json"
@@ -108,6 +109,9 @@ class HumanGateStore:
         final_recording_qa_path: Path | None = None,
         final_rehearsal_qa_path: Path | None = None,
         team_roster_path: Path | None = None,
+        training_video_review_qa_path: Path | None = None,
+        training_video_manifest_path: Path | None = None,
+        training_video_path: Path | None = None,
     ) -> None:
         self.path = path.expanduser().resolve()
         self.runbook_path = runbook_path.expanduser().resolve()
@@ -125,6 +129,21 @@ class HumanGateStore:
             team_roster_path.expanduser().resolve()
             if team_roster_path is not None
             else self.path.parent / "team_roster.json"
+        )
+        self.training_video_review_qa_path = (
+            training_video_review_qa_path.expanduser().resolve()
+            if training_video_review_qa_path is not None
+            else self.path.parent / "training_video_review_qa.json"
+        )
+        self.training_video_manifest_path = (
+            training_video_manifest_path.expanduser().resolve()
+            if training_video_manifest_path is not None
+            else ROOT / "output/video/n31_training_video_manifest_v1.json"
+        )
+        self.training_video_path = (
+            training_video_path.expanduser().resolve()
+            if training_video_path is not None
+            else ROOT / "output/video/n31_training_video_v1.mp4"
         )
 
     def _runbook(self) -> tuple[dict[str, Any], str]:
@@ -218,6 +237,13 @@ class HumanGateStore:
         gate_id: str,
         evidence: dict[str, Any],
     ) -> str | None:
+        if gate_id == "TRAINING_VIDEO_FULL_WATCH":
+            return training_video_review_qa_issue(
+                self.training_video_review_qa_path,
+                evidence,
+                manifest_path=self.training_video_manifest_path,
+                video_path=self.training_video_path,
+            )
         if gate_id == "FINAL_STAGE_REHEARSAL":
             return final_rehearsal_qa_issue(
                 self.final_rehearsal_qa_path,
