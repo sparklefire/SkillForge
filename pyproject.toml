@@ -26,6 +26,7 @@ dev = [
 
 [project.scripts]
 skillforge-demo = "skillforge.demo:main"
+skillforge-demo-mode-parity = "skillforge.demo_mode_parity:main"
 skillforge-agent-trace = "skillforge.agent_trace:main"
 skillforge-dgx-visual = "skillforge.dgx_visual:main"
 skillforge-case-ingest = "skillforge.case_ingest:main"

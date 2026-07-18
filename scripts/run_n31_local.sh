@@ -26,7 +26,11 @@ if [[ "$MODE" == "full-local" ]]; then
   "$PYTHON" scripts/process_n31_videos.py >/dev/null
 fi
 
-bash scripts/setup_ocr_languages.sh >/dev/null
+if [[ "${SKILLFORGE_OFFLINE_OCR:-0}" == "1" ]]; then
+  bash scripts/setup_ocr_languages.sh --offline >/dev/null
+else
+  bash scripts/setup_ocr_languages.sh >/dev/null
+fi
 
 "$PYTHON" -m skillforge.case_ingest \
   --manifest cases/n31/ingest_manifest.json \

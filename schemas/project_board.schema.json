@@ -12,7 +12,7 @@
     "status_vocabulary": {"const": ["COMPLETED", "READY", "AWAITING_HUMAN", "AWAITING_EXTERNAL"]},
     "tasks": {"type": "array", "minItems": 10, "maxItems": 10, "items": {"$ref": "#/$defs/task"}},
     "risks": {"type": "array", "minItems": 7, "maxItems": 7, "items": {"$ref": "#/$defs/risk"}},
-    "daily_commands": {"type": "array", "minItems": 7, "maxItems": 7, "uniqueItems": true, "items": {"type": "string", "pattern": "^bash scripts/[A-Za-z0-9_./ -]+$"}},
+    "daily_commands": {"type": "array", "minItems": 8, "maxItems": 8, "uniqueItems": true, "items": {"type": "string", "pattern": "^bash scripts/[A-Za-z0-9_./ -]+$"}},
     "data_policy": {"const": {"contains_credentials": false, "contains_personal_data": false, "contains_absolute_paths": false, "goal_blocked": false}}
   },
   "$defs": {

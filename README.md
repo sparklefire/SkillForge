@@ -193,6 +193,18 @@ bash scripts/run_demo_mode.sh offline
 
 `live` 现场重算已审核结构化 Gold 的质检与局部修订，`preprocessed` 重跑本地多源预处理，`offline` 只读取仓库内不含任何原始素材的 Gold 演示包。三种模式都使用原生 Python，不要求 Docker。
 
+录屏或路演前可对三种兜底执行结构化语义一致性门禁：
+
+```bash
+# 用本地输入重新生成预处理结果，再与现场模式和离线包比较
+bash scripts/check_demo_mode_parity.sh --refresh-preprocessed
+
+# 不重新摄取，只对当前三份结果做反向验真
+bash scripts/check_demo_mode_parity.sh --verify-only
+```
+
+门禁会重新计算 `live`，核验 `preprocessed` 和仓库内 `offline` 的6类结构化产物，并要求三者保持13步SOP、严重错误5→0、覆盖率0.9→1.0、4项局部修订和完成态工作流一致。刷新预处理时强制使用离线OCR缓存；缓存缺失或哈希不匹配会直接失败，不会联网下载。私有报告目录/文件权限为0700/0600，报告不含原始素材、来源原文、绝对路径、凭证或人工确认；该流程的网络请求、外部模型调用和自动人工确认均为0。
+
 三分钟路演材料和开场前自动验收：
 
 ```bash

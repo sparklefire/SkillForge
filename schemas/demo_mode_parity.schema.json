@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/demo_mode_parity.schema.json",
+  "title": "SkillForge Demo Mode Parity Report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "case_id",
+    "artifact_type",
+    "generated_at",
+    "status",
+    "mode_count",
+    "preprocessed_refresh_performed",
+    "modes",
+    "parity",
+    "data_policy"
+  ],
+  "properties": {
+    "version": {"const": 1},
+    "case_id": {"const": "n31_media_change"},
+    "artifact_type": {"const": "DEMO_MODE_PARITY_REPORT"},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "status": {"const": "PASSED"},
+    "mode_count": {"const": 3},
+    "preprocessed_refresh_performed": {"type": "boolean"},
+    "modes": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {"$ref": "#/$defs/mode"}
+    },
+    "parity": {
+      "const": {
+        "mode_order_exact": true,
+        "all_required_files_current": true,
+        "summary_semantics_equal": true,
+        "final_step_projection_equal": true,
+        "initial_conflict_projection_equal": true,
+        "revision_projection_equal": true,
+        "expected_closed_loop_metrics": true,
+        "external_model_calls": 0
+      }
+    },
+    "data_policy": {
+      "const": {
+        "private_local_state": true,
+        "contains_credentials": false,
+        "contains_personal_data": false,
+        "contains_absolute_paths": false,
+        "contains_raw_media": false,
+        "contains_source_claims": false,
+        "external_model_calls": 0,
+        "network_requests": 0,
+        "automatic_human_confirmations": 0
+      }
+    }
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "mode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "priority",
+        "source_state",
+        "required_file_count",
+        "source_snapshot_sha256",
+        "summary_projection_sha256",
+        "final_step_projection_sha256",
+        "initial_conflict_projection_sha256",
+        "revision_projection_sha256",
+        "before_severe_errors",
+        "after_severe_errors",
+        "revision_count",
+        "step_count",
+        "initial_conflict_count",
+        "final_conflict_count",
+        "gold_status",
+        "metrics_status",
+        "workflow_state",
+        "external_model_calls"
+      ],
+      "properties": {
+        "mode": {"enum": ["live", "preprocessed", "offline"]},
+        "priority": {"type": "integer", "minimum": 1, "maximum": 3},
+        "source_state": {
+          "enum": [
+            "RECOMPUTED_FROM_GOLD",
+            "REFRESHED_FROM_LOCAL_INPUTS",
+            "PREPARED_OUTPUT_VERIFIED",
+            "TRACKED_OFFLINE_BUNDLE"
+          ]
+        },
+        "required_file_count": {"const": 6},
+        "source_snapshot_sha256": {"$ref": "#/$defs/sha256"},
+        "summary_projection_sha256": {"$ref": "#/$defs/sha256"},
+        "final_step_projection_sha256": {"$ref": "#/$defs/sha256"},
+        "initial_conflict_projection_sha256": {"$ref": "#/$defs/sha256"},
+        "revision_projection_sha256": {"$ref": "#/$defs/sha256"},
+        "before_severe_errors": {"const": 5},
+        "after_severe_errors": {"const": 0},
+        "revision_count": {"const": 4},
+        "step_count": {"const": 13},
+        "initial_conflict_count": {"const": 5},
+        "final_conflict_count": {"const": 0},
+        "gold_status": {"const": "GOLD"},
+        "metrics_status": {"const": "FINAL"},
+        "workflow_state": {"const": "COMPLETED"},
+        "external_model_calls": {"const": 0}
+      }
+    }
+  }
+}
