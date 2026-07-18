@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/official_rules_review.schema.json",
+  "title": "SkillForge Private Official Rules Review",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "event_id", "updated_at", "status", "reviewed_at", "source", "requirements", "checks", "notes", "data_policy"],
+  "properties": {
+    "version": {"const": 1},
+    "event_id": {"const": "nvidia-dgx-spark-hackathon-2"},
+    "updated_at": {"type": "string", "format": "date-time"},
+    "status": {"enum": ["PENDING_INPUT", "READY_FOR_CHECK"]},
+    "reviewed_at": {"anyOf": [{"type": "null"}, {"type": "string", "format": "date-time"}]},
+    "source": {"anyOf": [{"type": "null"}, {"$ref": "#/$defs/localSource"}, {"$ref": "#/$defs/urlSource"}]},
+    "requirements": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "items": {"$ref": "#/$defs/requirement"}
+    },
+    "checks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["official_source_confirmed", "full_material_read", "six_requirements_reviewed", "submission_plan_updated", "conflicts_resolved"],
+      "properties": {
+        "official_source_confirmed": {"type": "boolean"},
+        "full_material_read": {"type": "boolean"},
+        "six_requirements_reviewed": {"type": "boolean"},
+        "submission_plan_updated": {"type": "boolean"},
+        "conflicts_resolved": {"type": "boolean"}
+      }
+    },
+    "notes": {"type": "string", "maxLength": 3000},
+    "data_policy": {
+      "const": {
+        "private_local_state": true,
+        "contains_rule_details": true,
+        "contains_credentials": false,
+        "git_tracked": false
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"status": {"const": "READY_FOR_CHECK"}}},
+      "then": {
+        "properties": {
+          "reviewed_at": {"type": "string", "format": "date-time"},
+          "source": {"oneOf": [{"$ref": "#/$defs/localSource"}, {"$ref": "#/$defs/urlSource"}]},
+          "requirements": {
+            "items": {
+              "properties": {
+                "finding": {"type": "string", "minLength": 1},
+                "source_reference": {"type": "string", "minLength": 1},
+                "confirmed": {"const": true}
+              }
+            }
+          },
+          "checks": {
+            "properties": {
+              "official_source_confirmed": {"const": true},
+              "full_material_read": {"const": true},
+              "six_requirements_reviewed": {"const": true},
+              "submission_plan_updated": {"const": true},
+              "conflicts_resolved": {"const": true}
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "requirementId": {"enum": ["SCORING_WEIGHTS", "SUBMISSION_FIELDS", "VIDEO_REQUIREMENTS", "EXTERNAL_API_POLICY", "OPEN_SOURCE_POLICY", "ON_SITE_RUNTIME_REQUIREMENT"]},
+    "requirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requirement_id", "finding", "source_reference", "confirmed"],
+      "properties": {
+        "requirement_id": {"$ref": "#/$defs/requirementId"},
+        "finding": {"type": "string", "maxLength": 3000},
+        "source_reference": {"type": "string", "maxLength": 500},
+        "confirmed": {"type": "boolean"}
+      }
+    },
+    "localSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "relative_path", "sha256", "bytes"],
+      "properties": {
+        "kind": {"const": "LOCAL_FILE"},
+        "relative_path": {"type": "string", "pattern": "^official_rules_sources/[A-Za-z0-9._-]+$", "maxLength": 300},
+        "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "bytes": {"type": "integer", "minimum": 1}
+      }
+    },
+    "urlSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "url", "url_sha256"],
+      "properties": {
+        "kind": {"const": "HTTPS_URL"},
+        "url": {"type": "string", "pattern": "^https://[^\\s]+$", "maxLength": 4096},
+        "url_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+      }
+    }
+  }
+}

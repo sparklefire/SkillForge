@@ -15,6 +15,12 @@ from skillforge.final_rehearsal import (
     verify_final_rehearsal,
 )
 from skillforge.human_gates import HumanGateError, HumanGateStore
+from skillforge.official_rules_review import (
+    _write_private_json as _write_rules_review_json,
+    attach_local_source,
+    initialize_official_rules_review,
+    verify_official_rules_review,
+)
 from skillforge.submission import build_submission_preflight
 from skillforge.team_roster import (
     _write_private_json as _write_roster_json,
@@ -225,18 +231,52 @@ def _ready_team_roster(private: Path) -> Path:
     return roster_path
 
 
+def _ready_official_rules_review(private: Path) -> Path:
+    review_path = private / "official_rules_review.json"
+    initialize_official_rules_review(review_path, private_root=private)
+    source_path = private.with_name(f"{private.name}_official_rules.txt")
+    source_path.write_text("official rules material for tests", encoding="utf-8")
+    attach_local_source(source_path, review_path, private_root=private)
+    document = json.loads(review_path.read_text(encoding="utf-8"))
+    document.update(
+        {
+            "updated_at": "2026-07-19T04:00:00+00:00",
+            "status": "READY_FOR_CHECK",
+            "reviewed_at": "2026-07-19T03:30:00+00:00",
+        }
+    )
+    for item in document["requirements"]:
+        item.update(
+            {
+                "finding": f"已核对 {item['requirement_id']}",
+                "source_reference": "官方材料测试段落",
+                "confirmed": True,
+            }
+        )
+    document["checks"] = {key: True for key in document["checks"]}
+    _write_rules_review_json(document, review_path, private_root=private)
+    report = verify_official_rules_review(review_path, private_root=private)
+    _write_rules_review_json(
+        report,
+        private / "official_rules_review_qa.json",
+        private_root=private,
+    )
+    return review_path
+
+
 def test_confirmation_is_private_hash_bound_and_revocable(tmp_path: Path) -> None:
     runbook = _copied_runbook(tmp_path)
     evidence = tmp_path / "review-note.txt"
-    evidence.write_text("官方规则核对证据", encoding="utf-8")
+    evidence.write_text("团队资格核对证据", encoding="utf-8")
     store_path = tmp_path / "private" / "human_gate_confirmations.json"
+    _ready_team_roster(store_path.parent)
     store = HumanGateStore(store_path, runbook_path=runbook)
 
     result = store.confirm(
-        GATE_IDS[4],
+        GATE_IDS[3],
         reviewer="仅私有审核名",
         evidence_file=evidence,
-        note="已核对官方规则",
+        note="已核对团队资格",
     )
 
     assert result["valid"] is True
@@ -246,15 +286,15 @@ def test_confirmation_is_private_hash_bound_and_revocable(tmp_path: Path) -> Non
     document = json.loads(store_path.read_text(encoding="utf-8"))
     validate_document(document, "human_gate_confirmations.schema.json")
     assert document["confirmations"][0]["evidence"]["sha256"]
-    assert "官方规则核对证据" not in store_path.read_text(encoding="utf-8")
+    assert "团队资格核对证据" not in store_path.read_text(encoding="utf-8")
     serialized_status = json.dumps(result, ensure_ascii=False)
     assert str(evidence.resolve()) not in serialized_status
     assert "仅私有审核名" not in serialized_status
 
     revoked = store.revoke(
-        GATE_IDS[4],
+        GATE_IDS[3],
         reviewer="仅私有审核名",
-        note="规则材料更新，需要重新核对",
+        note="报名资料更新，需要重新核对",
     )
     assert revoked["summary"] == {"passed": 0, "pending": 5, "total": 5}
     assert json.loads(store_path.read_text(encoding="utf-8"))["history"][-1]["action"] == "REVOKED"
@@ -386,9 +426,9 @@ def test_insecure_store_mode_is_rejected(tmp_path: Path) -> None:
     assert "STORE_MODE_NOT_600" in audit["issues"]
     with pytest.raises(HumanGateError, match="权限不安全"):
         store.confirm(
-            GATE_IDS[4],
+            GATE_IDS[3],
             reviewer="审核人",
-            evidence_url="https://example.com/rules",
+            evidence_url="https://example.com/team-proof",
         )
 
 
@@ -399,10 +439,15 @@ def test_custom_store_does_not_change_broad_existing_directory(tmp_path: Path) -
     broad = tmp_path / "shared"
     broad.mkdir(mode=0o755)
     broad.chmod(0o755)
-    store = HumanGateStore(broad / "state.json", runbook_path=runbook)
+    roster = _ready_team_roster(tmp_path / "private-roster")
+    store = HumanGateStore(
+        broad / "state.json",
+        runbook_path=runbook,
+        team_roster_path=roster,
+    )
 
     with pytest.raises(HumanGateError, match="目录权限必须为700"):
-        store.confirm(GATE_IDS[4], reviewer="审核人", evidence_file=evidence)
+        store.confirm(GATE_IDS[3], reviewer="审核人", evidence_file=evidence)
 
     assert stat.S_IMODE(broad.stat().st_mode) == 0o755
     assert not (broad / "state.json").exists()
@@ -418,12 +463,14 @@ def test_custom_store_does_not_change_broad_existing_directory(tmp_path: Path) -
     ],
 )
 def test_unsafe_evidence_url_is_rejected(tmp_path: Path, url: str) -> None:
+    private = tmp_path / "private"
+    _ready_team_roster(private)
     store = HumanGateStore(
-        tmp_path / "private" / "state.json",
+        private / "state.json",
         runbook_path=_copied_runbook(tmp_path),
     )
     with pytest.raises(HumanGateError, match="证据网址"):
-        store.confirm(GATE_IDS[4], reviewer="审核人", evidence_url=url)
+        store.confirm(GATE_IDS[3], reviewer="审核人", evidence_url=url)
 
 
 def test_valid_private_confirmations_remove_only_human_gates_from_preflight(
@@ -436,6 +483,7 @@ def test_valid_private_confirmations_remove_only_human_gates_from_preflight(
     recording = _ready_recording(private)
     rehearsal = _ready_rehearsal(private)
     roster_path = _ready_team_roster(private)
+    rules_review = _ready_official_rules_review(private)
     store_path = private / "human_gate_confirmations.json"
     store = HumanGateStore(store_path, runbook_path=RUNBOOK)
     for gate_id in GATE_IDS:
@@ -447,7 +495,11 @@ def test_valid_private_confirmations_remove_only_human_gates_from_preflight(
                 if gate_id == GATE_IDS[0]
                 else rehearsal
                 if gate_id == GATE_IDS[1]
-                else recording if gate_id == GATE_IDS[2] else evidence
+                else recording
+                if gate_id == GATE_IDS[2]
+                else rules_review
+                if gate_id == GATE_IDS[4]
+                else evidence
             ),
         )
 
@@ -462,6 +514,8 @@ def test_valid_private_confirmations_remove_only_human_gates_from_preflight(
         final_rehearsal_qa_path=private / "final_stage_rehearsal_qa.json",
         training_video_review_path=video_review,
         training_video_review_qa_path=private / "training_video_review_qa.json",
+        official_rules_review_path=rules_review,
+        official_rules_review_qa_path=private / "official_rules_review_qa.json",
     )
     checks = {item["check_id"]: item for item in report["automatic_checks"]}
 
@@ -471,9 +525,11 @@ def test_valid_private_confirmations_remove_only_human_gates_from_preflight(
     assert checks["TEAM_ROSTER_PRIVATE_STATE"]["status"] == "PASSED"
     assert checks["FINAL_REHEARSAL_PRIVATE_STATE"]["status"] == "PASSED"
     assert checks["TRAINING_VIDEO_REVIEW_PRIVATE_STATE"]["status"] == "PASSED"
+    assert checks["OFFICIAL_RULES_REVIEW_PRIVATE_STATE"]["status"] == "PASSED"
     assert "人工门禁=CONFIRMED" in checks["TRAINING_VIDEO_REVIEW_PRIVATE_STATE"]["details"][0]
     assert "人工门禁=CONFIRMED" in checks["FINAL_REHEARSAL_PRIVATE_STATE"]["details"][0]
     assert "人工门禁=CONFIRMED" in checks["TEAM_ROSTER_PRIVATE_STATE"]["details"][0]
+    assert "人工门禁=CONFIRMED" in checks["OFFICIAL_RULES_REVIEW_PRIVATE_STATE"]["details"][0]
     assert "人工门禁有效=5/5" in checks["HUMAN_GATE_CONFIRMATIONS"]["details"][0]
     serialized = json.dumps(report, ensure_ascii=False)
     assert str(evidence.resolve()) not in serialized
@@ -566,6 +622,42 @@ def test_training_video_gate_requires_current_full_watch_record_and_qa(
     audit = store.audit()
     assert audit["valid"] is False
     assert audit["issues"] == [f"TRAINING_VIDEO_REVIEW_QA_MISSING:{GATE_IDS[0]}"]
+
+
+def test_official_rules_gate_requires_current_private_review_and_qa(
+    tmp_path: Path,
+) -> None:
+    private = tmp_path / "private"
+    private.mkdir(mode=0o700)
+    private.chmod(0o700)
+    unverified = private / "official_rules_review.json"
+    unverified.write_text("{}", encoding="utf-8")
+    unverified.chmod(0o600)
+    store = HumanGateStore(
+        private / "state.json",
+        runbook_path=_copied_runbook(tmp_path),
+    )
+
+    with pytest.raises(HumanGateError, match="OFFICIAL_RULES_REVIEW_QA_MISSING"):
+        store.confirm(GATE_IDS[4], reviewer="审核人", evidence_file=unverified)
+    with pytest.raises(
+        HumanGateError, match="OFFICIAL_RULES_REVIEW_REQUIRES_LOCAL_FILE"
+    ):
+        store.confirm(
+            GATE_IDS[4],
+            reviewer="审核人",
+            evidence_url="https://example.com/official-rules",
+        )
+
+    unverified.unlink()
+    review = _ready_official_rules_review(private)
+    store.confirm(GATE_IDS[4], reviewer="审核人", evidence_file=review)
+    (private / "official_rules_review_qa.json").unlink()
+    audit = store.audit()
+    assert audit["valid"] is False
+    assert audit["issues"] == [
+        f"OFFICIAL_RULES_REVIEW_QA_MISSING:{GATE_IDS[4]}"
+    ]
 
 
 def test_final_recording_confirmation_tracks_qa_and_policy_state(

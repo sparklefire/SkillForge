@@ -23,6 +23,11 @@ from .final_rehearsal import (
     verify_final_rehearsal,
 )
 from .human_gates import HumanGateStore
+from .official_rules_review import (
+    OfficialRulesReviewError,
+    official_rules_review_qa_issue,
+    verify_official_rules_review,
+)
 from .pitch import build_readiness
 from .project_board import ProjectBoardError, build_project_board_status
 from .release_manifest import ReleaseManifestError, verify_release_manifest
@@ -522,6 +527,70 @@ def _check_training_video_review_private_state(
     )
 
 
+def _check_official_rules_review_private_state(
+    root: Path,
+    confirmed_gate_ids: set[str] | None = None,
+    review_path: Path | None = None,
+    qa_path: Path | None = None,
+) -> dict[str, Any]:
+    confirmed_gate_ids = confirmed_gate_ids or set()
+    review_path = (
+        review_path.resolve()
+        if review_path is not None
+        else (root / "outputs/submission/official_rules_review.json").resolve()
+    )
+    qa_path = (
+        qa_path.resolve()
+        if qa_path is not None
+        else review_path.parent / "official_rules_review_qa.json"
+    )
+    if not review_path.exists():
+        if qa_path.exists() or "OFFICIAL_RULES_VERIFIED" in confirmed_gate_ids:
+            return _check(
+                "OFFICIAL_RULES_REVIEW_PRIVATE_STATE",
+                "FAILED",
+                "规则审核QA或人工确认存在，但绑定的私有六项审核记录缺失",
+            )
+        return _check(
+            "OFFICIAL_RULES_REVIEW_PRIVATE_STATE",
+            "PASSED",
+            "私有官方规则六项审核状态=ABSENT；官方规则人工门禁保持待确认",
+        )
+    try:
+        report = verify_official_rules_review(
+            review_path,
+            public_snapshot_path=root / "config/official_rules_status.json",
+            private_root=review_path.parent,
+        )
+        issue = official_rules_review_qa_issue(
+            qa_path,
+            {
+                "kind": "LOCAL_FILE",
+                "locator": str(review_path),
+                "sha256": report["review_sha256"],
+                "size_bytes": report["review_bytes"],
+            },
+            public_snapshot_path=root / "config/official_rules_status.json",
+        )
+        if issue:
+            raise OfficialRulesReviewError(issue)
+    except (OSError, OfficialRulesReviewError, ContractValidationError) as exc:
+        return _check(
+            "OFFICIAL_RULES_REVIEW_PRIVATE_STATE",
+            "FAILED",
+            f"私有官方规则审核不完整或已失效；错误类型={type(exc).__name__}",
+        )
+    return _check(
+        "OFFICIAL_RULES_REVIEW_PRIVATE_STATE",
+        "PASSED",
+        (
+            f"官方规则六项机器检查通过；来源类型={report['source']['kind']}; "
+            "官方规则人工门禁="
+            f"{'CONFIRMED' if 'OFFICIAL_RULES_VERIFIED' in confirmed_gate_ids else 'PENDING'}"
+        ),
+    )
+
+
 def _check_pitch_package(
     root: Path,
     confirmed_gate_ids: set[str],
@@ -550,6 +619,8 @@ def _check_pitch_package(
 def _check_human_gate_confirmations(
     root: Path,
     confirmations_path: Path,
+    *,
+    official_rules_review_qa_path: Path | None = None,
 ) -> tuple[dict[str, Any], set[str]]:
     store = HumanGateStore(
         confirmations_path,
@@ -558,6 +629,8 @@ def _check_human_gate_confirmations(
             root / "output/video/n31_training_video_manifest_v1.json"
         ),
         training_video_path=root / "output/video/n31_training_video_v1.mp4",
+        official_rules_review_qa_path=official_rules_review_qa_path,
+        official_rules_snapshot_path=root / "config/official_rules_status.json",
     )
     audit = store.audit()
     if audit["valid"]:
@@ -697,11 +770,14 @@ def build_submission_preflight(
     final_rehearsal_qa_path: Path | None = None,
     training_video_review_path: Path | None = None,
     training_video_review_qa_path: Path | None = None,
+    official_rules_review_path: Path | None = None,
+    official_rules_review_qa_path: Path | None = None,
 ) -> dict[str, Any]:
     root = root.resolve()
     confirmation_check, confirmed_gate_ids = _check_human_gate_confirmations(
         root,
         (confirmations_path or root / "outputs/submission/human_gate_confirmations.json").resolve(),
+        official_rules_review_qa_path=official_rules_review_qa_path,
     )
     git_checks, commit, branch, clean, values = _check_git_and_secrets(
         root,
@@ -713,6 +789,12 @@ def build_submission_preflight(
         _check_project_identity(root),
         _check_required_documents(root),
         _check_official_rules_status(root),
+        _check_official_rules_review_private_state(
+            root,
+            confirmed_gate_ids,
+            review_path=official_rules_review_path,
+            qa_path=official_rules_review_qa_path,
+        ),
         _check_release_manifest(root),
         _check_project_board(root),
         _check_team_roster_private_state(

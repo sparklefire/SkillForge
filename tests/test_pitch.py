@@ -60,6 +60,7 @@ def test_pitch_keeps_human_review_as_a_submission_gate() -> None:
     assert video_gate["evidence_path"] == "outputs/submission/training_video_review.json"
     assert gates["FINAL_STAGE_REHEARSAL"]["evidence_path"] == "outputs/submission/final_stage_rehearsal.json"
     assert gates["FINAL_RECORDING_REVIEW"]["evidence_path"] == "outputs/submission/skillforge_final_recording.mp4"
+    assert gates["OFFICIAL_RULES_VERIFIED"]["evidence_path"] == "outputs/submission/official_rules_review.json"
 
 
 def test_pitch_requires_dgx_runtime_benchmark() -> None:

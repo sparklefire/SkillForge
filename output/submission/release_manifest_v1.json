@@ -262,7 +262,7 @@
     "contains_personal_data": false,
     "contains_public_urls": false
   },
-  "generated_at": "2026-07-18T17:21:38.027640+00:00",
+  "generated_at": "2026-07-18T17:45:24.925997+00:00",
   "human_gates": [
     {
       "blocking_for_submission": true,
@@ -351,8 +351,8 @@
       "role_id": "FINAL_REVIEWER"
     }
   ],
-  "runbook_sha256": "db43d734f427e16e8ab7f12a723d49d8da76487fad0c28d0f68e79d16b5a9c3e",
+  "runbook_sha256": "cef91b92e26c7b663f10dcc3d18f15009fdaa0687afbea376b5ff86b3ee48892",
   "status": "TECHNICAL_ARTIFACTS_FROZEN_HUMAN_GATES_PENDING",
-  "technical_freeze_digest": "d4020009e560e0ca1c7fee814b46675b60cc06a4a028778ccf92b66302f5071b",
+  "technical_freeze_digest": "53d27d6b75b3825d0ccb5d60a1f2bbc45959d585466584c9c580b0dff29c4953",
   "version": 1
 }

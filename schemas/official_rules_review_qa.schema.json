@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/official_rules_review_qa.schema.json",
+  "title": "SkillForge Private Official Rules Review QA",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "event_id", "artifact_type", "checked_at", "status", "review_sha256", "review_bytes", "public_snapshot_sha256", "source", "requirement_ids", "requirement_count", "checks", "human_gate_status", "data_policy"],
+  "properties": {
+    "version": {"const": 1},
+    "event_id": {"const": "nvidia-dgx-spark-hackathon-2"},
+    "artifact_type": {"const": "OFFICIAL_RULES_REVIEW_QA"},
+    "checked_at": {"type": "string", "format": "date-time"},
+    "status": {"const": "READY_FOR_HUMAN_CONFIRMATION"},
+    "review_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "review_bytes": {"type": "integer", "minimum": 1},
+    "public_snapshot_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "locator_sha256", "content_sha256", "bytes"],
+      "properties": {
+        "kind": {"enum": ["LOCAL_FILE", "HTTPS_URL"]},
+        "locator_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "content_sha256": {"anyOf": [{"type": "null"}, {"type": "string", "pattern": "^[a-f0-9]{64}$"}]},
+        "bytes": {"anyOf": [{"type": "null"}, {"type": "integer", "minimum": 1}]}
+      }
+    },
+    "requirement_ids": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "uniqueItems": true,
+      "items": {"enum": ["SCORING_WEIGHTS", "SUBMISSION_FIELDS", "VIDEO_REQUIREMENTS", "EXTERNAL_API_POLICY", "OPEN_SOURCE_POLICY", "ON_SITE_RUNTIME_REQUIREMENT"]}
+    },
+    "requirement_count": {"const": 6},
+    "checks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["public_snapshot_valid", "source_current", "requirement_set_exact", "all_findings_nonblank", "all_source_references_nonblank", "all_requirements_confirmed", "official_source_confirmed", "full_material_read", "six_requirements_reviewed", "submission_plan_updated", "conflicts_resolved"],
+      "properties": {
+        "public_snapshot_valid": {"const": true},
+        "source_current": {"const": true},
+        "requirement_set_exact": {"const": true},
+        "all_findings_nonblank": {"const": true},
+        "all_source_references_nonblank": {"const": true},
+        "all_requirements_confirmed": {"const": true},
+        "official_source_confirmed": {"const": true},
+        "full_material_read": {"const": true},
+        "six_requirements_reviewed": {"const": true},
+        "submission_plan_updated": {"const": true},
+        "conflicts_resolved": {"const": true}
+      }
+    },
+    "human_gate_status": {"const": "PENDING"},
+    "data_policy": {
+      "const": {
+        "private_local_state": true,
+        "contains_rule_details": false,
+        "contains_source_locator": false,
+        "contains_credentials": false,
+        "contains_absolute_paths": false,
+        "human_confirmation_generated": false
+      }
+    }
+  }
+}

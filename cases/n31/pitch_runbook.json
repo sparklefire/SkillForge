@@ -197,7 +197,7 @@
       "label": "按官方规则讲义核对评分、提交、外部API、开源和视频要求",
       "status": "PENDING",
       "blocking_for_submission": true,
-      "evidence_path": null
+      "evidence_path": "outputs/submission/official_rules_review.json"
     }
   ]
 }

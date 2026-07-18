@@ -17,6 +17,7 @@ from .contracts import validate_document
 from .demo import ROOT
 from .final_recording import final_recording_qa_issue
 from .final_rehearsal import final_rehearsal_qa_issue
+from .official_rules_review import official_rules_review_qa_issue
 from .team_roster import TeamRosterError, verify_team_roster
 from .training_video_review import training_video_review_qa_issue
 
@@ -112,6 +113,8 @@ class HumanGateStore:
         training_video_review_qa_path: Path | None = None,
         training_video_manifest_path: Path | None = None,
         training_video_path: Path | None = None,
+        official_rules_review_qa_path: Path | None = None,
+        official_rules_snapshot_path: Path | None = None,
     ) -> None:
         self.path = path.expanduser().resolve()
         self.runbook_path = runbook_path.expanduser().resolve()
@@ -144,6 +147,16 @@ class HumanGateStore:
             training_video_path.expanduser().resolve()
             if training_video_path is not None
             else ROOT / "output/video/n31_training_video_v1.mp4"
+        )
+        self.official_rules_review_qa_path = (
+            official_rules_review_qa_path.expanduser().resolve()
+            if official_rules_review_qa_path is not None
+            else self.path.parent / "official_rules_review_qa.json"
+        )
+        self.official_rules_snapshot_path = (
+            official_rules_snapshot_path.expanduser().resolve()
+            if official_rules_snapshot_path is not None
+            else ROOT / "config/official_rules_status.json"
         )
 
     def _runbook(self) -> tuple[dict[str, Any], str]:
@@ -252,6 +265,12 @@ class HumanGateStore:
             )
         if gate_id == "FINAL_RECORDING_REVIEW":
             return final_recording_qa_issue(self.final_recording_qa_path, evidence)
+        if gate_id == "OFFICIAL_RULES_VERIFIED":
+            return official_rules_review_qa_issue(
+                self.official_rules_review_qa_path,
+                evidence,
+                public_snapshot_path=self.official_rules_snapshot_path,
+            )
         return None
 
     def _team_roster_report(self) -> dict[str, Any]:
