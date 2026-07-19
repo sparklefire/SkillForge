@@ -219,6 +219,8 @@ def _ready_training_video_review(
         {
             "updated_at": "2026-07-19T03:00:00+00:00",
             "status": "READY_FOR_CHECK",
+            "watch_started_at": "2026-07-19T02:28:40+00:00",
+            "watch_completed_at": "2026-07-19T02:30:00+00:00",
             "watched_at": "2026-07-19T02:30:00+00:00",
             "playback_method": "LOCAL_PLAYER",
             "notes": "",

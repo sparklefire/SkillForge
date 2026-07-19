@@ -4,12 +4,14 @@
   "title": "SkillForge Private Training Video Full-Watch Review",
   "type": "object",
   "additionalProperties": false,
-  "required": ["version", "case_id", "updated_at", "status", "watched_at", "playback_method", "video", "manifest_sha256", "checks", "notes", "data_policy"],
+  "required": ["version", "case_id", "updated_at", "status", "watch_started_at", "watch_completed_at", "watched_at", "playback_method", "video", "manifest_sha256", "checks", "notes", "data_policy"],
   "properties": {
     "version": {"const": 1},
     "case_id": {"const": "n31_media_change"},
     "updated_at": {"type": "string", "format": "date-time"},
     "status": {"enum": ["PENDING_INPUT", "READY_FOR_CHECK"]},
+    "watch_started_at": {"anyOf": [{"type": "null"}, {"type": "string", "format": "date-time"}]},
+    "watch_completed_at": {"anyOf": [{"type": "null"}, {"type": "string", "format": "date-time"}]},
     "watched_at": {"anyOf": [{"type": "null"}, {"type": "string", "format": "date-time"}]},
     "playback_method": {"anyOf": [{"type": "null"}, {"enum": ["WEB_DEMO", "LOCAL_PLAYER", "OTHER_FULL_PLAYBACK"]}]},
     "video": {
@@ -54,6 +56,8 @@
       "if": {"properties": {"status": {"const": "READY_FOR_CHECK"}}},
       "then": {
         "properties": {
+          "watch_started_at": {"type": "string", "format": "date-time"},
+          "watch_completed_at": {"type": "string", "format": "date-time"},
           "watched_at": {"type": "string", "format": "date-time"},
           "playback_method": {"enum": ["WEB_DEMO", "LOCAL_PLAYER", "OTHER_FULL_PLAYBACK"]},
           "checks": {

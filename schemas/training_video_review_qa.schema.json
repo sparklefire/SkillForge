@@ -4,7 +4,7 @@
   "title": "SkillForge Private Training Video Review QA",
   "type": "object",
   "additionalProperties": false,
-  "required": ["version", "case_id", "artifact_type", "checked_at", "status", "review_sha256", "review_bytes", "manifest_sha256", "video", "checks", "human_gate_status", "data_policy"],
+  "required": ["version", "case_id", "artifact_type", "checked_at", "status", "review_sha256", "review_bytes", "manifest_sha256", "video", "watch_elapsed_ms", "checks", "human_gate_status", "data_policy"],
   "properties": {
     "version": {"const": 1},
     "case_id": {"const": "n31_media_change"},
@@ -14,6 +14,7 @@
     "review_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
     "review_bytes": {"type": "integer", "minimum": 1},
     "manifest_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "watch_elapsed_ms": {"type": "integer", "minimum": 58000, "maximum": 21600000},
     "video": {
       "type": "object",
       "additionalProperties": false,
@@ -28,7 +29,7 @@
     "checks": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["manifest_schema_valid", "manifest_ready_for_human_review", "automated_qa_passed", "visual_review_passed", "video_matches_manifest", "review_matches_current_artifacts", "full_playback_completed", "narration_audible", "narration_pacing_acceptable", "visuals_and_narration_in_sync", "all_steps_understandable", "no_sensitive_content_observed", "no_playback_corruption", "final_cut_accepted"],
+      "required": ["manifest_schema_valid", "manifest_ready_for_human_review", "automated_qa_passed", "visual_review_passed", "video_matches_manifest", "review_matches_current_artifacts", "watch_duration_sufficient", "full_playback_completed", "narration_audible", "narration_pacing_acceptable", "visuals_and_narration_in_sync", "all_steps_understandable", "no_sensitive_content_observed", "no_playback_corruption", "final_cut_accepted"],
       "properties": {
         "manifest_schema_valid": {"const": true},
         "manifest_ready_for_human_review": {"const": true},
@@ -36,6 +37,7 @@
         "visual_review_passed": {"const": true},
         "video_matches_manifest": {"const": true},
         "review_matches_current_artifacts": {"const": true},
+        "watch_duration_sufficient": {"const": true},
         "full_playback_completed": {"const": true},
         "narration_audible": {"const": true},
         "narration_pacing_acceptable": {"const": true},
@@ -52,6 +54,7 @@
         "private_local_state": true,
         "contains_personal_data": false,
         "contains_notes": false,
+        "contains_watch_timestamps": false,
         "contains_credentials": false,
         "contains_absolute_paths": false,
         "contains_media": false,

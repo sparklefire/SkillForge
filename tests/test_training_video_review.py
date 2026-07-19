@@ -53,6 +53,8 @@ def ready_review_document(manifest_path: Path, video_path: Path) -> dict:
         "case_id": "n31_media_change",
         "updated_at": "2026-07-19T03:00:00+00:00",
         "status": "READY_FOR_CHECK",
+        "watch_started_at": "2026-07-19T02:28:40+00:00",
+        "watch_completed_at": "2026-07-19T02:30:00+00:00",
         "watched_at": "2026-07-19T02:30:00+00:00",
         "playback_method": "LOCAL_PLAYER",
         "video": {
@@ -145,6 +147,8 @@ def test_template_binds_current_video_is_private_and_never_overwrites(
     )
 
     assert document["status"] == "PENDING_INPUT"
+    assert document["watch_started_at"] is None
+    assert document["watch_completed_at"] is None
     assert document["video"]["sha256"] == _sha256(video)
     assert document["manifest_sha256"] == _sha256(manifest)
     assert not any(document["checks"].values())
@@ -167,6 +171,7 @@ def test_ready_review_passes_without_copying_notes_or_paths_to_qa(
 
     assert report["status"] == "READY_FOR_HUMAN_CONFIRMATION"
     assert report["video"]["duration_ms"] == 80000
+    assert report["watch_elapsed_ms"] == 80000
     assert all(report["checks"].values())
     serialized = json.dumps(report, ensure_ascii=False)
     assert "私有记录" not in serialized
@@ -200,6 +205,26 @@ def test_incomplete_or_stale_review_is_rejected(tmp_path: Path, mutation) -> Non
     }
 
     with pytest.raises((TrainingVideoReviewError, ContractValidationError)):
+        verify_training_video_review_document(
+            document,
+            review_sha256="1" * 64,
+            review_bytes=100,
+            basis=basis,
+        )
+
+
+def test_short_watch_interval_is_rejected(tmp_path: Path) -> None:
+    manifest_path, video_path = public_video_basis(tmp_path)
+    document = ready_review_document(manifest_path, video_path)
+    document["watch_started_at"] = "2026-07-19T02:29:30+00:00"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    basis = {
+        "manifest": manifest,
+        "manifest_sha256": _sha256(manifest_path),
+        "video": document["video"],
+    }
+
+    with pytest.raises(TrainingVideoReviewError, match="观看时长不足"):
         verify_training_video_review_document(
             document,
             review_sha256="1" * 64,

@@ -250,6 +250,15 @@ bash scripts/check_final_recording_review.sh --init
 人工门禁不能由程序自动通过。完成某项人工工作后，使用私有确认器绑定当前运行单和证据哈希，不要手改路演JSON：
 
 ```bash
+bash scripts/run_guided_human_review.sh status
+bash scripts/run_guided_human_review.sh prepare
+
+# 以下三个命令必须在交互式终端运行；视频会由本机ffplay全屏播放
+bash scripts/run_guided_human_review.sh training-video
+bash scripts/run_guided_human_review.sh final-rehearsal
+bash scripts/run_guided_human_review.sh final-recording
+
+# 引导完成且匿名QA通过后，仍须由参赛者显式确认相应人工门禁
 bash scripts/manage_human_gates.sh status
 
 # 实际完整观看当前80秒成片后，填写私有审核表并做机器检查
@@ -277,7 +286,9 @@ bash scripts/manage_human_gates.sh confirm \
   --note "已完整观看并确认旁白节奏"
 ```
 
-观看审核模板预绑定当前成片和生成清单SHA-256。只有完整播放、旁白可听、节奏可接受、音画同步、步骤可理解、无敏感内容、无播放损坏且接受最终剪辑全部确认后才生成安全QA；通过后仍是 `READY_FOR_HUMAN_CONFIRMATION`。人工确认时会重新验证当前观看记录，并要求匿名QA除检查时间外与重算结果完全一致；成片、清单、记录或QA联动改写后旧确认自动失效。
+推荐的引导命令不会提供 `--yes` 或非交互确认方式。它使用单调时钟记录播放或彩排时长，逐项询问人工事实；任一回答为否、视频未正常播完、培训视频观看少于成片时长减2秒、最终录屏观看少于成片时长减2秒或彩排不在175–180秒内部目标内时，草稿和QA均不会被改为通过。`status` 和 `prepare` 不播放媒体、不填写人工结论，也不会确认门禁。
+
+培训视频观看模板预绑定当前成片和生成清单SHA-256，并记录带时区的播放开始、结束和确认时间。只有完整播放、旁白可听、节奏可接受、音画同步、步骤可理解、无敏感内容、无播放损坏且接受最终剪辑全部确认后才生成安全QA；通过后仍是 `READY_FOR_HUMAN_CONFIRMATION`。人工确认时会重新验证当前观看记录，并要求匿名QA除检查时间外与重算结果完全一致；成片、清单、记录或QA联动改写后旧确认自动失效。手工编辑JSON的旧命令保留为故障兜底，手工填写时同样必须提供开始、结束和确认三个带时区时间戳。
 
 彩排模板和QA报告位于Git忽略的 `outputs/submission/`。机器检查要求7段顺序与冻结运行单一致、实际时间连续、总时长处于内部175–180秒目标内，并逐段确认讲解、操作、证明点和故障兜底；通过后仍是 `READY_FOR_HUMAN_CONFIRMATION`。`FINAL_STAGE_REHEARSAL` 会从当前本地计时记录重新计算全部检查和报告字段；记录、QA、运行单或内部策略单独或联动变化后旧确认自动失效。
 
