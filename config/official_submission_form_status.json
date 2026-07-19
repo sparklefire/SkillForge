@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "event_id": "nvidia-dgx-spark-hackathon-2",
+  "checked_at": "2026-07-19",
+  "access_status": "ANONYMOUS_READ_ONLY",
+  "form_title": "NVIDIA DGX Spark Hackathon项目提交",
+  "required_fields": [
+    "TEAM_NAME",
+    "TEAM_MEMBERS",
+    "PROJECT_NAME",
+    "APPLICATION_DOMAIN",
+    "PROJECT_REPORT_URL",
+    "DEMO_VIDEO_URL",
+    "ARTICLE_URL",
+    "TEAM_PHOTO"
+  ],
+  "optional_fields": ["TEAM_ADDRESS"],
+  "application_domains": [
+    "科研 / 教育",
+    "航空",
+    "农业",
+    "建筑 / 工程 / 施工",
+    "汽车 / 物流 / 交通运输",
+    "云服务",
+    "消费互联网",
+    "能源",
+    "金融服务",
+    "游戏业",
+    "硬件 / 半导体",
+    "医疗健康和生命科学",
+    "高性能计算 / 科学计算",
+    "制造业",
+    "媒体和娱乐",
+    "公共事业部门",
+    "餐饮 / 酒店",
+    "零售 / 批发",
+    "智慧城市 / 空间",
+    "电信",
+    "其他"
+  ],
+  "team_photo": {
+    "max_bytes": 20000000,
+    "limit_label": "20MB",
+    "format_constraint_declared": false
+  },
+  "source": {
+    "publisher": "NVIDIA DGX Spark Hackathon项目提交表单",
+    "locator_sha256": "dabea5882070f2ab06d3eb9f8a9587906d629cefdf58bd5bec2367352f01de37",
+    "page_title": "NVIDIA DGX Spark Hackathon项目提交",
+    "render_surface": "CHROMIUM_DYNAMIC_FORM"
+  },
+  "unresolved_requirements": [
+    "VIDEO_REQUIREMENTS",
+    "EXTERNAL_API_POLICY",
+    "ON_SITE_RUNTIME_REQUIREMENT"
+  ],
+  "data_policy": {
+    "contains_form_url": false,
+    "contains_credentials": false,
+    "contains_personal_data": false,
+    "contains_field_values": false,
+    "form_filled": false,
+    "form_submitted": false
+  }
+}

@@ -39,6 +39,10 @@ from .submission_receipt import (
     SubmissionReceiptError,
     verify_saved_submission_receipt_qa,
 )
+from .submission_form_packet import (
+    SubmissionFormPacketError,
+    verify_saved_submission_form_packet_qa,
+)
 from .team_roster import TeamRosterError, verify_team_roster
 from .training_video_review import (
     TrainingVideoReviewError,
@@ -56,6 +60,7 @@ STAGE_ORDER = (
     "OFFICIAL_RULES_VERIFIED",
     "FINAL_STAGE_REHEARSAL",
     "FINAL_RECORDING_REVIEW",
+    "SUBMISSION_FORM_PACKET",
     "FINAL_CLEAN_PREFLIGHT",
     "SUBMISSION_UPLOAD",
     "PUBLIC_LINK_QA",
@@ -470,6 +475,124 @@ def _probe_final_recording(root: Path, private_root: Path) -> dict[str, str]:
     )
 
 
+def _submission_form_packet_stage(
+    root: Path,
+    private_root: Path,
+    *,
+    dependencies_complete: bool,
+) -> dict[str, Any]:
+    input_path = private_root / "submission_form_packet.json"
+    prefill_path = private_root / "submission_form_prefill.json"
+    qa_path = private_root / "submission_form_packet_qa.json"
+    dependencies = tuple(GATE_IDS)
+    if not input_path.exists():
+        if prefill_path.exists() or qa_path.exists():
+            return _stage(
+                "SUBMISSION_FORM_PACKET",
+                "SUBMISSION",
+                "NEEDS_REVIEW",
+                "INVALID",
+                depends_on=dependencies,
+                next_action="清理失去私有输入绑定的表单预填包/QA后重新初始化",
+                next_command="bash scripts/check_submission_form_packet.sh --init",
+            )
+        return _stage(
+            "SUBMISSION_FORM_PACKET",
+            "SUBMISSION",
+            "AWAITING_HUMAN" if dependencies_complete else "WAITING_ON_DEPENDENCIES",
+            "ABSENT",
+            depends_on=dependencies,
+            next_action="初始化并填写官方表单8项必填字段、团队照片和三个公开网址",
+            next_command="bash scripts/check_submission_form_packet.sh --init",
+        )
+    if not _private_file_safe(input_path, private_root):
+        return _stage(
+            "SUBMISSION_FORM_PACKET",
+            "SUBMISSION",
+            "NEEDS_REVIEW",
+            "INVALID",
+            depends_on=dependencies,
+            next_action="恢复表单私有输入的700/600权限后重新检查",
+            next_command="bash scripts/check_submission_form_packet.sh",
+        )
+    try:
+        packet = validate_document(
+            _read_json(input_path, "官方提交表单私有输入"),
+            "submission_form_packet.schema.json",
+        )
+    except (SubmissionCloseoutError, ContractValidationError):
+        return _stage(
+            "SUBMISSION_FORM_PACKET",
+            "SUBMISSION",
+            "NEEDS_REVIEW",
+            "INVALID",
+            depends_on=dependencies,
+            next_action="修复官方表单私有输入并重新运行机器检查",
+            next_command="bash scripts/check_submission_form_packet.sh",
+        )
+    if packet["status"] == "PENDING_INPUT":
+        if prefill_path.exists() or qa_path.exists():
+            return _stage(
+                "SUBMISSION_FORM_PACKET",
+                "SUBMISSION",
+                "NEEDS_REVIEW",
+                "INVALID",
+                depends_on=dependencies,
+                next_action="删除与草稿状态冲突的预填包/QA后重新检查",
+                next_command="bash scripts/check_submission_form_packet.sh",
+            )
+        return _stage(
+            "SUBMISSION_FORM_PACKET",
+            "SUBMISSION",
+            "AWAITING_HUMAN" if dependencies_complete else "WAITING_ON_DEPENDENCIES",
+            "DRAFT",
+            depends_on=dependencies,
+            next_action="填写团队名称、三个公开网址并绑定20MB内团队照片",
+            next_command="bash scripts/check_submission_form_packet.sh",
+        )
+    if not prefill_path.exists() and not qa_path.exists():
+        return _stage(
+            "SUBMISSION_FORM_PACKET",
+            "SUBMISSION",
+            "READY" if dependencies_complete else "WAITING_ON_DEPENDENCIES",
+            "INPUT_READY",
+            depends_on=dependencies,
+            next_action="匿名检查三个网址并生成只供人工复制的私有表单包",
+            next_command="bash scripts/check_submission_form_packet.sh",
+        )
+    try:
+        verify_saved_submission_form_packet_qa(
+            qa_path,
+            input_path=input_path,
+            prefill_path=prefill_path,
+            form_snapshot_path=root / "config/official_submission_form_status.json",
+            roster_path=private_root / "team_roster.json",
+            roster_qa_path=private_root / "team_roster_qa.json",
+            private_root=private_root,
+        )
+    except (SubmissionFormPacketError, ContractValidationError, OSError):
+        return _stage(
+            "SUBMISSION_FORM_PACKET",
+            "SUBMISSION",
+            "NEEDS_REVIEW",
+            "INVALID",
+            depends_on=dependencies,
+            next_action="重新生成表单预填包和去标识化QA并处理来源漂移",
+            next_command="bash scripts/check_submission_form_packet.sh",
+        )
+    return _stage(
+        "SUBMISSION_FORM_PACKET",
+        "SUBMISSION",
+        "COMPLETED" if dependencies_complete else "WAITING_ON_DEPENDENCIES",
+        "VERIFIED",
+        depends_on=dependencies,
+        next_action=(
+            None if dependencies_complete else "先完成并确认五项人工/外部门禁"
+        ),
+        next_command=(
+            None if dependencies_complete else "bash scripts/manage_human_gates.sh status"
+        ),
+    )
 GATE_PROBES: dict[str, tuple[str, Callable[[Path, Path], dict[str, str]]]] = {
     "TRAINING_VIDEO_FULL_WATCH": ("HUMAN", _probe_training_video),
     "TEAM_ELIGIBILITY_CONFIRMED": ("HUMAN", _probe_team_roster),
@@ -579,7 +702,7 @@ def _preflight_stage(
     dependencies_complete: bool,
 ) -> dict[str, Any]:
     path = private_root / "submission_preflight_final.json"
-    dependencies = tuple(GATE_IDS)
+    dependencies = (*GATE_IDS, "SUBMISSION_FORM_PACKET")
     if not path.exists():
         return _stage(
             "FINAL_CLEAN_PREFLIGHT",
@@ -587,7 +710,7 @@ def _preflight_stage(
             "READY" if dependencies_complete else "WAITING_ON_DEPENDENCIES",
             "ABSENT",
             depends_on=dependencies,
-            next_action="五项门禁确认后固定最终干净预检",
+            next_action="五项门禁和表单材料包完成后固定最终干净预检",
             next_command=(
                 "bash scripts/check_submission.sh --output "
                 "outputs/submission/submission_preflight_final.json"
@@ -792,8 +915,10 @@ def _overall_status(stages: list[dict[str, Any]]) -> str:
         return "PUBLIC_LINK_QA_PENDING"
     if by_id["FINAL_CLEAN_PREFLIGHT"]["status"] == "COMPLETED":
         return "READY_FOR_UPLOAD"
-    if all(by_id[gate_id]["status"] == "COMPLETED" for gate_id in GATE_IDS):
+    if by_id["SUBMISSION_FORM_PACKET"]["status"] == "COMPLETED":
         return "FINAL_PREFLIGHT_PENDING"
+    if all(by_id[gate_id]["status"] == "COMPLETED" for gate_id in GATE_IDS):
+        return "SUBMISSION_FORM_PACKET_PENDING"
     if by_id["TECHNICAL_RELEASE_BUNDLE"]["status"] != "COMPLETED":
         return "TECHNICAL_PACKAGE_PENDING"
     return "TECHNICAL_READY_HUMAN_GATES_PENDING"
@@ -830,8 +955,16 @@ def build_submission_closeout_status(
     private_root = private_root.expanduser().resolve()
     technical = _technical_bundle_stage(root, release_archive, release_qa)
     gates, audit = _gate_stages(root, private_root)
-    dependencies_complete = technical["status"] == "COMPLETED" and all(
+    gates_complete = technical["status"] == "COMPLETED" and all(
         item["status"] == "COMPLETED" for item in gates
+    )
+    form_packet = _submission_form_packet_stage(
+        root,
+        private_root,
+        dependencies_complete=gates_complete,
+    )
+    dependencies_complete = (
+        gates_complete and form_packet["status"] == "COMPLETED"
     )
     preflight = _preflight_stage(
         root,
@@ -852,7 +985,7 @@ def build_submission_closeout_status(
         )
     elif not preflight_complete and publication_input_ready:
         publication["status"] = "WAITING_ON_DEPENDENCIES"
-        publication["next_action"] = "先关闭五项门禁并完成最终干净预检"
+        publication["next_action"] = "先关闭五项门禁、完成表单材料包和最终干净预检"
         publication["next_command"] = "bash scripts/check_submission.sh"
     upload_complete = preflight_complete and (
         publication_input_ready or publication["status"] == "COMPLETED"
@@ -879,7 +1012,7 @@ def build_submission_closeout_status(
         private_root,
         publication_complete=publication["status"] == "COMPLETED",
     )
-    stages = [technical, *gates, preflight, upload, publication, receipt]
+    stages = [technical, *gates, form_packet, preflight, upload, publication, receipt]
     if tuple(item["stage_id"] for item in stages) != STAGE_ORDER:
         raise SubmissionCloseoutError("收尾阶段顺序与冻结定义不一致")
     status = _overall_status(stages)

@@ -473,7 +473,7 @@ def test_unsafe_evidence_url_is_rejected(tmp_path: Path, url: str) -> None:
         store.confirm(GATE_IDS[3], reviewer="审核人", evidence_url=url)
 
 
-def test_valid_private_confirmations_remove_only_human_gates_from_preflight(
+def test_valid_private_confirmations_still_require_submission_form_packet(
     tmp_path: Path,
 ) -> None:
     evidence = tmp_path / "evidence.txt"
@@ -516,16 +516,21 @@ def test_valid_private_confirmations_remove_only_human_gates_from_preflight(
         training_video_review_qa_path=private / "training_video_review_qa.json",
         official_rules_review_path=rules_review,
         official_rules_review_qa_path=private / "official_rules_review_qa.json",
+        submission_form_packet_path=private / "submission_form_packet.json",
+        submission_form_prefill_path=private / "submission_form_prefill.json",
+        submission_form_packet_qa_path=private / "submission_form_packet_qa.json",
     )
     checks = {item["check_id"]: item for item in report["automatic_checks"]}
 
     assert report["pending_human_gates"] == []
-    assert report["status"] == "DEVELOPMENT_CHECK"
+    assert report["status"] == "NOT_READY"
     assert checks["HUMAN_GATE_CONFIRMATIONS"]["status"] == "PASSED"
     assert checks["TEAM_ROSTER_PRIVATE_STATE"]["status"] == "PASSED"
     assert checks["FINAL_REHEARSAL_PRIVATE_STATE"]["status"] == "PASSED"
     assert checks["TRAINING_VIDEO_REVIEW_PRIVATE_STATE"]["status"] == "PASSED"
     assert checks["OFFICIAL_RULES_REVIEW_PRIVATE_STATE"]["status"] == "PASSED"
+    assert checks["SUBMISSION_FORM_PACKET_PRIVATE_STATE"]["status"] == "FAILED"
+    assert "私有表单输入缺失" in checks["SUBMISSION_FORM_PACKET_PRIVATE_STATE"]["details"][0]
     assert "人工门禁=CONFIRMED" in checks["TRAINING_VIDEO_REVIEW_PRIVATE_STATE"]["details"][0]
     assert "人工门禁=CONFIRMED" in checks["FINAL_REHEARSAL_PRIVATE_STATE"]["details"][0]
     assert "人工门禁=CONFIRMED" in checks["TEAM_ROSTER_PRIVATE_STATE"]["details"][0]

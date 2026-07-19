@@ -58,7 +58,7 @@ def test_current_empty_private_state_is_actionable_not_implementation_blocked(
     assert report["implementation_goal_blocked"] is False
     assert report["formal_submission_ready"] is False
     assert report["submission_archived"] is False
-    assert report["stage_count"] == 10
+    assert report["stage_count"] == 11
     assert report["completed_stage_count"] == 1
     assert report["human_gate_summary"] == {
         "confirmed": 0,
@@ -73,6 +73,8 @@ def test_current_empty_private_state_is_actionable_not_implementation_blocked(
     stages = _stages(report)
     assert stages["TECHNICAL_RELEASE_BUNDLE"]["status"] == "COMPLETED"
     assert stages["OFFICIAL_RULES_VERIFIED"]["status"] == "AWAITING_EXTERNAL"
+    assert stages["SUBMISSION_FORM_PACKET"]["status"] == "WAITING_ON_DEPENDENCIES"
+    assert stages["SUBMISSION_FORM_PACKET"]["evidence_state"] == "ABSENT"
     assert stages["FINAL_CLEAN_PREFLIGHT"]["status"] == "WAITING_ON_DEPENDENCIES"
     assert report["data_policy"]["automatic_human_confirmations"] == 0
     assert report["data_policy"]["network_requests"] == 0
@@ -205,6 +207,8 @@ def test_overall_state_machine_orders_post_gate_dependencies(private_root: Path)
     by_id = {item["stage_id"]: item for item in stages}
     for gate_id in GATE_IDS:
         by_id[gate_id]["status"] = "COMPLETED"
+    assert _overall_status(stages) == "SUBMISSION_FORM_PACKET_PENDING"
+    by_id["SUBMISSION_FORM_PACKET"]["status"] = "COMPLETED"
     assert _overall_status(stages) == "FINAL_PREFLIGHT_PENDING"
     by_id["FINAL_CLEAN_PREFLIGHT"]["status"] = "COMPLETED"
     assert _overall_status(stages) == "READY_FOR_UPLOAD"

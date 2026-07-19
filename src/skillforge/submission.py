@@ -32,6 +32,10 @@ from .pitch import build_readiness
 from .project_board import ProjectBoardError, build_project_board_status
 from .release_manifest import ReleaseManifestError, verify_release_manifest
 from .team_roster import TeamRosterError, verify_team_roster
+from .submission_form_packet import (
+    SubmissionFormPacketError,
+    verify_saved_submission_form_packet_qa,
+)
 from .training_video_review import (
     TrainingVideoReviewError,
     training_video_review_qa_issue,
@@ -470,6 +474,98 @@ def _check_team_roster_private_state(
     )
 
 
+def _check_submission_form_packet_private_state(
+    root: Path,
+    confirmed_gate_ids: set[str] | None = None,
+    input_path: Path | None = None,
+    prefill_path: Path | None = None,
+    qa_path: Path | None = None,
+) -> dict[str, Any]:
+    confirmed_gate_ids = confirmed_gate_ids or set()
+    required_gates = {
+        "TRAINING_VIDEO_FULL_WATCH",
+        "TEAM_ELIGIBILITY_CONFIRMED",
+        "OFFICIAL_RULES_VERIFIED",
+        "FINAL_STAGE_REHEARSAL",
+        "FINAL_RECORDING_REVIEW",
+    }
+    gates_complete = required_gates.issubset(confirmed_gate_ids)
+    input_path = (
+        input_path.resolve()
+        if input_path is not None
+        else (root / "outputs/submission/submission_form_packet.json").resolve()
+    )
+    private_root = input_path.parent
+    prefill_path = (
+        prefill_path.resolve()
+        if prefill_path is not None
+        else private_root / "submission_form_prefill.json"
+    )
+    qa_path = (
+        qa_path.resolve()
+        if qa_path is not None
+        else private_root / "submission_form_packet_qa.json"
+    )
+    if not input_path.exists():
+        if prefill_path.exists() or qa_path.exists() or gates_complete:
+            return _check(
+                "SUBMISSION_FORM_PACKET_PRIVATE_STATE",
+                "FAILED",
+                "提交表单预填包/QA或五项确认已存在，但私有表单输入缺失",
+            )
+        return _check(
+            "SUBMISSION_FORM_PACKET_PRIVATE_STATE",
+            "PASSED",
+            "私有官方提交表单材料包状态=ABSENT；不会自动填写或提交浏览器表单",
+        )
+    try:
+        document = validate_document(
+            _read_json(input_path), "submission_form_packet.schema.json"
+        )
+    except (OSError, ContractValidationError, json.JSONDecodeError):
+        return _check(
+            "SUBMISSION_FORM_PACKET_PRIVATE_STATE",
+            "FAILED",
+            "私有官方提交表单输入无法读取或不符合严格Schema",
+        )
+    if document["status"] == "PENDING_INPUT":
+        if prefill_path.exists() or qa_path.exists() or gates_complete:
+            return _check(
+                "SUBMISSION_FORM_PACKET_PRIVATE_STATE",
+                "FAILED",
+                "官方提交表单输入仍为PENDING_INPUT，但预填包/QA或五项确认已存在",
+            )
+        return _check(
+            "SUBMISSION_FORM_PACKET_PRIVATE_STATE",
+            "PASSED",
+            "私有官方提交表单材料包状态=PENDING_INPUT；人工复制提交，不执行浏览器写入",
+        )
+    try:
+        report = verify_saved_submission_form_packet_qa(
+            qa_path,
+            input_path=input_path,
+            prefill_path=prefill_path,
+            form_snapshot_path=root / "config/official_submission_form_status.json",
+            roster_path=private_root / "team_roster.json",
+            roster_qa_path=private_root / "team_roster_qa.json",
+            private_root=private_root,
+        )
+    except (OSError, SubmissionFormPacketError, ContractValidationError) as exc:
+        return _check(
+            "SUBMISSION_FORM_PACKET_PRIVATE_STATE",
+            "FAILED",
+            f"官方提交表单材料包不完整或已漂移；错误类型={type(exc).__name__}",
+        )
+    return _check(
+        "SUBMISSION_FORM_PACKET_PRIVATE_STATE",
+        "PASSED",
+        (
+            f"官方提交表单8项必填字段机器QA通过；网址={len(report['url_checks'])}; "
+            "提交方式=MANUAL_COPY_ONLY; 浏览器提交=false"
+        ),
+    )
+
+
 def _check_final_rehearsal_private_state(
     root: Path,
     confirmed_gate_ids: set[str] | None = None,
@@ -881,6 +977,9 @@ def build_submission_preflight(
     training_video_review_qa_path: Path | None = None,
     official_rules_review_path: Path | None = None,
     official_rules_review_qa_path: Path | None = None,
+    submission_form_packet_path: Path | None = None,
+    submission_form_prefill_path: Path | None = None,
+    submission_form_packet_qa_path: Path | None = None,
 ) -> dict[str, Any]:
     root = root.resolve()
     confirmation_check, confirmed_gate_ids = _check_human_gate_confirmations(
@@ -910,6 +1009,13 @@ def build_submission_preflight(
             root,
             confirmed_gate_ids,
             roster_path=team_roster_path,
+        ),
+        _check_submission_form_packet_private_state(
+            root,
+            confirmed_gate_ids,
+            input_path=submission_form_packet_path,
+            prefill_path=submission_form_prefill_path,
+            qa_path=submission_form_packet_qa_path,
         ),
         _check_training_video_review_private_state(
             root,

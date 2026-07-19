@@ -1,0 +1,161 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/submission_form_packet_qa.schema.json",
+  "title": "SkillForge Redacted Submission Form Packet QA",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "case_id",
+    "artifact_type",
+    "checked_at",
+    "status",
+    "packet_sha256",
+    "prefill_sha256",
+    "form_snapshot_sha256",
+    "team_roster_sha256",
+    "team_roster_qa_sha256",
+    "required_field_count",
+    "optional_field_count",
+    "team_member_count",
+    "application_domain_sha256",
+    "url_checks",
+    "team_photo",
+    "checks",
+    "data_policy"
+  ],
+  "properties": {
+    "version": {"const": 1},
+    "case_id": {"const": "n31_media_change"},
+    "artifact_type": {"const": "SUBMISSION_FORM_PACKET_QA"},
+    "checked_at": {"type": "string", "format": "date-time"},
+    "status": {"const": "READY_FOR_HUMAN_SUBMISSION"},
+    "packet_sha256": {"$ref": "#/$defs/sha256"},
+    "prefill_sha256": {"$ref": "#/$defs/sha256"},
+    "form_snapshot_sha256": {"$ref": "#/$defs/sha256"},
+    "team_roster_sha256": {"$ref": "#/$defs/sha256"},
+    "team_roster_qa_sha256": {"$ref": "#/$defs/sha256"},
+    "required_field_count": {"const": 8},
+    "optional_field_count": {"const": 1},
+    "team_member_count": {"type": "integer", "minimum": 2, "maximum": 5},
+    "application_domain_sha256": {"$ref": "#/$defs/sha256"},
+    "url_checks": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {"$ref": "#/$defs/urlCheck"}
+    },
+    "team_photo": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sha256", "bytes", "mime_type", "width", "height"],
+      "properties": {
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "bytes": {"type": "integer", "minimum": 1, "maximum": 20000000},
+        "mime_type": {"enum": ["image/jpeg", "image/png", "image/webp"]},
+        "width": {"type": "integer", "minimum": 1},
+        "height": {"type": "integer", "minimum": 1}
+      }
+    },
+    "checks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "form_snapshot_current",
+        "required_fields_complete",
+        "application_domain_allowed",
+        "team_roster_schema_valid",
+        "team_roster_qa_current",
+        "team_size_valid",
+        "team_photo_current",
+        "team_photo_under_20mb",
+        "team_photo_decodable",
+        "three_urls_unique",
+        "three_urls_safe",
+        "three_urls_anonymous_reachable",
+        "three_url_content_types_match",
+        "browser_form_not_filled",
+        "browser_form_not_submitted"
+      ],
+      "properties": {
+        "form_snapshot_current": {"const": true},
+        "required_fields_complete": {"const": true},
+        "application_domain_allowed": {"const": true},
+        "team_roster_schema_valid": {"const": true},
+        "team_roster_qa_current": {"const": true},
+        "team_size_valid": {"const": true},
+        "team_photo_current": {"const": true},
+        "team_photo_under_20mb": {"const": true},
+        "team_photo_decodable": {"const": true},
+        "three_urls_unique": {"const": true},
+        "three_urls_safe": {"const": true},
+        "three_urls_anonymous_reachable": {"const": true},
+        "three_url_content_types_match": {"const": true},
+        "browser_form_not_filled": {"const": true},
+        "browser_form_not_submitted": {"const": true}
+      }
+    },
+    "data_policy": {
+      "const": {
+        "private_local_state": true,
+        "contains_personal_data": false,
+        "contains_member_names": false,
+        "contains_organizations": false,
+        "contains_urls": false,
+        "contains_team_photo_locator": false,
+        "contains_team_photo_bytes": false,
+        "contains_form_url": false,
+        "contains_credentials": false,
+        "browser_form_filled": false,
+        "browser_form_submitted": false,
+        "network_requests": 3
+      }
+    }
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "urlCheck": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "field_id",
+        "url_sha256",
+        "final_url_sha256",
+        "http_status",
+        "content_type",
+        "redirect_count",
+        "status",
+        "checks"
+      ],
+      "properties": {
+        "field_id": {"enum": ["PROJECT_REPORT_URL", "DEMO_VIDEO_URL", "ARTICLE_URL"]},
+        "url_sha256": {"$ref": "#/$defs/sha256"},
+        "final_url_sha256": {
+          "anyOf": [{"$ref": "#/$defs/sha256"}, {"type": "null"}]
+        },
+        "http_status": {"type": "integer", "minimum": 200, "maximum": 299},
+        "content_type": {"type": "string", "minLength": 1, "maxLength": 200},
+        "redirect_count": {"type": "integer", "minimum": 0},
+        "status": {"const": "PASSED"},
+        "checks": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "input_url_safe",
+            "anonymous_reachable",
+            "content_type_matches",
+            "final_url_safe",
+            "remote_ip_public"
+          ],
+          "properties": {
+            "input_url_safe": {"const": true},
+            "anonymous_reachable": {"const": true},
+            "content_type_matches": {"const": true},
+            "final_url_safe": {"const": true},
+            "remote_ip_public": {"const": true}
+          }
+        }
+      }
+    }
+  }
+}

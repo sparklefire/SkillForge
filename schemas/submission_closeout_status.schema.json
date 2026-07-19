@@ -29,6 +29,7 @@
       "enum": [
         "TECHNICAL_PACKAGE_PENDING",
         "TECHNICAL_READY_HUMAN_GATES_PENDING",
+        "SUBMISSION_FORM_PACKET_PENDING",
         "FINAL_PREFLIGHT_PENDING",
         "READY_FOR_UPLOAD",
         "PUBLIC_LINK_QA_PENDING",
@@ -40,8 +41,8 @@
     "implementation_goal_blocked": {"const": false},
     "formal_submission_ready": {"type": "boolean"},
     "submission_archived": {"type": "boolean"},
-    "stage_count": {"const": 10},
-    "completed_stage_count": {"type": "integer", "minimum": 0, "maximum": 10},
+    "stage_count": {"const": 11},
+    "completed_stage_count": {"type": "integer", "minimum": 0, "maximum": 11},
     "human_gate_summary": {
       "type": "object",
       "additionalProperties": false,
@@ -72,8 +73,8 @@
     },
     "stages": {
       "type": "array",
-      "minItems": 10,
-      "maxItems": 10,
+      "minItems": 11,
+      "maxItems": 11,
       "items": {"$ref": "#/$defs/stage"}
     },
     "data_policy": {
@@ -99,6 +100,7 @@
         "OFFICIAL_RULES_VERIFIED",
         "FINAL_STAGE_REHEARSAL",
         "FINAL_RECORDING_REVIEW",
+        "SUBMISSION_FORM_PACKET",
         "FINAL_CLEAN_PREFLIGHT",
         "SUBMISSION_UPLOAD",
         "PUBLIC_LINK_QA",

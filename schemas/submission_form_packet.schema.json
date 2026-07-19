@@ -1,0 +1,143 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/submission_form_packet.schema.json",
+  "title": "SkillForge Private Submission Form Packet Input",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "case_id",
+    "updated_at",
+    "status",
+    "form_snapshot_sha256",
+    "fields",
+    "team_photo",
+    "data_policy"
+  ],
+  "properties": {
+    "version": {"const": 1},
+    "case_id": {"const": "n31_media_change"},
+    "updated_at": {"type": "string", "format": "date-time"},
+    "status": {"enum": ["PENDING_INPUT", "READY_FOR_CHECK"]},
+    "form_snapshot_sha256": {"$ref": "#/$defs/sha256"},
+    "fields": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "team_name",
+        "team_address",
+        "project_name",
+        "application_domain",
+        "project_report_url",
+        "demo_video_url",
+        "article_url"
+      ],
+      "properties": {
+        "team_name": {"type": "string", "maxLength": 200},
+        "team_address": {
+          "anyOf": [
+            {"type": "null"},
+            {"type": "string", "minLength": 1, "maxLength": 300}
+          ]
+        },
+        "project_name": {"const": "SkillForge（匠传）"},
+        "application_domain": {
+          "anyOf": [{"type": "null"}, {"$ref": "#/$defs/applicationDomain"}]
+        },
+        "project_report_url": {"$ref": "#/$defs/nullableUrl"},
+        "demo_video_url": {"$ref": "#/$defs/nullableUrl"},
+        "article_url": {"$ref": "#/$defs/nullableUrl"}
+      }
+    },
+    "team_photo": {
+      "anyOf": [{"type": "null"}, {"$ref": "#/$defs/teamPhoto"}]
+    },
+    "data_policy": {
+      "const": {
+        "private_local_state": true,
+        "contains_personal_data": true,
+        "contains_public_urls": true,
+        "contains_team_photo_locator": true,
+        "git_tracked": false,
+        "browser_form_filled": false,
+        "browser_form_submitted": false
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"status": {"const": "READY_FOR_CHECK"}}},
+      "then": {
+        "properties": {
+          "fields": {
+            "properties": {
+              "team_name": {"minLength": 1},
+              "application_domain": {"$ref": "#/$defs/applicationDomain"},
+              "project_report_url": {"type": "string", "format": "uri"},
+              "demo_video_url": {"type": "string", "format": "uri"},
+              "article_url": {"type": "string", "format": "uri"}
+            }
+          },
+          "team_photo": {"$ref": "#/$defs/teamPhoto"}
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "nullableUrl": {
+      "anyOf": [
+        {"type": "null"},
+        {"type": "string", "format": "uri", "maxLength": 4096}
+      ]
+    },
+    "applicationDomain": {
+      "enum": [
+        "科研 / 教育",
+        "航空",
+        "农业",
+        "建筑 / 工程 / 施工",
+        "汽车 / 物流 / 交通运输",
+        "云服务",
+        "消费互联网",
+        "能源",
+        "金融服务",
+        "游戏业",
+        "硬件 / 半导体",
+        "医疗健康和生命科学",
+        "高性能计算 / 科学计算",
+        "制造业",
+        "媒体和娱乐",
+        "公共事业部门",
+        "餐饮 / 酒店",
+        "零售 / 批发",
+        "智慧城市 / 空间",
+        "电信",
+        "其他"
+      ]
+    },
+    "teamPhoto": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "relative_path",
+        "sha256",
+        "bytes",
+        "mime_type",
+        "width",
+        "height"
+      ],
+      "properties": {
+        "relative_path": {
+          "type": "string",
+          "pattern": "^submission_form_assets/team_photo\\.(?:jpg|jpeg|png|webp)$"
+        },
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "bytes": {"type": "integer", "minimum": 1, "maximum": 20000000},
+        "mime_type": {"enum": ["image/jpeg", "image/png", "image/webp"]},
+        "width": {"type": "integer", "minimum": 1},
+        "height": {"type": "integer", "minimum": 1}
+      }
+    }
+  }
+}

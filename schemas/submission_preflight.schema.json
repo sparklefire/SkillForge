@@ -45,7 +45,7 @@
     },
     "automatic_checks": {
       "type": "array",
-      "minItems": 16,
+      "minItems": 17,
       "items": {"$ref": "#/$defs/check"}
     },
     "pending_human_gates": {

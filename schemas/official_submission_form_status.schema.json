@@ -1,0 +1,117 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/official_submission_form_status.schema.json",
+  "title": "SkillForge Official Submission Form Read-only Snapshot",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "event_id",
+    "checked_at",
+    "access_status",
+    "form_title",
+    "required_fields",
+    "optional_fields",
+    "application_domains",
+    "team_photo",
+    "source",
+    "unresolved_requirements",
+    "data_policy"
+  ],
+  "properties": {
+    "version": {"const": 1},
+    "event_id": {"const": "nvidia-dgx-spark-hackathon-2"},
+    "checked_at": {"type": "string", "format": "date"},
+    "access_status": {"const": "ANONYMOUS_READ_ONLY"},
+    "form_title": {"const": "NVIDIA DGX Spark Hackathon项目提交"},
+    "required_fields": {
+      "const": [
+        "TEAM_NAME",
+        "TEAM_MEMBERS",
+        "PROJECT_NAME",
+        "APPLICATION_DOMAIN",
+        "PROJECT_REPORT_URL",
+        "DEMO_VIDEO_URL",
+        "ARTICLE_URL",
+        "TEAM_PHOTO"
+      ]
+    },
+    "optional_fields": {
+      "const": ["TEAM_ADDRESS"]
+    },
+    "application_domains": {
+      "const": [
+        "科研 / 教育",
+        "航空",
+        "农业",
+        "建筑 / 工程 / 施工",
+        "汽车 / 物流 / 交通运输",
+        "云服务",
+        "消费互联网",
+        "能源",
+        "金融服务",
+        "游戏业",
+        "硬件 / 半导体",
+        "医疗健康和生命科学",
+        "高性能计算 / 科学计算",
+        "制造业",
+        "媒体和娱乐",
+        "公共事业部门",
+        "餐饮 / 酒店",
+        "零售 / 批发",
+        "智慧城市 / 空间",
+        "电信",
+        "其他"
+      ]
+    },
+    "team_photo": {
+      "const": {
+        "max_bytes": 20000000,
+        "limit_label": "20MB",
+        "format_constraint_declared": false
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["publisher", "locator_sha256", "page_title", "render_surface"],
+      "properties": {
+        "publisher": {"const": "NVIDIA DGX Spark Hackathon项目提交表单"},
+        "locator_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "page_title": {"const": "NVIDIA DGX Spark Hackathon项目提交"},
+        "render_surface": {"const": "CHROMIUM_DYNAMIC_FORM"}
+      }
+    },
+    "unresolved_requirements": {
+      "const": [
+        "VIDEO_REQUIREMENTS",
+        "EXTERNAL_API_POLICY",
+        "ON_SITE_RUNTIME_REQUIREMENT"
+      ]
+    },
+    "data_policy": {
+      "const": {
+        "contains_form_url": false,
+        "contains_credentials": false,
+        "contains_personal_data": false,
+        "contains_field_values": false,
+        "form_filled": false,
+        "form_submitted": false
+      }
+    }
+  },
+  "$defs": {
+    "requiredField": {
+      "enum": [
+        "TEAM_NAME",
+        "TEAM_MEMBERS",
+        "PROJECT_NAME",
+        "APPLICATION_DOMAIN",
+        "PROJECT_REPORT_URL",
+        "DEMO_VIDEO_URL",
+        "ARTICLE_URL",
+        "TEAM_PHOTO"
+      ]
+    }
+  }
+}

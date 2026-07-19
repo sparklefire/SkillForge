@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/submission_form_prefill.schema.json",
+  "title": "SkillForge Private Submission Form Prefill",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "case_id",
+    "artifact_type",
+    "generated_at",
+    "status",
+    "required_fields",
+    "optional_fields",
+    "team_member_count",
+    "source_hashes",
+    "submission_mode",
+    "data_policy"
+  ],
+  "properties": {
+    "version": {"const": 1},
+    "case_id": {"const": "n31_media_change"},
+    "artifact_type": {"const": "SUBMISSION_FORM_PREFILL"},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "status": {"const": "READY_FOR_HUMAN_SUBMISSION"},
+    "required_fields": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "team_name",
+        "team_members",
+        "project_name",
+        "application_domain",
+        "project_report_url",
+        "demo_video_url",
+        "article_url",
+        "team_photo_relative_path"
+      ],
+      "properties": {
+        "team_name": {"type": "string", "minLength": 1},
+        "team_members": {"type": "string", "minLength": 1},
+        "project_name": {"const": "SkillForge（匠传）"},
+        "application_domain": {"type": "string", "minLength": 1},
+        "project_report_url": {"type": "string", "format": "uri"},
+        "demo_video_url": {"type": "string", "format": "uri"},
+        "article_url": {"type": "string", "format": "uri"},
+        "team_photo_relative_path": {"type": "string", "minLength": 1}
+      }
+    },
+    "optional_fields": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["team_address"],
+      "properties": {"team_address": {"type": ["string", "null"]}}
+    },
+    "team_member_count": {"type": "integer", "minimum": 2, "maximum": 5},
+    "source_hashes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["packet", "form_snapshot", "team_roster", "team_roster_qa"],
+      "properties": {
+        "packet": {"$ref": "#/$defs/sha256"},
+        "form_snapshot": {"$ref": "#/$defs/sha256"},
+        "team_roster": {"$ref": "#/$defs/sha256"},
+        "team_roster_qa": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "submission_mode": {"const": "MANUAL_COPY_ONLY"},
+    "data_policy": {
+      "const": {
+        "private_local_state": true,
+        "contains_personal_data": true,
+        "contains_public_urls": true,
+        "contains_team_photo_locator": true,
+        "git_tracked": false,
+        "browser_form_filled": false,
+        "browser_form_submitted": false
+      }
+    }
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+  }
+}
