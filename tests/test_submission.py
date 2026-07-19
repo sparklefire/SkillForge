@@ -45,7 +45,7 @@ def test_submission_preflight_preserves_human_gates(tmp_path: Path) -> None:
     assert report["status"] == "DEVELOPMENT_CHECK"
     assert checks["PROJECT_IDENTITY"]["status"] == "PASSED"
     assert checks["REQUIRED_DOCUMENTS"]["status"] == "PASSED"
-    assert "11份说明文档" in checks["REQUIRED_DOCUMENTS"]["details"][0]
+    assert "12份说明文档" in checks["REQUIRED_DOCUMENTS"]["details"][0]
     assert checks["SUBMISSION_ARTICLE"]["status"] == "PASSED"
     assert "事实主张=15项" in checks["SUBMISSION_ARTICLE"]["details"][0]
     assert "公开网址仍需人工发布" in checks["SUBMISSION_ARTICLE"]["details"][0]

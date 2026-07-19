@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/final_recording_storyboard.schema.json",
+  "title": "SkillForge Final Recording Storyboard",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "case_id", "artifact_type", "target_duration_ms", "resolution", "tts", "scenes", "data_policy"],
+  "properties": {
+    "version": {"const": 1},
+    "case_id": {"const": "n31_media_change"},
+    "artifact_type": {"const": "FINAL_RECORDING_STORYBOARD"},
+    "target_duration_ms": {"const": 178000},
+    "resolution": {
+      "const": {"width": 1920, "height": 1080, "fps": 30}
+    },
+    "tts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["model", "voice", "instruction", "sample_rate", "text_only"],
+      "properties": {
+        "model": {"const": "stepaudio-2.5-tts"},
+        "voice": {"const": "zhixingjiejie"},
+        "instruction": {"type": "string", "minLength": 1, "maxLength": 200},
+        "sample_rate": {"const": 48000},
+        "text_only": {"const": true}
+      }
+    },
+    "scenes": {
+      "type": "array",
+      "minItems": 9,
+      "maxItems": 9,
+      "items": {"$ref": "#/$defs/scene"}
+    },
+    "data_policy": {
+      "const": {
+        "screenshot_assets_private": true,
+        "raw_media_sent_to_tts": false,
+        "tts_text_only": true,
+        "contains_credentials": false,
+        "contains_personal_data": false,
+        "automatic_human_approval": false
+      }
+    }
+  },
+  "$defs": {
+    "scene": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scene_id", "order", "duration_ms", "title", "narration", "visual", "evidence_sources"],
+      "properties": {
+        "scene_id": {"type": "string", "pattern": "^R0[1-9]$"},
+        "order": {"type": "integer", "minimum": 1, "maximum": 9},
+        "duration_ms": {"type": "integer", "minimum": 10000, "maximum": 30000},
+        "title": {"type": "string", "minLength": 1, "maxLength": 80},
+        "narration": {"type": "string", "minLength": 30, "maxLength": 240},
+        "visual": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "source"],
+          "properties": {
+            "kind": {"enum": ["SCREENSHOT", "TRAINING_VIDEO"]},
+            "source": {"type": "string", "minLength": 1, "maxLength": 200},
+            "crop": {
+              "type": "array",
+              "minItems": 4,
+              "maxItems": 4,
+              "items": {"type": "integer", "minimum": 0, "maximum": 4096}
+            }
+          }
+        },
+        "evidence_sources": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1, "maxLength": 240}
+        }
+      }
+    }
+  }
+}

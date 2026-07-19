@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/final_recording_build.schema.json",
+  "title": "SkillForge Private Final Recording Build Report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "case_id", "artifact_type", "generated_at", "status", "storyboard_sha256", "scene_count", "target_duration_ms", "media", "scenes", "tts", "machine_qa", "human_review", "data_policy"],
+  "properties": {
+    "version": {"const": 1},
+    "case_id": {"const": "n31_media_change"},
+    "artifact_type": {"const": "FINAL_RECORDING_BUILD"},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "status": {"enum": ["READY_FOR_HUMAN_REVIEW", "MACHINE_QA_FAILED"]},
+    "storyboard_sha256": {"$ref": "#/$defs/sha256"},
+    "scene_count": {"const": 9},
+    "target_duration_ms": {"const": 178000},
+    "media": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["filename", "sha256", "bytes", "duration_ms", "width", "height", "fps", "video_codec", "audio_codec"],
+      "properties": {
+        "filename": {"const": "skillforge_final_recording.mp4"},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "bytes": {"type": "integer", "minimum": 1},
+        "duration_ms": {"type": "integer", "minimum": 175000, "maximum": 180500},
+        "width": {"const": 1920},
+        "height": {"const": 1080},
+        "fps": {"type": "number", "minimum": 29, "maximum": 31},
+        "video_codec": {"const": "h264"},
+        "audio_codec": {"const": "aac"}
+      }
+    },
+    "scenes": {
+      "type": "array",
+      "minItems": 9,
+      "maxItems": 9,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["scene_id", "order", "duration_ms", "visual_kind", "visual_source_sha256", "narration_sha256", "tts_audio_sha256", "rendered_sha256", "output_probe_ms", "difference_hash_distance", "sequence_match"],
+        "properties": {
+          "scene_id": {"type": "string", "pattern": "^R0[1-9]$"},
+          "order": {"type": "integer", "minimum": 1, "maximum": 9},
+          "duration_ms": {"type": "integer", "minimum": 10000, "maximum": 30000},
+          "visual_kind": {"enum": ["SCREENSHOT", "TRAINING_VIDEO"]},
+          "visual_source_sha256": {"$ref": "#/$defs/sha256"},
+          "narration_sha256": {"$ref": "#/$defs/sha256"},
+          "tts_audio_sha256": {"$ref": "#/$defs/sha256"},
+          "rendered_sha256": {"$ref": "#/$defs/sha256"},
+          "output_probe_ms": {"type": "integer", "minimum": 1, "maximum": 178000},
+          "difference_hash_distance": {"type": "integer", "minimum": 0, "maximum": 576},
+          "sequence_match": {"type": "boolean"}
+        }
+      }
+    },
+    "tts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["model", "voice", "scene_count", "generated_count", "reused_count", "external_model_calls", "text_only"],
+      "properties": {
+        "model": {"const": "stepaudio-2.5-tts"},
+        "voice": {"const": "zhixingjiejie"},
+        "scene_count": {"const": 9},
+        "generated_count": {"type": "integer", "minimum": 0, "maximum": 9},
+        "reused_count": {"type": "integer", "minimum": 0, "maximum": 9},
+        "external_model_calls": {"type": "integer", "minimum": 0, "maximum": 9},
+        "text_only": {"const": true}
+      }
+    },
+    "machine_qa": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "report_sha256", "all_checks_passed", "scene_sequence_all_matched"],
+      "properties": {
+        "status": {"enum": ["READY_FOR_HUMAN_REVIEW", "MACHINE_QA_FAILED"]},
+        "report_sha256": {"$ref": "#/$defs/sha256"},
+        "all_checks_passed": {"type": "boolean"},
+        "scene_sequence_all_matched": {"type": "boolean"}
+      }
+    },
+    "human_review": {
+      "const": {"required": true, "status": "PENDING", "automatic_approval": false}
+    },
+    "data_policy": {
+      "const": {
+        "private_local_state": true,
+        "screenshot_assets_private": true,
+        "raw_media_sent_to_tts": false,
+        "tts_text_only": true,
+        "contains_credentials": false,
+        "contains_absolute_paths": false,
+        "automatic_human_approval": false
+      }
+    }
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+  }
+}

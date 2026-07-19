@@ -237,6 +237,15 @@ bash scripts/check_pitch.sh
 
 验收器检查180秒时间轴、Gold指标、五类Agent与工具追踪、四场景无来源内容门禁、高推理语义复核、选择性重建边界、交付配置、低码率预览映射、DGX报告、PPT、海报、培训视频、证据包和三种演示兜底。当前状态为 `READY_WITH_HUMAN_GATES`：自动检查通过，但完整观看、真人彩排、最终录屏、团队资格和官方规则五项门禁仍待参赛者确认。正式材料见 [三分钟路演脚本](./docs/三分钟路演脚本.md)、[现场演示与录屏操作单](./docs/现场演示与录屏操作单.md) 和 [8页路演PPT](./output/presentation/SkillForge_三分钟路演_v1.pptx)。
 
+已提供私有最终录屏候选自动构建器：
+
+```bash
+bash scripts/build_final_recording_candidate.sh
+bash scripts/check_final_recording.sh
+```
+
+构建器使用八张本地Web安全截图、已发布的80秒培训视频和冻结讲解词生成九场景、178秒、1080p有声字幕候选，并逐场验证最终时间点没有漏场景或错序。StepAudio TTS只接收公开旁白文本；截图、TTS缓存、成片和报告位于Git忽略的 `outputs/submission/`。机器通过只能进入 `READY_FOR_HUMAN_REVIEW`，完整观看与最终确认仍由参赛者完成。具体边界见 [最终录屏候选制作](./docs/最终录屏候选制作.md)。
+
 人工门禁不能由程序自动通过。完成某项人工工作后，使用私有确认器绑定当前运行单和证据哈希，不要手改路演JSON：
 
 ```bash
@@ -328,7 +337,7 @@ bash scripts/check_submission_closeout.sh --verify-only
 bash scripts/check_submission.sh
 ```
 
-预检会运行全量测试并执行18项固定检查，核对项目身份、11份说明文档、赛事征文事实绑定、18项成果、Git工作树、跟踪文件边界、`.env`忽略与600权限、本地密钥值泄漏、成果绝对路径、私有成片观看/彩排/官方规则/团队记录、官方表单材料包及人工确认有效性。报告和确认目录均由Git忽略；报告只写门禁汇总，不记录密钥值、确认人、规则结论、来源网址、说明、私有备注或证据路径。只有 `READY_FOR_SUBMISSION` 返回0；`NOT_READY`返回1，`DEVELOPMENT_CHECK`或 `READY_WITH_HUMAN_GATES` 返回2。开发中可显式使用 `--allow-dirty`，但不能得到正式提交结论。
+预检会运行全量测试并执行18项固定检查，核对项目身份、12份说明文档、赛事征文事实绑定、18项成果、Git工作树、跟踪文件边界、`.env`忽略与600权限、本地密钥值泄漏、成果绝对路径、私有成片观看/彩排/官方规则/团队记录、官方表单材料包及人工确认有效性。报告和确认目录均由Git忽略；报告只写门禁汇总，不记录密钥值、确认人、规则结论、来源网址、说明、私有备注或证据路径。只有 `READY_FOR_SUBMISSION` 返回0；`NOT_READY`返回1，`DEVELOPMENT_CHECK`或 `READY_WITH_HUMAN_GATES` 返回2。开发中可显式使用 `--allow-dirty`，但不能得到正式提交结论。
 
 实际提交成功后的回执不进入Git。五项人工门禁全部关闭后，先完成官方表单材料包的8项字段、团队照片和3个网址QA，再用 `bash scripts/check_submission.sh --output outputs/submission/submission_preflight_final.json` 固定最终干净预检；人工复制到官方表单并上传后，通过提交后公开链接QA，再用 `bash scripts/check_submission_receipt.sh --init` 建立私有审核表并绑定成功截图或PDF。回执检查器同时核对最终预检、18项发布冻结、提交后公开链接QA、提交编号哈希和七项人工复查；安全QA不复制截图、编号、网址、个人信息或绝对路径。
 

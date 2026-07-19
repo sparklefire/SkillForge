@@ -59,6 +59,7 @@ REQUIRED_DOCUMENTS = [
     "docs/SkillForge任务拆解.md",
     "docs/官方参考代码复现.md",
     "docs/赛事征文.md",
+    "docs/最终录屏候选制作.md",
 ]
 ABSOLUTE_PATH_MARKERS = (b"/Users/", b"/home/Developer/", b"file://")
 SECRET_KEY_MARKERS = ("KEY", "TOKEN", "SECRET", "PASSWORD", "AUTHORIZATION")

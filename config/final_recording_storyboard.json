@@ -1,0 +1,105 @@
+{
+  "version": 1,
+  "case_id": "n31_media_change",
+  "artifact_type": "FINAL_RECORDING_STORYBOARD",
+  "target_duration_ms": 178000,
+  "resolution": {"width": 1920, "height": 1080, "fps": 30},
+  "tts": {
+    "model": "stepaudio-2.5-tts",
+    "voice": "zhixingjiejie",
+    "instruction": "普通话女声，专业、清晰、可信，语速平稳，适合技术项目路演。不要朗读标点或英文文件名。",
+    "sample_rate": 48000,
+    "text_only": true
+  },
+  "scenes": [
+    {
+      "scene_id": "R01",
+      "order": 1,
+      "duration_ms": 15000,
+      "title": "匠传 SkillForge",
+      "narration": "工业培训的关键经验，常常分散在操作视频、设备手册和熟练工人的口述中。SkillForge把这些多模态素材，转化为有证据、可质检、会局部修订的培训包。",
+      "visual": {"kind": "SCREENSHOT", "source": "01_overview.png"},
+      "evidence_sources": ["cases/n31/demo_bundle/summary.json"]
+    },
+    {
+      "scene_id": "R02",
+      "order": 2,
+      "duration_ms": 20000,
+      "title": "五类Agent协作，而不是单次生成",
+      "narration": "Perception负责提取页码和时间点，SOP Agent规划步骤与依赖，Creator生成清单、测验、海报和视频，Verifier检查遗漏、顺序和无依据内容，Revision只修改出错字段，再交回Verifier复检。每次工具调用和产物哈希都可审计。",
+      "visual": {"kind": "SCREENSHOT", "source": "02_agents.png"},
+      "evidence_sources": ["cases/n31/evaluations/agent_tool_trace_v1.json"]
+    },
+    {
+      "scene_id": "R03",
+      "order": 3,
+      "duration_ms": 20000,
+      "title": "真实N31案例：现场重算Gold闭环",
+      "narration": "主案例是汉印N31折叠标签纸更换、缝标学习和试印验收。点击完整运行，系统从已审核Gold重新执行九个阶段，保留两轮质检、阶段耗时和峰值内存。当前现场重算完成，严重错误从五项降到零项。",
+      "visual": {"kind": "SCREENSHOT", "source": "08_live_run.png"},
+      "evidence_sources": ["cases/n31/demo_bundle/workflow.json", "cases/n31/demo_bundle/summary.json"]
+    },
+    {
+      "scene_id": "R04",
+      "order": 4,
+      "duration_ms": 22000,
+      "title": "发现问题：先限定当前步骤的Evidence边界",
+      "narration": "为了验证质检能力，我们在Gold副本中注入受控错误，包括缺少介质学习、前置依赖断裂、顺序错误、无依据参数和无依据工具。Verifier不会凭常识补写，而是先展示当前步骤允许引用的Evidence，再拒绝越界工具、参数和绝对安全承诺。",
+      "visual": {"kind": "SCREENSHOT", "source": "04_grounding.png"},
+      "evidence_sources": ["cases/n31/demo_bundle/grounding_gate.json", "cases/n31/demo_bundle/initial_conflicts.json"]
+    },
+    {
+      "scene_id": "R05",
+      "order": 5,
+      "duration_ms": 20000,
+      "title": "展示证据：页码、视频和录音时间点可回溯",
+      "narration": "例如系统发现缺少缝标学习步骤后，可以打开手册第二十页的结构化证据，同时看到关联的视频和口述时间段。页面只提供受控的Evidence定位，不暴露原始素材下载入口。每个关键步骤都能回答，这条结论来自哪里。",
+      "visual": {"kind": "SCREENSHOT", "source": "07_evidence.png", "crop": [300, 0, 1320, 390]},
+      "evidence_sources": ["cases/n31/demo_bundle/bundle.json", "cases/n31/gold/gold_sop.json"]
+    },
+    {
+      "scene_id": "R06",
+      "order": 6,
+      "duration_ms": 20000,
+      "title": "局部修订：保留未受影响内容",
+      "narration": "Revision根据证据执行四项局部修订：插入缺失步骤，删除无依据参数，删除无依据工具，并恢复正确顺序。必要步骤和证据覆盖都从百分之九十恢复到百分之百。选择性重建只影响七个步骤、一道题和七个视频镜头。",
+      "visual": {"kind": "SCREENSHOT", "source": "05_revision.png", "crop": [300, 340, 1320, 720]},
+      "evidence_sources": ["cases/n31/demo_bundle/revision_audit.json", "cases/n31/evaluations/selective_rebuild_v1.json"]
+    },
+    {
+      "scene_id": "R07",
+      "order": 7,
+      "duration_ms": 20000,
+      "title": "DGX Spark承担真实本地视觉计算",
+      "narration": "DGX Spark上的NVIDIA GB10，实际处理六段安全派生视频和四百二十帧，筛出五十个候选时间点。CUDA特征只用于缩小复核范围，不自动证明动作成立。敏感原始素材留在本地，Step Plan外部能力也会被明确标注。",
+      "visual": {"kind": "SCREENSHOT", "source": "03_dgx.png"},
+      "evidence_sources": ["cases/n31/evaluations/dgx_visual_compute_v1.json"]
+    },
+    {
+      "scene_id": "R08",
+      "order": 8,
+      "duration_ms": 26000,
+      "title": "从SOP到可直接使用的培训成果",
+      "narration": "通过质检后，Creator生成十三项手机检查清单、五题培训测验、一页A4海报和八十秒培训视频。这里展示的是已经通过自动媒体检查的N31训练片段；完整观看、字幕隐私和最终节奏，仍然保留给参赛者人工确认。",
+      "visual": {"kind": "TRAINING_VIDEO", "source": "output/video/n31_training_video_v1.mp4"},
+      "evidence_sources": ["output/video/n31_training_video_manifest_v1.json", "cases/n31/demo_bundle/checklist.json", "cases/n31/demo_bundle/quiz.json"]
+    },
+    {
+      "scene_id": "R09",
+      "order": 9,
+      "duration_ms": 15000,
+      "title": "三种演示兜底，边界明确",
+      "narration": "现场重算、预处理结果和无素材离线包，保证演示稳定。SkillForge不宣称全部模型都在DGX本地运行，也不会用机器检查替代人工审核。项目代码、评测和复现说明，已经公开在GitHub。",
+      "visual": {"kind": "SCREENSHOT", "source": "06_outputs.png"},
+      "evidence_sources": ["cases/n31/pitch_runbook.json", "output/submission/release_manifest_v1.json"]
+    }
+  ],
+  "data_policy": {
+    "screenshot_assets_private": true,
+    "raw_media_sent_to_tts": false,
+    "tts_text_only": true,
+    "contains_credentials": false,
+    "contains_personal_data": false,
+    "automatic_human_approval": false
+  }
+}
