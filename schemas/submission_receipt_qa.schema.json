@@ -34,7 +34,7 @@
         "generated_at": {"type": "string", "format": "date-time"},
         "source_commit": {"type": "string", "pattern": "^[a-f0-9]{7,40}$"},
         "source_branch": {"type": "string", "minLength": 1},
-        "automatic_check_count": {"type": "integer", "minimum": 17}
+        "automatic_check_count": {"type": "integer", "minimum": 18}
       }
     },
     "release_manifest": {

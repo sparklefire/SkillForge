@@ -11,6 +11,7 @@ from skillforge.final_rehearsal import initialize_final_rehearsal
 from skillforge.official_rules_review import initialize_official_rules_review
 from skillforge.submission import (
     _check_official_rules_status,
+    _check_submission_article,
     _find_secret_value_leaks,
     _find_sensitive_tracked_paths,
     build_submission_preflight,
@@ -44,6 +45,10 @@ def test_submission_preflight_preserves_human_gates(tmp_path: Path) -> None:
     assert report["status"] == "DEVELOPMENT_CHECK"
     assert checks["PROJECT_IDENTITY"]["status"] == "PASSED"
     assert checks["REQUIRED_DOCUMENTS"]["status"] == "PASSED"
+    assert "11份说明文档" in checks["REQUIRED_DOCUMENTS"]["details"][0]
+    assert checks["SUBMISSION_ARTICLE"]["status"] == "PASSED"
+    assert "事实主张=15项" in checks["SUBMISSION_ARTICLE"]["details"][0]
+    assert "公开网址仍需人工发布" in checks["SUBMISSION_ARTICLE"]["details"][0]
     assert checks["OFFICIAL_RULES_STATUS"]["status"] == "PASSED"
     assert "官方材料确认=4项" in checks["OFFICIAL_RULES_STATUS"]["details"][0]
     assert "待官方细则=3项" in checks["OFFICIAL_RULES_STATUS"]["details"][0]
@@ -160,6 +165,17 @@ def test_official_rules_status_is_strict_and_does_not_close_gate() -> None:
     assert check["status"] == "PASSED"
     assert "公开确认=8项" in check["details"][0]
     assert "规则人工门禁保持待确认" in check["details"][0]
+
+
+def test_submission_article_preflight_check_fails_safely_when_missing(
+    tmp_path: Path,
+) -> None:
+    passed = _check_submission_article(ROOT)
+    missing = _check_submission_article(tmp_path)
+
+    assert passed["status"] == "PASSED"
+    assert missing["status"] == "FAILED"
+    assert str(tmp_path) not in missing["details"][0]
 
 
 def test_official_rules_schema_rejects_false_detail_closure() -> None:

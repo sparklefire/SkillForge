@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/submission_article_policy.schema.json",
+  "title": "SkillForge Submission Article Policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "case_id",
+    "article_path",
+    "minimum_chinese_characters",
+    "required_headings",
+    "required_claim_ids",
+    "allowed_repository_url_prefix",
+    "forbidden_phrases",
+    "data_policy"
+  ],
+  "properties": {
+    "version": {"const": 1},
+    "case_id": {"const": "n31_media_change"},
+    "article_path": {"const": "docs/赛事征文.md"},
+    "minimum_chinese_characters": {"const": 600},
+    "required_headings": {
+      "const": [
+        "项目背景",
+        "SkillForge如何工作",
+        "真实案例",
+        "Agent质检与局部修订",
+        "DGX Spark与技术实现",
+        "可复现结果",
+        "交付成果",
+        "边界与下一步",
+        "项目信息"
+      ]
+    },
+    "required_claim_ids": {
+      "const": [
+        "TRACEABLE_REVISION_LOOP",
+        "GOLD_13_STEPS",
+        "ERRORS_5_TO_0",
+        "COVERAGE_90_TO_100",
+        "FOUR_LOCAL_REVISIONS",
+        "TRAINING_OUTPUTS",
+        "DGX_NATIVE_CUDA",
+        "PDF_STRUCTURE",
+        "MULTISOURCE_ABLATION",
+        "SOURCE_CANDIDATE_SYNTHESIS",
+        "AGENT_TOOL_TRACE",
+        "SELECTIVE_REBUILD",
+        "RUNTIME_SCOPE",
+        "MODEL_AND_REFERENCE_BOUNDARY",
+        "DEMO_MODES"
+      ]
+    },
+    "allowed_repository_url_prefix": {
+      "const": "https://github.com/sparklefire/SkillForge"
+    },
+    "forbidden_phrases": {
+      "const": [
+        "全部模型均在DGX本地运行",
+        "原始多模态处理仅需44.8毫秒",
+        "无需人工审核",
+        "完全自动生成Gold",
+        "100%安全",
+        "何老师参考代码已在本项目跑通",
+        "视频完整证明全部步骤"
+      ]
+    },
+    "data_policy": {
+      "const": {
+        "contains_credentials": false,
+        "contains_personal_data": false,
+        "contains_form_url": false,
+        "contains_private_media": false,
+        "automatic_publication": false
+      }
+    }
+  }
+}

@@ -272,6 +272,15 @@ bash scripts/manage_human_gates.sh confirm \
 
 官方动态提交表单已通过匿名只读方式核对：8项必填为团队名称、队长及成员、项目名称、应用领域、项目/报告网址、演示视频网址、赛事征文网址和20MB内团队照片，团队地址为可选项。公开仓库只保存字段结构、21个领域选项和表单定位哈希，不保存表单网址、姓名、真实字段值或照片。私有材料包只供人工复制，绝不自动填写或提交浏览器表单：
 
+赛事征文正文已保存为 [docs/赛事征文.md](./docs/赛事征文.md)。本地检查器会逐项绑定17个公开事实来源和15项核心主张，检查字数、标题顺序、仓库链接、夸大表述、私有路径与凭证；它不会联网或自动发布：
+
+```bash
+bash scripts/check_submission_article.sh
+bash scripts/check_submission_article.sh --verify-only
+```
+
+当前内容状态为 `READY_FOR_MANUAL_PUBLICATION`，1958个中文字符；公开网址必须由参赛者在技术社区人工发布后再填入私有表单材料包。
+
 ```bash
 # 当前本机已经初始化，已有文件时不要重复执行 --init
 bash scripts/check_submission_form_packet.sh --init
@@ -319,7 +328,7 @@ bash scripts/check_submission_closeout.sh --verify-only
 bash scripts/check_submission.sh
 ```
 
-预检会运行全量测试并执行17项固定检查，核对项目身份、10份说明文档、18项成果、Git工作树、跟踪文件边界、`.env`忽略与600权限、本地密钥值泄漏、成果绝对路径、私有成片观看/彩排/官方规则/团队记录、官方表单材料包及人工确认有效性。报告和确认目录均由Git忽略；报告只写门禁汇总，不记录密钥值、确认人、规则结论、来源网址、说明、私有备注或证据路径。只有 `READY_FOR_SUBMISSION` 返回0；`NOT_READY`返回1，`DEVELOPMENT_CHECK`或 `READY_WITH_HUMAN_GATES` 返回2。开发中可显式使用 `--allow-dirty`，但不能得到正式提交结论。
+预检会运行全量测试并执行18项固定检查，核对项目身份、11份说明文档、赛事征文事实绑定、18项成果、Git工作树、跟踪文件边界、`.env`忽略与600权限、本地密钥值泄漏、成果绝对路径、私有成片观看/彩排/官方规则/团队记录、官方表单材料包及人工确认有效性。报告和确认目录均由Git忽略；报告只写门禁汇总，不记录密钥值、确认人、规则结论、来源网址、说明、私有备注或证据路径。只有 `READY_FOR_SUBMISSION` 返回0；`NOT_READY`返回1，`DEVELOPMENT_CHECK`或 `READY_WITH_HUMAN_GATES` 返回2。开发中可显式使用 `--allow-dirty`，但不能得到正式提交结论。
 
 实际提交成功后的回执不进入Git。五项人工门禁全部关闭后，先完成官方表单材料包的8项字段、团队照片和3个网址QA，再用 `bash scripts/check_submission.sh --output outputs/submission/submission_preflight_final.json` 固定最终干净预检；人工复制到官方表单并上传后，通过提交后公开链接QA，再用 `bash scripts/check_submission_receipt.sh --init` 建立私有审核表并绑定成功截图或PDF。回执检查器同时核对最终预检、18项发布冻结、提交后公开链接QA、提交编号哈希和七项人工复查；安全QA不复制截图、编号、网址、个人信息或绝对路径。
 

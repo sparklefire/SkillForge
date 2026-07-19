@@ -36,6 +36,10 @@ from .submission_form_packet import (
     SubmissionFormPacketError,
     verify_saved_submission_form_packet_qa,
 )
+from .submission_article import (
+    SubmissionArticleError,
+    verify_saved_submission_article_qa,
+)
 from .training_video_review import (
     TrainingVideoReviewError,
     training_video_review_qa_issue,
@@ -54,6 +58,7 @@ REQUIRED_DOCUMENTS = [
     "docs/执行状态.md",
     "docs/SkillForge任务拆解.md",
     "docs/官方参考代码复现.md",
+    "docs/赛事征文.md",
 ]
 ABSOLUTE_PATH_MARKERS = (b"/Users/", b"/home/Developer/", b"file://")
 SECRET_KEY_MARKERS = ("KEY", "TOKEN", "SECRET", "PASSWORD", "AUTHORIZATION")
@@ -263,6 +268,30 @@ def _check_required_documents(root: Path) -> dict[str, Any]:
         f"{len(REQUIRED_DOCUMENTS)}份说明文档存在且非空"
         if not missing
         else f"缺少文档: {','.join(missing)}",
+    )
+
+
+def _check_submission_article(root: Path) -> dict[str, Any]:
+    try:
+        report = verify_saved_submission_article_qa(
+            root / "output/submission/submission_article_qa_v1.json",
+            root=root,
+            policy_path=root / "config/submission_article_policy.json",
+        )
+    except (OSError, SubmissionArticleError, ContractValidationError) as exc:
+        return _check(
+            "SUBMISSION_ARTICLE",
+            "FAILED",
+            f"赛事征文缺失、无效或已漂移；错误类型={type(exc).__name__}",
+        )
+    return _check(
+        "SUBMISSION_ARTICLE",
+        "PASSED",
+        (
+            f"征文内容可人工发布；中文字符={report['chinese_character_count']}；"
+            f"事实主张={len(report['claim_checks'])}项；来源={len(report['source_checks'])}项；"
+            "公开网址仍需人工发布后填写"
+        ),
     )
 
 
@@ -996,6 +1025,7 @@ def build_submission_preflight(
     checks = [
         _check_project_identity(root),
         _check_required_documents(root),
+        _check_submission_article(root),
         _check_official_rules_status(root),
         _check_official_rules_review_private_state(
             root,
