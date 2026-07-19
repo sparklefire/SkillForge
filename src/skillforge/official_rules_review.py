@@ -30,6 +30,11 @@ REQUIREMENT_IDS = (
     "OPEN_SOURCE_POLICY",
     "ON_SITE_RUNTIME_REQUIREMENT",
 )
+UNRESOLVED_REQUIREMENT_IDS = (
+    "VIDEO_REQUIREMENTS",
+    "EXTERNAL_API_POLICY",
+    "ON_SITE_RUNTIME_REQUIREMENT",
+)
 ALLOWED_SOURCE_SUFFIXES = {
     ".pdf",
     ".html",
@@ -39,6 +44,7 @@ ALLOWED_SOURCE_SUFFIXES = {
     ".png",
     ".jpg",
     ".jpeg",
+    ".pptx",
 }
 
 
@@ -143,7 +149,7 @@ def load_public_snapshot(
         raise OfficialRulesReviewError("公开规则核验快照无效") from exc
     if (
         document["verification_status"] != "OFFICIAL_DETAIL_REQUIRED"
-        or tuple(document["unresolved_requirements"]) != REQUIREMENT_IDS
+        or tuple(document["unresolved_requirements"]) != UNRESOLVED_REQUIREMENT_IDS
         or document["public_access_audit"]["official_detail_obtained"] is not False
     ):
         raise OfficialRulesReviewError("公开规则核验快照与当前六项待核要求不一致")

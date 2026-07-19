@@ -109,6 +109,25 @@ def test_local_source_review_produces_redacted_hash_bound_qa(tmp_path: Path) -> 
     assert report["data_policy"]["contains_source_locator"] is False
 
 
+def test_participant_provided_pptx_can_be_bound_as_official_source(
+    tmp_path: Path,
+) -> None:
+    private = tmp_path / "private"
+    review = private / "official_rules_review.json"
+    initialize_official_rules_review(review, private_root=private)
+    source = tmp_path / "opening-deck.pptx"
+    source.write_bytes(b"minimal-test-pptx-placeholder")
+
+    attach_local_source(source, review, private_root=private)
+
+    document = json.loads(review.read_text(encoding="utf-8"))
+    assert document["source"]["kind"] == "LOCAL_FILE"
+    assert document["source"]["relative_path"].endswith(".pptx")
+    copied = private / document["source"]["relative_path"]
+    assert copied.read_bytes() == source.read_bytes()
+    assert stat.S_IMODE(copied.stat().st_mode) == 0o600
+
+
 def test_safe_url_source_is_hash_bound_without_exposing_url(tmp_path: Path) -> None:
     review, _, report = _ready_review(tmp_path, use_url=True)
 

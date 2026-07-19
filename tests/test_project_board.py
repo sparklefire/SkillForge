@@ -28,12 +28,12 @@ def test_tracked_board_is_on_track_and_does_not_mark_goal_blocked() -> None:
     validate_document(report, "project_board_status.schema.json")
     assert report["status"] == "ON_TRACK"
     assert report["implementation_goal_blocked"] is False
-    assert report["task_count"] == 10
-    assert report["completed_count"] == 1
+    assert report["task_count"] == 11
+    assert report["completed_count"] == 2
     assert report["ready_count"] == 1
     assert report["awaiting_human_count"] == 7
     assert report["awaiting_external_count"] == 1
-    assert report["accepted_non_blocking_risk_count"] == 1
+    assert report["accepted_non_blocking_risk_count"] == 2
 
 
 def test_default_date_uses_contest_timezone_not_machine_timezone(

@@ -10,6 +10,7 @@
     "checked_at",
     "verification_status",
     "publicly_confirmed",
+    "official_material_confirmed",
     "unresolved_requirements",
     "public_access_audit",
     "sources",
@@ -36,6 +37,22 @@
           "SUBMISSION_DEADLINE_2026_07_22",
           "JUDGING_2026_07_23_TO_26",
           "FINAL_2026_08_02"
+        ]
+      }
+    },
+    "official_material_confirmed": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "SCORING_WEIGHTS",
+          "SUBMISSION_FIELDS",
+          "VIDEO_REQUIREMENTS",
+          "EXTERNAL_API_POLICY",
+          "OPEN_SOURCE_POLICY",
+          "ON_SITE_RUNTIME_REQUIREMENT",
+          "REFERENCE_CODE_BASELINE"
         ]
       }
     },

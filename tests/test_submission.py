@@ -45,7 +45,8 @@ def test_submission_preflight_preserves_human_gates(tmp_path: Path) -> None:
     assert checks["PROJECT_IDENTITY"]["status"] == "PASSED"
     assert checks["REQUIRED_DOCUMENTS"]["status"] == "PASSED"
     assert checks["OFFICIAL_RULES_STATUS"]["status"] == "PASSED"
-    assert "待官方细则=6项" in checks["OFFICIAL_RULES_STATUS"]["details"][0]
+    assert "官方材料确认=4项" in checks["OFFICIAL_RULES_STATUS"]["details"][0]
+    assert "待官方细则=3项" in checks["OFFICIAL_RULES_STATUS"]["details"][0]
     assert checks["OFFICIAL_RULES_REVIEW_PRIVATE_STATE"]["status"] == "PASSED"
     assert "ABSENT" in checks["OFFICIAL_RULES_REVIEW_PRIVATE_STATE"]["details"][0]
     assert checks["RELEASE_FREEZE_MANIFEST"]["status"] == "PASSED"

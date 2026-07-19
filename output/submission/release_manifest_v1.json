@@ -262,7 +262,7 @@
     "contains_personal_data": false,
     "contains_public_urls": false
   },
-  "generated_at": "2026-07-18T17:45:24.925997+00:00",
+  "generated_at": "2026-07-19T01:31:36.675802+00:00",
   "human_gates": [
     {
       "blocking_for_submission": true,
@@ -307,7 +307,7 @@
       "final_checker_role": "FINAL_REVIEWER",
       "owner_role": "TECHNICAL_OWNER",
       "public_url": null,
-      "status": "PENDING_OFFICIAL_RULES",
+      "status": "PENDING_USER_AUTHORIZATION",
       "target_id": "CODE_REPOSITORY"
     },
     {
@@ -318,7 +318,7 @@
       "target_id": "FINAL_RECORDING"
     }
   ],
-  "role_config_sha256": "53ff734a3848343d0cacb5b96519fc05c20d09ecde6612861c8180a106210d04",
+  "role_config_sha256": "5a3bbde33a964ea3bb1f26841c183a7cdf20eef47866055427023b83b9c4a523",
   "roles": [
     {
       "label": "技术负责人",
@@ -353,6 +353,6 @@
   ],
   "runbook_sha256": "cef91b92e26c7b663f10dcc3d18f15009fdaa0687afbea376b5ff86b3ee48892",
   "status": "TECHNICAL_ARTIFACTS_FROZEN_HUMAN_GATES_PENDING",
-  "technical_freeze_digest": "53d27d6b75b3825d0ccb5d60a1f2bbc45959d585466584c9c580b0dff29c4953",
+  "technical_freeze_digest": "732934fe212910e2e605679fed4987e678cda92b3e7b619ced9793edbbffecbd",
   "version": 1
 }

@@ -88,7 +88,7 @@
         "target_id": {"enum": ["PROJECT_PAGE", "CODE_REPOSITORY", "FINAL_RECORDING"]},
         "owner_role": {"$ref": "#/$defs/roleId"},
         "final_checker_role": {"$ref": "#/$defs/roleId"},
-        "status": {"enum": ["PENDING_SUBMISSION", "PENDING_OFFICIAL_RULES", "PENDING_HUMAN_REVIEW"]}
+        "status": {"enum": ["PENDING_SUBMISSION", "PENDING_OFFICIAL_RULES", "PENDING_USER_AUTHORIZATION", "PENDING_HUMAN_REVIEW"]}
       }
     }
   }

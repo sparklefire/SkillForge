@@ -13,12 +13,15 @@
     "JUDGING_2026_07_23_TO_26",
     "FINAL_2026_08_02"
   ],
-  "unresolved_requirements": [
+  "official_material_confirmed": [
     "SCORING_WEIGHTS",
     "SUBMISSION_FIELDS",
+    "OPEN_SOURCE_POLICY",
+    "REFERENCE_CODE_BASELINE"
+  ],
+  "unresolved_requirements": [
     "VIDEO_REQUIREMENTS",
     "EXTERNAL_API_POLICY",
-    "OPEN_SOURCE_POLICY",
     "ON_SITE_RUNTIME_REQUIREMENT"
   ],
   "public_access_audit": {
@@ -27,7 +30,7 @@
     "public_rule_material_available": false,
     "official_detail_obtained": false,
     "technical_lecture_download_count": 3,
-    "inspection_method": "ANONYMOUS_INTERACTIVE_PAGE",
+    "inspection_method": "PARTICIPANT_PROVIDED_OFFICIAL_MATERIAL",
     "authentication_or_organizer_material_required": true
   },
   "sources": [
@@ -42,6 +45,12 @@
       "publisher": "NVIDIA",
       "url": "https://scrm.nvidia.cn/lp/dgx-spark-hackathon-multi-agents-20260712",
       "access_scope": "PUBLIC_TRAINING_AGENDA"
+    },
+    {
+      "source_id": "NVIDIA_PARTICIPANT_MATERIAL",
+      "publisher": "NVIDIA x StepFun",
+      "url": "https://scrm.nvidia.cn/assets/download-dgx-spark-hackathon-multi-agents-20260712-04",
+      "access_scope": "OFFICIAL_RULE_MATERIAL"
     }
   ],
   "data_policy": {

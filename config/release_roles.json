@@ -55,7 +55,7 @@
   ],
   "publication_targets": [
     {"target_id": "PROJECT_PAGE", "owner_role": "SUBMISSION_OWNER", "final_checker_role": "FINAL_REVIEWER", "status": "PENDING_SUBMISSION"},
-    {"target_id": "CODE_REPOSITORY", "owner_role": "TECHNICAL_OWNER", "final_checker_role": "FINAL_REVIEWER", "status": "PENDING_OFFICIAL_RULES"},
+    {"target_id": "CODE_REPOSITORY", "owner_role": "TECHNICAL_OWNER", "final_checker_role": "FINAL_REVIEWER", "status": "PENDING_USER_AUTHORIZATION"},
     {"target_id": "FINAL_RECORDING", "owner_role": "DEMO_OPERATOR", "final_checker_role": "FINAL_REVIEWER", "status": "PENDING_HUMAN_REVIEW"}
   ],
   "branch_policy": {

@@ -49,6 +49,7 @@ REQUIRED_DOCUMENTS = [
     "docs/环境与接入.md",
     "docs/执行状态.md",
     "docs/SkillForge任务拆解.md",
+    "docs/官方参考代码复现.md",
 ]
 ABSOLUTE_PATH_MARKERS = (b"/Users/", b"/home/Developer/", b"file://")
 SECRET_KEY_MARKERS = ("KEY", "TOKEN", "SECRET", "PASSWORD", "AUTHORIZATION")
@@ -69,17 +70,24 @@ EXPECTED_PUBLIC_RULE_FACTS = {
     "FINAL_2026_08_02",
 }
 EXPECTED_UNRESOLVED_RULE_REQUIREMENTS = {
-    "SCORING_WEIGHTS",
-    "SUBMISSION_FIELDS",
     "VIDEO_REQUIREMENTS",
     "EXTERNAL_API_POLICY",
-    "OPEN_SOURCE_POLICY",
     "ON_SITE_RUNTIME_REQUIREMENT",
+}
+EXPECTED_OFFICIAL_MATERIAL_FACTS = {
+    "SCORING_WEIGHTS",
+    "SUBMISSION_FIELDS",
+    "OPEN_SOURCE_POLICY",
+    "REFERENCE_CODE_BASELINE",
 }
 EXPECTED_RULE_SOURCES = {
     "NVIDIA_CSDN_EVENT_PAGE": "https://nvidia.csdn.net/6a4476b3662f9a54cb87233d.html",
     "NVIDIA_TRAINING_PAGE": (
         "https://scrm.nvidia.cn/lp/dgx-spark-hackathon-multi-agents-20260712"
+    ),
+    "NVIDIA_PARTICIPANT_MATERIAL": (
+        "https://scrm.nvidia.cn/assets/"
+        "download-dgx-spark-hackathon-multi-agents-20260712-04"
     ),
 }
 
@@ -268,6 +276,7 @@ def _check_official_rules_status(root: Path) -> dict[str, Any]:
         )
 
     confirmed = set(status["publicly_confirmed"])
+    official_material = set(status["official_material_confirmed"])
     unresolved = set(status["unresolved_requirements"])
     sources = {item["source_id"]: item["url"] for item in status["sources"]}
     audit = status["public_access_audit"]
@@ -275,6 +284,7 @@ def _check_official_rules_status(root: Path) -> dict[str, Any]:
         status["verification_status"] == "OFFICIAL_DETAIL_REQUIRED"
         and status["checked_at"] == "2026-07-19"
         and confirmed == EXPECTED_PUBLIC_RULE_FACTS
+        and official_material == EXPECTED_OFFICIAL_MATERIAL_FACTS
         and unresolved == EXPECTED_UNRESOLVED_RULE_REQUIREMENTS
         and len(status["sources"]) == len(sources)
         and sources == EXPECTED_RULE_SOURCES
@@ -283,20 +293,21 @@ def _check_official_rules_status(root: Path) -> dict[str, Any]:
         and audit["public_rule_material_available"] is False
         and audit["official_detail_obtained"] is False
         and audit["technical_lecture_download_count"] == 3
-        and audit["inspection_method"] == "ANONYMOUS_INTERACTIVE_PAGE"
+        and audit["inspection_method"] == "PARTICIPANT_PROVIDED_OFFICIAL_MATERIAL"
         and audit["authentication_or_organizer_material_required"] is True
     )
     if not current_snapshot_ok:
         return _check(
             "OFFICIAL_RULES_STATUS",
             "FAILED",
-            "规则核验状态与2026-07-19公开访问复核结论不一致；必须重新核验后更新代码与快照",
+            "规则核验状态与2026-07-19公开页面及参赛者官方材料复核结论不一致；必须重新核验后更新代码与快照",
         )
     return _check(
         "OFFICIAL_RULES_STATUS",
         "PASSED",
         (
-            f"公开确认={len(confirmed)}项；待官方细则={len(unresolved)}项；"
+            f"公开确认={len(confirmed)}项；官方材料确认={len(official_material)}项；"
+            f"待官方细则={len(unresolved)}项；"
             "规则人工门禁保持待确认"
         ),
     )

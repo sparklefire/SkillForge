@@ -1,0 +1,146 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/reference_material_audit.schema.json",
+  "title": "SkillForge Official Reference Material Audit",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "artifact_type",
+    "checked_at",
+    "status",
+    "sources",
+    "notebook",
+    "opening_deck",
+    "runtime_bundle",
+    "risk_flags",
+    "execution_claim",
+    "data_policy"
+  ],
+  "properties": {
+    "version": {"const": 1},
+    "artifact_type": {"const": "OFFICIAL_REFERENCE_MATERIAL_AUDIT"},
+    "checked_at": {"type": "string", "format": "date"},
+    "status": {"enum": ["WAITING_ON_RUNTIME_BUNDLE", "READY_FOR_ISOLATED_EXECUTION"]},
+    "sources": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "filename", "sha256", "bytes"],
+        "properties": {
+          "kind": {"enum": ["JUPYTER_NOTEBOOK", "OPENING_DECK"]},
+          "filename": {"type": "string", "minLength": 1, "maxLength": 200},
+          "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+          "bytes": {"type": "integer", "minimum": 1}
+        }
+      }
+    },
+    "notebook": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "nbformat",
+        "cell_count",
+        "code_cell_count",
+        "markdown_cell_count",
+        "executed_code_cell_count",
+        "error_output_count",
+        "embedded_success_evidence",
+        "expected_runtime"
+      ],
+      "properties": {
+        "nbformat": {"const": 4},
+        "cell_count": {"type": "integer", "minimum": 1},
+        "code_cell_count": {"type": "integer", "minimum": 1},
+        "markdown_cell_count": {"type": "integer", "minimum": 1},
+        "executed_code_cell_count": {"type": "integer", "minimum": 0},
+        "error_output_count": {"type": "integer", "minimum": 0},
+        "embedded_success_evidence": {"type": "boolean"},
+        "expected_runtime": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["architecture", "gpu", "python", "node", "openclaw", "comfyui", "pytorch", "ollama_model"],
+          "properties": {
+            "architecture": {"type": "string", "minLength": 1},
+            "gpu": {"type": "string", "minLength": 1},
+            "python": {"type": "string", "minLength": 1},
+            "node": {"type": "string", "minLength": 1},
+            "openclaw": {"type": "string", "minLength": 1},
+            "comfyui": {"type": "string", "minLength": 1},
+            "pytorch": {"type": "string", "minLength": 1},
+            "ollama_model": {"type": "string", "minLength": 1}
+          }
+        }
+      }
+    },
+    "opening_deck": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["slide_count", "scoring_slide", "submission_slide", "scoring_weights_found", "submission_requirements_found"],
+      "properties": {
+        "slide_count": {"type": "integer", "minimum": 1},
+        "scoring_slide": {"const": 9},
+        "submission_slide": {"const": 10},
+        "scoring_weights_found": {"type": "boolean"},
+        "submission_requirements_found": {"type": "boolean"}
+      }
+    },
+    "runtime_bundle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["required_entry_count", "present_entry_count", "missing_entries"],
+      "properties": {
+        "required_entry_count": {"type": "integer", "minimum": 1},
+        "present_entry_count": {"type": "integer", "minimum": 0},
+        "missing_entries": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^[A-Za-z0-9._/-]+$"}
+        }
+      }
+    },
+    "risk_flags": {
+      "type": "array",
+      "minItems": 5,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "AUTO_APPROVE_DEVICES",
+          "DELETE_SESSION_STATE",
+          "DISABLE_DEVICE_AUTH",
+          "KILL_SHARED_PORTS",
+          "PRINT_GATEWAY_TOKEN"
+        ]
+      }
+    },
+    "execution_claim": {
+      "const": {
+        "upstream_embedded_outputs_observed": true,
+        "current_skillforge_dgx_execution_completed": false,
+        "base_completion_standard_met": false
+      }
+    },
+    "data_policy": {
+      "const": {
+        "contains_credentials": false,
+        "contains_gateway_token": false,
+        "contains_absolute_paths": false,
+        "contains_source_content": false,
+        "executes_notebook": false
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"status": {"const": "WAITING_ON_RUNTIME_BUNDLE"}}},
+      "then": {"properties": {"runtime_bundle": {"properties": {"missing_entries": {"minItems": 1}}}}}
+    },
+    {
+      "if": {"properties": {"status": {"const": "READY_FOR_ISOLATED_EXECUTION"}}},
+      "then": {"properties": {"runtime_bundle": {"properties": {"missing_entries": {"maxItems": 0}}}}}
+    }
+  ]
+}

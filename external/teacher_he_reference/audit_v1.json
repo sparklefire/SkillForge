@@ -1,0 +1,80 @@
+{
+  "artifact_type": "OFFICIAL_REFERENCE_MATERIAL_AUDIT",
+  "checked_at": "2026-07-19",
+  "data_policy": {
+    "contains_absolute_paths": false,
+    "contains_credentials": false,
+    "contains_gateway_token": false,
+    "contains_source_content": false,
+    "executes_notebook": false
+  },
+  "execution_claim": {
+    "base_completion_standard_met": false,
+    "current_skillforge_dgx_execution_completed": false,
+    "upstream_embedded_outputs_observed": true
+  },
+  "notebook": {
+    "cell_count": 60,
+    "code_cell_count": 25,
+    "embedded_success_evidence": true,
+    "error_output_count": 0,
+    "executed_code_cell_count": 25,
+    "expected_runtime": {
+      "architecture": "aarch64",
+      "comfyui": "0.18.1",
+      "gpu": "NVIDIA GB10",
+      "node": "22.20.0",
+      "ollama_model": "qwen3.6:35b",
+      "openclaw": "2026.5.19",
+      "python": "3.12.3",
+      "pytorch": "2.11.0+cu130"
+    },
+    "markdown_cell_count": 35,
+    "nbformat": 4
+  },
+  "opening_deck": {
+    "scoring_slide": 9,
+    "scoring_weights_found": true,
+    "slide_count": 12,
+    "submission_requirements_found": true,
+    "submission_slide": 10
+  },
+  "risk_flags": [
+    "AUTO_APPROVE_DEVICES",
+    "DELETE_SESSION_STATE",
+    "DISABLE_DEVICE_AUTH",
+    "KILL_SHARED_PORTS",
+    "PRINT_GATEWAY_TOKEN"
+  ],
+  "runtime_bundle": {
+    "missing_entries": [
+      "scripts/env-check.sh",
+      "scripts/ollama-ctl.sh",
+      "scripts/comfyui-ctl.sh",
+      "scripts/openclaw-ctl.sh",
+      "openclaw",
+      "node22",
+      "ollama",
+      "comfyui-app/ComfyUI",
+      "sample/sample_face.jpg"
+    ],
+    "present_entry_count": 0,
+    "required_entry_count": 9
+  },
+  "sources": [
+    {
+      "bytes": 1457510,
+      "filename": "workshop-Copy.ipynb",
+      "kind": "JUPYTER_NOTEBOOK",
+      "sha256": "cb6d7f718974b31396449e612b33d46b07d8094e0c282e261397fa2b747e5d3f"
+    },
+    {
+      "bytes": 92004638,
+      "filename": "第二届DGX-Spark黑客松开幕.pptx",
+      "kind": "OPENING_DECK",
+      "sha256": "048b4bd66e9de70ecea4f732c117ee8f08b309e50eca705df845f026c9414947"
+    }
+  ],
+  "status": "WAITING_ON_RUNTIME_BUNDLE",
+  "version": 1
+}

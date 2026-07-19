@@ -111,7 +111,7 @@
         "target_id": {"enum": ["PROJECT_PAGE", "CODE_REPOSITORY", "FINAL_RECORDING"]},
         "owner_role": {"type": "string", "pattern": "^[A-Z0-9_]+$"},
         "final_checker_role": {"type": "string", "pattern": "^[A-Z0-9_]+$"},
-        "status": {"enum": ["PENDING_SUBMISSION", "PENDING_OFFICIAL_RULES", "PENDING_HUMAN_REVIEW"]},
+        "status": {"enum": ["PENDING_SUBMISSION", "PENDING_OFFICIAL_RULES", "PENDING_USER_AUTHORIZATION", "PENDING_HUMAN_REVIEW"]},
         "public_url": {"type": "null"}
       }
     }
