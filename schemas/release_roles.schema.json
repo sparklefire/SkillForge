@@ -42,8 +42,8 @@
         "review_required_for_p0_changes": true,
         "freeze_requires_clean_worktree": true,
         "regenerate_on_artifact_change": true,
-        "remote_configuration_allowed": false,
-        "push_allowed": false
+        "remote_configuration_allowed": true,
+        "push_allowed": true
       }
     },
     "identity_assignment": {

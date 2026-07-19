@@ -249,9 +249,9 @@
     "freeze_requires_clean_worktree": true,
     "local_commit_required": true,
     "protected_branch": "main",
-    "push_allowed": false,
+    "push_allowed": true,
     "regenerate_on_artifact_change": true,
-    "remote_configuration_allowed": false,
+    "remote_configuration_allowed": true,
     "review_required_for_p0_changes": true
   },
   "case_id": "n31_media_change",
@@ -262,7 +262,7 @@
     "contains_personal_data": false,
     "contains_public_urls": false
   },
-  "generated_at": "2026-07-19T01:31:36.675802+00:00",
+  "generated_at": "2026-07-19T09:53:15.564304+00:00",
   "human_gates": [
     {
       "blocking_for_submission": true,
@@ -307,7 +307,7 @@
       "final_checker_role": "FINAL_REVIEWER",
       "owner_role": "TECHNICAL_OWNER",
       "public_url": null,
-      "status": "PENDING_USER_AUTHORIZATION",
+      "status": "PENDING_SUBMISSION",
       "target_id": "CODE_REPOSITORY"
     },
     {
@@ -318,7 +318,7 @@
       "target_id": "FINAL_RECORDING"
     }
   ],
-  "role_config_sha256": "5a3bbde33a964ea3bb1f26841c183a7cdf20eef47866055427023b83b9c4a523",
+  "role_config_sha256": "b19bbc1c651574c993ef739c411fb5c556ba61da8836e5354ad236ba6ac5cd43",
   "roles": [
     {
       "label": "技术负责人",
@@ -353,6 +353,6 @@
   ],
   "runbook_sha256": "cef91b92e26c7b663f10dcc3d18f15009fdaa0687afbea376b5ff86b3ee48892",
   "status": "TECHNICAL_ARTIFACTS_FROZEN_HUMAN_GATES_PENDING",
-  "technical_freeze_digest": "732934fe212910e2e605679fed4987e678cda92b3e7b619ced9793edbbffecbd",
+  "technical_freeze_digest": "edcb2d23bb075e19fb73c1cf087234b28e3228eef43ac9f1eec31c4a4ed0e4a8",
   "version": 1
 }

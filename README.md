@@ -2,6 +2,8 @@
 
 把专家操作视频、设备手册和口述经验，自动转化为可追溯、可验证、会自我修订的多模态培训包。
 
+公开仓库：[github.com/sparklefire/SkillForge](https://github.com/sparklefire/SkillForge)
+
 ## 当前目标
 
 在 2026-07-22 前交付一条稳定、可演示的主链路：
