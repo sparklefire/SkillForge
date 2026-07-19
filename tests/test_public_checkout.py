@@ -147,6 +147,15 @@ def test_script_is_executable_and_default_report_is_ignored() -> None:
     ignored = subprocess.run(
         ["git", "check-ignore", "-q", str(DEFAULT_REPORT.relative_to(ROOT))],
         cwd=ROOT,
+        stderr=subprocess.DEVNULL,
         check=False,
     )
-    assert ignored.returncode == 0
+    if ignored.returncode == 128:
+        ignore_rules = {
+            line.strip()
+            for line in (ROOT / ".gitignore").read_text(encoding="utf-8").splitlines()
+            if line.strip() and not line.lstrip().startswith("#")
+        }
+        assert "outputs/*" in ignore_rules
+    else:
+        assert ignored.returncode == 0
