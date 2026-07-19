@@ -327,13 +327,12 @@ def final_rehearsal_qa_issue(
             _read_json(report_path, "彩排QA报告"),
             "final_rehearsal_qa.schema.json",
         )
-    except (ContractValidationError, FinalRehearsalError):
-        return "FINAL_REHEARSAL_QA_INVALID"
-    try:
         current_runbook_sha256 = _sha256(runbook_path.expanduser().resolve())
         current_policy_sha256 = _sha256(policy_path.expanduser().resolve())
     except OSError:
         return "FINAL_REHEARSAL_QA_BASIS_MISSING"
+    except (ContractValidationError, FinalRehearsalError):
+        return "FINAL_REHEARSAL_QA_INVALID"
     if report["runbook_sha256"] != current_runbook_sha256:
         return "FINAL_REHEARSAL_QA_RUNBOOK_CHANGED"
     if report["policy_sha256"] != current_policy_sha256:
@@ -343,6 +342,21 @@ def final_rehearsal_qa_issue(
         or report["record_bytes"] != evidence.get("size_bytes")
     ):
         return "FINAL_REHEARSAL_QA_RECORD_CHANGED"
+    try:
+        current = verify_final_rehearsal(
+            record_path,
+            runbook_path=runbook_path,
+            policy_path=policy_path,
+            private_root=record_path.parent,
+        )
+    except (ContractValidationError, FinalRehearsalError, OSError):
+        return "FINAL_REHEARSAL_QA_INVALID"
+    if any(
+        report[key] != value
+        for key, value in current.items()
+        if key != "checked_at"
+    ):
+        return "FINAL_REHEARSAL_QA_STATE_CHANGED"
     return None
 
 

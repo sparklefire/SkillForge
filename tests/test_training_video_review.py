@@ -255,6 +255,32 @@ def test_qa_binding_rejects_url_permissions_and_changed_record(tmp_path: Path) -
     assert training_video_review_qa_issue(
         qa, evidence, manifest_path=manifest, video_path=video
     ) is None
+    changed_binding = json.loads(review.read_text(encoding="utf-8"))
+    changed_binding["video"]["sha256"] = "f" * 64
+    _write_private_json(changed_binding, review, private_root=private)
+    forged_report = deepcopy(report)
+    forged_report["review_sha256"] = _sha256(review)
+    forged_report["review_bytes"] = review.stat().st_size
+    _write_private_json(forged_report, qa, private_root=private)
+    forged_evidence = {
+        "kind": "LOCAL_FILE",
+        "locator": str(review.resolve()),
+        "sha256": _sha256(review),
+        "size_bytes": review.stat().st_size,
+    }
+    assert (
+        training_video_review_qa_issue(
+            qa,
+            forged_evidence,
+            manifest_path=manifest,
+            video_path=video,
+        )
+        == "TRAINING_VIDEO_REVIEW_QA_INVALID"
+    )
+    _write_private_json(
+        ready_review_document(manifest, video), review, private_root=private
+    )
+    _write_private_json(report, qa, private_root=private)
     assert (
         training_video_review_qa_issue(
             qa,

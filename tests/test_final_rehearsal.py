@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import shutil
 import stat
@@ -25,6 +26,10 @@ from skillforge.submission import _check_final_rehearsal_private_state
 
 ROOT = Path(__file__).resolve().parents[1]
 BOUNDARIES = [0, 20000, 40000, 70000, 110000, 140000, 160000, 178000]
+
+
+def _sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 def ready_rehearsal_document(runbook_path: Path = DEFAULT_RUNBOOK) -> dict:
@@ -185,6 +190,45 @@ def test_qa_binding_rejects_changed_record_policy_and_url(tmp_path: Path) -> Non
     }
 
     assert final_rehearsal_qa_issue(report_path, evidence) is None
+    changed_timing = json.loads(record.read_text(encoding="utf-8"))
+    changed_timing["segments"][-1]["actual_end_ms"] -= 1000
+    changed_timing["total_duration_ms"] -= 1000
+    _write_private_json(changed_timing, record, private_root=private)
+    forged_report = deepcopy(report)
+    forged_report["record_sha256"] = _sha256(record)
+    forged_report["record_bytes"] = record.stat().st_size
+    _write_private_json(forged_report, report_path, private_root=private)
+    forged_evidence = {
+        "kind": "LOCAL_FILE",
+        "locator": str(record.resolve()),
+        "sha256": _sha256(record),
+        "size_bytes": record.stat().st_size,
+    }
+    assert (
+        final_rehearsal_qa_issue(report_path, forged_evidence)
+        == "FINAL_REHEARSAL_QA_STATE_CHANGED"
+    )
+    _write_private_json(ready_rehearsal_document(), record, private_root=private)
+    _write_private_json(report, report_path, private_root=private)
+    inconsistent = json.loads(record.read_text(encoding="utf-8"))
+    inconsistent["segments"][1]["actual_start_ms"] += 1000
+    _write_private_json(inconsistent, record, private_root=private)
+    forged_report = deepcopy(report)
+    forged_report["record_sha256"] = _sha256(record)
+    forged_report["record_bytes"] = record.stat().st_size
+    _write_private_json(forged_report, report_path, private_root=private)
+    forged_evidence = {
+        "kind": "LOCAL_FILE",
+        "locator": str(record.resolve()),
+        "sha256": _sha256(record),
+        "size_bytes": record.stat().st_size,
+    }
+    assert (
+        final_rehearsal_qa_issue(report_path, forged_evidence)
+        == "FINAL_REHEARSAL_QA_INVALID"
+    )
+    _write_private_json(ready_rehearsal_document(), record, private_root=private)
+    _write_private_json(report, report_path, private_root=private)
     assert (
         final_rehearsal_qa_issue(report_path, {"kind": "HTTPS_URL"})
         == "FINAL_REHEARSAL_REQUIRES_LOCAL_FILE"

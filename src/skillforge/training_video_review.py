@@ -306,6 +306,21 @@ def training_video_review_qa_issue(
         or report["review_bytes"] != evidence.get("size_bytes")
     ):
         return "TRAINING_VIDEO_REVIEW_RECORD_CHANGED"
+    try:
+        current = verify_training_video_review_document(
+            _read_json(review_path, "观看审核记录"),
+            review_sha256=_sha256(review_path),
+            review_bytes=review_path.stat().st_size,
+            basis=basis,
+        )
+    except (ContractValidationError, TrainingVideoReviewError, OSError):
+        return "TRAINING_VIDEO_REVIEW_QA_INVALID"
+    if any(
+        report[key] != value
+        for key, value in current.items()
+        if key != "checked_at"
+    ):
+        return "TRAINING_VIDEO_REVIEW_STATE_CHANGED"
     return None
 
 
