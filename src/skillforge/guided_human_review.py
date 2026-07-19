@@ -10,6 +10,7 @@ import shutil
 import stat
 import subprocess
 import sys
+import tempfile
 import time
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
@@ -146,6 +147,69 @@ def _require_private_file(path: Path, label: str) -> Path:
     return resolved
 
 
+def _private_destination(path: Path, private_root: Path, label: str) -> Path:
+    resolved = path.expanduser().resolve()
+    root = private_root.expanduser().resolve()
+    if resolved == root or root not in resolved.parents:
+        raise GuidedHumanReviewError(f"{label}必须位于私有审核目录内")
+    return resolved
+
+
+def _restore_private_bytes(
+    content: bytes,
+    destination: Path,
+    *,
+    private_root: Path,
+) -> None:
+    destination = _private_destination(destination, private_root, "审核草稿")
+    descriptor, temporary_name = tempfile.mkstemp(
+        prefix=f".{destination.name}.rollback.", dir=destination.parent
+    )
+    temporary = Path(temporary_name)
+    try:
+        with os.fdopen(descriptor, "wb") as handle:
+            handle.write(content)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.chmod(temporary, 0o600)
+        os.replace(temporary, destination)
+        os.chmod(destination, 0o600)
+    finally:
+        temporary.unlink(missing_ok=True)
+
+
+def _persist_review_transaction(
+    document: dict[str, Any],
+    *,
+    input_path: Path,
+    report_path: Path,
+    private_root: Path,
+    writer: Callable[..., Path],
+    verifier: Callable[[], dict[str, Any]],
+) -> dict[str, Any]:
+    """Write a review and its QA together, restoring the draft on any failure."""
+
+    original = input_path.read_bytes()
+    try:
+        writer(document, input_path, private_root=private_root)
+        report = verifier()
+        writer(report, report_path, private_root=private_root)
+    except Exception:
+        try:
+            report_path.unlink(missing_ok=True)
+            _restore_private_bytes(
+                original,
+                input_path,
+                private_root=private_root,
+            )
+        except OSError as rollback_error:
+            raise GuidedHumanReviewError(
+                "人工审核写入失败且无法恢复原草稿"
+            ) from rollback_error
+        raise
+    return report
+
+
 def _iso(value: datetime, label: str) -> str:
     if value.tzinfo is None:
         raise GuidedHumanReviewError(f"{label}必须包含时区")
@@ -197,6 +261,13 @@ def complete_training_video_review(
     notes: str = "",
 ) -> dict[str, Any]:
     private_root = input_path.expanduser().resolve().parent
+    report_path = _private_destination(
+        report_path,
+        private_root,
+        "培训视频观看QA",
+    )
+    if report_path.exists():
+        raise GuidedHumanReviewError("培训视频观看QA已存在，拒绝覆盖")
     migrate_pending_training_video_review(input_path, private_root=private_root)
     input_path = _require_private_file(input_path, "培训视频观看草稿")
     document = validate_document(
@@ -205,8 +276,6 @@ def complete_training_video_review(
     )
     if document["status"] != "PENDING_INPUT":
         raise GuidedHumanReviewError("培训视频观看记录不是待填写状态")
-    if report_path.expanduser().resolve().exists():
-        raise GuidedHumanReviewError("培训视频观看QA已存在，拒绝覆盖")
     _require_true_answers(
         answers,
         set(TRAINING_CHECK_PROMPTS),
@@ -236,15 +305,19 @@ def complete_training_video_review(
         review_bytes=1,
         basis=basis,
     )
-    _write_training_json(document, input_path, private_root=private_root)
-    report = verify_training_video_review(
-        input_path,
-        manifest_path=manifest_path,
-        video_path=video_path,
+    return _persist_review_transaction(
+        document,
+        input_path=input_path,
+        report_path=report_path,
         private_root=private_root,
+        writer=_write_training_json,
+        verifier=lambda: verify_training_video_review(
+            input_path,
+            manifest_path=manifest_path,
+            video_path=video_path,
+            private_root=private_root,
+        ),
     )
-    _write_training_json(report, report_path, private_root=private_root)
-    return report
 
 
 def complete_final_recording_review(
@@ -261,6 +334,13 @@ def complete_final_recording_review(
     notes: str = "",
 ) -> dict[str, Any]:
     private_root = input_path.expanduser().resolve().parent
+    report_path = _private_destination(
+        report_path,
+        private_root,
+        "最终录屏观看QA",
+    )
+    if report_path.exists():
+        raise GuidedHumanReviewError("最终录屏观看QA已存在，拒绝覆盖")
     input_path = _require_private_file(input_path, "最终录屏观看草稿")
     document = validate_document(
         _read_json(input_path, "最终录屏观看草稿"),
@@ -268,8 +348,6 @@ def complete_final_recording_review(
     )
     if document["status"] != "PENDING_INPUT":
         raise GuidedHumanReviewError("最终录屏观看记录不是待填写状态")
-    if report_path.expanduser().resolve().exists():
-        raise GuidedHumanReviewError("最终录屏观看QA已存在，拒绝覆盖")
     _require_true_answers(
         answers,
         set(FINAL_RECORDING_CHECK_PROMPTS),
@@ -305,18 +383,22 @@ def complete_final_recording_review(
         review_bytes=1,
         basis=basis,
     )
-    _write_final_recording_json(document, input_path, private_root=private_root)
-    report = verify_final_recording_review(
-        input_path,
-        recording_path=recording_path,
-        machine_qa_path=machine_qa_path,
-        build_report_path=build_report_path,
-        storyboard_path=storyboard_path,
-        policy_path=policy_path,
+    return _persist_review_transaction(
+        document,
+        input_path=input_path,
+        report_path=report_path,
         private_root=private_root,
+        writer=_write_final_recording_json,
+        verifier=lambda: verify_final_recording_review(
+            input_path,
+            recording_path=recording_path,
+            machine_qa_path=machine_qa_path,
+            build_report_path=build_report_path,
+            storyboard_path=storyboard_path,
+            policy_path=policy_path,
+            private_root=private_root,
+        ),
     )
-    _write_final_recording_json(report, report_path, private_root=private_root)
-    return report
 
 
 def complete_final_rehearsal(
@@ -332,6 +414,13 @@ def complete_final_rehearsal(
     notes: str = "",
 ) -> dict[str, Any]:
     private_root = input_path.expanduser().resolve().parent
+    report_path = _private_destination(
+        report_path,
+        private_root,
+        "最终彩排QA",
+    )
+    if report_path.exists():
+        raise GuidedHumanReviewError("最终彩排QA已存在，拒绝覆盖")
     input_path = _require_private_file(input_path, "最终彩排草稿")
     document = validate_document(
         _read_json(input_path, "最终彩排草稿"),
@@ -339,8 +428,6 @@ def complete_final_rehearsal(
     )
     if document["status"] != "PENDING_INPUT":
         raise GuidedHumanReviewError("最终彩排记录不是待填写状态")
-    if report_path.expanduser().resolve().exists():
-        raise GuidedHumanReviewError("最终彩排QA已存在，拒绝覆盖")
     runbook = load_runbook(runbook_path)
     policy = load_policy(policy_path)
     if (
@@ -394,15 +481,19 @@ def complete_final_rehearsal(
         policy=policy,
         policy_sha256=_sha256(policy_path.expanduser().resolve()),
     )
-    _write_rehearsal_json(document, input_path, private_root=private_root)
-    report = verify_final_rehearsal(
-        input_path,
-        runbook_path=runbook_path,
-        policy_path=policy_path,
+    return _persist_review_transaction(
+        document,
+        input_path=input_path,
+        report_path=report_path,
         private_root=private_root,
+        writer=_write_rehearsal_json,
+        verifier=lambda: verify_final_rehearsal(
+            input_path,
+            runbook_path=runbook_path,
+            policy_path=policy_path,
+            private_root=private_root,
+        ),
     )
-    _write_rehearsal_json(report, report_path, private_root=private_root)
-    return report
 
 
 def prepare_pending_reviews() -> dict[str, str]:

@@ -11,6 +11,7 @@ from pathlib import Path
 
 import pytest
 
+import skillforge.guided_human_review as guided_review
 from skillforge.contracts import validate_document
 from skillforge.final_recording import evaluate_final_recording, write_private_report
 from skillforge.final_recording_review import (
@@ -260,6 +261,71 @@ def test_guided_training_decline_or_short_playback_does_not_write(
     assert not qa.exists()
 
 
+def test_guided_training_rejects_qa_destination_outside_private_root(
+    tmp_path: Path,
+) -> None:
+    manifest, video = _training_basis(tmp_path)
+    private = tmp_path / "submission"
+    review = private / "training_video_review.json"
+    initialize_training_video_review(
+        review,
+        manifest_path=manifest,
+        video_path=video,
+        private_root=private,
+    )
+    before = review.read_bytes()
+
+    with pytest.raises(GuidedHumanReviewError, match="必须位于私有审核目录内"):
+        complete_training_video_review(
+            _playback(80000),
+            {key: True for key in TRAINING_CHECK_PROMPTS},
+            input_path=review,
+            report_path=tmp_path / "outside_qa.json",
+            manifest_path=manifest,
+            video_path=video,
+        )
+
+    assert review.read_bytes() == before
+    assert not (tmp_path / "outside_qa.json").exists()
+
+
+def test_guided_training_report_write_failure_rolls_back_exact_draft(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    manifest, video = _training_basis(tmp_path)
+    private = tmp_path / "submission"
+    review = private / "training_video_review.json"
+    qa = private / "training_video_review_qa.json"
+    initialize_training_video_review(
+        review,
+        manifest_path=manifest,
+        video_path=video,
+        private_root=private,
+    )
+    before = review.read_bytes()
+    real_writer = guided_review._write_training_json
+
+    def failing_writer(document, destination, *, private_root):
+        if Path(destination).resolve() == qa.resolve():
+            raise OSError("synthetic QA write failure")
+        return real_writer(document, destination, private_root=private_root)
+
+    monkeypatch.setattr(guided_review, "_write_training_json", failing_writer)
+    with pytest.raises(OSError, match="synthetic QA write failure"):
+        complete_training_video_review(
+            _playback(80000),
+            {key: True for key in TRAINING_CHECK_PROMPTS},
+            input_path=review,
+            report_path=qa,
+            manifest_path=manifest,
+            video_path=video,
+        )
+
+    assert review.read_bytes() == before
+    assert not qa.exists()
+
+
 def test_legacy_training_template_migrates_only_when_pristine(tmp_path: Path) -> None:
     manifest, video = _training_basis(tmp_path)
     private = tmp_path / "submission"
@@ -327,6 +393,52 @@ def test_guided_final_recording_review_records_qa_without_confirmation(
     ] is False
 
 
+def test_guided_final_recording_report_write_failure_rolls_back_exact_draft(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    paths = _final_recording_basis(tmp_path)
+    review = paths["private"] / "final_recording_review.json"
+    qa = paths["private"] / "final_recording_review_qa.json"
+    initialize_final_recording_review(
+        review,
+        recording_path=paths["recording"],
+        machine_qa_path=paths["machine_qa"],
+        build_report_path=paths["build"],
+        storyboard_path=STORYBOARD,
+        policy_path=FINAL_POLICY,
+        private_root=paths["private"],
+    )
+    before = review.read_bytes()
+    real_writer = guided_review._write_final_recording_json
+
+    def failing_writer(document, destination, *, private_root):
+        if Path(destination).resolve() == qa.resolve():
+            raise OSError("synthetic QA write failure")
+        return real_writer(document, destination, private_root=private_root)
+
+    monkeypatch.setattr(
+        guided_review,
+        "_write_final_recording_json",
+        failing_writer,
+    )
+    with pytest.raises(OSError, match="synthetic QA write failure"):
+        complete_final_recording_review(
+            _playback(180000),
+            {key: True for key in FINAL_RECORDING_CHECK_PROMPTS},
+            input_path=review,
+            report_path=qa,
+            recording_path=paths["recording"],
+            machine_qa_path=paths["machine_qa"],
+            build_report_path=paths["build"],
+            storyboard_path=STORYBOARD,
+            policy_path=FINAL_POLICY,
+        )
+
+    assert review.read_bytes() == before
+    assert not qa.exists()
+
+
 def test_guided_rehearsal_records_contiguous_boundaries_and_qa(
     tmp_path: Path,
 ) -> None:
@@ -356,6 +468,42 @@ def test_guided_rehearsal_records_contiguous_boundaries_and_qa(
     assert report["human_gate_status"] == "PENDING"
     assert [item["actual_start_ms"] for item in saved["segments"]] == boundaries[:-1]
     assert [item["actual_end_ms"] for item in saved["segments"]] == boundaries[1:]
+
+
+def test_guided_rehearsal_report_write_failure_rolls_back_exact_draft(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    private = tmp_path / "submission"
+    record = private / "final_stage_rehearsal.json"
+    qa = private / "final_stage_rehearsal_qa.json"
+    initialize_final_rehearsal(record, runbook_path=RUNBOOK, private_root=private)
+    before = record.read_bytes()
+    real_writer = guided_review._write_rehearsal_json
+
+    def failing_writer(document, destination, *, private_root):
+        if Path(destination).resolve() == qa.resolve():
+            raise OSError("synthetic QA write failure")
+        return real_writer(document, destination, private_root=private_root)
+
+    monkeypatch.setattr(guided_review, "_write_rehearsal_json", failing_writer)
+    with pytest.raises(OSError, match="synthetic QA write failure"):
+        complete_final_rehearsal(
+            [0, 20000, 40000, 70000, 110000, 140000, 160000, 178000],
+            [
+                {key: True for key in REHEARSAL_SEGMENT_KEYS}
+                for _ in range(7)
+            ],
+            {key: True for key in REHEARSAL_COMPLETION_PROMPTS},
+            started_at=datetime(2026, 7, 19, 6, 0, tzinfo=timezone.utc),
+            input_path=record,
+            report_path=qa,
+            runbook_path=RUNBOOK,
+            policy_path=REHEARSAL_POLICY,
+        )
+
+    assert record.read_bytes() == before
+    assert not qa.exists()
 
 
 def test_guided_rehearsal_rejects_bad_duration_or_human_check_without_write(
