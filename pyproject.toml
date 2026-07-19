@@ -63,6 +63,7 @@ skillforge-training-video = "skillforge.training_video:main"
 skillforge-training-video-review = "skillforge.training_video_review:main"
 skillforge-video-preview = "skillforge.video_preview:main"
 skillforge-provisional-rehearsal = "skillforge.provisional_rehearsal:main"
+skillforge-public-checkout = "skillforge.public_checkout:main"
 skillforge-visual-review = "skillforge.visual_review:main"
 skillforge-web = "skillforge.web:main"
 

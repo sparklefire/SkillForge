@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/public_checkout_reproducibility.schema.json",
+  "title": "SkillForge Public Checkout Reproducibility QA",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "case_id", "artifact_type", "checked_at", "status", "source", "archive", "checks", "results", "data_policy"],
+  "properties": {
+    "version": {"const": 1},
+    "case_id": {"const": "n31_media_change"},
+    "artifact_type": {"const": "PUBLIC_CHECKOUT_REPRODUCIBILITY_QA"},
+    "checked_at": {"type": "string", "format": "date-time"},
+    "status": {"enum": ["PASSED", "DEVELOPMENT_CHECK"]},
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["branch", "commit", "worktree_clean", "matches_origin_main", "tracked_file_count"],
+      "properties": {
+        "branch": {"const": "main"},
+        "commit": {"type": "string", "pattern": "^[a-f0-9]{40}$"},
+        "worktree_clean": {"type": "boolean"},
+        "matches_origin_main": {"type": "boolean"},
+        "tracked_file_count": {"type": "integer", "minimum": 1}
+      }
+    },
+    "archive": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sha256", "bytes", "file_count"],
+      "properties": {
+        "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "bytes": {"type": "integer", "minimum": 1},
+        "file_count": {"type": "integer", "minimum": 1}
+      }
+    },
+    "checks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["git_archive_exact", "safe_member_paths", "no_private_inputs", "no_env_file", "actual_secret_values_absent", "package_installed_without_index", "package_loaded_from_clean_runtime", "offline_web_healthy", "gold_loop_reproduced", "technical_bundle_rebuilt", "pitch_package_ready"],
+      "properties": {
+        "git_archive_exact": {"const": true},
+        "safe_member_paths": {"const": true},
+        "no_private_inputs": {"const": true},
+        "no_env_file": {"const": true},
+        "actual_secret_values_absent": {"const": true},
+        "package_installed_without_index": {"const": true},
+        "package_loaded_from_clean_runtime": {"const": true},
+        "offline_web_healthy": {"const": true},
+        "gold_loop_reproduced": {"const": true},
+        "technical_bundle_rebuilt": {"const": true},
+        "pitch_package_ready": {"const": true}
+      }
+    },
+    "results": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["runtime", "docker_required", "gold_status", "metrics_status", "workflow_state", "severe_before", "severe_after", "revision_count", "web_health_status", "web_payload_status", "release_artifact_count", "release_member_count", "pitch_status", "pending_human_gate_count", "network_requests", "external_model_calls", "automatic_human_confirmations"],
+      "properties": {
+        "runtime": {"const": "native-python"},
+        "docker_required": {"const": false},
+        "gold_status": {"const": "GOLD"},
+        "metrics_status": {"const": "FINAL"},
+        "workflow_state": {"const": "COMPLETED"},
+        "severe_before": {"const": 5},
+        "severe_after": {"const": 0},
+        "revision_count": {"const": 4},
+        "web_health_status": {"const": 200},
+        "web_payload_status": {"const": 200},
+        "release_artifact_count": {"const": 18},
+        "release_member_count": {"const": 20},
+        "pitch_status": {"const": "READY_WITH_HUMAN_GATES"},
+        "pending_human_gate_count": {"const": 5},
+        "network_requests": {"const": 0},
+        "external_model_calls": {"const": 0},
+        "automatic_human_confirmations": {"const": 0}
+      }
+    },
+    "data_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["private_local_state", "contains_credentials", "contains_personal_data", "contains_absolute_paths", "contains_raw_media", "contains_private_inputs", "contains_runtime_checkout", "external_network_allowed", "automatic_human_approval"],
+      "properties": {
+        "private_local_state": {"const": true},
+        "contains_credentials": {"const": false},
+        "contains_personal_data": {"const": false},
+        "contains_absolute_paths": {"const": false},
+        "contains_raw_media": {"const": false},
+        "contains_private_inputs": {"const": false},
+        "contains_runtime_checkout": {"const": false},
+        "external_network_allowed": {"const": false},
+        "automatic_human_approval": {"const": false}
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"status": {"const": "PASSED"}}},
+      "then": {
+        "properties": {
+          "source": {
+            "properties": {
+              "worktree_clean": {"const": true},
+              "matches_origin_main": {"const": true}
+            }
+          }
+        }
+      }
+    }
+  ]
+}

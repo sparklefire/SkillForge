@@ -35,6 +35,10 @@ from .official_rules_review import (
 )
 from .pitch import build_readiness
 from .project_board import ProjectBoardError, build_project_board_status
+from .public_checkout import (
+    PublicCheckoutError,
+    verify_saved_public_checkout_report,
+)
 from .release_manifest import ReleaseManifestError, verify_release_manifest
 from .team_roster import TeamRosterError, verify_team_roster
 from .submission_form_packet import (
@@ -1024,6 +1028,47 @@ def _check_tests(root: Path, *, run_tests: bool) -> dict[str, Any]:
     )
 
 
+def _check_public_checkout(
+    root: Path,
+    *,
+    allow_dirty: bool,
+    allow_missing_git: bool,
+) -> dict[str, Any]:
+    if allow_missing_git:
+        return _check(
+            "PUBLIC_CHECKOUT_REPRODUCIBILITY",
+            "SKIPPED",
+            "无Git部署检查不替代公开仓库纯净检出复现",
+        )
+    if allow_dirty:
+        return _check(
+            "PUBLIC_CHECKOUT_REPRODUCIBILITY",
+            "SKIPPED",
+            "开发模式不接受可能过期的纯净检出报告",
+        )
+    try:
+        report = verify_saved_public_checkout_report(
+            root / "outputs/reproducibility/public_checkout_reproducibility.json",
+            root=root,
+            private_root=root / "outputs/reproducibility",
+        )
+    except (ContractValidationError, OSError, PublicCheckoutError):
+        return _check(
+            "PUBLIC_CHECKOUT_REPRODUCIBILITY",
+            "FAILED",
+            "当前提交缺少有效的公开纯净检出复现报告",
+        )
+    return _check(
+        "PUBLIC_CHECKOUT_REPRODUCIBILITY",
+        "PASSED",
+        (
+            f"提交={report['source']['commit'][:12]}; "
+            f"跟踪文件={report['source']['tracked_file_count']}; "
+            "离线Gold=5→0; 技术包=20成员; 网络请求=0"
+        ),
+    )
+
+
 def _check_git_and_secrets(
     root: Path,
     *,
@@ -1162,6 +1207,11 @@ def build_submission_preflight(
         pitch_check,
         _check_public_artifacts(root, values),
         *git_checks,
+        _check_public_checkout(
+            root,
+            allow_dirty=allow_dirty,
+            allow_missing_git=allow_missing_git,
+        ),
         _check_tests(root, run_tests=run_tests),
     ]
     failed = any(item["status"] == "FAILED" for item in checks)

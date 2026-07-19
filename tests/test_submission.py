@@ -74,7 +74,9 @@ def test_submission_preflight_preserves_human_gates(tmp_path: Path) -> None:
     assert checks["PUBLIC_ARTIFACT_BOUNDARY"]["status"] == "PASSED"
     assert checks["TRACKED_SENSITIVE_PATHS"]["status"] in {"PASSED", "SKIPPED"}
     assert checks["ENV_AND_SECRET_SCAN"]["status"] in {"PASSED", "SKIPPED"}
+    assert checks["PUBLIC_CHECKOUT_REPRODUCIBILITY"]["status"] == "SKIPPED"
     assert checks["AUTOMATED_TESTS"]["status"] == "SKIPPED"
+    assert len(report["automatic_checks"]) == 20
     assert set(report["pending_human_gates"]) == {
         "TRAINING_VIDEO_FULL_WATCH",
         "FINAL_STAGE_REHEARSAL",

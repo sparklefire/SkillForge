@@ -175,7 +175,7 @@ def test_ready_receipt_binds_all_final_basis_without_private_content(
     validate_document(report, "submission_receipt_qa.schema.json")
     assert report["status"] == "READY_FOR_ARCHIVE"
     assert report["receipt_source"]["kind"] == kind
-    assert report["final_preflight"]["automatic_check_count"] >= 18
+    assert report["final_preflight"]["automatic_check_count"] == 20
     assert report["release_manifest"]["artifact_count"] == 18
     assert report["publication_links"]["target_count"] == 3
     assert all(report["checks"].values())
