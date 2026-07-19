@@ -14,6 +14,9 @@ logs/*
 outputs/*
 !outputs/.gitkeep
 
+# 活动方/第三方参考代码先在本地独立审计，授权和提交边界确认前不进入Git。
+external/teacher_he_reference/drop/
+
 # 原始行业素材默认视为敏感数据，不提交到代码仓库。
 cases/*/input/*
 !cases/*/input/.gitkeep
