@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/step_discovery_evaluation.schema.json",
+  "title": "SkillForge Step Discovery Evaluation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "case_id",
+    "report_id",
+    "status",
+    "discovery_report_sha256",
+    "uses_gold_as_model_input",
+    "evaluation_reference_not_sent_to_model",
+    "semantic_text_quality_evaluated",
+    "metrics",
+    "failures",
+    "limitations",
+    "data_policy"
+  ],
+  "properties": {
+    "version": {"const": 1},
+    "case_id": {"type": "string", "minLength": 1},
+    "report_id": {"const": "STEP_DISCOVERY_EVALUATION_V1"},
+    "status": {"enum": ["PASSED", "FAILED"]},
+    "discovery_report_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "uses_gold_as_model_input": {"const": false},
+    "evaluation_reference_not_sent_to_model": {"const": true},
+    "semantic_text_quality_evaluated": {"const": false},
+    "metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "expected_evidence_count",
+        "observed_evidence_count",
+        "evidence_recall",
+        "ordering_violation_count",
+        "required_source_type_count",
+        "observed_source_type_count",
+        "source_type_coverage",
+        "candidate_count",
+        "review_containment_rate",
+        "automatic_gold_changes"
+      ],
+      "properties": {
+        "expected_evidence_count": {"type": "integer", "minimum": 8},
+        "observed_evidence_count": {"type": "integer", "minimum": 0},
+        "evidence_recall": {"type": "number", "minimum": 0, "maximum": 1},
+        "ordering_violation_count": {"type": "integer", "minimum": 0},
+        "required_source_type_count": {"type": "integer", "minimum": 1, "maximum": 3},
+        "observed_source_type_count": {"type": "integer", "minimum": 0, "maximum": 3},
+        "source_type_coverage": {"type": "number", "minimum": 0, "maximum": 1},
+        "candidate_count": {"type": "integer", "minimum": 8, "maximum": 15},
+        "review_containment_rate": {"type": "number", "minimum": 0, "maximum": 1},
+        "automatic_gold_changes": {"const": 0}
+      }
+    },
+    "failures": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1}
+    },
+    "limitations": {
+      "type": "array",
+      "minItems": 2,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "data_policy": {
+      "const": {
+        "contains_raw_media": false,
+        "contains_credentials": false,
+        "contains_absolute_paths": false,
+        "external_model_calls": 0
+      }
+    }
+  }
+}

@@ -1,0 +1,152 @@
+{
+  "version": 1,
+  "steps": [
+    {
+      "provisional_id": "P01",
+      "title": "准备工作台",
+      "action": "清理工作台并放置虚构演示警示牌",
+      "object": "演示工作台",
+      "phase": "PREPARATION",
+      "prerequisites": [],
+      "tools": [
+        {"name": "虚构演示警示牌", "evidence_ids": ["E001"]}
+      ],
+      "parameters": [],
+      "warnings": [],
+      "success_check": {"text": "工作台已清理且警示牌已放置", "evidence_ids": ["E001"]},
+      "required": true,
+      "evidence_ids": ["E001"],
+      "confidence": 0.95
+    },
+    {
+      "provisional_id": "P02",
+      "title": "关闭电源",
+      "action": "关闭电源并确认运行指示熄灭",
+      "object": "虚构设备电源",
+      "phase": "PREPARATION",
+      "prerequisites": ["P01"],
+      "tools": [],
+      "parameters": [],
+      "warnings": [],
+      "success_check": {"text": "运行指示已经熄灭", "evidence_ids": ["E002"]},
+      "required": true,
+      "evidence_ids": ["E002"],
+      "confidence": 0.99
+    },
+    {
+      "provisional_id": "P03",
+      "title": "佩戴演示防护用品",
+      "action": "佩戴演示手套和护目镜",
+      "object": "演示防护用品",
+      "phase": "PREPARATION",
+      "prerequisites": ["P02"],
+      "tools": [
+        {"name": "演示手套", "evidence_ids": ["E003"]},
+        {"name": "护目镜", "evidence_ids": ["E003"]}
+      ],
+      "parameters": [],
+      "warnings": [],
+      "success_check": {"text": "演示手套和护目镜已佩戴", "evidence_ids": ["E003"]},
+      "required": true,
+      "evidence_ids": ["E003"],
+      "confidence": 0.94
+    },
+    {
+      "provisional_id": "P04",
+      "title": "打开维护盖板",
+      "action": "向上打开维护盖板",
+      "object": "虚构设备维护盖板",
+      "phase": "EXECUTION",
+      "prerequisites": ["P03"],
+      "tools": [],
+      "parameters": [],
+      "warnings": [],
+      "success_check": {"text": "维护盖板已经向上打开", "evidence_ids": ["E004"]},
+      "required": true,
+      "evidence_ids": ["E004"],
+      "confidence": 0.93
+    },
+    {
+      "provisional_id": "P05",
+      "title": "松开演示卡扣",
+      "action": "依次松开左右两个演示卡扣",
+      "object": "演示卡扣",
+      "phase": "EXECUTION",
+      "prerequisites": ["P04"],
+      "tools": [],
+      "parameters": [],
+      "warnings": [],
+      "success_check": {"text": "左右两个演示卡扣均已松开", "evidence_ids": ["E005"]},
+      "required": true,
+      "evidence_ids": ["E005"],
+      "confidence": 0.95
+    },
+    {
+      "provisional_id": "P06",
+      "title": "取出并封装演示过滤件",
+      "action": "水平取出演示过滤件并装入密封袋",
+      "object": "演示过滤件",
+      "phase": "EXECUTION",
+      "prerequisites": ["P05"],
+      "tools": [
+        {"name": "密封袋", "evidence_ids": ["E006"]}
+      ],
+      "parameters": [],
+      "warnings": [
+        {"text": "取出过程中不要抖动", "evidence_ids": ["E006"]}
+      ],
+      "success_check": {"text": "演示过滤件已装入密封袋", "evidence_ids": ["E006"]},
+      "required": true,
+      "evidence_ids": ["E006"],
+      "confidence": 0.96
+    },
+    {
+      "provisional_id": "P07",
+      "title": "擦拭演示密封面",
+      "action": "使用无绒布单向擦拭演示密封面",
+      "object": "演示密封面",
+      "phase": "EXECUTION",
+      "prerequisites": ["P06"],
+      "tools": [
+        {"name": "无绒布", "evidence_ids": ["E007"]}
+      ],
+      "parameters": [],
+      "warnings": [],
+      "success_check": {"text": "演示密封面已经单向擦拭", "evidence_ids": ["E007"]},
+      "required": true,
+      "evidence_ids": ["E007"],
+      "confidence": 0.95
+    },
+    {
+      "provisional_id": "P08",
+      "title": "安装新演示过滤件",
+      "action": "将箭头朝向设备内部并推入至两侧齐平",
+      "object": "新演示过滤件",
+      "phase": "EXECUTION",
+      "prerequisites": ["P07"],
+      "tools": [],
+      "parameters": [],
+      "warnings": [],
+      "success_check": {"text": "箭头朝向设备内部且两侧齐平", "evidence_ids": ["E008"]},
+      "required": true,
+      "evidence_ids": ["E008"],
+      "confidence": 0.99
+    },
+    {
+      "provisional_id": "P09",
+      "title": "复位并检查",
+      "action": "锁紧卡扣、关闭盖板、恢复供电并检查运行指示",
+      "object": "虚构设备",
+      "phase": "VERIFICATION",
+      "prerequisites": ["P08"],
+      "tools": [],
+      "parameters": [],
+      "warnings": [],
+      "success_check": {"text": "卡扣锁紧、盖板关闭且运行指示正常", "evidence_ids": ["E009"]},
+      "required": true,
+      "evidence_ids": ["E009"],
+      "confidence": 0.99
+    }
+  ],
+  "excluded_evidence": []
+}

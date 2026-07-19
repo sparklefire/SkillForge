@@ -1,0 +1,116 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/step_discovery_response.schema.json",
+  "title": "SkillForge Gold-free Step Discovery Model Response",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "steps", "excluded_evidence"],
+  "properties": {
+    "version": {"const": 1},
+    "steps": {
+      "type": "array",
+      "minItems": 8,
+      "maxItems": 15,
+      "items": {"$ref": "#/$defs/modelStep"}
+    },
+    "excluded_evidence": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/exclusion"}
+    }
+  },
+  "$defs": {
+    "evidenceIds": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^E[0-9]{3}$"}
+    },
+    "groundedText": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["text", "evidence_ids"],
+      "properties": {
+        "text": {"type": "string", "minLength": 1},
+        "evidence_ids": {"$ref": "#/$defs/evidenceIds"}
+      }
+    },
+    "tool": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "evidence_ids"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "evidence_ids": {"$ref": "#/$defs/evidenceIds"}
+      }
+    },
+    "parameter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "value", "unit", "evidence_ids"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "value": {"type": ["string", "number"]},
+        "unit": {"type": "string"},
+        "evidence_ids": {"$ref": "#/$defs/evidenceIds"}
+      }
+    },
+    "modelStep": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "provisional_id",
+        "title",
+        "action",
+        "object",
+        "phase",
+        "prerequisites",
+        "tools",
+        "parameters",
+        "warnings",
+        "success_check",
+        "required",
+        "evidence_ids",
+        "confidence"
+      ],
+      "properties": {
+        "provisional_id": {"type": "string", "pattern": "^P[0-9]{2}$"},
+        "title": {"type": "string", "minLength": 1},
+        "action": {"type": "string", "minLength": 1},
+        "object": {"type": "string", "minLength": 1},
+        "phase": {
+          "enum": ["PREPARATION", "EXECUTION", "VERIFICATION", "RESET"]
+        },
+        "prerequisites": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^P[0-9]{2}$"}
+        },
+        "tools": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/tool"}
+        },
+        "parameters": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/parameter"}
+        },
+        "warnings": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/groundedText"}
+        },
+        "success_check": {"$ref": "#/$defs/groundedText"},
+        "required": {"type": "boolean"},
+        "evidence_ids": {"$ref": "#/$defs/evidenceIds"},
+        "confidence": {"type": "number", "minimum": 0, "maximum": 1}
+      }
+    },
+    "exclusion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["evidence_id", "reason"],
+      "properties": {
+        "evidence_id": {"type": "string", "pattern": "^E[0-9]{3}$"},
+        "reason": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

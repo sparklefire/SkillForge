@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/step_discovery_evaluation_spec.schema.json",
+  "title": "SkillForge Step Discovery Evaluation Specification",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "case_id",
+    "ordered_evidence_ids",
+    "required_source_types"
+  ],
+  "properties": {
+    "version": {"const": 1},
+    "case_id": {"type": "string", "minLength": 1},
+    "ordered_evidence_ids": {
+      "type": "array",
+      "minItems": 8,
+      "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^E[0-9]{3}$"}
+    },
+    "required_source_types": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"enum": ["video", "pdf", "audio"]}
+    }
+  }
+}

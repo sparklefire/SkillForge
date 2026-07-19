@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "case_id": "SYNTHETIC-DISCOVERY-001",
+  "ordered_evidence_ids": [
+    "E001",
+    "E002",
+    "E003",
+    "E004",
+    "E005",
+    "E006",
+    "E007",
+    "E008",
+    "E009"
+  ],
+  "required_source_types": ["video", "pdf", "audio"]
+}

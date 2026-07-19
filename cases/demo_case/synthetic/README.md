@@ -10,3 +10,11 @@
 4. 添加无来源参数“12 N·m”。
 
 其用途仅为验证“发现问题 → 展示证据 → 自动局部修订 → 前后对比”的工程闭环。真实案例接入后必须替换本目录的数据，并由领域审核者确认。
+
+`discovery_evidence.json` 与 `discovery_response_fixture.json` 是另一条独立工程回归：
+模型只看到九条虚构 Evidence，不接收 Gold SOP、标准步骤文本或 semantic key；输出永远停在
+`NEEDS_REVIEW / HUMAN_REVIEW_REQUIRED`，不能覆盖 Gold 或直接发布。运行：
+
+```bash
+bash scripts/run_safe_step_discovery.sh
+```

@@ -1,0 +1,203 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/step_discovery_report.schema.json",
+  "title": "SkillForge Gold-free Evidence Step Discovery Report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "case_id",
+    "title",
+    "report_id",
+    "status",
+    "extraction_mode",
+    "uses_gold_step_text",
+    "semantic_spec_provided",
+    "input_evidence_sha256",
+    "model",
+    "reasoning_effort",
+    "execution_mode",
+    "model_calls",
+    "evidence_catalog",
+    "ordered_candidates",
+    "excluded_evidence",
+    "summary",
+    "guardrails",
+    "data_policy"
+  ],
+  "properties": {
+    "version": {"const": 1},
+    "case_id": {"type": "string", "minLength": 1},
+    "title": {"type": "string", "minLength": 1},
+    "report_id": {"const": "GOLD_FREE_STEP_DISCOVERY_V1"},
+    "status": {"const": "NEEDS_REVIEW"},
+    "extraction_mode": {"const": "GOLD_FREE_EVIDENCE_DISCOVERY"},
+    "uses_gold_step_text": {"const": false},
+    "semantic_spec_provided": {"const": false},
+    "input_evidence_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "model": {"type": "string", "minLength": 1},
+    "reasoning_effort": {"enum": ["low", "medium", "high"]},
+    "execution_mode": {"enum": ["LIVE_STEP_PLAN", "OFFLINE_FIXTURE"]},
+    "model_calls": {"type": "integer", "minimum": 0, "maximum": 6},
+    "evidence_catalog": {
+      "type": "array",
+      "minItems": 8,
+      "items": {"$ref": "evidence.schema.json"}
+    },
+    "ordered_candidates": {
+      "type": "array",
+      "minItems": 8,
+      "maxItems": 15,
+      "items": {"$ref": "#/$defs/candidate"}
+    },
+    "excluded_evidence": {
+      "type": "array",
+      "items": {"$ref": "step_discovery_response.schema.json#/$defs/exclusion"}
+    },
+    "summary": {"$ref": "#/$defs/summary"},
+    "guardrails": {
+      "const": {
+        "model_output_classification": "MODEL_INFERENCE",
+        "model_controls_provenance": false,
+        "unknown_evidence_rejected": true,
+        "human_review_required": true,
+        "may_override_gold": false,
+        "may_publish": false,
+        "automatic_gold_changes": 0
+      }
+    },
+    "data_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contains_raw_media",
+        "contains_credentials",
+        "contains_absolute_paths",
+        "safe_structured_derivative_only",
+        "external_model_calls"
+      ],
+      "properties": {
+        "contains_raw_media": {"const": false},
+        "contains_credentials": {"const": false},
+        "contains_absolute_paths": {"const": false},
+        "safe_structured_derivative_only": {"const": true},
+        "external_model_calls": {"type": "integer", "minimum": 0, "maximum": 6}
+      }
+    }
+  },
+  "$defs": {
+    "candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "provisional_id",
+        "title",
+        "action",
+        "object",
+        "phase",
+        "prerequisites",
+        "tools",
+        "parameters",
+        "warnings",
+        "success_check",
+        "required",
+        "evidence_ids",
+        "source_types",
+        "confidence",
+        "review_reasons",
+        "review_status"
+      ],
+      "properties": {
+        "provisional_id": {"type": "string", "pattern": "^P[0-9]{2}$"},
+        "title": {"type": "string", "minLength": 1},
+        "action": {"type": "string", "minLength": 1},
+        "object": {"type": "string", "minLength": 1},
+        "phase": {
+          "enum": ["PREPARATION", "EXECUTION", "VERIFICATION", "RESET"]
+        },
+        "prerequisites": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^P[0-9]{2}$"}
+        },
+        "tools": {
+          "type": "array",
+          "items": {"$ref": "step_discovery_response.schema.json#/$defs/tool"}
+        },
+        "parameters": {
+          "type": "array",
+          "items": {"$ref": "step_discovery_response.schema.json#/$defs/parameter"}
+        },
+        "warnings": {
+          "type": "array",
+          "items": {"$ref": "step_discovery_response.schema.json#/$defs/groundedText"}
+        },
+        "success_check": {
+          "$ref": "step_discovery_response.schema.json#/$defs/groundedText"
+        },
+        "required": {"type": "boolean"},
+        "evidence_ids": {
+          "$ref": "step_discovery_response.schema.json#/$defs/evidenceIds"
+        },
+        "source_types": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"enum": ["video", "pdf", "audio"]}
+        },
+        "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+        "review_reasons": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "review_status": {"const": "HUMAN_REVIEW_REQUIRED"}
+      }
+    },
+    "sourceCounts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["video", "pdf", "audio"],
+      "properties": {
+        "video": {"type": "integer", "minimum": 0},
+        "pdf": {"type": "integer", "minimum": 0},
+        "audio": {"type": "integer", "minimum": 0}
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "input_evidence_count",
+        "source_type_counts",
+        "step_count",
+        "required_step_count",
+        "used_evidence_count",
+        "excluded_evidence_count",
+        "unused_evidence_count",
+        "multi_source_step_count",
+        "human_review_required_count",
+        "all_references_grounded",
+        "all_evidence_accounted_for",
+        "graph_acyclic",
+        "phase_monotonic"
+      ],
+      "properties": {
+        "input_evidence_count": {"type": "integer", "minimum": 8},
+        "source_type_counts": {"$ref": "#/$defs/sourceCounts"},
+        "step_count": {"type": "integer", "minimum": 8, "maximum": 15},
+        "required_step_count": {"type": "integer", "minimum": 0, "maximum": 15},
+        "used_evidence_count": {"type": "integer", "minimum": 1},
+        "excluded_evidence_count": {"type": "integer", "minimum": 0},
+        "unused_evidence_count": {"const": 0},
+        "multi_source_step_count": {"type": "integer", "minimum": 0},
+        "human_review_required_count": {"type": "integer", "minimum": 8, "maximum": 15},
+        "all_references_grounded": {"const": true},
+        "all_evidence_accounted_for": {"const": true},
+        "graph_acyclic": {"const": true},
+        "phase_monotonic": {"const": true}
+      }
+    }
+  }
+}

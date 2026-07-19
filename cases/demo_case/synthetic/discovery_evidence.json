@@ -1,0 +1,101 @@
+[
+  {
+    "evidence_id": "E001",
+    "source_type": "video",
+    "source_ref": "synthetic/discovery_demo.mp4",
+    "claim": "操作者清理工作台并放置虚构演示警示牌。",
+    "locator": {"start_ms": 0, "end_ms": 6000},
+    "classification": "SOURCE_FACT",
+    "relevance": 0.94,
+    "confidence": 0.95,
+    "review_status": "VERIFIED"
+  },
+  {
+    "evidence_id": "E002",
+    "source_type": "pdf",
+    "source_ref": "synthetic/discovery_manual.pdf",
+    "claim": "虚构设备维护前应关闭电源并确认运行指示熄灭。",
+    "locator": {"page": 2, "paragraph": "虚构安全准备"},
+    "classification": "SOURCE_FACT",
+    "relevance": 1.0,
+    "confidence": 0.99,
+    "review_status": "VERIFIED"
+  },
+  {
+    "evidence_id": "E003",
+    "source_type": "audio",
+    "source_ref": "synthetic/discovery_expert.wav",
+    "claim": "确认指示熄灭后，再佩戴演示手套和护目镜。",
+    "locator": {"start_ms": 7000, "end_ms": 13000},
+    "classification": "EXPERT_ADVICE",
+    "relevance": 0.96,
+    "confidence": 0.94,
+    "review_status": "VERIFIED"
+  },
+  {
+    "evidence_id": "E004",
+    "source_type": "video",
+    "source_ref": "synthetic/discovery_demo.mp4",
+    "claim": "操作者向上打开虚构设备的维护盖板。",
+    "locator": {"start_ms": 14000, "end_ms": 21000},
+    "classification": "SOURCE_FACT",
+    "relevance": 0.93,
+    "confidence": 0.93,
+    "review_status": "VERIFIED"
+  },
+  {
+    "evidence_id": "E005",
+    "source_type": "video",
+    "source_ref": "synthetic/discovery_demo.mp4",
+    "claim": "操作者依次松开左右两个演示卡扣。",
+    "locator": {"start_ms": 22000, "end_ms": 29000},
+    "classification": "SOURCE_FACT",
+    "relevance": 0.95,
+    "confidence": 0.95,
+    "review_status": "VERIFIED"
+  },
+  {
+    "evidence_id": "E006",
+    "source_type": "audio",
+    "source_ref": "synthetic/discovery_expert.wav",
+    "claim": "水平取出演示过滤件并装入密封袋，过程中不要抖动。",
+    "locator": {"start_ms": 14000, "end_ms": 23000},
+    "classification": "EXPERT_ADVICE",
+    "relevance": 0.98,
+    "confidence": 0.96,
+    "review_status": "VERIFIED"
+  },
+  {
+    "evidence_id": "E007",
+    "source_type": "video",
+    "source_ref": "synthetic/discovery_demo.mp4",
+    "claim": "操作者使用无绒布单向擦拭演示密封面。",
+    "locator": {"start_ms": 39000, "end_ms": 46000},
+    "classification": "SOURCE_FACT",
+    "relevance": 0.95,
+    "confidence": 0.95,
+    "review_status": "VERIFIED"
+  },
+  {
+    "evidence_id": "E008",
+    "source_type": "pdf",
+    "source_ref": "synthetic/discovery_manual.pdf",
+    "claim": "新演示过滤件的箭头朝向设备内部，并推入至两侧齐平。",
+    "locator": {"page": 4, "paragraph": "虚构安装方向"},
+    "classification": "SOURCE_FACT",
+    "relevance": 1.0,
+    "confidence": 0.99,
+    "review_status": "VERIFIED"
+  },
+  {
+    "evidence_id": "E009",
+    "source_type": "pdf",
+    "source_ref": "synthetic/discovery_manual.pdf",
+    "claim": "锁紧卡扣并关闭盖板后，恢复供电并确认运行指示正常。",
+    "locator": {"page": 5, "paragraph": "虚构完成确认"},
+    "classification": "SOURCE_FACT",
+    "relevance": 1.0,
+    "confidence": 0.99,
+    "review_status": "VERIFIED"
+  }
+]
