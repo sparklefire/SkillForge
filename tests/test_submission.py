@@ -36,6 +36,8 @@ def test_submission_preflight_preserves_human_gates(tmp_path: Path) -> None:
         final_rehearsal_qa_path=absent / "final_stage_rehearsal_qa.json",
         training_video_review_path=absent / "training_video_review.json",
         training_video_review_qa_path=absent / "training_video_review_qa.json",
+        final_recording_review_path=absent / "final_recording_review.json",
+        final_recording_review_qa_path=absent / "final_recording_review_qa.json",
         official_rules_review_path=absent / "official_rules_review.json",
         official_rules_review_qa_path=absent / "official_rules_review_qa.json",
     )
@@ -65,6 +67,8 @@ def test_submission_preflight_preserves_human_gates(tmp_path: Path) -> None:
     assert "ABSENT" in checks["TRAINING_VIDEO_REVIEW_PRIVATE_STATE"]["details"][0]
     assert checks["FINAL_REHEARSAL_PRIVATE_STATE"]["status"] == "PASSED"
     assert "ABSENT" in checks["FINAL_REHEARSAL_PRIVATE_STATE"]["details"][0]
+    assert checks["FINAL_RECORDING_REVIEW_PRIVATE_STATE"]["status"] == "PASSED"
+    assert "ABSENT" in checks["FINAL_RECORDING_REVIEW_PRIVATE_STATE"]["details"][0]
     assert checks["HUMAN_GATE_CONFIRMATIONS"]["status"] == "PASSED"
     assert checks["PITCH_PACKAGE"]["status"] == "PASSED"
     assert checks["PUBLIC_ARTIFACT_BOUNDARY"]["status"] == "PASSED"

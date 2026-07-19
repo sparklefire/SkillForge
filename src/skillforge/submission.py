@@ -22,6 +22,11 @@ from .final_rehearsal import (
     final_rehearsal_qa_issue,
     verify_final_rehearsal,
 )
+from .final_recording_review import (
+    FinalRecordingReviewError,
+    final_recording_review_qa_issue,
+    verify_final_recording_review,
+)
 from .human_gates import HumanGateStore
 from .official_rules_review import (
     OfficialRulesReviewError,
@@ -751,6 +756,91 @@ def _check_training_video_review_private_state(
     )
 
 
+def _check_final_recording_review_private_state(
+    root: Path,
+    confirmed_gate_ids: set[str] | None = None,
+    review_path: Path | None = None,
+    qa_path: Path | None = None,
+) -> dict[str, Any]:
+    confirmed_gate_ids = confirmed_gate_ids or set()
+    review_path = (
+        review_path.resolve()
+        if review_path is not None
+        else (root / "outputs/submission/final_recording_review.json").resolve()
+    )
+    qa_path = (
+        qa_path.resolve()
+        if qa_path is not None
+        else review_path.parent / "final_recording_review_qa.json"
+    )
+    if not review_path.exists():
+        if qa_path.exists() or "FINAL_RECORDING_REVIEW" in confirmed_gate_ids:
+            return _check(
+                "FINAL_RECORDING_REVIEW_PRIVATE_STATE",
+                "FAILED",
+                "最终录屏观看QA或人工确认存在，但绑定的私有完整观看记录缺失",
+            )
+        return _check(
+            "FINAL_RECORDING_REVIEW_PRIVATE_STATE",
+            "PASSED",
+            "私有178秒最终录屏观看记录状态=ABSENT；最终录屏人工门禁保持待确认",
+        )
+    draft = _check_pending_private_draft(
+        review_path,
+        qa_path,
+        schema_name="final_recording_review.schema.json",
+        check_id="FINAL_RECORDING_REVIEW_PRIVATE_STATE",
+        gate_id="FINAL_RECORDING_REVIEW",
+        confirmed_gate_ids=confirmed_gate_ids,
+        label="私有178秒最终录屏观看记录",
+    )
+    if draft is not None:
+        return draft
+    recording_path = review_path.parent / "skillforge_final_recording.mp4"
+    try:
+        report = verify_final_recording_review(
+            review_path,
+            recording_path=recording_path,
+            machine_qa_path=review_path.parent / "final_recording_qa.json",
+            build_report_path=review_path.parent / "final_recording_build.json",
+            storyboard_path=root / "config/final_recording_storyboard.json",
+            policy_path=root / "config/final_recording_policy.json",
+            private_root=review_path.parent,
+        )
+        issue = final_recording_review_qa_issue(
+            qa_path,
+            {
+                "kind": "LOCAL_FILE",
+                "locator": str(recording_path),
+                "sha256": report["recording"]["sha256"],
+                "size_bytes": report["recording"]["bytes"],
+            },
+            review_path=review_path,
+            recording_path=recording_path,
+            machine_qa_path=review_path.parent / "final_recording_qa.json",
+            build_report_path=review_path.parent / "final_recording_build.json",
+            storyboard_path=root / "config/final_recording_storyboard.json",
+            policy_path=root / "config/final_recording_policy.json",
+        )
+        if issue:
+            raise FinalRecordingReviewError(issue)
+    except (OSError, FinalRecordingReviewError, ContractValidationError) as exc:
+        return _check(
+            "FINAL_RECORDING_REVIEW_PRIVATE_STATE",
+            "FAILED",
+            f"私有最终录屏完整观看记录不完整或已失效；错误类型={type(exc).__name__}",
+        )
+    return _check(
+        "FINAL_RECORDING_REVIEW_PRIVATE_STATE",
+        "PASSED",
+        (
+            f"当前最终录屏完整观看机器检查通过；时长={report['recording']['duration_ms']}毫秒; "
+            "最终录屏人工门禁="
+            f"{'CONFIRMED' if 'FINAL_RECORDING_REVIEW' in confirmed_gate_ids else 'PENDING'}"
+        ),
+    )
+
+
 def _check_official_rules_review_private_state(
     root: Path,
     confirmed_gate_ids: set[str] | None = None,
@@ -1005,6 +1095,8 @@ def build_submission_preflight(
     final_rehearsal_qa_path: Path | None = None,
     training_video_review_path: Path | None = None,
     training_video_review_qa_path: Path | None = None,
+    final_recording_review_path: Path | None = None,
+    final_recording_review_qa_path: Path | None = None,
     official_rules_review_path: Path | None = None,
     official_rules_review_qa_path: Path | None = None,
     submission_form_packet_path: Path | None = None,
@@ -1059,6 +1151,12 @@ def build_submission_preflight(
             confirmed_gate_ids,
             rehearsal_path=final_rehearsal_path,
             qa_path=final_rehearsal_qa_path,
+        ),
+        _check_final_recording_review_private_state(
+            root,
+            confirmed_gate_ids,
+            review_path=final_recording_review_path,
+            qa_path=final_recording_review_qa_path,
         ),
         confirmation_check,
         pitch_check,

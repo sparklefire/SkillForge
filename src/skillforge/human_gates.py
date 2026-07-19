@@ -16,6 +16,7 @@ from urllib.parse import urlsplit
 from .contracts import validate_document
 from .demo import ROOT
 from .final_recording import final_recording_qa_issue
+from .final_recording_review import final_recording_review_qa_issue
 from .final_rehearsal import final_rehearsal_qa_issue
 from .official_rules_review import official_rules_review_qa_issue
 from .team_roster import TeamRosterError, verify_team_roster
@@ -108,6 +109,12 @@ class HumanGateStore:
         *,
         runbook_path: Path = DEFAULT_RUNBOOK,
         final_recording_qa_path: Path | None = None,
+        final_recording_review_path: Path | None = None,
+        final_recording_review_qa_path: Path | None = None,
+        final_recording_path: Path | None = None,
+        final_recording_build_path: Path | None = None,
+        final_recording_storyboard_path: Path | None = None,
+        final_recording_policy_path: Path | None = None,
         final_rehearsal_qa_path: Path | None = None,
         team_roster_path: Path | None = None,
         training_video_review_qa_path: Path | None = None,
@@ -122,6 +129,36 @@ class HumanGateStore:
             final_recording_qa_path.expanduser().resolve()
             if final_recording_qa_path is not None
             else self.path.parent / "final_recording_qa.json"
+        )
+        self.final_recording_review_path = (
+            final_recording_review_path.expanduser().resolve()
+            if final_recording_review_path is not None
+            else self.path.parent / "final_recording_review.json"
+        )
+        self.final_recording_review_qa_path = (
+            final_recording_review_qa_path.expanduser().resolve()
+            if final_recording_review_qa_path is not None
+            else self.path.parent / "final_recording_review_qa.json"
+        )
+        self.final_recording_path = (
+            final_recording_path.expanduser().resolve()
+            if final_recording_path is not None
+            else self.path.parent / "skillforge_final_recording.mp4"
+        )
+        self.final_recording_build_path = (
+            final_recording_build_path.expanduser().resolve()
+            if final_recording_build_path is not None
+            else self.path.parent / "final_recording_build.json"
+        )
+        self.final_recording_storyboard_path = (
+            final_recording_storyboard_path.expanduser().resolve()
+            if final_recording_storyboard_path is not None
+            else ROOT / "config/final_recording_storyboard.json"
+        )
+        self.final_recording_policy_path = (
+            final_recording_policy_path.expanduser().resolve()
+            if final_recording_policy_path is not None
+            else ROOT / "config/final_recording_policy.json"
         )
         self.final_rehearsal_qa_path = (
             final_rehearsal_qa_path.expanduser().resolve()
@@ -264,7 +301,21 @@ class HumanGateStore:
                 runbook_path=self.runbook_path,
             )
         if gate_id == "FINAL_RECORDING_REVIEW":
-            return final_recording_qa_issue(self.final_recording_qa_path, evidence)
+            machine_issue = final_recording_qa_issue(
+                self.final_recording_qa_path, evidence
+            )
+            if machine_issue:
+                return machine_issue
+            return final_recording_review_qa_issue(
+                self.final_recording_review_qa_path,
+                evidence,
+                review_path=self.final_recording_review_path,
+                recording_path=self.final_recording_path,
+                machine_qa_path=self.final_recording_qa_path,
+                build_report_path=self.final_recording_build_path,
+                storyboard_path=self.final_recording_storyboard_path,
+                policy_path=self.final_recording_policy_path,
+            )
         if gate_id == "OFFICIAL_RULES_VERIFIED":
             return official_rules_review_qa_issue(
                 self.official_rules_review_qa_path,

@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/final_recording_review.schema.json",
+  "title": "SkillForge Private Final Recording Full-Watch Review",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "case_id", "updated_at", "status", "watch_started_at", "watch_completed_at", "playback_method", "recording", "machine_qa_sha256", "build_report_sha256", "storyboard_sha256", "policy_sha256", "checks", "notes", "data_policy"],
+  "properties": {
+    "version": {"const": 1},
+    "case_id": {"const": "n31_media_change"},
+    "updated_at": {"type": "string", "format": "date-time"},
+    "status": {"enum": ["PENDING_INPUT", "READY_FOR_CHECK"]},
+    "watch_started_at": {"anyOf": [{"type": "null"}, {"type": "string", "format": "date-time"}]},
+    "watch_completed_at": {"anyOf": [{"type": "null"}, {"type": "string", "format": "date-time"}]},
+    "playback_method": {"anyOf": [{"type": "null"}, {"enum": ["LOCAL_PLAYER", "WEB_DEMO", "OTHER_FULL_PLAYBACK"]}]},
+    "recording": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["filename", "sha256", "bytes", "duration_ms"],
+      "properties": {
+        "filename": {"const": "skillforge_final_recording.mp4"},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "bytes": {"type": "integer", "minimum": 1},
+        "duration_ms": {"type": "integer", "minimum": 175000, "maximum": 180500}
+      }
+    },
+    "machine_qa_sha256": {"$ref": "#/$defs/sha256"},
+    "build_report_sha256": {"$ref": "#/$defs/sha256"},
+    "storyboard_sha256": {"$ref": "#/$defs/sha256"},
+    "policy_sha256": {"$ref": "#/$defs/sha256"},
+    "checks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["full_playback_completed", "subtitles_present_and_readable", "no_private_content_or_personal_ui", "narration_audible", "narration_pacing_acceptable", "narration_and_demo_in_sync", "all_nine_scenes_understandable", "claims_and_boundaries_accurate", "no_playback_corruption", "final_cut_accepted", "official_video_requirements_not_assumed"],
+      "properties": {
+        "full_playback_completed": {"type": "boolean"},
+        "subtitles_present_and_readable": {"type": "boolean"},
+        "no_private_content_or_personal_ui": {"type": "boolean"},
+        "narration_audible": {"type": "boolean"},
+        "narration_pacing_acceptable": {"type": "boolean"},
+        "narration_and_demo_in_sync": {"type": "boolean"},
+        "all_nine_scenes_understandable": {"type": "boolean"},
+        "claims_and_boundaries_accurate": {"type": "boolean"},
+        "no_playback_corruption": {"type": "boolean"},
+        "final_cut_accepted": {"type": "boolean"},
+        "official_video_requirements_not_assumed": {"type": "boolean"}
+      }
+    },
+    "notes": {"type": "string", "maxLength": 2000},
+    "data_policy": {
+      "const": {
+        "private_local_state": true,
+        "contains_personal_data": false,
+        "contains_credentials": false,
+        "git_tracked": false,
+        "automatic_human_approval": false
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"status": {"const": "READY_FOR_CHECK"}}},
+      "then": {
+        "properties": {
+          "watch_started_at": {"type": "string", "format": "date-time"},
+          "watch_completed_at": {"type": "string", "format": "date-time"},
+          "playback_method": {"enum": ["LOCAL_PLAYER", "WEB_DEMO", "OTHER_FULL_PLAYBACK"]},
+          "checks": {
+            "properties": {
+              "full_playback_completed": {"const": true},
+              "subtitles_present_and_readable": {"const": true},
+              "no_private_content_or_personal_ui": {"const": true},
+              "narration_audible": {"const": true},
+              "narration_pacing_acceptable": {"const": true},
+              "narration_and_demo_in_sync": {"const": true},
+              "all_nine_scenes_understandable": {"const": true},
+              "claims_and_boundaries_accurate": {"const": true},
+              "no_playback_corruption": {"const": true},
+              "final_cut_accepted": {"const": true},
+              "official_video_requirements_not_assumed": {"const": true}
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+  }
+}

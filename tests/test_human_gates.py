@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import stat
 from pathlib import Path
 
@@ -9,6 +10,11 @@ import pytest
 import skillforge.final_recording as final_recording_module
 from skillforge.contracts import validate_document
 from skillforge.final_recording import evaluate_final_recording, write_private_report
+from skillforge.final_recording_review import (
+    _write_private_json as _write_recording_review_json,
+    initialize_final_recording_review,
+    verify_final_recording_review,
+)
 from skillforge.final_rehearsal import (
     _write_private_json as _write_rehearsal_json,
     initialize_final_rehearsal,
@@ -82,7 +88,113 @@ def _ready_recording(private: Path) -> Path:
             "maximum_contiguous_black_ms": 500,
         },
     )
-    write_private_report(report, private / "final_recording_qa.json")
+    machine_qa = private / "final_recording_qa.json"
+    write_private_report(report, machine_qa)
+    sha256 = lambda path: hashlib.sha256(path.read_bytes()).hexdigest()
+    digest = "a" * 64
+    build = {
+        "version": 1,
+        "case_id": "n31_media_change",
+        "artifact_type": "FINAL_RECORDING_BUILD",
+        "generated_at": "2026-07-19T00:00:00+00:00",
+        "status": "READY_FOR_HUMAN_REVIEW",
+        "storyboard_sha256": sha256(
+            ROOT / "config/final_recording_storyboard.json"
+        ),
+        "scene_count": 9,
+        "target_duration_ms": 178000,
+        "media": {
+            "filename": recording.name,
+            "sha256": sha256(recording),
+            "bytes": recording.stat().st_size,
+            "duration_ms": 178000,
+            "width": 1920,
+            "height": 1080,
+            "fps": 30.0,
+            "video_codec": "h264",
+            "audio_codec": "aac",
+        },
+        "scenes": [
+            {
+                "scene_id": f"R{order:02d}",
+                "order": order,
+                "duration_ms": 15000,
+                "visual_kind": "SCREENSHOT",
+                "visual_source_sha256": digest,
+                "narration_sha256": digest,
+                "tts_audio_sha256": digest,
+                "rendered_sha256": digest,
+                "output_probe_ms": order * 10000,
+                "difference_hash_distance": 0,
+                "sequence_match": True,
+            }
+            for order in range(1, 10)
+        ],
+        "tts": {
+            "model": "stepaudio-2.5-tts",
+            "voice": "zhixingjiejie",
+            "scene_count": 9,
+            "generated_count": 0,
+            "reused_count": 9,
+            "external_model_calls": 0,
+            "text_only": True,
+        },
+        "machine_qa": {
+            "status": "READY_FOR_HUMAN_REVIEW",
+            "report_sha256": sha256(machine_qa),
+            "all_checks_passed": True,
+            "scene_sequence_all_matched": True,
+        },
+        "human_review": {
+            "required": True,
+            "status": "PENDING",
+            "automatic_approval": False,
+        },
+        "data_policy": {
+            "private_local_state": True,
+            "screenshot_assets_private": True,
+            "raw_media_sent_to_tts": False,
+            "tts_text_only": True,
+            "contains_credentials": False,
+            "contains_absolute_paths": False,
+            "automatic_human_approval": False,
+        },
+    }
+    build_path = private / "final_recording_build.json"
+    _write_recording_review_json(build, build_path, private_root=private)
+    review = private / "final_recording_review.json"
+    review_qa = private / "final_recording_review_qa.json"
+    review.unlink(missing_ok=True)
+    review_qa.unlink(missing_ok=True)
+    initialize_final_recording_review(
+        review,
+        recording_path=recording,
+        machine_qa_path=machine_qa,
+        build_report_path=build_path,
+        private_root=private,
+    )
+    review_document = json.loads(review.read_text(encoding="utf-8"))
+    review_document.update(
+        {
+            "updated_at": "2026-07-19T00:03:01+00:00",
+            "status": "READY_FOR_CHECK",
+            "watch_started_at": "2026-07-19T00:00:00+00:00",
+            "watch_completed_at": "2026-07-19T00:03:00+00:00",
+            "playback_method": "LOCAL_PLAYER",
+        }
+    )
+    review_document["checks"] = {
+        key: True for key in review_document["checks"]
+    }
+    _write_recording_review_json(review_document, review, private_root=private)
+    review_report = verify_final_recording_review(
+        review,
+        recording_path=recording,
+        machine_qa_path=machine_qa,
+        build_report_path=build_path,
+        private_root=private,
+    )
+    _write_recording_review_json(review_report, review_qa, private_root=private)
     return recording
 
 
@@ -563,6 +675,21 @@ def test_final_recording_gate_requires_matching_private_machine_qa(
             reviewer="审核人",
             evidence_url="https://example.com/final-recording.mp4",
         )
+
+
+def test_final_recording_gate_requires_completed_full_watch_review(
+    tmp_path: Path,
+) -> None:
+    private = tmp_path / "private"
+    recording = _ready_recording(private)
+    (private / "final_recording_review_qa.json").unlink()
+    store = HumanGateStore(
+        private / "state.json",
+        runbook_path=_copied_runbook(tmp_path),
+    )
+
+    with pytest.raises(HumanGateError, match="FINAL_RECORDING_REVIEW_QA_MISSING"):
+        store.confirm(GATE_IDS[2], reviewer="审核人", evidence_file=recording)
 
 
 def test_final_rehearsal_gate_requires_current_timed_record_and_qa(

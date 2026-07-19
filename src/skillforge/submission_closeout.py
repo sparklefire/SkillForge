@@ -16,6 +16,11 @@ from typing import Any, Callable
 from .contracts import ContractValidationError, validate_document
 from .demo import ROOT
 from .final_recording import DEFAULT_RECORDING, final_recording_qa_issue
+from .final_recording_review import (
+    FinalRecordingReviewError,
+    final_recording_review_qa_issue,
+    verify_final_recording_review,
+)
 from .final_rehearsal import (
     FinalRehearsalError,
     final_rehearsal_qa_issue,
@@ -427,13 +432,19 @@ def _probe_rehearsal(root: Path, private_root: Path) -> dict[str, str]:
 
 def _probe_final_recording(root: Path, private_root: Path) -> dict[str, str]:
     recording = private_root / DEFAULT_RECORDING.name
-    qa = private_root / "final_recording_qa.json"
-    if not recording.exists() and not qa.exists():
+    machine_qa = private_root / "final_recording_qa.json"
+    build_report = private_root / "final_recording_build.json"
+    review = private_root / "final_recording_review.json"
+    review_qa = private_root / "final_recording_review_qa.json"
+    if not any(
+        path.exists()
+        for path in (recording, machine_qa, build_report, review, review_qa)
+    ):
         return {
             "status": "AWAITING_HUMAN",
             "evidence_state": "ABSENT",
-            "next_action": "录制最终有声字幕视频并保存到固定私有文件名",
-            "next_command": "bash scripts/check_final_recording.sh",
+            "next_action": "生成最终有声字幕候选并运行机器QA",
+            "next_command": "bash scripts/build_final_recording_candidate.sh",
         }
     if not recording.exists() or not _private_file_safe(recording, private_root):
         return {
@@ -442,7 +453,7 @@ def _probe_final_recording(root: Path, private_root: Path) -> dict[str, str]:
             "next_action": "恢复固定文件名和700/600权限后重新检查录屏",
             "next_command": "bash scripts/check_final_recording.sh",
         }
-    if not qa.exists():
+    if not machine_qa.exists():
         return {
             "status": "READY",
             "evidence_state": "INPUT_READY",
@@ -450,7 +461,7 @@ def _probe_final_recording(root: Path, private_root: Path) -> dict[str, str]:
             "next_command": "bash scripts/check_final_recording.sh",
         }
     issue = final_recording_qa_issue(
-        qa,
+        machine_qa,
         {
             "kind": "LOCAL_FILE",
             "locator": str(recording),
@@ -458,19 +469,100 @@ def _probe_final_recording(root: Path, private_root: Path) -> dict[str, str]:
             "size_bytes": recording.stat().st_size,
         },
     )
-    return (
-        {
-            "status": "READY_FOR_CONFIRMATION",
-            "evidence_state": "MACHINE_READY",
-            "next_action": "完整观看录屏后显式确认最终录屏门禁",
-            "next_command": "bash scripts/manage_human_gates.sh status",
-        }
-        if issue is None
-        else {
+    if issue is not None:
+        return {
             "status": "NEEDS_REVIEW",
             "evidence_state": "INVALID",
             "next_action": "重新运行录屏QA并处理媒体或策略漂移",
             "next_command": "bash scripts/check_final_recording.sh",
+        }
+    if not build_report.exists() or not _private_file_safe(build_report, private_root):
+        return {
+            "status": "NEEDS_REVIEW",
+            "evidence_state": "INVALID",
+            "next_action": "恢复当前录屏构建报告后重新生成候选",
+            "next_command": "bash scripts/build_final_recording_candidate.sh",
+        }
+    if not review.exists() and not review_qa.exists():
+        return {
+            "status": "AWAITING_HUMAN",
+            "evidence_state": "MACHINE_READY",
+            "next_action": "初始化并填写最终录屏完整观看记录",
+            "next_command": "bash scripts/check_final_recording_review.sh --init",
+        }
+    if not review.exists() or not _private_file_safe(review, private_root):
+        return {
+            "status": "NEEDS_REVIEW",
+            "evidence_state": "INVALID",
+            "next_action": "恢复最终录屏观看记录的固定文件名和700/600权限",
+            "next_command": "bash scripts/check_final_recording_review.sh",
+        }
+    try:
+        review_document = validate_document(
+            _read_json(review, "最终录屏观看记录"),
+            "final_recording_review.schema.json",
+        )
+    except (ContractValidationError, SubmissionCloseoutError):
+        return {
+            "status": "NEEDS_REVIEW",
+            "evidence_state": "INVALID",
+            "next_action": "修复最终录屏观看记录的格式或来源绑定",
+            "next_command": "bash scripts/check_final_recording_review.sh",
+        }
+    if review_document["status"] == "PENDING_INPUT":
+        return {
+            "status": "AWAITING_HUMAN",
+            "evidence_state": "DRAFT",
+            "next_action": "完整观看最终录屏并填写私有审核记录",
+            "next_command": "bash scripts/check_final_recording_review.sh",
+        }
+    if not review_qa.exists():
+        return {
+            "status": "READY",
+            "evidence_state": "INPUT_READY",
+            "next_action": "运行最终录屏完整观看记录QA",
+            "next_command": "bash scripts/check_final_recording_review.sh",
+        }
+    try:
+        report = verify_final_recording_review(
+            review,
+            recording_path=recording,
+            machine_qa_path=machine_qa,
+            build_report_path=build_report,
+            storyboard_path=root / "config/final_recording_storyboard.json",
+            policy_path=root / "config/final_recording_policy.json",
+            private_root=private_root,
+        )
+        review_issue = final_recording_review_qa_issue(
+            review_qa,
+            {
+                "kind": "LOCAL_FILE",
+                "locator": str(recording),
+                "sha256": report["recording"]["sha256"],
+                "size_bytes": report["recording"]["bytes"],
+            },
+            review_path=review,
+            recording_path=recording,
+            machine_qa_path=machine_qa,
+            build_report_path=build_report,
+            storyboard_path=root / "config/final_recording_storyboard.json",
+            policy_path=root / "config/final_recording_policy.json",
+        )
+    except (ContractValidationError, FinalRecordingReviewError, OSError):
+        review_issue = "FINAL_RECORDING_REVIEW_QA_INVALID"
+    return (
+        {
+            "status": "READY_FOR_CONFIRMATION",
+            "evidence_state": "MACHINE_READY",
+            "next_action": "显式确认最终录屏人工门禁",
+            "next_command": "bash scripts/manage_human_gates.sh status",
+        }
+        if review_issue is None
+        else {
+            "status": "NEEDS_REVIEW",
+            "evidence_state": "INVALID",
+            "next_action": "重新运行完整观看QA并处理审核记录或产物漂移",
+            "next_command": "bash scripts/check_final_recording_review.sh",
         }
     )
 
@@ -610,6 +702,14 @@ def _gate_stages(
         private_root / "human_gate_confirmations.json",
         runbook_path=root / "cases/n31/pitch_runbook.json",
         final_recording_qa_path=private_root / "final_recording_qa.json",
+        final_recording_review_path=private_root / "final_recording_review.json",
+        final_recording_review_qa_path=private_root
+        / "final_recording_review_qa.json",
+        final_recording_path=private_root / "skillforge_final_recording.mp4",
+        final_recording_build_path=private_root / "final_recording_build.json",
+        final_recording_storyboard_path=root
+        / "config/final_recording_storyboard.json",
+        final_recording_policy_path=root / "config/final_recording_policy.json",
         final_rehearsal_qa_path=private_root / "final_stage_rehearsal_qa.json",
         team_roster_path=private_root / "team_roster.json",
         training_video_review_qa_path=private_root / "training_video_review_qa.json",

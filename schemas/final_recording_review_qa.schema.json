@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillforge.local/schemas/final_recording_review_qa.schema.json",
+  "title": "SkillForge Private Final Recording Full-Watch Review QA",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "case_id", "artifact_type", "checked_at", "status", "review_sha256", "review_bytes", "recording", "machine_qa_sha256", "build_report_sha256", "storyboard_sha256", "policy_sha256", "watch_elapsed_ms", "checks", "human_gate_status", "official_rules_boundary", "data_policy"],
+  "properties": {
+    "version": {"const": 1},
+    "case_id": {"const": "n31_media_change"},
+    "artifact_type": {"const": "FINAL_RECORDING_FULL_WATCH_QA"},
+    "checked_at": {"type": "string", "format": "date-time"},
+    "status": {"const": "READY_FOR_HUMAN_CONFIRMATION"},
+    "review_sha256": {"$ref": "#/$defs/sha256"},
+    "review_bytes": {"type": "integer", "minimum": 1},
+    "recording": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["filename", "sha256", "bytes", "duration_ms"],
+      "properties": {
+        "filename": {"const": "skillforge_final_recording.mp4"},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "bytes": {"type": "integer", "minimum": 1},
+        "duration_ms": {"type": "integer", "minimum": 175000, "maximum": 180500}
+      }
+    },
+    "machine_qa_sha256": {"$ref": "#/$defs/sha256"},
+    "build_report_sha256": {"$ref": "#/$defs/sha256"},
+    "storyboard_sha256": {"$ref": "#/$defs/sha256"},
+    "policy_sha256": {"$ref": "#/$defs/sha256"},
+    "watch_elapsed_ms": {"type": "integer", "minimum": 173000, "maximum": 21600000},
+    "checks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["machine_qa_ready", "machine_checks_passed", "build_report_ready", "build_checks_passed", "scene_sequence_matched", "recording_matches_machine_qa", "recording_matches_build", "review_matches_current_artifacts", "storyboard_matches_build", "policy_matches_machine_qa", "watch_duration_sufficient", "full_playback_completed", "subtitles_present_and_readable", "no_private_content_or_personal_ui", "narration_audible", "narration_pacing_acceptable", "narration_and_demo_in_sync", "all_nine_scenes_understandable", "claims_and_boundaries_accurate", "no_playback_corruption", "final_cut_accepted", "official_video_requirements_not_assumed"],
+      "properties": {
+        "machine_qa_ready": {"const": true},
+        "machine_checks_passed": {"const": true},
+        "build_report_ready": {"const": true},
+        "build_checks_passed": {"const": true},
+        "scene_sequence_matched": {"const": true},
+        "recording_matches_machine_qa": {"const": true},
+        "recording_matches_build": {"const": true},
+        "review_matches_current_artifacts": {"const": true},
+        "storyboard_matches_build": {"const": true},
+        "policy_matches_machine_qa": {"const": true},
+        "watch_duration_sufficient": {"const": true},
+        "full_playback_completed": {"const": true},
+        "subtitles_present_and_readable": {"const": true},
+        "no_private_content_or_personal_ui": {"const": true},
+        "narration_audible": {"const": true},
+        "narration_pacing_acceptable": {"const": true},
+        "narration_and_demo_in_sync": {"const": true},
+        "all_nine_scenes_understandable": {"const": true},
+        "claims_and_boundaries_accurate": {"const": true},
+        "no_playback_corruption": {"const": true},
+        "final_cut_accepted": {"const": true},
+        "official_video_requirements_not_assumed": {"const": true}
+      }
+    },
+    "human_gate_status": {"const": "PENDING"},
+    "official_rules_boundary": {
+      "const": {
+        "official_video_requirements_verified": false,
+        "separate_official_rules_gate_required": true
+      }
+    },
+    "data_policy": {
+      "const": {
+        "private_local_state": true,
+        "contains_personal_data": false,
+        "contains_notes": false,
+        "contains_watch_timestamps": false,
+        "contains_credentials": false,
+        "contains_absolute_paths": false,
+        "contains_media": false,
+        "human_confirmation_generated": false
+      }
+    }
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+  }
+}
