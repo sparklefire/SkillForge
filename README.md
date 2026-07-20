@@ -328,7 +328,7 @@ bash scripts/run_runtime_benchmark.sh local
 bash scripts/run_runtime_benchmark.sh dgx
 ```
 
-基准执行2次预热和20次测量，分别覆盖直接 Python Gold 闭环和 Web 现场重算。当前 DGX 报告中位数为37.626毫秒和44.800毫秒，基准进程高水位RSS为86,491,136字节。该数字只描述已审核结构化Gold的确定性质检、局部修订和输出，不包含原始视频、PDF、录音预处理，也不调用外部模型。报告见 [运行时评测说明](./output/evaluation/README.md)。
+基准执行2次预热，并对直接 Python Gold 闭环和 Web 现场重算各测量20次。当前 DGX 报告的40轮测量全部成功，两条路径各自只有1个唯一P0语义指纹且指纹相同；具体耗时和资源数字只在 [运行时评测说明](./output/evaluation/README.md) 中维护。该基准只描述已审核结构化Gold的确定性质检、局部修订和输出，不包含原始视频、PDF、录音预处理，也不调用外部模型。
 
 18项冻结成果的可复现公开技术交付包：
 

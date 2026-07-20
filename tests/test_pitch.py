@@ -68,9 +68,22 @@ def test_pitch_requires_dgx_runtime_benchmark() -> None:
     assert "RUNTIME_BENCHMARK" in artifact_ids
     result = _check_runtime_benchmark(ROOT)
     assert result["status"] == "PASSED"
+    assert result["assertions"]["forty_runs_semantically_stable"] is True
     assert result["assertions"]["twenty_measured_runs"] is True
     assert result["metrics"]["gold_workflow_median_ms"] > 0
     assert result["metrics"]["web_live_rerun_median_ms"] > 0
+
+
+def test_pitch_script_uses_stability_claim_instead_of_stale_latency() -> None:
+    metrics_segment = next(
+        item for item in _runbook()["segments"] if item["phase"] == "METRICS"
+    )
+    public_text = metrics_segment["speaker_script"] + " ".join(
+        metrics_segment["proof_points"]
+    )
+    assert "40轮" in public_text
+    assert "唯一P0语义指纹" in public_text
+    assert "44.8" not in public_text
 
 
 def test_pitch_requires_bounded_temporal_windows() -> None:

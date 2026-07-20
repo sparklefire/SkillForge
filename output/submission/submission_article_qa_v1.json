@@ -1,7 +1,7 @@
 {
-  "article_bytes": 8406,
+  "article_bytes": 8414,
   "article_path": "docs/赛事征文.md",
-  "article_sha256": "ef452f1770645b5d178cc8cb519ae64d4745e2d922362d11bb1ba48ce504d496",
+  "article_sha256": "c35e1d48a97c1d24c7e43a7b4ab36c690e732c26501a72ee9838ac9a1ae19d00",
   "artifact_type": "SUBMISSION_ARTICLE_QA",
   "case_id": "n31_media_change",
   "checks": {
@@ -18,7 +18,7 @@
     "required_headings_ordered": true,
     "title_present": true
   },
-  "chinese_character_count": 1958,
+  "chinese_character_count": 1960,
   "claim_checks": [
     {
       "claim_id": "TRACEABLE_REVISION_LOOP",
@@ -124,7 +124,7 @@
     },
     {
       "claim_id": "RUNTIME_SCOPE",
-      "fact_sha256": "4da169fc10c56c221055bd565694eb5b876a35917ad57784ea6b57d2aa557592",
+      "fact_sha256": "47ea7f42bddc07d25b44ec5222d2311afef7fdc24e158ac2bede289c1d227e1c",
       "source_ids": [
         "RUNTIME_BENCHMARK"
       ],
@@ -204,7 +204,7 @@
     },
     {
       "path": "cases/n31/pitch_runbook.json",
-      "sha256": "cef91b92e26c7b663f10dcc3d18f15009fdaa0687afbea376b5ff86b3ee48892",
+      "sha256": "ac4491ab282a245c090b941060e64a4e6a01b23637426f0cc434789352d115f4",
       "source_id": "PITCH_RUNBOOK",
       "status": "PASSED"
     },
@@ -234,7 +234,7 @@
     },
     {
       "path": "output/evaluation/runtime_benchmark_dgx.json",
-      "sha256": "185cccd7f26edc54815d240698c996fcc04c6dbd4f5262a56cbdf1d6ebe57ca2",
+      "sha256": "1e0cded9d7a59b37387ca4d64668ed8cf10603042c6876362bb5a877b8bfbde7",
       "source_id": "RUNTIME_BENCHMARK",
       "status": "PASSED"
     },

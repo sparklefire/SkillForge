@@ -47,7 +47,7 @@ FORBIDDEN_PUBLIC_TEXT = (
     "Bearer ",
     "outputs/submission",
     "全部模型均在DGX本地运行",
-    "原始多模态处理仅需44.8毫秒",
+    "原始多模态处理仅需",
     "无需人工审核",
 )
 FONT_CANDIDATES = (

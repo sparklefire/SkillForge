@@ -164,7 +164,7 @@
     },
     {
       "artifact_id": "RUNTIME_BENCHMARK",
-      "bytes": 2638,
+      "bytes": 6656,
       "final_checker_role": "FINAL_REVIEWER",
       "kind": "JSON",
       "path": "output/evaluation/runtime_benchmark_dgx.json",
@@ -173,7 +173,7 @@
         "SUBMISSION_ATTACHMENT"
       ],
       "responsible_role": "TECHNICAL_OWNER",
-      "sha256": "185cccd7f26edc54815d240698c996fcc04c6dbd4f5262a56cbdf1d6ebe57ca2",
+      "sha256": "1e0cded9d7a59b37387ca4d64668ed8cf10603042c6876362bb5a877b8bfbde7",
       "status": "FROZEN_MACHINE_VERIFIED"
     },
     {
@@ -262,7 +262,7 @@
     "contains_personal_data": false,
     "contains_public_urls": false
   },
-  "generated_at": "2026-07-19T09:53:15.564304+00:00",
+  "generated_at": "2026-07-20T02:16:34.662579+00:00",
   "human_gates": [
     {
       "blocking_for_submission": true,
@@ -351,8 +351,8 @@
       "role_id": "FINAL_REVIEWER"
     }
   ],
-  "runbook_sha256": "cef91b92e26c7b663f10dcc3d18f15009fdaa0687afbea376b5ff86b3ee48892",
+  "runbook_sha256": "ac4491ab282a245c090b941060e64a4e6a01b23637426f0cc434789352d115f4",
   "status": "TECHNICAL_ARTIFACTS_FROZEN_HUMAN_GATES_PENDING",
-  "technical_freeze_digest": "edcb2d23bb075e19fb73c1cf087234b28e3228eef43ac9f1eec31c4a4ed0e4a8",
+  "technical_freeze_digest": "410017f3e31ca1fadf73fdccece2a023d8be65215efc8b30c08c7f43db97e8be",
   "version": 1
 }

@@ -618,7 +618,27 @@ def _check_runtime_benchmark(root: Path) -> dict[str, Any]:
         and report["environment"]["accelerator"] == "NVIDIA GB10",
         "twenty_measured_runs": report["configuration"]["measured_iterations"] == 20
         and len(gold.get("samples_ms", [])) == 20
-        and len(web.get("samples_ms", [])) == 20,
+        and len(web.get("samples_ms", [])) == 20
+        and gold.get("successful_iterations") == 20
+        and web.get("successful_iterations") == 20
+        and gold.get("failure_count") == 0
+        and web.get("failure_count") == 0,
+        "forty_runs_semantically_stable": report["stability"]
+        == {
+            "total_measured_iterations": 40,
+            "all_measured_iterations_succeeded": True,
+            "gold_semantics_stable": True,
+            "web_semantics_stable": True,
+            "gold_and_web_semantics_equal": True,
+            "unique_semantic_fingerprint_count": 1,
+            "semantic_fingerprint_sha256": gold.get(
+                "semantic_fingerprint_sha256"
+            ),
+        }
+        and gold.get("semantic_fingerprint_sha256")
+        == web.get("semantic_fingerprint_sha256")
+        and len(set(gold.get("semantic_fingerprints_sha256", []))) == 1
+        and len(set(web.get("semantic_fingerprints_sha256", []))) == 1,
         "gold_workflow_measured": gold.get("timing_ms", {}).get("median", 0) > 0
         and gold.get("assertions") == expected_assertions,
         "web_live_rerun_measured": web.get("timing_ms", {}).get("median", 0) > 0
@@ -631,6 +651,8 @@ def _check_runtime_benchmark(root: Path) -> dict[str, Any]:
             "credentials_accessed": False,
             "network_transport": "IN_PROCESS_ONLY",
             "contains_absolute_paths": False,
+            "network_requests": 0,
+            "automatic_human_confirmations": 0,
         },
     }
     return {
@@ -641,6 +663,9 @@ def _check_runtime_benchmark(root: Path) -> dict[str, Any]:
             "gold_workflow_median_ms": gold.get("timing_ms", {}).get("median"),
             "web_live_rerun_median_ms": web.get("timing_ms", {}).get("median"),
             "process_peak_rss_bytes": report["resources"]["process_peak_rss_bytes"],
+            "semantic_fingerprint_sha256": report["stability"][
+                "semantic_fingerprint_sha256"
+            ],
         },
     }
 

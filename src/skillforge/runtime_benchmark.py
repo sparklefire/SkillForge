@@ -19,6 +19,7 @@ from fastapi.testclient import TestClient
 
 from .contracts import validate_document
 from .demo import ROOT
+from .demo_mode_parity import semantic_fingerprint_from_directory
 from .gold_rehearsal import run_gold_rehearsal
 from .web import create_app
 
@@ -83,13 +84,15 @@ def _measure(
     warmup_iterations: int,
     measured_iterations: int,
     scratch: Path,
-) -> tuple[list[float], list[int], dict[str, Any]]:
+) -> tuple[list[float], list[int], list[str], dict[str, Any]]:
     for index in range(warmup_iterations):
-        summary, _ = operation(index, scratch / f"warmup-{index:02d}")
+        summary, written_dir = operation(index, scratch / f"warmup-{index:02d}")
         _assertions(summary)
+        semantic_fingerprint_from_directory(written_dir)
 
     samples: list[float] = []
     output_sizes: list[int] = []
+    semantic_fingerprints: list[str] = []
     last_assertions: dict[str, Any] | None = None
     for index in range(measured_iterations):
         output_dir = scratch / f"sample-{index:03d}"
@@ -99,9 +102,14 @@ def _measure(
         last_assertions = _assertions(summary)
         samples.append(round(elapsed_ms, 3))
         output_sizes.append(_output_bytes(written_dir))
+        semantic_fingerprints.append(
+            semantic_fingerprint_from_directory(written_dir)
+        )
     if last_assertions is None:
         raise ValueError("至少需要一次测量迭代")
-    return samples, output_sizes, last_assertions
+    if len(set(semantic_fingerprints)) != 1:
+        raise ValueError("同一路径多轮运行的P0语义指纹发生漂移")
+    return samples, output_sizes, semantic_fingerprints, last_assertions
 
 
 def build_runtime_benchmark(
@@ -150,18 +158,21 @@ def build_runtime_benchmark(
                 raise ValueError("Web现场重算缺少阶段运行标识")
             return summary, output_dir / "n31_stage_runs" / "runs" / run_id
 
-        gold_samples, gold_sizes, gold_assertions = _measure(
+        gold_samples, gold_sizes, gold_fingerprints, gold_assertions = _measure(
             gold_operation,
             warmup_iterations=warmup_iterations,
             measured_iterations=measured_iterations,
             scratch=scratch / "gold",
         )
-        web_samples, web_sizes, web_assertions = _measure(
+        web_samples, web_sizes, web_fingerprints, web_assertions = _measure(
             web_operation,
             warmup_iterations=warmup_iterations,
             measured_iterations=measured_iterations,
             scratch=scratch / "web",
         )
+
+    if gold_fingerprints[0] != web_fingerprints[0]:
+        raise ValueError("直接Gold与Web现场重算的P0语义指纹不一致")
 
     usage_after = resource.getrusage(resource.RUSAGE_SELF)
     report = {
@@ -189,6 +200,11 @@ def build_runtime_benchmark(
                 "samples_ms": gold_samples,
                 "timing_ms": _timing(gold_samples),
                 "mean_output_bytes": round(statistics.fmean(gold_sizes)),
+                "successful_iterations": measured_iterations,
+                "failure_count": 0,
+                "semantic_fingerprints_sha256": gold_fingerprints,
+                "unique_semantic_fingerprint_count": 1,
+                "semantic_fingerprint_sha256": gold_fingerprints[0],
                 "assertions": gold_assertions,
             },
             {
@@ -197,9 +213,23 @@ def build_runtime_benchmark(
                 "samples_ms": web_samples,
                 "timing_ms": _timing(web_samples),
                 "mean_output_bytes": round(statistics.fmean(web_sizes)),
+                "successful_iterations": measured_iterations,
+                "failure_count": 0,
+                "semantic_fingerprints_sha256": web_fingerprints,
+                "unique_semantic_fingerprint_count": 1,
+                "semantic_fingerprint_sha256": web_fingerprints[0],
                 "assertions": web_assertions,
             },
         ],
+        "stability": {
+            "total_measured_iterations": measured_iterations * 2,
+            "all_measured_iterations_succeeded": True,
+            "gold_semantics_stable": True,
+            "web_semantics_stable": True,
+            "gold_and_web_semantics_equal": True,
+            "unique_semantic_fingerprint_count": 1,
+            "semantic_fingerprint_sha256": gold_fingerprints[0],
+        },
         "resources": {
             "measurement_scope": "BENCHMARK_PROCESS_HIGH_WATERMARK",
             "process_peak_rss_bytes": _peak_rss_bytes(usage_after),
@@ -212,6 +242,8 @@ def build_runtime_benchmark(
             "credentials_accessed": False,
             "network_transport": "IN_PROCESS_ONLY",
             "contains_absolute_paths": False,
+            "network_requests": 0,
+            "automatic_human_confirmations": 0,
         },
     }
     return validate_document(report, "runtime_benchmark.schema.json")

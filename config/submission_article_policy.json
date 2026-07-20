@@ -34,7 +34,7 @@
   "allowed_repository_url_prefix": "https://github.com/sparklefire/SkillForge",
   "forbidden_phrases": [
     "全部模型均在DGX本地运行",
-    "原始多模态处理仅需44.8毫秒",
+    "原始多模态处理仅需",
     "无需人工审核",
     "完全自动生成Gold",
     "100%安全",

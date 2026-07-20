@@ -94,13 +94,13 @@
       "start_ms": 140000,
       "end_ms": 160000,
       "surface": "PPT",
-      "speaker_script": "真实Gold评测中，步骤和证据覆盖从90%升至100%，严重错误从5降到0；DGX上20次结构化现场重算中位约45毫秒。多源消融显示，手册80%、口述90%，联合才到100%。",
+      "speaker_script": "真实Gold评测中，步骤和证据覆盖从90%升至100%，严重错误从5降到0；DGX上直接Gold与Web现场重算各20次，共40轮全部成功，P0语义指纹始终一致。多源消融显示，手册80%、口述90%，联合才到100%。",
       "operator_action": "切回结果页，强调前后指标和多源消融。",
       "proof_points": [
         "required_step_coverage 90%→100%",
         "evidence_supported_required_steps 90%→100%",
         "manual_only 80%，expert_audio_only 90%，two_or_more_source_types 100%",
-        "DGX WEB_LIVE_RERUN 20次中位44.800毫秒；不包含原始素材预处理"
+        "DGX DIRECT_PYTHON与WEB_LIVE_RERUN各20次，共40轮成功且唯一P0语义指纹1个；不包含原始素材预处理"
       ],
       "fallback": "直接口述三组数值；它们同时保存在Gold summary与多源评测JSON中。"
     },

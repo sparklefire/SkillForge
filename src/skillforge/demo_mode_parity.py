@@ -38,6 +38,12 @@ EXPECTED_CONFLICT_KINDS = (
     "UNSUPPORTED_PARAMETER",
     "UNSUPPORTED_TOOL",
 )
+SEMANTIC_FINGERPRINT_KEYS = (
+    "summary_projection_sha256",
+    "final_step_projection_sha256",
+    "initial_conflict_projection_sha256",
+    "revision_projection_sha256",
+)
 RefreshRunner = Callable[[Path], None]
 
 
@@ -238,6 +244,20 @@ def _analyze_mode(
     }
 
 
+def semantic_fingerprint_from_directory(directory: Path) -> str:
+    """Return the stable P0 semantics fingerprint for one completed run."""
+
+    analysis = _analyze_mode(
+        "live",
+        1,
+        "RECOMPUTED_FROM_GOLD",
+        directory.expanduser().resolve(),
+    )
+    return _canonical_sha256(
+        {key: analysis[key] for key in SEMANTIC_FINGERPRINT_KEYS}
+    )
+
+
 def _refresh_preprocessed(root: Path) -> None:
     environment = os.environ.copy()
     environment["SKILLFORGE_OFFLINE_OCR"] = "1"
@@ -297,13 +317,7 @@ def build_demo_mode_parity(
             ),
         ]
 
-    fingerprint_keys = (
-        "summary_projection_sha256",
-        "final_step_projection_sha256",
-        "initial_conflict_projection_sha256",
-        "revision_projection_sha256",
-    )
-    for key in fingerprint_keys:
+    for key in SEMANTIC_FINGERPRINT_KEYS:
         if len({item[key] for item in modes}) != 1:
             raise DemoModeParityError("三种演示模式的核心语义结果不一致")
     document = {

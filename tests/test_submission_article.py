@@ -82,7 +82,7 @@ def test_missing_heading_or_metric_claim_is_rejected() -> None:
     "phrase",
     [
         "全部模型均在DGX本地运行",
-        "原始多模态处理仅需44.8毫秒",
+        "原始多模态处理仅需179.826毫秒",
         "无需人工审核",
         "完全自动生成Gold",
         "100%安全",

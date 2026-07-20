@@ -14,6 +14,7 @@
     "environment",
     "configuration",
     "benchmarks",
+    "stability",
     "resources",
     "data_policy"
   ],
@@ -71,6 +72,28 @@
         }
       ]
     },
+    "stability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "total_measured_iterations",
+        "all_measured_iterations_succeeded",
+        "gold_semantics_stable",
+        "web_semantics_stable",
+        "gold_and_web_semantics_equal",
+        "unique_semantic_fingerprint_count",
+        "semantic_fingerprint_sha256"
+      ],
+      "properties": {
+        "total_measured_iterations": {"type": "integer", "minimum": 2, "maximum": 200},
+        "all_measured_iterations_succeeded": {"const": true},
+        "gold_semantics_stable": {"const": true},
+        "web_semantics_stable": {"const": true},
+        "gold_and_web_semantics_equal": {"const": true},
+        "unique_semantic_fingerprint_count": {"const": 1},
+        "semantic_fingerprint_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
     "resources": {
       "type": "object",
       "additionalProperties": false,
@@ -95,18 +118,23 @@
         "raw_media_processed",
         "credentials_accessed",
         "network_transport",
-        "contains_absolute_paths"
+        "contains_absolute_paths",
+        "network_requests",
+        "automatic_human_confirmations"
       ],
       "properties": {
         "external_model_calls": {"const": 0},
         "raw_media_processed": {"const": false},
         "credentials_accessed": {"const": false},
         "network_transport": {"const": "IN_PROCESS_ONLY"},
-        "contains_absolute_paths": {"const": false}
+        "contains_absolute_paths": {"const": false},
+        "network_requests": {"const": 0},
+        "automatic_human_confirmations": {"const": 0}
       }
     }
   },
   "$defs": {
+    "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
     "benchmark": {
       "type": "object",
       "additionalProperties": false,
@@ -116,6 +144,11 @@
         "samples_ms",
         "timing_ms",
         "mean_output_bytes",
+        "successful_iterations",
+        "failure_count",
+        "semantic_fingerprints_sha256",
+        "unique_semantic_fingerprint_count",
+        "semantic_fingerprint_sha256",
         "assertions"
       ],
       "properties": {
@@ -139,6 +172,16 @@
           }
         },
         "mean_output_bytes": {"type": "integer", "minimum": 1},
+        "successful_iterations": {"type": "integer", "minimum": 1, "maximum": 100},
+        "failure_count": {"const": 0},
+        "semantic_fingerprints_sha256": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 100,
+          "items": {"$ref": "#/$defs/sha256"}
+        },
+        "unique_semantic_fingerprint_count": {"const": 1},
+        "semantic_fingerprint_sha256": {"$ref": "#/$defs/sha256"},
         "assertions": {
           "type": "object",
           "additionalProperties": false,

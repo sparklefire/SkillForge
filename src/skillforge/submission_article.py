@@ -174,6 +174,7 @@ def _claim_checks(article: str, sources: dict[str, Any]) -> list[dict[str, Any]]
     runtime_items = {
         item.get("benchmark_id"): item for item in runtime.get("benchmarks", [])
     }
+    gold_runtime = runtime_items.get("GOLD_WORKFLOW", {})
     web_runtime = runtime_items.get("WEB_LIVE_RERUN", {})
     ablation = multisource.get("source_ablation", {})
     modes = runbook.get("demo_modes", [])
@@ -370,23 +371,42 @@ def _claim_checks(article: str, sources: dict[str, Any]) -> list[dict[str, Any]]
             claim_id="RUNTIME_SCOPE",
             source_ids=["RUNTIME_BENCHMARK"],
             facts={
-                "median_ms": web_runtime.get("timing_ms", {}).get("median"),
                 "measured_iterations": runtime.get("configuration", {}).get(
                     "measured_iterations"
                 ),
                 "warmup_iterations": runtime.get("configuration", {}).get(
                     "warmup_iterations"
                 ),
+                "total_measured_iterations": runtime.get("stability", {}).get(
+                    "total_measured_iterations"
+                ),
+                "unique_semantic_fingerprint_count": runtime.get(
+                    "stability", {}
+                ).get("unique_semantic_fingerprint_count"),
+                "gold_failure_count": gold_runtime.get("failure_count"),
+                "web_failure_count": web_runtime.get("failure_count"),
                 "raw_media_processed": runtime.get("data_policy", {}).get(
                     "raw_media_processed"
                 ),
             },
-            valid=web_runtime.get("timing_ms", {}).get("median") == 44.8
-            and runtime.get("configuration", {}).get("measured_iterations") == 20
+            valid=runtime.get("configuration", {}).get("measured_iterations") == 20
             and runtime.get("configuration", {}).get("warmup_iterations") == 2
+            and runtime.get("stability", {}).get("total_measured_iterations") == 40
+            and runtime.get("stability", {}).get(
+                "unique_semantic_fingerprint_count"
+            )
+            == 1
+            and runtime.get("stability", {}).get(
+                "gold_and_web_semantics_equal"
+            )
+            is True
+            and gold_runtime.get("successful_iterations") == 20
+            and web_runtime.get("successful_iterations") == 20
+            and gold_runtime.get("failure_count") == 0
+            and web_runtime.get("failure_count") == 0
             and runtime.get("data_policy", {}).get("raw_media_processed") is False,
             fragments=[
-                "Web现场重算中位数为44.8毫秒",
+                "直接Gold与Web现场重算各20次，共40轮全部成功且唯一P0语义指纹为1个",
                 "这个数值不包含原始视频、PDF或录音的预处理",
             ],
         ),
