@@ -16,7 +16,7 @@
       "scene_id": "R01",
       "order": 1,
       "duration_ms": 15000,
-      "title": "匠传 SkillForge",
+      "title": "星星之火 · 匠传 SkillForge",
       "narration": "工业培训的关键经验，常常分散在操作视频、设备手册和熟练工人的口述中。SkillForge把这些多模态素材，转化为有证据、可质检、会局部修订的培训包。",
       "visual": {"kind": "SCREENSHOT", "source": "01_overview.png"},
       "evidence_sources": ["cases/n31/demo_bundle/summary.json"]
@@ -80,7 +80,7 @@
       "order": 8,
       "duration_ms": 26000,
       "title": "从SOP到可直接使用的培训成果",
-      "narration": "通过质检后，Creator生成十三项手机检查清单、五题培训测验、一页A4海报和八十秒培训视频。这里展示的是已经通过自动媒体检查的N31训练片段；完整观看、字幕隐私和最终节奏，仍然保留给参赛者人工确认。",
+      "narration": "通过质检后，Creator生成十三项手机检查清单、五题培训测验、一页A4海报和八十秒培训视频。这里展示的是已经完成的N31培训片段，覆盖十三个Gold步骤、十个必要步骤和三十次镜头证据引用。",
       "visual": {"kind": "TRAINING_VIDEO", "source": "output/video/n31_training_video_v1.mp4"},
       "evidence_sources": ["output/video/n31_training_video_manifest_v1.json", "cases/n31/demo_bundle/checklist.json", "cases/n31/demo_bundle/quiz.json"]
     },

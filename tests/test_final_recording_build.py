@@ -11,6 +11,8 @@ from PIL import Image
 from skillforge.contracts import validate_document
 from skillforge.final_recording_build import (
     FinalRecordingBuildError,
+    PUBLIC_RECORDING_FOOTER,
+    PUBLIC_RECORDING_KICKER,
     _atempo_chain,
     _sequence_distance,
     load_storyboard,
@@ -33,6 +35,15 @@ def test_frozen_storyboard_is_strict_public_and_exact() -> None:
     ]
     assert storyboard["tts"]["text_only"] is True
     assert storyboard["data_policy"]["automatic_human_approval"] is False
+    assert storyboard["scenes"][0]["title"] == "星星之火 · 匠传 SkillForge"
+    assert "人工确认" not in storyboard["scenes"][7]["narration"]
+
+
+def test_public_recording_overlay_uses_team_identity_without_draft_label() -> None:
+    assert PUBLIC_RECORDING_KICKER == "星星之火 · SKILLFORGE"
+    assert "候选" not in PUBLIC_RECORDING_KICKER
+    assert "候选" not in PUBLIC_RECORDING_FOOTER
+    assert "机器QA" not in PUBLIC_RECORDING_FOOTER
 
 
 def test_storyboard_rejects_private_text_and_visual_substitution() -> None:

@@ -22,6 +22,10 @@ from .media import MediaProcessingError, probe_media, resolve_ffmpeg
 from .training_video import StepAudioTTSClient
 
 
+PUBLIC_RECORDING_KICKER = "星星之火 · SKILLFORGE"
+PUBLIC_RECORDING_FOOTER = "真实N31案例 · DGX Spark本地计算 · 证据驱动局部修订"
+
+
 DEFAULT_STORYBOARD = ROOT / "config/final_recording_storyboard.json"
 DEFAULT_PRIVATE_ROOT = ROOT / "outputs/submission"
 DEFAULT_ASSETS = DEFAULT_PRIVATE_ROOT / "final_recording_assets"
@@ -223,7 +227,7 @@ def _draw_overlay(
     draw.rectangle((76, 36, 84, 132), fill=(130, 235, 164, 255))
     draw.text(
         (108, 32),
-        f"SKILLFORGE 最终录屏候选 · {scene['order']}/9",
+        f"{PUBLIC_RECORDING_KICKER} · {scene['order']}/9",
         font=kicker_font,
         fill=(139, 225, 171, 255),
     )
@@ -235,7 +239,7 @@ def _draw_overlay(
         y += 52
     draw.text(
         (105, 1038),
-        "候选成片 · 机器QA不替代完整人工观看",
+        PUBLIC_RECORDING_FOOTER,
         font=kicker_font,
         fill=(211, 172, 88, 255),
     )
