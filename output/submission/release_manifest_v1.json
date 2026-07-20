@@ -232,7 +232,7 @@
     },
     {
       "artifact_id": "PITCH_DECK",
-      "bytes": 1464192,
+      "bytes": 1462651,
       "final_checker_role": "FINAL_REVIEWER",
       "kind": "PPTX",
       "path": "output/presentation/SkillForge_三分钟路演_v1.pptx",
@@ -241,7 +241,7 @@
         "DEMO_RUNTIME"
       ],
       "responsible_role": "DEMO_OPERATOR",
-      "sha256": "5178e64c947b5965f82f98acfb0d13bb304e14d7cf7c0ac5c3d63609c2d73c66",
+      "sha256": "9878027fde7cf3714af577363a4404f8356328316c85eb9272aa2c3d70b31481",
       "status": "FROZEN_MACHINE_VERIFIED"
     }
   ],
@@ -262,7 +262,7 @@
     "contains_personal_data": false,
     "contains_public_urls": false
   },
-  "generated_at": "2026-07-20T02:16:34.662579+00:00",
+  "generated_at": "2026-07-20T04:45:41.627662+00:00",
   "human_gates": [
     {
       "blocking_for_submission": true,
@@ -353,6 +353,6 @@
   ],
   "runbook_sha256": "ac4491ab282a245c090b941060e64a4e6a01b23637426f0cc434789352d115f4",
   "status": "TECHNICAL_ARTIFACTS_FROZEN_HUMAN_GATES_PENDING",
-  "technical_freeze_digest": "410017f3e31ca1fadf73fdccece2a023d8be65215efc8b30c08c7f43db97e8be",
+  "technical_freeze_digest": "202dade8e7b3034a15d17f54c7f30b53d2660cd705eb9694f88da422fb1787c4",
   "version": 1
 }

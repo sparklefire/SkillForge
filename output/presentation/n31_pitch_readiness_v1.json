@@ -115,7 +115,7 @@
         },
         {
           "artifact_id": "PITCH_DECK",
-          "detail": "1464192 bytes · sha256=5178e64c947b5965f82f98acfb0d13bb304e14d7cf7c0ac5c3d63609c2d73c66",
+          "detail": "1462651 bytes · sha256=9878027fde7cf3714af577363a4404f8356328316c85eb9272aa2c3d70b31481",
           "path": "output/presentation/SkillForge_三分钟路演_v1.pptx",
           "status": "PASSED"
         }
@@ -191,7 +191,7 @@
   ],
   "contains_credentials": false,
   "contains_raw_media": false,
-  "generated_at": "2026-07-20T02:16:28.637008+00:00",
+  "generated_at": "2026-07-20T04:45:41.449462+00:00",
   "pending_human_gates": [
     "TRAINING_VIDEO_FULL_WATCH",
     "FINAL_STAGE_REHEARSAL",
