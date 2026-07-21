@@ -686,6 +686,21 @@ def _rehearsal_ppt_hint() -> str:
     return "output/presentation/ 目录下最新版路演PPT（v2）"
 
 
+def _surface_flow(runbook: dict[str, Any]) -> str:
+    runs: list[tuple[str, int, int]] = []
+    for index, segment in enumerate(runbook["segments"], start=1):
+        surface = str(segment["surface"])
+        if runs and runs[-1][0] == surface:
+            runs[-1] = (surface, runs[-1][1], index)
+        else:
+            runs.append((surface, index, index))
+    parts = []
+    for surface, first, last in runs:
+        span = f"第{first}段" if first == last else f"第{first}-{last}段"
+        parts.append(f"{surface}({span})")
+    return " → ".join(parts)
+
+
 def _interactive_rehearsal() -> dict[str, Any]:
     _require_tty()
     runbook = load_runbook()
@@ -697,6 +712,7 @@ def _interactive_rehearsal() -> dict[str, Any]:
         f"  1. PPT：演示模式打开 {_rehearsal_ppt_hint()}，停在第1页\n"
         "  2. Web：浏览器打开 http://127.0.0.1:17860；若无法访问，另开终端运行 bash scripts/dgx_demo_tunnel.sh\n"
         "  3. 布局：PPT与浏览器各占半屏（或Alt+Tab切换）；界面说明：PPT=演示文稿窗口，WEB=浏览器页面\n"
+        f"  界面顺序：{_surface_flow(runbook)}\n"
         "  4. 不用录音、不用录屏——正式录屏已通过审核，本次只练节奏和切换\n"
         f"  5. 计时自动进行：每段讲完按一次回车即可，建议全程落在{total_seconds - 5}~{total_seconds}秒\n"
         "  6. 讲解词已写入PPT备注（演示者视图可见），下面再列一份供对照\n"

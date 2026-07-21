@@ -204,7 +204,7 @@
     },
     {
       "path": "cases/n31/pitch_runbook.json",
-      "sha256": "e2404bc234e8d626b3cf1fbe16bb9cd0a3fa67b8a401fbcc0f4781a9b5e237e2",
+      "sha256": "3d59adbdbb166437c957860a4785e1902e417e0aaadcf746da6dbeff6ba88634",
       "source_id": "PITCH_RUNBOOK",
       "status": "PASSED"
     },
