@@ -18,6 +18,7 @@ from pathlib import Path
 from typing import Any, Callable
 
 from .contracts import ContractValidationError, validate_document
+from .demo import ROOT
 from .final_recording_review import (
     DEFAULT_BUILD_REPORT,
     DEFAULT_INPUT as DEFAULT_FINAL_RECORDING_INPUT,
@@ -46,9 +47,11 @@ from .final_rehearsal import (
     verify_final_rehearsal,
     verify_final_rehearsal_document,
 )
+from .human_gates import HumanGateError, HumanGateStore
 from .training_video_review import (
     DEFAULT_INPUT as DEFAULT_TRAINING_INPUT,
     DEFAULT_MANIFEST,
+    DEFAULT_PRIVATE_ROOT,
     DEFAULT_REPORT as DEFAULT_TRAINING_REPORT,
     DEFAULT_VIDEO,
     MAXIMUM_WATCH_ELAPSED_MS,
@@ -517,6 +520,50 @@ def prepare_pending_reviews() -> dict[str, str]:
     return actions
 
 
+_GATE_BY_REVIEW = {
+    "training_video": "TRAINING_VIDEO_FULL_WATCH",
+    "final_recording": "FINAL_RECORDING_REVIEW",
+    "final_rehearsal": "FINAL_STAGE_REHEARSAL",
+}
+
+
+def _gate_audit_state() -> tuple[set[str], str]:
+    """Read-only lookup of currently confirmed gates for status guidance.
+
+    Returns ``(confirmed_gate_ids, store_state)``. Never raises: any failure
+    degrades to an empty confirmed set with state ``UNKNOWN`` so the status
+    summary stays available even when the private store is absent.
+    """
+    try:
+        private_root = DEFAULT_PRIVATE_ROOT
+        store = HumanGateStore(
+            private_root / "human_gate_confirmations.json",
+            runbook_path=DEFAULT_RUNBOOK,
+            final_recording_qa_path=DEFAULT_MACHINE_QA,
+            final_recording_review_path=DEFAULT_FINAL_RECORDING_INPUT,
+            final_recording_review_qa_path=DEFAULT_FINAL_RECORDING_REPORT,
+            final_recording_path=DEFAULT_RECORDING,
+            final_recording_build_path=DEFAULT_BUILD_REPORT,
+            final_recording_storyboard_path=DEFAULT_STORYBOARD,
+            final_recording_policy_path=DEFAULT_FINAL_RECORDING_POLICY,
+            final_rehearsal_qa_path=DEFAULT_REHEARSAL_REPORT,
+            team_roster_path=private_root / "team_roster.json",
+            training_video_review_qa_path=DEFAULT_TRAINING_REPORT,
+            training_video_manifest_path=DEFAULT_MANIFEST,
+            training_video_path=DEFAULT_VIDEO,
+            official_rules_review_qa_path=private_root
+            / "official_rules_review_qa.json",
+            official_rules_snapshot_path=ROOT
+            / "config"
+            / "official_rules_status.json",
+        )
+        audit = store.audit()
+        confirmed = set(audit["confirmed_gate_ids"]) if audit["valid"] else set()
+        return confirmed, str(audit["store_state"])
+    except (HumanGateError, ContractValidationError, OSError, KeyError, ValueError):
+        return set(), "UNKNOWN"
+
+
 def review_status() -> dict[str, Any]:
     items = {
         "training_video": (
@@ -535,6 +582,7 @@ def review_status() -> dict[str, Any]:
             DEFAULT_RECORDING,
         ),
     }
+    confirmed_gates, gate_store_state = _gate_audit_state()
     result: dict[str, Any] = {}
     for name, (record, report, basis) in items.items():
         status = "ABSENT"
@@ -547,10 +595,12 @@ def review_status() -> dict[str, Any]:
             "record_status": status,
             "qa_present": report.is_file(),
             "basis_present": basis.is_file(),
+            "gate_confirmed": _GATE_BY_REVIEW[name] in confirmed_gates,
         }
     return {
         "status": "HUMAN_ACTION_REQUIRED",
         "automatic_human_confirmations": 0,
+        "gate_store_state": gate_store_state,
         "items": result,
     }
 
@@ -566,21 +616,32 @@ _STATUS_DONE = {"FINAL_APPROVED", "READY_FOR_CHECK"}
 def _print_status_guidance(result: dict[str, Any]) -> None:
     """Print a human-readable Chinese summary to stderr; stdout JSON stays unchanged."""
     items = result.get("items", {})
+    store_state = result.get("gate_store_state", "UNKNOWN")
     lines = ["── 人工审核状态（仅供本人阅读，不会自动通过任何门禁）──"]
     pending: list[str] = []
     for key, (label, action) in _STATUS_LABELS.items():
         entry = items.get(key, {})
         status = entry.get("record_status", "ABSENT")
+        command = f"bash scripts/run_guided_human_review.sh {action}"
         if status in _STATUS_DONE and entry.get("qa_present"):
-            lines.append(f"✅ {label}：已完成")
+            if entry.get("gate_confirmed"):
+                lines.append(f"✅ {label}：已完成")
+            else:
+                lines.append(f"⚠️ {label}：审核记录仍在，但门禁确认已失效，需重新确认")
+                pending.append(command)
         else:
             lines.append(f"⏳ {label}：待完成（当前状态 {status}）")
-            pending.append(f"bash scripts/run_guided_human_review.sh {action}")
+            pending.append(command)
+    if store_state == "STALE":
+        lines.append(
+            "提示：运行单已变化，先运行 bash scripts/manage_human_gates.sh reset-stale"
+            " --reviewer 你的姓名 --note 重置原因 以清空过期确认。"
+        )
     if pending:
         lines.append("下一步（在本机交互式终端依次运行）：")
         lines.extend(f"  {command}" for command in pending)
     else:
-        lines.append("三项人工审核均已完成。")
+        lines.append("三项人工审核均已完成并确认。")
     print("\n".join(lines), file=sys.stderr)
 
 
@@ -643,8 +704,96 @@ def _require_tty() -> None:
         raise GuidedHumanReviewError("引导式人工审核必须在交互式终端运行")
 
 
+_MEDIA_REVIEW_PROFILE = {
+    "training-video": {
+        "gate_id": "TRAINING_VIDEO_FULL_WATCH",
+        "record_path": DEFAULT_TRAINING_INPUT,
+        "qa_path": DEFAULT_TRAINING_REPORT,
+        "label": "80秒培训视频观看审核",
+        "initialize": initialize_training_video_review,
+    },
+    "final-recording": {
+        "gate_id": "FINAL_RECORDING_REVIEW",
+        "record_path": DEFAULT_FINAL_RECORDING_INPUT,
+        "qa_path": DEFAULT_FINAL_RECORDING_REPORT,
+        "label": "最终录屏观看审核",
+        "initialize": initialize_final_recording_review,
+    },
+}
+
+
+def _archive_private_file(path: Path) -> Path | None:
+    """Move a private review artifact aside with a UTC timestamp suffix."""
+    if not path.exists():
+        return None
+    timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    archived = path.with_name(f"{path.name}.archived-{timestamp}")
+    path.rename(archived)
+    return archived
+
+
+def _media_review_preflight(kind: str) -> dict[str, Any] | None:
+    """Handle completed-but-unconfirmed media reviews before replaying.
+
+    Returns a result dict when the interactive flow should stop early
+    (gate already confirmed, or the user declined a redo); returns None
+    when the flow should continue. Raises GuidedHumanReviewError when a
+    stale seal must be reset before any redo is meaningful.
+    """
+    profile = _MEDIA_REVIEW_PROFILE[kind]
+    record_path: Path = profile["record_path"]
+    qa_path: Path = profile["qa_path"]
+    status = "ABSENT"
+    if record_path.is_file():
+        try:
+            status = _read_json(record_path, "私有草稿").get("status", "INVALID")
+        except GuidedHumanReviewError:
+            status = "INVALID"
+    if not (status in _STATUS_DONE or qa_path.exists()):
+        return None
+    confirmed_gates, store_state = _gate_audit_state()
+    if profile["gate_id"] in confirmed_gates:
+        print(f"✅ {profile['label']}已完成并且门禁已确认，无需重复观看。")
+        return {
+            "status": "ALREADY_CONFIRMED",
+            "review_type": profile["gate_id"],
+            "automatic_human_confirmations": 0,
+        }
+    if store_state == "STALE":
+        raise GuidedHumanReviewError(
+            "运行单已变化且门禁密封尚未重置；请先运行 bash scripts/manage_human_gates.sh "
+            "reset-stale --reviewer 你的姓名 --note 重置原因 后重试"
+        )
+    print(
+        f"⚠️ {profile['label']}记录已完成，但门禁确认已失效"
+        "（通常因为运行单更新后系统按约定使旧确认过期）。"
+    )
+    if not _confirm("是否将旧记录和QA归档后重新观看并确认？"):
+        print("已取消；旧记录保持不变。")
+        return {
+            "status": "CANCELLED_BY_USER",
+            "review_type": profile["gate_id"],
+            "automatic_human_confirmations": 0,
+        }
+    archived = [
+        str(item)
+        for item in (
+            _archive_private_file(record_path),
+            _archive_private_file(qa_path),
+        )
+        if item is not None
+    ]
+    if not record_path.exists():
+        profile["initialize"]()
+    print("旧文件已归档：" + ("；".join(archived) if archived else "无"))
+    return None
+
+
 def _interactive_media(kind: str, player: str | None) -> dict[str, Any]:
     _require_tty()
+    early = _media_review_preflight(kind)
+    if early is not None:
+        return early
     if kind == "training-video":
         print("即将全屏播放80秒培训视频。不要拖动进度；播放结束后逐项回答。")
         playback = run_ffplay(DEFAULT_VIDEO, "SkillForge 80秒培训视频审核", player=player)
@@ -761,6 +910,38 @@ def _interactive_rehearsal() -> dict[str, Any]:
     }
 
 
+_CONFIRM_HINTS = {
+    "training-video": (
+        "TRAINING_VIDEO_FULL_WATCH",
+        "outputs/submission/training_video_review.json",
+    ),
+    "final-recording": (
+        "FINAL_RECORDING_REVIEW",
+        "outputs/submission/skillforge_final_recording.mp4",
+    ),
+    "final-rehearsal": (
+        "FINAL_STAGE_REHEARSAL",
+        "outputs/submission/final_stage_rehearsal.json",
+    ),
+}
+
+
+def _print_confirm_hint(action: str, result: dict[str, Any]) -> None:
+    """After a successful review, show the explicit gate confirmation command."""
+    if action not in _CONFIRM_HINTS:
+        return
+    if result.get("status") not in {"READY_FOR_CHECK", "FINAL_APPROVED"}:
+        return
+    gate_id, evidence = _CONFIRM_HINTS[action]
+    print(
+        "── 下一步：显式确认门禁（本工具不会自动确认）──\n"
+        f"  bash scripts/manage_human_gates.sh confirm --gate {gate_id}"
+        f" --reviewer 你的姓名 --evidence-file {evidence}"
+        " --note 已重新观看并确认无问题",
+        file=sys.stderr,
+    )
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -823,6 +1004,8 @@ def main() -> int:
     print(json.dumps(result, ensure_ascii=False, sort_keys=True))
     if args.action == "status":
         _print_status_guidance(result)
+    else:
+        _print_confirm_hint(args.action, result)
     return 0
 
 
