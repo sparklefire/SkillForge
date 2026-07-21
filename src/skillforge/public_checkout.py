@@ -510,11 +510,13 @@ def main() -> int:
             allow_dirty=args.allow_dirty,
         )
     except (ContractValidationError, OSError, PublicCheckoutError) as exc:
+        reason = str(exc) or "公开纯净检出复现失败"
+        print(f"❌ 公开纯净检出复现失败：{reason}", file=sys.stderr)
         print(
             json.dumps(
                 {
                     "status": "ERROR",
-                    "message": "公开纯净检出复现失败",
+                    "message": reason,
                     "error_type": type(exc).__name__,
                 },
                 ensure_ascii=False,
