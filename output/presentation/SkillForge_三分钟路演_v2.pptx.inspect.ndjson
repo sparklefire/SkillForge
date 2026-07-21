@@ -1,0 +1,226 @@
+{"kind":"deck","id":"pr/aqcwho","name":"Deck"}
+{"kind":"layout","layoutId":"/ppt/slideMasters/slideMaster1.xml","name":"Master","type":"master"}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout1.xml","name":"Title Slide","type":"title"}
+{"kind":"slide","id":"sl/y90nupkv","slide":1,"title":"NVIDIA DGX SPARK 黑客松 2026 · 星星之火","textShapes":5}
+{"kind":"shape","id":"sh/547294r6","slide":1,"name":"cover-white","bbox":[0,26.9,685,720]}
+{"kind":"shape","id":"sh/k3yl0zql","slide":1,"name":"cover-accent","bbox":[44,126,92,8]}
+{"kind":"textbox","id":"sh/7qp4be9c","slide":1,"name":"cover-kicker","text":"NVIDIA DGX SPARK 黑客松 2026 · 星星之火","textPreview":"NVIDIA DGX SPARK 黑客松 2026 · 星星之火","textChars":32,"textLines":1,"bbox":[44,44,560,28]}
+{"kind":"textbox","id":"sh/65g3298r","slide":1,"name":"cover-title","text":"SkillForge\n匠传","textPreview":"SkillForge | 匠传","textChars":13,"textLines":2,"bbox":[44,160,560,205]}
+{"kind":"textbox","id":"sh/ts7md4r2","slide":1,"name":"cover-subtitle","text":"不让关键操作随人员流动而失真\n让专家经验成为可追溯、可验证、会自我修订的培训能力","textPreview":"不让关键操作随人员流动而失真 | 让专家经验成为可追溯、可验证、会自我修订的培训能力","textChars":40,"textLines":2,"bbox":[44,407,580,96]}
+{"kind":"shape","id":"sh/sryl4zqx","slide":1,"name":"cover-chip","bbox":[44,594,446,54]}
+{"kind":"textbox","id":"sh/fu94fe98","slide":1,"name":"cover-chip-text","text":"视频、手册、口述 → 可执行培训","textPreview":"视频、手册、口述 → 可执行培训","textChars":16,"textLines":1,"bbox":[66,608,405,26]}
+{"kind":"textbox","id":"sh/utg3698n","slide":1,"name":"cover-page","text":"01 / 08","textPreview":"01 / 08","textChars":7,"textLines":1,"bbox":[540,682,72,18]}
+{"kind":"image","id":"im/jqxw72dk","slide":1,"name":"N31真实案例画面","geometry":"roundRect","bbox":[640,0,640,720]}
+{"kind":"notes","id":"nt/y90nupkv","slide":1,"text":"大家好，我们是星星之火，参加 NVIDIA DGX SPARK 黑客松 2026。\n\n我们想解决的不是“如何再生成一份教程”，而是如何让关键操作经验真正留在组织里。专家离开、人员换班或设备升级后，如果步骤没有证据、无法验证，也无法在发现问题后修订，培训就会失真。\n\nSkillForge 把专家操作视频、设备手册和口述经验，转成可执行、可追溯、可验证、会自我修订的培训能力：每一步能回源，每个问题可复检，每次修改可审计。"}
+{"kind":"slide","id":"sl/hwbqtkby","slide":2,"title":"REAL OPERATION · REAL FAILURE MODES","textShapes":19}
+{"kind":"textbox","id":"sh/u94fqp4n","slide":2,"name":"kicker-2","text":"REAL OPERATION · REAL FAILURE MODES","textPreview":"REAL OPERATION · REAL FAILURE MODES","textChars":35,"textLines":1,"bbox":[44,30,620,22]}
+{"kind":"textbox","id":"sh/9072xkry","slide":2,"name":"title-2","text":"一次“换纸”，知识却散落在三种来源里","textPreview":"一次“换纸”，知识却散落在三种来源里","textChars":18,"textLines":1,"bbox":[44,57,1120,66]}
+{"kind":"textbox","id":"sh/ozy1ofad","slide":2,"name":"number-2","text":"02","textPreview":"02","textChars":2,"textLines":1,"bbox":[1180,34,56,24]}
+{"kind":"shape","id":"sh/b29kza94","slide":2,"name":"problem-left","bbox":[44,144,412,482]}
+{"kind":"textbox","id":"sh/a10jqpsj","slide":2,"name":"problem-claim","text":"普通内容生成\n能写教程，\n却无法证明\n“为什么这样做”","textPreview":"普通内容生成 | 能写教程， | 却无法证明 | “为什么这样做”","textChars":27,"textLines":4,"bbox":[72,174,350,184]}
+{"kind":"shape","id":"sh/x4r21kru","slide":2,"name":"problem-divider","bbox":[72,386,90,5]}
+{"kind":"textbox","id":"sh/w3i1sfa9","slide":2,"name":"problem-hidden","text":"最容易漏掉的不是大动作","textPreview":"最容易漏掉的不是大动作","textChars":11,"textLines":1,"bbox":[72,414,340,32]}
+{"kind":"textbox","id":"sh/r65knqtk","slide":2,"name":"problem-one","text":"01  导纸夹宽度与居中","textPreview":"01  导纸夹宽度与居中","textChars":12,"textLines":1,"bbox":[72,466,330,28]}
+{"kind":"textbox","id":"sh/q5wjelsz","slide":2,"name":"problem-two","text":"02  缝标介质学习","textPreview":"02  缝标介质学习","textChars":10,"textLines":1,"bbox":[72,510,330,28]}
+{"kind":"textbox","id":"sh/ove9o7yd","slide":2,"name":"problem-three","text":"03  试印与完成验收","textPreview":"03  试印与完成验收","textChars":11,"textLines":1,"bbox":[72,554,330,28]}
+{"kind":"shape","id":"sh/mtwrmxg7","slide":2,"name":"source-video","bbox":[490,514,228,112]}
+{"kind":"shape","id":"sh/nu58f2hs","slide":2,"name":"source-manual","bbox":[749,514,228,112]}
+{"kind":"shape","id":"sh/wjy9sry9","slide":2,"name":"source-audio","bbox":[1008,514,228,112]}
+{"kind":"textbox","id":"sh/xk7qlczu","slide":2,"name":"source-video-n","text":"01","textPreview":"01","textChars":2,"textLines":1,"bbox":[510,534,44,24]}
+{"kind":"textbox","id":"sh/ahwrqhgj","slide":2,"name":"source-video-t","text":"专家操作视频","textPreview":"专家操作视频","textChars":6,"textLines":1,"bbox":[510,565,188,26]}
+{"kind":"textbox","id":"sh/bip8jmho","slide":2,"name":"source-video-l","text":"绑定视频时间点","textPreview":"绑定视频时间点","textChars":7,"textLines":1,"bbox":[510,596,188,20]}
+{"kind":"textbox","id":"sh/cnupgny5","slide":2,"name":"source-manual-n","text":"02","textPreview":"02","textChars":2,"textLines":1,"bbox":[769,534,44,24]}
+{"kind":"textbox","id":"sh/do3q9szq","slide":2,"name":"source-manual-t","text":"设备 PDF","textPreview":"设备 PDF","textChars":6,"textLines":1,"bbox":[769,565,188,26]}
+{"kind":"textbox","id":"sh/t8byxkn2","slide":2,"name":"source-manual-l","text":"绑定原始页码","textPreview":"绑定原始页码","textChars":6,"textLines":1,"bbox":[769,596,188,20]}
+{"kind":"textbox","id":"sh/s72xofmh","slide":2,"name":"source-audio-n","text":"03","textPreview":"03","textChars":2,"textLines":1,"bbox":[1028,534,44,24]}
+{"kind":"textbox","id":"sh/76twva5c","slide":2,"name":"source-audio-t","text":"专家口述","textPreview":"专家口述","textChars":4,"textLines":1,"bbox":[1028,565,188,26]}
+{"kind":"textbox","id":"sh/65kfmpor","slide":2,"name":"source-audio-l","text":"绑定录音时间点","textPreview":"绑定录音时间点","textChars":7,"textLines":1,"bbox":[1028,596,188,20]}
+{"kind":"shape","id":"sh/hcvy14ne","slide":2,"name":"footer-line-2","bbox":[44,680,1192,1]}
+{"kind":"textbox","id":"sh/gbmxszmt","slide":2,"name":"footer-source-2","text":"来源：N31 Gold v1 与80秒培训视频联系表","textPreview":"来源：N31 Gold v1 与80秒培训视频联系表","textChars":26,"textLines":1,"bbox":[44,687,1080,18]}
+{"kind":"textbox","id":"sh/fadgzu58","slide":2,"name":"footer-page-2","text":"2/8","textPreview":"2/8","textChars":3,"textLines":1,"bbox":[1180,687,56,18]}
+{"kind":"image","id":"im/mtwfm5kr","slide":2,"name":"N31十五镜头联系表","geometry":"roundRect","bbox":[490,144,746,344]}
+{"kind":"notes","id":"nt/hwbqtkby","slide":2,"text":""}
+{"kind":"slide","id":"sl/ofy9wn61","slide":3,"title":"SYSTEM · EVIDENCE FIRST","textShapes":30}
+{"kind":"textbox","id":"sh/21szqxcb","slide":3,"name":"kicker-3","text":"SYSTEM · EVIDENCE FIRST","textPreview":"SYSTEM · EVIDENCE FIRST","textChars":23,"textLines":1,"bbox":[44,30,620,22]}
+{"kind":"textbox","id":"sh/cza94vmx","slide":3,"name":"title-3","text":"五个 Agent，把素材变成可验证闭环","textPreview":"五个 Agent，把素材变成可验证闭环","textChars":19,"textLines":1,"bbox":[44,57,1120,66]}
+{"kind":"textbox","id":"sh/d0jax03i","slide":3,"name":"number-3","text":"03","textPreview":"03","textChars":2,"textLines":1,"bbox":[1180,34,56,24]}
+{"kind":"textbox","id":"sh/298ryl4v","slide":3,"name":"input-label","text":"INPUTS","textPreview":"INPUTS","textChars":6,"textLines":1,"bbox":[44,152,180,22]}
+{"kind":"shape","id":"sh/3ah8rqlg","slide":3,"name":"input-video","bbox":[44,192,220,92]}
+{"kind":"shape","id":"sh/obq90bml","slide":3,"name":"input-pdf","bbox":[44,305,220,92]}
+{"kind":"shape","id":"sh/pcjqtg36","slide":3,"name":"input-audio","bbox":[44,418,220,92]}
+{"kind":"textbox","id":"sh/m5cra54z","slide":3,"name":"input-video-text","text":"操作视频\n时间点 + 关键帧","textPreview":"操作视频 | 时间点 + 关键帧","textChars":14,"textLines":2,"bbox":[66,210,178,56]}
+{"kind":"textbox","id":"sh/n6ls3alk","slide":3,"name":"input-pdf-text","text":"设备手册\n页码 + 段落","textPreview":"设备手册 | 页码 + 段落","textChars":12,"textLines":2,"bbox":[66,323,178,56]}
+{"kind":"textbox","id":"sh/n2l4fq98","slide":3,"name":"input-audio-text","text":"专家口述\n时间点 + 经验","textPreview":"专家口述 | 时间点 + 经验","textChars":13,"textLines":2,"bbox":[66,436,178,56]}
+{"kind":"textbox","id":"sh/m1c3mlsn","slide":3,"name":"input-arrow","text":"→","textPreview":"→","textChars":1,"textLines":1,"bbox":[284,321,48,48]}
+{"kind":"shape","id":"sh/943mhgre","slide":3,"name":"agent-frame","bbox":[340,152,552,420]}
+{"kind":"textbox","id":"sh/83ulovat","slide":3,"name":"agent-label","text":"AGENT LOOP","textPreview":"AGENT LOOP","textChars":10,"textLines":1,"bbox":[368,176,170,22]}
+{"kind":"shape","id":"sh/v6l4jq94","slide":3,"name":"agent-perception","bbox":[368,218,230,82]}
+{"kind":"shape","id":"sh/a5c3ql8z","slide":3,"name":"agent-sop","bbox":[626,218,230,82]}
+{"kind":"shape","id":"sh/x8nml0ra","slide":3,"name":"agent-creator","bbox":[368,326,230,82]}
+{"kind":"shape","id":"sh/w7ulsvqp","slide":3,"name":"agent-verifier","bbox":[626,326,230,82]}
+{"kind":"shape","id":"sh/ja54na9g","slide":3,"name":"agent-revision","bbox":[497,462,230,82]}
+{"kind":"textbox","id":"sh/i9w3u58v","slide":3,"name":"agent-perception-t","text":"Perception Agent","textPreview":"Perception Agent","textChars":16,"textLines":1,"bbox":[388,234,190,26]}
+{"kind":"textbox","id":"sh/e10f2twf","slide":3,"name":"agent-perception-b","text":"提取并对齐证据","textPreview":"提取并对齐证据","textChars":7,"textLines":1,"bbox":[388,268,190,20]}
+{"kind":"textbox","id":"sh/f29gbyx0","slide":3,"name":"agent-sop-t","text":"SOP Agent","textPreview":"SOP Agent","textChars":9,"textLines":1,"bbox":[646,234,190,26]}
+{"kind":"textbox","id":"sh/03ix43e5","slide":3,"name":"agent-sop-b","text":"规划步骤与依赖","textPreview":"规划步骤与依赖","textChars":7,"textLines":1,"bbox":[646,268,190,20]}
+{"kind":"textbox","id":"sh/14ryd8fq","slide":3,"name":"agent-creator-t","text":"Creator Agent","textPreview":"Creator Agent","textChars":13,"textLines":1,"bbox":[388,342,190,26]}
+{"kind":"textbox","id":"sh/6d0fytg3","slide":3,"name":"agent-creator-b","text":"生成培训内容","textPreview":"生成培训内容","textChars":6,"textLines":1,"bbox":[388,376,190,20]}
+{"kind":"textbox","id":"sh/re9g7yxo","slide":3,"name":"agent-verifier-t","text":"Verifier Agent","textPreview":"Verifier Agent","textChars":14,"textLines":1,"bbox":[646,342,190,26]}
+{"kind":"textbox","id":"sh/sfix03y9","slide":3,"name":"agent-verifier-b","text":"规则 + 证据质检","textPreview":"规则 + 证据质检","textChars":9,"textLines":1,"bbox":[646,376,190,20]}
+{"kind":"textbox","id":"sh/tgry9ofu","slide":3,"name":"agent-revision-t","text":"Revision Agent","textPreview":"Revision Agent","textChars":14,"textLines":1,"bbox":[517,478,190,26]}
+{"kind":"textbox","id":"sh/a9kfadwn","slide":3,"name":"agent-revision-b","text":"只修改出错局部","textPreview":"只修改出错局部","textChars":7,"textLines":1,"bbox":[517,512,190,20]}
+{"kind":"textbox","id":"sh/batgjixs","slide":3,"name":"agent-flow-1","text":"→","textPreview":"→","textChars":1,"textLines":1,"bbox":[599,237,28,28]}
+{"kind":"textbox","id":"sh/l4fi9cza","slide":3,"name":"agent-flow-2","text":"↓","textPreview":"↓","textChars":1,"textLines":1,"bbox":[730,301,28,28]}
+{"kind":"textbox","id":"sh/k3m1g7yp","slide":3,"name":"agent-flow-3","text":"←","textPreview":"←","textChars":1,"textLines":1,"bbox":[599,345,28,28]}
+{"kind":"textbox","id":"sh/z2d07mh4","slide":3,"name":"agent-flow-4","text":"↓ 修订","textPreview":"↓ 修订","textChars":4,"textLines":1,"bbox":[538,420,120,28]}
+{"kind":"textbox","id":"sh/y14jehgj","slide":3,"name":"agent-flow-5","text":"↑ 复检","textPreview":"↑ 复检","textChars":4,"textLines":1,"bbox":[706,420,120,28]}
+{"kind":"textbox","id":"sh/x0vi5czy","slide":3,"name":"output-arrow","text":"→","textPreview":"→","textChars":1,"textLines":1,"bbox":[910,321,48,48]}
+{"kind":"textbox","id":"sh/czmhc7id","slide":3,"name":"output-label","text":"OUTPUTS","textPreview":"OUTPUTS","textChars":7,"textLines":1,"bbox":[980,152,180,22]}
+{"kind":"textbox","id":"sh/byd032h8","slide":3,"name":"output-list","text":"结构化 SOP\n手机检查清单\n培训测验\nA4 海报\n60–90秒培训视频\n质检与修订记录","textPreview":"结构化 SOP | 手机检查清单 | 培训测验 | A4 海报 | 60–90秒培训视频 | 质检与修订记录","textChars":44,"textLines":6,"bbox":[980,202,244,314]}
+{"kind":"shape","id":"sh/ax4zax0n","slide":3,"name":"loop-claim","bbox":[980,530,244,54]}
+{"kind":"textbox","id":"sh/hwzihwzi","slide":3,"name":"loop-claim-text","text":"证据定位贯穿全链路","textPreview":"证据定位贯穿全链路","textChars":9,"textLines":1,"bbox":[997,544,210,26]}
+{"kind":"shape","id":"sh/wv61obyx","slide":3,"name":"footer-line-3","bbox":[44,680,1192,1]}
+{"kind":"textbox","id":"sh/4nuhs7uh","slide":3,"name":"footer-source-3","text":"SkillForge P0工作流：素材解析 → 规划 → 创作 → 质检 → 局部修订 → 输出","textPreview":"SkillForge P0工作流：素材解析 → 规划 → 创作 → 质检 → 局部修订 → 输出","textChars":48,"textLines":1,"bbox":[44,687,1080,18]}
+{"kind":"textbox","id":"sh/po3ilcvm","slide":3,"name":"footer-page-3","text":"3/8","textPreview":"3/8","textChars":3,"textLines":1,"bbox":[1180,687,56,18]}
+{"kind":"notes","id":"nt/ofy9wn61","slide":3,"text":""}
+{"kind":"slide","id":"sl/jyx0ra1s","slide":4,"title":"LIVE DEMO · CONTROLLED GOLD FAULT SET","textShapes":20}
+{"kind":"textbox","id":"sh/ilwf69kv","slide":4,"name":"kicker-4","text":"LIVE DEMO · CONTROLLED GOLD FAULT SET","textPreview":"LIVE DEMO · CONTROLLED GOLD FAULT SET","textChars":37,"textLines":1,"bbox":[44,30,620,22]}
+{"kind":"textbox","id":"sh/1cj2d8b6","slide":4,"name":"title-4","text":"Verifier 发现5个严重问题，只改动4处","textPreview":"Verifier 发现5个严重问题，只改动4处","textChars":23,"textLines":1,"bbox":[44,57,1120,66]}
+{"kind":"textbox","id":"sh/0ba143al","slide":4,"name":"number-4","text":"04","textPreview":"04","textChars":2,"textLines":1,"bbox":[1180,34,56,24]}
+{"kind":"shape","id":"sh/rm1k7yt4","slide":4,"name":"issue-shot-frame","bbox":[44,150,734,136]}
+{"kind":"textbox","id":"sh/doj29oba","slide":4,"name":"issue-proof-note","text":"同一问题同时引用：视频 E039 / E077 · 手册 E104 P20 · 操作者口述 E148 / E149 / E151 / E153","textPreview":"同一问题同时引用：视频 E039 / E077 · 手册 E104 P20 · 操作者口述 E148 / E149 / E151 / E153","textChars":71,"textLines":1,"bbox":[44,312,734,46]}
+{"kind":"shape","id":"sh/sna103ap","slide":4,"name":"metric-five-zero","bbox":[808,150,428,230]}
+{"kind":"textbox","id":"sh/3ihk3et8","slide":4,"name":"metric-five-zero-label","text":"严重错误","textPreview":"严重错误","textChars":4,"textLines":1,"bbox":[838,178,180,26]}
+{"kind":"textbox","id":"sh/ih8ju9sn","slide":4,"name":"metric-five-zero-value","text":"5 → 0","textPreview":"5 → 0","textChars":5,"textLines":1,"bbox":[838,218,340,92]}
+{"kind":"textbox","id":"sh/kbm987y5","slide":4,"name":"metric-five-zero-note","text":"复检后归零","textPreview":"复检后归零","textChars":5,"textLines":1,"bbox":[842,322,210,24]}
+{"kind":"textbox","id":"sh/5cva1cfq","slide":4,"name":"issue-kinds-label","text":"发现什么","textPreview":"发现什么","textChars":4,"textLines":1,"bbox":[44,416,180,24]}
+{"kind":"shape","id":"sh/i94r6xgz","slide":4,"name":"issue-kind-1","bbox":[44,454,226,118]}
+{"kind":"shape","id":"sh/jadsz2xk","slide":4,"name":"issue-kind-2","bbox":[292,454,226,118]}
+{"kind":"shape","id":"sh/w72947yt","slide":4,"name":"issue-kind-3","bbox":[540,454,238,118]}
+{"kind":"textbox","id":"sh/x8vaxsfe","slide":4,"name":"issue-kind-1-t","text":"缺步骤","textPreview":"缺步骤","textChars":3,"textLines":1,"bbox":[64,475,180,32]}
+{"kind":"textbox","id":"sh/a5kr2xg3","slide":4,"name":"issue-kind-1-b","text":"遗漏S09缝标学习","textPreview":"遗漏S09缝标学习","textChars":9,"textLines":1,"bbox":[64,523,180,24]}
+{"kind":"textbox","id":"sh/v6tsv2xo","slide":4,"name":"issue-kind-2-t","text":"顺序错误","textPreview":"顺序错误","textChars":4,"textLines":1,"bbox":[312,475,180,32]}
+{"kind":"textbox","id":"sh/g36tgryd","slide":4,"name":"issue-kind-2-b","text":"S07必须先于S08","textPreview":"S07必须先于S08","textChars":10,"textLines":1,"bbox":[312,523,180,24]}
+{"kind":"textbox","id":"sh/h4fa9wfy","slide":4,"name":"issue-kind-3-t","text":"无依据内容","textPreview":"无依据内容","textChars":5,"textLines":1,"bbox":[560,475,190,32]}
+{"kind":"textbox","id":"sh/p0batw72","slide":4,"name":"issue-kind-3-b","text":"工具与参数按规则拒绝","textPreview":"工具与参数按规则拒绝","textChars":10,"textLines":1,"bbox":[560,523,190,24]}
+{"kind":"shape","id":"sh/oz29krqh","slide":4,"name":"local-edits","bbox":[808,416,428,156]}
+{"kind":"textbox","id":"sh/3ytsrmpw","slide":4,"name":"local-edits-n","text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[838,434,104,82]}
+{"kind":"textbox","id":"sh/2xkrih8b","slide":4,"name":"local-edits-title","text":"处局部修订","textPreview":"处局部修订","textChars":5,"textLines":1,"bbox":[952,447,240,34]}
+{"kind":"textbox","id":"sh/1wbapc7q","slide":4,"name":"local-edits-list","text":"插入 · 重排 · 删除工具 · 删除参数","textPreview":"插入 · 重排 · 删除工具 · 删除参数","textChars":21,"textLines":1,"bbox":[952,492,244,48]}
+{"kind":"shape","id":"sh/gv29g7q5","slide":4,"name":"demo-honesty","bbox":[44,600,1192,54]}
+{"kind":"textbox","id":"sh/fu9sn2p0","slide":4,"name":"demo-honesty-text","text":"现场重算＝操作者审核 Gold 的受控错误集；稳定验证质检与修订，不冒充原始素材实时推理。","textPreview":"现场重算＝操作者审核 Gold 的受控错误集；稳定验证质检与修订，不冒充原始素材实时推理。","textChars":45,"textLines":1,"bbox":[66,615,1148,26]}
+{"kind":"shape","id":"sh/et0reh8f","slide":4,"name":"footer-line-4","bbox":[44,680,1192,1]}
+{"kind":"textbox","id":"sh/tsrqlc7u","slide":4,"name":"footer-source-4","text":"来源：N31 Gold演示包 summary / initial_conflicts / revision_audit","textPreview":"来源：N31 Gold演示包 summary / initial_conflicts / revision_audit","textChars":59,"textLines":1,"bbox":[44,687,1080,18]}
+{"kind":"textbox","id":"sh/sri9s7q9","slide":4,"name":"footer-page-4","text":"4/8","textPreview":"4/8","textChars":3,"textLines":1,"bbox":[1180,687,56,18]}
+{"kind":"image","id":"im/s3etcnmd","slide":4,"name":"Web首个问题与证据截图","geometry":"roundRect","bbox":[44,150,734,136]}
+{"kind":"notes","id":"nt/jyx0ra1s","slide":4,"text":""}
+{"kind":"slide","id":"sl/i107q5of","slide":5,"title":"TRACEABILITY · NOT JUST CITATIONS","textShapes":26}
+{"kind":"textbox","id":"sh/5kn2hszu","slide":5,"name":"kicker-5","text":"TRACEABILITY · NOT JUST CITATIONS","textPreview":"TRACEABILITY · NOT JUST CITATIONS","textChars":33,"textLines":1,"bbox":[44,30,620,22]}
+{"kind":"textbox","id":"sh/dgbulwnm","slide":5,"name":"title-5","text":"每一步，都能回到页码或时间点","textPreview":"每一步，都能回到页码或时间点","textChars":14,"textLines":1,"bbox":[44,57,1120,66]}
+{"kind":"textbox","id":"sh/cf2tcr61","slide":5,"name":"number-5","text":"05","textPreview":"05","textChars":2,"textLines":1,"bbox":[1180,34,56,24]}
+{"kind":"shape","id":"sh/z2tcnm5s","slide":5,"name":"evidence-stat-1","bbox":[44,148,270,142]}
+{"kind":"shape","id":"sh/yhkbe1o7","slide":5,"name":"evidence-stat-2","bbox":[336,148,270,142]}
+{"kind":"shape","id":"sh/l4bupwny","slide":5,"name":"evidence-stat-3","bbox":[628,148,270,142]}
+{"kind":"textbox","id":"sh/032tgr6d","slide":5,"name":"evidence-stat-1-v","text":"154","textPreview":"154","textChars":3,"textLines":1,"bbox":[66,166,220,68]}
+{"kind":"textbox","id":"sh/n6dcr65o","slide":5,"name":"evidence-stat-1-l","text":"Evidence Catalog","textPreview":"Evidence Catalog","textChars":16,"textLines":1,"bbox":[66,242,220,26]}
+{"kind":"textbox","id":"sh/m5kbi1oj","slide":5,"name":"evidence-stat-2-v","text":"12","textPreview":"12","textChars":2,"textLines":1,"bbox":[358,166,220,68]}
+{"kind":"textbox","id":"sh/w32dkbuh","slide":5,"name":"evidence-stat-2-l","text":"口述时间段","textPreview":"口述时间段","textChars":5,"textLines":1,"bbox":[358,242,220,26]}
+{"kind":"textbox","id":"sh/x4vedgvm","slide":5,"name":"evidence-stat-3-v","text":"13","textPreview":"13","textChars":2,"textLines":1,"bbox":[650,166,220,68]}
+{"kind":"textbox","id":"sh/ahkvi1cb","slide":5,"name":"evidence-stat-3-l","text":"Gold步骤","textPreview":"Gold步骤","textChars":6,"textLines":1,"bbox":[650,242,220,26]}
+{"kind":"textbox","id":"sh/k7mxovud","slide":5,"name":"evidence-example-label","text":"一条步骤的证据链","textPreview":"一条步骤的证据链","textChars":8,"textLines":1,"bbox":[44,334,320,24]}
+{"kind":"shape","id":"sh/58vehgvy","slide":5,"name":"evidence-step","bbox":[44,378,282,194]}
+{"kind":"textbox","id":"sh/i54fmlc7","slide":5,"name":"evidence-step-id","text":"S09","textPreview":"S09","textChars":3,"textLines":1,"bbox":[68,400,70,30]}
+{"kind":"textbox","id":"sh/j6dwfqds","slide":5,"name":"evidence-step-title","text":"执行缝标学习","textPreview":"执行缝标学习","textChars":6,"textLines":1,"bbox":[68,445,226,34]}
+{"kind":"textbox","id":"sh/sb6xsvu9","slide":5,"name":"evidence-step-note","text":"必要步骤 · VERIFIED","textPreview":"必要步骤 · VERIFIED","textChars":15,"textLines":1,"bbox":[68,505,226,24]}
+{"kind":"textbox","id":"sh/tcfel0vu","slide":5,"name":"evidence-arrow","text":"→","textPreview":"→","textChars":1,"textLines":1,"bbox":[340,446,52,48]}
+{"kind":"shape","id":"sh/hgrmpwj2","slide":5,"name":"evidence-manual","bbox":[410,378,254,194]}
+{"kind":"shape","id":"sh/gfi5grih","slide":5,"name":"evidence-video","bbox":[682,378,254,194]}
+{"kind":"shape","id":"sh/fe94nm1w","slide":5,"name":"evidence-audio","bbox":[954,378,282,194]}
+{"kind":"textbox","id":"sh/ud0ne10b","slide":5,"name":"evidence-manual-k","text":"PDF","textPreview":"PDF","textChars":3,"textLines":1,"bbox":[432,400,70,22]}
+{"kind":"textbox","id":"sh/pkr6tgjy","slide":5,"name":"evidence-manual-v","text":"E104","textPreview":"E104","textChars":4,"textLines":1,"bbox":[432,443,210,34]}
+{"kind":"textbox","id":"sh/4ji5kbid","slide":5,"name":"evidence-manual-l","text":"用户手册 · P20","textPreview":"用户手册 · P20","textChars":10,"textLines":1,"bbox":[432,502,210,26]}
+{"kind":"textbox","id":"sh/3i94r61s","slide":5,"name":"evidence-video-k","text":"VIDEO","textPreview":"VIDEO","textChars":5,"textLines":1,"bbox":[704,400,90,22]}
+{"kind":"textbox","id":"sh/2h0ni107","slide":5,"name":"evidence-video-v","text":"E039","textPreview":"E039","textChars":4,"textLines":1,"bbox":[704,443,210,34]}
+{"kind":"textbox","id":"sh/5o7mhcju","slide":5,"name":"evidence-video-l","text":"190–195秒","textPreview":"190–195秒","textChars":8,"textLines":1,"bbox":[704,502,210,26]}
+{"kind":"textbox","id":"sh/kny587i9","slide":5,"name":"evidence-audio-k","text":"EXPERT AUDIO","textPreview":"EXPERT AUDIO","textChars":12,"textLines":1,"bbox":[976,400,150,22]}
+{"kind":"textbox","id":"sh/atcjidg7","slide":5,"name":"evidence-audio-v","text":"E148","textPreview":"E148","textChars":4,"textLines":1,"bbox":[976,443,234,34]}
+{"kind":"textbox","id":"sh/vu5kbihc","slide":5,"name":"evidence-audio-l","text":"153.84–195.68秒","textPreview":"153.84–195.68秒","textChars":14,"textLines":1,"bbox":[976,502,234,26]}
+{"kind":"shape","id":"sh/wve1knyx","slide":5,"name":"evidence-rule","bbox":[44,604,1192,48]}
+{"kind":"textbox","id":"sh/xwn2dszi","slide":5,"name":"evidence-rule-text","text":"引用存在 ≠ 证据充分：低可见度、遮挡和来源冲突会进入待复核，不会被伪装成事实。","textPreview":"引用存在 ≠ 证据充分：低可见度、遮挡和来源冲突会进入待复核，不会被伪装成事实。","textChars":40,"textLines":1,"bbox":[66,617,1148,24]}
+{"kind":"shape","id":"sh/ihw3mxg3","slide":5,"name":"footer-line-5","bbox":[44,680,1192,1]}
+{"kind":"textbox","id":"sh/ji5kf2ho","slide":5,"name":"footer-source-5","text":"来源：Gold SOP与Evidence Catalog；示例为S09缝标学习","textPreview":"来源：Gold SOP与Evidence Catalog；示例为S09缝标学习","textChars":39,"textLines":1,"bbox":[44,687,1080,18]}
+{"kind":"textbox","id":"sh/kjelony9","slide":5,"name":"footer-page-5","text":"5/8","textPreview":"5/8","textChars":3,"textLines":1,"bbox":[1180,687,56,18]}
+{"kind":"image","id":"im/18zih4ru","slide":5,"name":"N31操作画面","geometry":"roundRect","bbox":[930,148,306,142]}
+{"kind":"notes","id":"nt/i107q5of","slide":5,"text":""}
+{"kind":"slide","id":"sl/x8f69ofe","slide":6,"title":"LOCAL COMPUTE · EXPLICIT CLAIM BOUNDARY","textShapes":17}
+{"kind":"textbox","id":"sh/ydgnit07","slide":6,"name":"kicker-6","text":"LOCAL COMPUTE · EXPLICIT CLAIM BOUNDARY","textPreview":"LOCAL COMPUTE · EXPLICIT CLAIM BOUNDARY","textChars":39,"textLines":1,"bbox":[44,30,620,22]}
+{"kind":"textbox","id":"sh/yhg7epsj","slide":6,"name":"title-6","text":"DGX Spark：把敏感视频留在现场","textPreview":"DGX Spark：把敏感视频留在现场","textChars":19,"textLines":1,"bbox":[44,57,1120,66]}
+{"kind":"textbox","id":"sh/zi98nu94","slide":6,"name":"number-6","text":"06","textPreview":"06","textChars":2,"textLines":1,"bbox":[1180,34,56,24]}
+{"kind":"shape","id":"sh/87ipkzal","slide":6,"name":"dgx-metrics","bbox":[44,148,438,442]}
+{"kind":"textbox","id":"sh/98rqt4r6","slide":6,"name":"dgx-gpu-label","text":"GPU","textPreview":"GPU","textChars":3,"textLines":1,"bbox":[72,174,80,22]}
+{"kind":"textbox","id":"sh/ml07i9sv","slide":6,"name":"dgx-gpu-value","text":"NVIDIA GB10","textPreview":"NVIDIA GB10","textChars":11,"textLines":1,"bbox":[72,202,360,44]}
+{"kind":"shape","id":"sh/7m98ru9g","slide":6,"name":"dgx-rule","bbox":[72,270,350,2]}
+{"kind":"textbox","id":"sh/oryp8fah","slide":6,"name":"dgx-6-v","text":"6","textPreview":"6","textChars":1,"textLines":1,"bbox":[72,300,90,70]}
+{"kind":"textbox","id":"sh/pc76hkr2","slide":6,"name":"dgx-6-l","text":"安全视频","textPreview":"安全视频","textChars":4,"textLines":1,"bbox":[72,372,110,24]}
+{"kind":"textbox","id":"sh/h4bupgn6","slide":6,"name":"dgx-420-v","text":"420","textPreview":"420","textChars":3,"textLines":1,"bbox":[198,300,150,70]}
+{"kind":"textbox","id":"sh/w32twb6l","slide":6,"name":"dgx-420-l","text":"处理帧","textPreview":"处理帧","textChars":3,"textLines":1,"bbox":[198,372,110,24]}
+{"kind":"textbox","id":"sh/v2tcn650","slide":6,"name":"dgx-50-v","text":"50","textPreview":"50","textChars":2,"textLines":1,"bbox":[348,300,100,70]}
+{"kind":"textbox","id":"sh/u1kbu1ov","slide":6,"name":"dgx-50-l","text":"候选帧","textPreview":"候选帧","textChars":3,"textLines":1,"bbox":[348,372,110,24]}
+{"kind":"shape","id":"sh/5svutgni","slide":6,"name":"dgx-time","bbox":[72,426,350,62]}
+{"kind":"textbox","id":"sh/47mt0b6x","slide":6,"name":"dgx-time-v","text":"13.134秒","textPreview":"13.134秒","textChars":7,"textLines":1,"bbox":[90,443,160,30]}
+{"kind":"textbox","id":"sh/j6dcr65c","slide":6,"name":"dgx-time-l","text":"端到端计算","textPreview":"端到端计算","textChars":5,"textLines":1,"bbox":[258,448,142,24]}
+{"kind":"shape","id":"sh/i54bylor","slide":6,"name":"dgx-stack","bbox":[72,510,350,52]}
+{"kind":"textbox","id":"sh/twfux0ne","slide":6,"name":"dgx-stack-t","text":"原生 Python + FFmpeg + CUDA","textPreview":"原生 Python + FFmpeg + CUDA","textChars":25,"textLines":1,"bbox":[90,524,314,25]}
+{"kind":"shape","id":"sh/svmt4v6t","slide":6,"name":"dgx-shot-frame","bbox":[514,148,722,442]}
+{"kind":"shape","id":"sh/dcnm98zm","slide":6,"name":"dgx-boundary","bbox":[44,614,1192,40]}
+{"kind":"textbox","id":"sh/qpwnet0b","slide":6,"name":"dgx-boundary-t","text":"候选筛选 ≠ 语义结论  ·  P0无需Docker  ·  Docker仅在部署本地GPU模型或VSS时处理","textPreview":"候选筛选 ≠ 语义结论  ·  P0无需Docker  ·  Docker仅在部署本地GPU模型或VSS时处理","textChars":55,"textLines":1,"bbox":[64,624,1152,22]}
+{"kind":"shape","id":"sh/bq547yhw","slide":6,"name":"footer-line-6","bbox":[44,680,1192,1]}
+{"kind":"textbox","id":"sh/0fy5k3id","slide":6,"name":"footer-source-6","text":"来源：DGX Spark原生CUDA视觉计算报告 v1","textPreview":"来源：DGX Spark原生CUDA视觉计算报告 v1","textChars":27,"textLines":1,"bbox":[44,687,1080,18]}
+{"kind":"textbox","id":"sh/lg76d8zy","slide":6,"name":"footer-page-6","text":"6/8","textPreview":"6/8","textChars":3,"textLines":1,"bbox":[1180,687,56,18]}
+{"kind":"image","id":"im/ofq9wfal","slide":6,"name":"DGX Web计算报告","geometry":"roundRect","bbox":[514,148,722,442]}
+{"kind":"notes","id":"nt/x8f69ofe","slide":6,"text":""}
+{"kind":"slide","id":"sl/gnmp4jqx","slide":7,"title":"MEASURED ON OPERATOR-REVIEWED GOLD","textShapes":17}
+{"kind":"textbox","id":"sh/f6xkvq5c","slide":7,"name":"kicker-7","text":"MEASURED ON OPERATOR-REVIEWED GOLD","textPreview":"MEASURED ON OPERATOR-REVIEWED GOLD","textChars":34,"textLines":1,"bbox":[44,30,620,22]}
+{"kind":"textbox","id":"sh/cb2tkvap","slide":7,"name":"title-7","text":"错误5→0，覆盖率90%→100%","textPreview":"错误5→0，覆盖率90%→100%","textChars":17,"textLines":1,"bbox":[44,57,1120,66]}
+{"kind":"textbox","id":"sh/dcbud0ra","slide":7,"name":"number-7","text":"07","textPreview":"07","textChars":2,"textLines":1,"bbox":[1180,34,56,24]}
+{"kind":"shape","id":"sh/ydkbm5sv","slide":7,"name":"chart-bg","bbox":[44,154,494,378]}
+{"kind":"textbox","id":"sh/zedcfa9g","slide":7,"name":"chart-label","text":"严重错误数量","textPreview":"严重错误数量","textChars":6,"textLines":1,"bbox":[70,176,240,28]}
+{"kind":"shape","id":"sh/kzmdova1","slide":7,"name":"result-card-1","bbox":[570,154,310,174]}
+{"kind":"shape","id":"sh/l0vuh0rm","slide":7,"name":"result-card-2","bbox":[902,154,334,174]}
+{"kind":"textbox","id":"sh/eh0ba1sr","slide":7,"name":"result-card-1-v","text":"90% → 100%","textPreview":"90% → 100%","textChars":10,"textLines":1,"bbox":[594,190,262,44]}
+{"kind":"textbox","id":"sh/fi9c369c","slide":7,"name":"result-card-1-l","text":"必要步骤覆盖","textPreview":"必要步骤覆盖","textChars":6,"textLines":1,"bbox":[594,252,262,26]}
+{"kind":"textbox","id":"sh/baxkjqlk","slide":7,"name":"result-card-2-v","text":"90% → 100%","textPreview":"90% → 100%","textChars":10,"textLines":1,"bbox":[926,190,286,44]}
+{"kind":"textbox","id":"sh/a9ojq5kz","slide":7,"name":"result-card-2-l","text":"证据覆盖","textPreview":"证据覆盖","textChars":4,"textLines":1,"bbox":[926,252,286,26]}
+{"kind":"shape","id":"sh/xcz2l03q","slide":7,"name":"result-tests","bbox":[570,350,666,82]}
+{"kind":"textbox","id":"sh/cbq1sv25","slide":7,"name":"result-tests-v","text":"45 / 45","textPreview":"45 / 45","textChars":7,"textLines":1,"bbox":[594,365,170,48]}
+{"kind":"textbox","id":"sh/n6x0fqlo","slide":7,"name":"result-tests-l","text":"本机与DGX自动测试（路演层新增前基线）","textPreview":"本机与DGX自动测试（路演层新增前基线）","textChars":20,"textLines":1,"bbox":[782,375,422,30]}
+{"kind":"textbox","id":"sh/25ojml43","slide":7,"name":"outputs-label","text":"同一份Gold继续生成","textPreview":"同一份Gold继续生成","textChars":11,"textLines":1,"bbox":[570,466,300,24]}
+{"kind":"shape","id":"sh/p8fih03e","slide":7,"name":"output-sop","bbox":[570,504,150,70]}
+{"kind":"shape","id":"sh/o761ov2t","slide":7,"name":"output-check","bbox":[736,504,150,70]}
+{"kind":"shape","id":"sh/f2d0b6lc","slide":7,"name":"output-quiz","bbox":[902,504,150,70]}
+{"kind":"shape","id":"sh/eh4jil4r","slide":7,"name":"output-media","bbox":[1068,504,168,70]}
+{"kind":"textbox","id":"sh/id4ju1oz","slide":7,"name":"output-sop-t","text":"13步 SOP","textPreview":"13步 SOP","textChars":7,"textLines":1,"bbox":[584,524,122,26]}
+{"kind":"textbox","id":"sh/jedkn654","slide":7,"name":"output-check-t","text":"13项清单","textPreview":"13项清单","textChars":5,"textLines":1,"bbox":[750,524,122,26]}
+{"kind":"textbox","id":"sh/4fm1wb6p","slide":7,"name":"output-quiz-t","text":"5题测验","textPreview":"5题测验","textChars":4,"textLines":1,"bbox":[916,524,122,26]}
+{"kind":"textbox","id":"sh/50v2pgna","slide":7,"name":"output-media-t","text":"海报 + 80秒视频","textPreview":"海报 + 80秒视频","textChars":10,"textLines":1,"bbox":[1078,524,148,26]}
+{"kind":"shape","id":"sh/r2dkrq5g","slide":7,"name":"footer-line-7","bbox":[44,680,1192,1]}
+{"kind":"textbox","id":"sh/s3ml0v61","slide":7,"name":"footer-source-7","text":"来源：N31 Gold summary、多源评测、培训成果清单与测试记录","textPreview":"来源：N31 Gold summary、多源评测、培训成果清单与测试记录","textChars":36,"textLines":1,"bbox":[44,687,1080,18]}
+{"kind":"textbox","id":"sh/d4f2t0nm","slide":7,"name":"footer-page-7","text":"7/8","textPreview":"7/8","textChars":3,"textLines":1,"bbox":[1180,687,56,18]}
+{"kind":"chart","id":"ch/czqx03i9","slide":7,"name":"Chart","chartType":"bar","bbox":[72,220,434,286]}
+{"kind":"image","id":"im/a9gji54j","slide":7,"name":"训练视频十五镜头成果","geometry":"roundRect","bbox":[44,552,494,102]}
+{"kind":"notes","id":"nt/gnmp4jqx","slide":7,"text":""}
+{"kind":"slide","id":"sl/fu1gfa1s","slide":8,"title":"SKILLFORGE · 匠传","textShapes":9}
+{"kind":"shape","id":"sh/0jydkreh","slide":8,"name":"closing-accent","bbox":[44,44,118,9]}
+{"kind":"textbox","id":"sh/18byd4zy","slide":8,"name":"closing-kicker","text":"SKILLFORGE · 匠传","textPreview":"SKILLFORGE · 匠传","textChars":15,"textLines":1,"bbox":[44,82,360,28]}
+{"kind":"textbox","id":"sh/g72x4zyd","slide":8,"name":"closing-title","text":"不是生成更多内容，\n而是让内容\n能被相信。","textPreview":"不是生成更多内容， | 而是让内容 | 能被相信。","textChars":21,"textLines":3,"bbox":[44,158,880,315]}
+{"kind":"shape","id":"sh/ri9g7uhw","slide":8,"name":"closing-values","bbox":[934,152,302,366]}
+{"kind":"textbox","id":"sh/6h0fypgb","slide":8,"name":"closing-values-k","text":"FROM ONE N31 CASE","textPreview":"FROM ONE N31 CASE","textChars":17,"textLines":1,"bbox":[962,181,246,22]}
+{"kind":"textbox","id":"sh/tkby9kzm","slide":8,"name":"closing-values-t","text":"到任何设备、\n任何技能","textPreview":"到任何设备、 | 任何技能","textChars":11,"textLines":2,"bbox":[962,230,246,86]}
+{"kind":"shape","id":"sh/sjix0zy1","slide":8,"name":"closing-values-rule","bbox":[962,342,160,2]}
+{"kind":"textbox","id":"sh/je9g3ahk","slide":8,"name":"closing-values-list","text":"每一步可回源\n每个问题可复检\n每次修改可审计","textPreview":"每一步可回源 | 每个问题可复检 | 每次修改可审计","textChars":22,"textLines":3,"bbox":[962,374,246,118]}
+{"kind":"shape","id":"sh/id0fu50z","slide":8,"name":"closing-dgx","bbox":[44,548,1192,82]}
+{"kind":"textbox","id":"sh/o7ydoret","slide":8,"name":"closing-dgx-main","text":"DGX Spark 让敏感视频留在现场","textPreview":"DGX Spark 让敏感视频留在现场","textChars":19,"textLines":1,"bbox":[72,565,585,38]}
+{"kind":"textbox","id":"sh/98rehwve","slide":8,"name":"closing-dgx-sub","text":"让专家经验成为可部署、可验证的组织能力","textPreview":"让专家经验成为可部署、可验证的组织能力","textChars":19,"textLines":1,"bbox":[690,571,510,30]}
+{"kind":"textbox","id":"sh/m5gvmhwn","slide":8,"name":"closing-footer","text":"SkillForge 匠传 · N31 Gold v1 · 原生Python P0","textPreview":"SkillForge 匠传 · N31 Gold v1 · 原生Python P0","textChars":41,"textLines":1,"bbox":[44,682,1020,18]}
+{"kind":"textbox","id":"sh/n6pwfmd8","slide":8,"name":"closing-page","text":"08 / 08","textPreview":"08 / 08","textChars":7,"textLines":1,"bbox":[1160,682,76,18]}
+{"kind":"notes","id":"nt/fu1gfa1s","slide":8,"text":""}
