@@ -50,9 +50,14 @@ def test_default_date_uses_contest_timezone_not_machine_timezone(
     assert report["as_of"] == "2026-07-19"
 
 
-def test_overdue_and_deadline_states_are_explicit_not_blocked() -> None:
-    attention = build_project_board_status(as_of=date(2026, 7, 22))
-    missed = build_project_board_status(as_of=date(2026, 7, 23))
+def test_overdue_and_deadline_states_are_explicit_not_blocked(tmp_path: Path) -> None:
+    board = json.loads(BOARD.read_text(encoding="utf-8"))
+    # 构造一个含有过期任务的看板，验证逻辑正确性
+    board["tasks"][0]["status"] = "AWAITING_HUMAN"
+    board["tasks"][0]["due_date"] = "2026-07-20"
+    board_path = _write_board(tmp_path, board)
+    attention = build_project_board_status(board_path=board_path, as_of=date(2026, 7, 22))
+    missed = build_project_board_status(board_path=board_path, as_of=date(2026, 7, 23))
     assert attention["status"] == "ATTENTION_REQUIRED"
     assert attention["overdue_task_ids"]
     assert attention["implementation_goal_blocked"] is False

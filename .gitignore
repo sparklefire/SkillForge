@@ -25,3 +25,6 @@ cases/*/derived/*
 !cases/*/derived/.gitkeep
 cases/*/output/*
 !cases/*/output/.gitkeep
+
+# Office 临时锁文件
+~$*

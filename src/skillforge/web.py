@@ -123,7 +123,7 @@ HTML = """<!doctype html>
   </style>
 </head>
 <body><main>
-  <div class="tag">DGX native pipeline · no Docker required</div>
+  <div class="tag">DGX 原生流水线 · 无需 Docker · 星星之火</div>
   <h1>匠传 SkillForge</h1>
   <p>从素材证据到 SOP，再到发现问题、引用证据和局部自动修订。</p>
   <section class="panel"><h2 id="metrics-title">闭环指标</h2><div id="basis" class="notice"></div><div id="metrics" class="grid"></div></section>
