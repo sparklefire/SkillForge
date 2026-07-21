@@ -4,6 +4,17 @@
 
 公开仓库：[github.com/sparklefire/SkillForge](https://github.com/sparklefire/SkillForge)
 
+## 团队
+
+**星星之火** · 武汉以清软件有限公司 · [GitHub 组织](https://github.com/sparklefire)
+
+| 成员 | 角色 | GitHub |
+|---|---|---|
+| 邱世乐 | 队长 / 演示 | [qiushile](https://github.com/qiushile) |
+| 解文超 | 队员 | [Monster-Xwc](https://github.com/Monster-Xwc) |
+| 臧杰 | 队员 | [JZZ-max](https://github.com/JZZ-max) |
+| 与逢 | 队员 | [yufeng711](https://github.com/yufeng711) |
+
 ## 当前目标
 
 在 2026-07-22 前交付一条稳定、可演示的主链路：
@@ -235,7 +246,7 @@ bash scripts/check_demo_mode_parity.sh --verify-only
 bash scripts/check_pitch.sh
 ```
 
-验收器检查180秒时间轴、Gold指标、五类Agent与工具追踪、四场景无来源内容门禁、高推理语义复核、选择性重建边界、交付配置、低码率预览映射、DGX报告、PPT、海报、培训视频、证据包和三种演示兜底。当前状态为 `READY_WITH_HUMAN_GATES`：自动检查通过，但完整观看、真人彩排、最终录屏、团队资格和官方规则五项门禁仍待参赛者确认。正式材料见 [三分钟路演脚本](./docs/三分钟路演脚本.md)、[现场演示与录屏操作单](./docs/现场演示与录屏操作单.md) 和 [8页路演PPT](./output/presentation/SkillForge_三分钟路演_v1.pptx)。
+验收器检查180秒时间轴、Gold指标、五类Agent与工具追踪、四场景无来源内容门禁、高推理语义复核、选择性重建边界、交付配置、低码率预览映射、DGX报告、PPT、海报、培训视频、证据包和三种演示兜底。当前状态为 `READY_WITH_HUMAN_GATES`：自动检查通过，但完整观看、真人彩排、最终录屏、团队资格和官方规则五项门禁仍待参赛者确认。正式材料见 [三分钟路演脚本](./docs/三分钟路演脚本.md)、[现场演示与录屏操作单](./docs/现场演示与录屏操作单.md) 和 [8页路演PPT](./output/presentation/星星之火_SkillForge_三分钟路演_v2.pptx)。
 
 已提供私有最终录屏候选自动构建器：
 
