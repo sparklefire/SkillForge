@@ -9,7 +9,7 @@ Shell 脚本自动加载项目 `.env`（不打印密钥）；Python 脚本需要
 
 | 脚本 | 说明 |
 |---|---|
-| `setup_native.sh` | 一键创建 `.venv`、安装依赖、安装项目包 |
+| `setup_native.sh` | 一键创建 `.venv`、安装依赖、安装项目包（含前置检查与下一步提示） |
 | `setup_ocr_languages.sh` | 下载 Tesseract 中文 OCR 语言包到本地缓存 |
 | `check_dgx.sh` | 检查 DGX Spark SSH、GPU、FFmpeg、项目目录 |
 | `verify_step_plan.py` | 最小请求验证 Step Plan 密钥连通性 |

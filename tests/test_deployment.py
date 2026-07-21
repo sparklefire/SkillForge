@@ -42,3 +42,13 @@ def test_demo_mode_announces_selected_mode() -> None:
     assert "演示模式：live" in script
     assert "演示模式：preprocessed" in script
     assert "演示模式：offline" in script
+
+
+def test_setup_native_has_guards_and_next_step_hint() -> None:
+    script_path = ROOT / "scripts/setup_native.sh"
+    subprocess.run(["bash", "-n", str(script_path)], check=True)
+    script = script_path.read_text(encoding="utf-8")
+    assert "native_setup=ok" in script
+    assert "command -v python3" in script
+    assert "requirements.lock" in script
+    assert "run_demo_mode.sh offline" in script
