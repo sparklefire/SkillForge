@@ -176,6 +176,7 @@ def test_real_refresh_runner_forces_offline_ocr(
     assert "--offline" in setup_script
     assert "离线模式拒绝下载" in setup_script
     assert "SKILLFORGE_OFFLINE_OCR" in local_script
+    assert "progress()" in local_script
 
 
 def test_cli_report_is_private_and_script_is_executable(

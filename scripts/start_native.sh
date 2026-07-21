@@ -17,4 +17,8 @@ fi
 
 mkdir -p "$ROOT/outputs"
 cd "$ROOT"
+
+PORT="${SKILLFORGE_PORT:-7860}"
+echo "▶ 正在启动 SkillForge Web 演示…" >&2
+echo "  浏览器打开：http://127.0.0.1:${PORT}（按 Ctrl+C 停止）" >&2
 exec "$ROOT/.venv/bin/python" -m skillforge.web

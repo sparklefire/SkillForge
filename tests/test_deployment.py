@@ -19,6 +19,7 @@ def test_dgx_service_is_loopback_only_and_offline() -> None:
     assert "NoNewPrivileges=true" in unit
     assert "docker" not in unit.lower()
     assert 'SKILLFORGE_SKIP_DOTENV:-0' in starter
+    assert "浏览器打开：http://127.0.0.1:" in starter
 
 
 def test_dgx_deployment_shell_syntax() -> None:

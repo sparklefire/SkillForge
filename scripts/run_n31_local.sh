@@ -23,24 +23,40 @@ fi
 cd "$ROOT"
 
 if [[ "$MODE" == "full-local" ]]; then
+  TOTAL_STEPS=6
+else
+  TOTAL_STEPS=5
+fi
+CURRENT_STEP=0
+progress() {
+  CURRENT_STEP=$((CURRENT_STEP + 1))
+  echo "▶ [$CURRENT_STEP/$TOTAL_STEPS] $1" >&2
+}
+
+if [[ "$MODE" == "full-local" ]]; then
+  progress "视频预处理（首次运行较慢，请耐心等候）…"
   "$PYTHON" scripts/process_n31_videos.py >/dev/null
 fi
 
+progress "准备 OCR 语言包…"
 if [[ "${SKILLFORGE_OFFLINE_OCR:-0}" == "1" ]]; then
   bash scripts/setup_ocr_languages.sh --offline >/dev/null
 else
   bash scripts/setup_ocr_languages.sh >/dev/null
 fi
 
+progress "解析素材并抽取证据…"
 "$PYTHON" -m skillforge.case_ingest \
   --manifest cases/n31/ingest_manifest.json \
   --output cases/n31/output/ingest_local_v1 >/dev/null
 
+progress "规划候选 SOP…"
 "$PYTHON" -m skillforge.candidate_sop \
   --plan cases/n31/candidate_sop_plan.json \
   --catalog cases/n31/output/ingest_local_v1/evidence_catalog.json \
   --output cases/n31/output/candidate_v1 >/dev/null
 
+progress "质检彩排与自动修订…"
 if [[ -f cases/n31/gold/gold_sop.json ]]; then
   bash scripts/build_n31_source_candidates.sh >/dev/null
   "$PYTHON" -m skillforge.gold_rehearsal \
@@ -58,6 +74,7 @@ else
   REHEARSAL_DIR="cases/n31/output/rehearsal_v1"
 fi
 
+progress "汇总本地流水线结果…"
 "$PYTHON" - "$REHEARSAL_DIR" <<'PY'
 import json
 import sys
@@ -127,3 +144,5 @@ print(
     )
 )
 PY
+
+echo "✅ 本地流水线完成（external_model_calls=0）。打开 Web 演示：bash scripts/start_native.sh" >&2
