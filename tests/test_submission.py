@@ -270,3 +270,26 @@ def test_submission_script_is_executable() -> None:
     script = ROOT / "scripts/check_submission.sh"
     assert script.is_file()
     assert script.stat().st_mode & 0o111
+
+
+def test_preflight_summary_prints_to_stderr_only(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    from skillforge.submission import _print_preflight_summary
+
+    report = {
+        "status": "READY_WITH_HUMAN_GATES",
+        "automatic_checks": [
+            {"check_id": "CHECK_A", "status": "PASSED", "details": ["甲项通过"]},
+            {"check_id": "CHECK_B", "status": "FAILED", "details": ["乙项失败"]},
+        ],
+        "pending_human_gates": ["GATE_X"],
+    }
+    _print_preflight_summary(report)
+    captured = capsys.readouterr()
+    assert captured.out == ""
+    assert "1/2 项通过" in captured.err
+    assert "✅ CHECK_A" in captured.err
+    assert "❌ CHECK_B" in captured.err
+    assert "GATE_X" in captured.err
+    assert "manage_human_gates.sh status" in captured.err

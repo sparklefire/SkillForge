@@ -1244,6 +1244,36 @@ def build_submission_preflight(
     return validate_document(report, "submission_preflight.schema.json")
 
 
+_PREFLIGHT_STATUS_LABELS = {
+    "READY_FOR_SUBMISSION": "可提交",
+    "READY_WITH_HUMAN_GATES": "技术就绪，待人工门禁",
+    "NOT_READY": "未就绪",
+}
+
+
+def _print_preflight_summary(report: dict[str, Any]) -> None:
+    """Human-readable preflight summary on stderr; stdout stays pure JSON."""
+    checks = report.get("automatic_checks", [])
+    passed = sum(1 for item in checks if item.get("status") == "PASSED")
+    status = report.get("status", "UNKNOWN")
+    label = _PREFLIGHT_STATUS_LABELS.get(status, status)
+    lines = [f"── 提交预检：{passed}/{len(checks)} 项通过 · {label} ──"]
+    for item in checks:
+        icon = "✅" if item.get("status") == "PASSED" else "❌"
+        detail = ""
+        details = item.get("details") or []
+        if details:
+            detail = "　" + str(details[0])
+        lines.append(f"{icon} {item.get('check_id', '?')}{detail}")
+    pending_gates = report.get("pending_human_gates") or []
+    if pending_gates:
+        lines.append(f"⏳ 待人工门禁（{len(pending_gates)}）：" + "、".join(pending_gates))
+        lines.append("   查看与确认：bash scripts/manage_human_gates.sh status")
+    if status == "READY_FOR_SUBMISSION":
+        lines.append("🎉 全部就绪，可进入官方表单提交流程。")
+    print("\n".join(lines), file=sys.stderr)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -1267,6 +1297,7 @@ def main() -> int:
         confirmations_path=args.confirmations,
     )
     _write_json(args.output, report)
+    _print_preflight_summary(report)
     print(json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True))
     if report["status"] == "READY_FOR_SUBMISSION":
         return 0
