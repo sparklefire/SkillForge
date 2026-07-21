@@ -5,6 +5,7 @@ import json
 import os
 import stat
 import subprocess
+import sys
 from copy import deepcopy
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -564,3 +565,35 @@ def test_guided_status_script_is_safe_and_player_env_excludes_secrets(
     payload = json.loads(result.stdout)
     assert payload["automatic_human_confirmations"] == 0
     assert str(ROOT) not in result.stdout
+def test_guided_review_error_prints_actionable_hints(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    def _boom() -> None:
+        raise GuidedHumanReviewError("引导式人工审核必须在交互式终端运行")
+
+    monkeypatch.setattr(guided_review, "_require_tty", _boom)
+    monkeypatch.setattr(sys, "argv", ["guided_human_review", "training-video"])
+    exit_code = guided_review.main()
+    captured = capsys.readouterr()
+    assert exit_code == 1
+    payload = json.loads(captured.out)
+    assert payload["status"] == "ERROR"
+    assert payload["message"] == "引导式人工审核必须在交互式终端运行"
+    assert "真实终端" in captured.err
+
+
+def test_guided_review_declined_prints_actionable_hints(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    def _boom(*args: object, **kwargs: object) -> object:
+        raise GuidedHumanReviewDeclined("培训视频观看检查存在未确认项；草稿和QA均未修改")
+
+    monkeypatch.setattr(guided_review, "_require_tty", lambda: None)
+    monkeypatch.setattr(guided_review, "_interactive_media", _boom)
+    monkeypatch.setattr(sys, "argv", ["guided_human_review", "training-video"])
+    exit_code = guided_review.main()
+    captured = capsys.readouterr()
+    assert exit_code == 1
+    payload = json.loads(captured.out)
+    assert payload["status"] == "ERROR"
+    assert "答 y" in captured.err

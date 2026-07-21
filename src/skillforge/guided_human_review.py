@@ -17,6 +17,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Callable
 
+from .cli_hints import print_error_hints
 from .contracts import ContractValidationError, validate_document
 from .demo import ROOT
 from .final_recording_review import (
@@ -942,6 +943,41 @@ def _print_confirm_hint(action: str, result: dict[str, Any]) -> None:
     )
 
 
+_GUIDED_REVIEW_ERROR_HINTS = {
+    "未找到ffplay播放器": [
+        "── 需要ffplay播放器 ──",
+        "  安装FFmpeg：brew install ffmpeg（本机原生方案）；",
+        "  或用 --player /path/to/ffplay 指定可执行文件后重试。",
+    ],
+    "引导式人工审核必须在交互式终端运行": [
+        "  提示：请在本机真实终端直接运行本命令，不要通过管道、脚本或非交互方式调用。",
+    ],
+    "待审核视频不存在或为空": [
+        "  提示：先构建待审核视频（培训视频或最终录屏构建脚本），再重新运行本流程。",
+    ],
+    "播放时长不足或异常；没有写入人工结论": [
+        "  提示：请从头到尾完整观看，不要拖动进度或提前关闭；播放结束后再逐项确认。",
+    ],
+    "播放器未正常完成；草稿和QA均未修改": [
+        "  提示：让播放器自然播完并自动退出，不要中途关闭窗口；然后重新运行本流程。",
+    ],
+    "培训视频观看检查存在未确认项；草稿和QA均未修改": [
+        "  提示：所有检查项都需答 y 才能通过；若有项答 n，说明该片需要修正，"
+        "修正后重新运行本流程并逐项确认。",
+    ],
+    "最终录屏观看检查存在未确认项；草稿和QA均未修改": [
+        "  提示：所有检查项都需答 y 才能通过；若有项答 n，说明该片需要修正，"
+        "修正后重新运行本流程并逐项确认。",
+    ],
+    "彩排逐段检查存在未确认项；草稿和QA均未修改": [
+        "  提示：每段的讲解、操作、证明点和兜底都需完成并答 y；补齐后重新运行本流程。",
+    ],
+    "彩排整体检查存在未确认项；草稿和QA均未修改": [
+        "  提示：整体检查三项都需答 y；补齐后重新运行本流程。",
+    ],
+}
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -990,6 +1026,8 @@ def main() -> int:
             )
             else "引导式人工审核失败"
         )
+        if isinstance(exc, GuidedHumanReviewError):
+            print_error_hints(message, exact_hints=_GUIDED_REVIEW_ERROR_HINTS)
         print(
             json.dumps(
                 {
