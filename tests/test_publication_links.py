@@ -2,11 +2,13 @@ from __future__ import annotations
 
 import json
 import stat
+import sys
 from copy import deepcopy
 from pathlib import Path
 
 import pytest
 
+from skillforge import publication_links as publication_module
 from skillforge.contracts import ContractValidationError, validate_document
 from skillforge.publication_links import (
     EXPECTED_TARGETS,
@@ -199,3 +201,18 @@ def test_publication_link_script_is_executable() -> None:
         "CODE_REPOSITORY": "HTML",
         "FINAL_RECORDING": "HTML_OR_VIDEO",
     }
+def test_publication_links_error_prints_actionable_hints(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    def _boom(*args: object, **kwargs: object) -> object:
+        raise PublicationLinksError("公开链接私有输入不存在；请先使用--init")
+
+    monkeypatch.setattr(publication_module, "verify_publication_links", _boom)
+    monkeypatch.setattr(sys, "argv", ["check_publication_links"])
+    exit_code = publication_module.main()
+    captured = capsys.readouterr()
+    assert exit_code == 1
+    payload = json.loads(captured.out)
+    assert payload["status"] == "ERROR"
+    assert "--init" in captured.err
+    assert "READY_FOR_CHECK" in captured.err

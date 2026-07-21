@@ -3,11 +3,13 @@ from __future__ import annotations
 import hashlib
 import json
 import stat
+import sys
 from copy import deepcopy
 from pathlib import Path
 
 import pytest
 
+from skillforge import training_video_review as tvr_module
 from skillforge.contracts import ContractValidationError, validate_document
 from skillforge.submission import _check_training_video_review_private_state
 from skillforge.training_video_review import (
@@ -415,3 +417,17 @@ def test_training_video_review_script_is_executable() -> None:
     script = ROOT / "scripts/check_training_video_review.sh"
     assert script.is_file()
     assert script.stat().st_mode & 0o111
+def test_training_video_review_error_prints_actionable_hints(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    def _boom(*args: object, **kwargs: object) -> object:
+        raise TrainingVideoReviewError("观看审核记录不存在；请先使用--init")
+
+    monkeypatch.setattr(tvr_module, "verify_training_video_review", _boom)
+    monkeypatch.setattr(sys, "argv", ["check_training_video_review"])
+    exit_code = tvr_module.main()
+    captured = capsys.readouterr()
+    assert exit_code == 1
+    payload = json.loads(captured.out)
+    assert payload["status"] == "ERROR"
+    assert "training-video" in captured.err

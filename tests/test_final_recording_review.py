@@ -4,10 +4,12 @@ import hashlib
 import json
 import os
 import stat
+import sys
 from pathlib import Path
 
 import pytest
 
+from skillforge import final_recording_review as frr_module
 from skillforge.contracts import ContractValidationError, validate_document
 from skillforge.final_recording import evaluate_final_recording, write_private_report
 from skillforge.final_recording_review import (
@@ -362,3 +364,17 @@ def test_final_recording_review_script_is_executable() -> None:
     script = ROOT / "scripts/check_final_recording_review.sh"
     assert script.is_file()
     assert os.access(script, os.X_OK)
+def test_final_recording_review_error_prints_actionable_hints(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    def _boom(*args: object, **kwargs: object) -> object:
+        raise FinalRecordingReviewError("最终录屏审核记录不存在；请先使用--init")
+
+    monkeypatch.setattr(frr_module, "verify_final_recording_review", _boom)
+    monkeypatch.setattr(sys, "argv", ["check_final_recording_review"])
+    exit_code = frr_module.main()
+    captured = capsys.readouterr()
+    assert exit_code == 1
+    payload = json.loads(captured.out)
+    assert payload["status"] == "ERROR"
+    assert "final-recording" in captured.err

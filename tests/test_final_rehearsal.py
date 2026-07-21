@@ -4,11 +4,13 @@ import hashlib
 import json
 import shutil
 import stat
+import sys
 from copy import deepcopy
 from pathlib import Path
 
 import pytest
 
+from skillforge import final_rehearsal as rehearsal_module
 from skillforge.contracts import ContractValidationError, validate_document
 from skillforge.final_rehearsal import (
     DEFAULT_POLICY,
@@ -314,3 +316,32 @@ def test_final_rehearsal_script_is_executable() -> None:
     script = ROOT / "scripts/check_final_rehearsal.sh"
     assert script.is_file()
     assert script.stat().st_mode & 0o111
+def test_final_rehearsal_error_prints_actionable_hints(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    def _boom(*args: object, **kwargs: object) -> object:
+        raise FinalRehearsalError("彩排记录不存在；请先使用--init")
+
+    monkeypatch.setattr(rehearsal_module, "verify_final_rehearsal", _boom)
+    monkeypatch.setattr(sys, "argv", ["check_final_rehearsal"])
+    exit_code = rehearsal_module.main()
+    captured = capsys.readouterr()
+    assert exit_code == 1
+    payload = json.loads(captured.out)
+    assert payload["status"] == "ERROR"
+    assert "--init" in captured.err
+    assert "final-rehearsal" in captured.err
+
+
+def test_final_rehearsal_dynamic_failure_uses_prefix_hint(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    def _boom(*args: object, **kwargs: object) -> object:
+        raise FinalRehearsalError("彩排计时或完整性检查未通过：DURATION")
+
+    monkeypatch.setattr(rehearsal_module, "verify_final_rehearsal", _boom)
+    monkeypatch.setattr(sys, "argv", ["check_final_rehearsal"])
+    exit_code = rehearsal_module.main()
+    captured = capsys.readouterr()
+    assert exit_code == 1
+    assert "READY_FOR_CHECK" in captured.err

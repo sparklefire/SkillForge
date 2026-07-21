@@ -9,6 +9,7 @@ import json
 import os
 import stat
 import subprocess
+import sys
 import tempfile
 from collections.abc import Callable
 from datetime import datetime, timezone
@@ -16,6 +17,7 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import parse_qsl, urlsplit, urlunsplit
 
+from .cli_hints import print_error_hints
 from .contracts import ContractValidationError, validate_document
 from .demo import ROOT
 
@@ -380,6 +382,41 @@ def _write_private_json(
     return destination
 
 
+_PUBLICATION_LINKS_ERROR_HINTS = {
+    "公开链接私有输入不存在；请先使用--init": [
+        "── 公开链接待办（私有） ──",
+        "  1. 初始化空白链接表：bash scripts/check_publication_links.sh --init",
+        "  2. 用编辑器填入作品页、代码仓库、最终录屏三个公开网址，"
+        "并把 status 改为 READY_FOR_CHECK",
+        "  3. 重新运行 bash scripts/check_publication_links.sh 复核三个公开入口",
+    ],
+    "公开链接尚未填写完成": [
+        "  提示：用编辑器填入三个公开网址并把 status 改为 READY_FOR_CHECK，"
+        "再重新运行本脚本。",
+    ],
+    "三个公开入口必须完整、唯一且类型正确": [
+        "  提示：作品页、代码仓库、最终录屏三个网址必须都填写、互不重复且类型正确，"
+        "修正后重新运行本脚本。",
+    ],
+    "公开链接必须是无账号、片段或私有主机的HTTPS地址": [
+        "  提示：三个入口必须是可匿名访问的公开 HTTPS 网址，"
+        "不能含登录账号、#片段或私有/内网主机。",
+    ],
+    "公开链接不能包含疑似凭证或签名参数": [
+        "  提示：公开网址不能携带 token、签名或密钥类查询参数；改用干净链接后重试。",
+    ],
+    "公开链接输入不符合严格Schema": [
+        "  提示：对照私有链接表模板的字段名与取值检查并修正，再重新运行本脚本。",
+    ],
+    "公开链接私有输入权限必须为目录0700、文件0600": [
+        "  提示：私有目录应为 0700、链接表文件应为 0600；修正后重新运行本脚本。",
+    ],
+    "公开链接私有目录权限必须为0700": [
+        "  提示：私有提交目录权限应为 0700；修正后重新运行本脚本。",
+    ],
+}
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input", type=Path, default=DEFAULT_INPUT)
@@ -394,6 +431,8 @@ def main() -> int:
         report = verify_publication_links(args.input)
         _write_private_json(report, args.output)
     except (ContractValidationError, OSError, PublicationLinksError) as exc:
+        if isinstance(exc, PublicationLinksError):
+            print_error_hints(str(exc), exact_hints=_PUBLICATION_LINKS_ERROR_HINTS)
         print(
             json.dumps(
                 {

@@ -7,11 +7,13 @@ import hashlib
 import json
 import os
 import stat
+import sys
 import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from .cli_hints import print_error_hints
 from .contracts import ContractValidationError, validate_document
 from .demo import ROOT
 
@@ -395,6 +397,38 @@ def training_video_review_qa_issue(
     return None
 
 
+_TRAINING_VIDEO_REVIEW_ERROR_HINTS = {
+    "观看审核记录不存在；请先使用--init": [
+        "── 培训视频完整观看待办（私有） ──",
+        "  建议直接用引导式流程：bash scripts/run_guided_human_review.sh training-video",
+        "  它会初始化记录、带你从头到尾看完并按屏幕提示完成确认。",
+    ],
+    "观看审核记录尚未填写完成": [
+        "  提示：改用 bash scripts/run_guided_human_review.sh training-video 继续，"
+        "或补全观看记录并把 status 改为 READY_FOR_CHECK 后重新运行本脚本。",
+    ],
+    "培训视频观看时长不足或异常": [
+        "  提示：请从头到尾完整观看当前成片，不要拖动跳过，再重新记录观看时间。",
+    ],
+    "培训视频观看时间顺序或确认时间无效": [
+        "  提示：开始时间应早于结束与确认时间且都带时区；修正后重新运行本脚本。",
+    ],
+    "观看审核记录不符合严格Schema": [
+        "  提示：对照私有观看记录模板的字段名与取值检查并修正，再重新运行本脚本。",
+    ],
+    "观看审核记录权限必须为目录0700、文件0600": [
+        "  提示：私有目录应为 0700、观看记录文件应为 0600；修正后重新运行本脚本。",
+    ],
+}
+
+_TRAINING_VIDEO_REVIEW_PREFIX_HINTS = {
+    "完整观看或当前成片绑定未通过": [
+        "  提示：改用 bash scripts/run_guided_human_review.sh training-video 重新完成"
+        "完整观看与当前成片绑定。",
+    ],
+}
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input", type=Path, default=DEFAULT_INPUT)
@@ -419,6 +453,12 @@ def main() -> int:
         )
         _write_private_json(report, args.output)
     except (ContractValidationError, OSError, TrainingVideoReviewError) as exc:
+        if isinstance(exc, TrainingVideoReviewError):
+            print_error_hints(
+                str(exc),
+                exact_hints=_TRAINING_VIDEO_REVIEW_ERROR_HINTS,
+                prefix_hints=_TRAINING_VIDEO_REVIEW_PREFIX_HINTS,
+            )
         print(
             json.dumps(
                 {

@@ -7,11 +7,13 @@ import hashlib
 import json
 import os
 import stat
+import sys
 import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from .cli_hints import print_error_hints
 from .contracts import ContractValidationError, validate_document
 from .demo import ROOT
 
@@ -360,6 +362,36 @@ def final_rehearsal_qa_issue(
     return None
 
 
+_FINAL_REHEARSAL_ERROR_HINTS = {
+    "彩排记录不存在；请先使用--init": [
+        "── 最终彩排待办（私有） ──",
+        "  1. 初始化空白彩排记录：bash scripts/check_final_rehearsal.sh --init",
+        "  2. 建议改用引导式流程：bash scripts/run_guided_human_review.sh final-rehearsal",
+        "  3. 按运行单完成连续真人计时彩排并填写记录，把 status 改为 READY_FOR_CHECK",
+    ],
+    "彩排记录尚未填写完成": [
+        "  提示：按运行单补全彩排各阶段计时与结论，并把 status 改为 READY_FOR_CHECK，"
+        "再重新运行本脚本；或改用 bash scripts/run_guided_human_review.sh final-rehearsal。",
+    ],
+    "彩排记录不符合严格Schema": [
+        "  提示：对照私有彩排记录模板的字段名与取值检查并修正，再重新运行本脚本。",
+    ],
+    "彩排记录权限必须为目录0700、文件0600": [
+        "  提示：私有目录应为 0700、彩排记录文件应为 0600；修正后重新运行本脚本。",
+    ],
+    "彩排私有目录权限必须为0700": [
+        "  提示：私有提交目录权限应为 0700；修正后重新运行本脚本。",
+    ],
+}
+
+_FINAL_REHEARSAL_PREFIX_HINTS = {
+    "彩排计时或完整性检查未通过": [
+        "  提示：按运行单重做上述未通过项，补全计时与结论，"
+        "并把 status 改为 READY_FOR_CHECK，再重新运行本脚本。",
+    ],
+}
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input", type=Path, default=DEFAULT_INPUT)
@@ -380,6 +412,12 @@ def main() -> int:
         )
         _write_private_json(report, args.output)
     except (ContractValidationError, FinalRehearsalError, OSError) as exc:
+        if isinstance(exc, FinalRehearsalError):
+            print_error_hints(
+                str(exc),
+                exact_hints=_FINAL_REHEARSAL_ERROR_HINTS,
+                prefix_hints=_FINAL_REHEARSAL_PREFIX_HINTS,
+            )
         print(
             json.dumps(
                 {
