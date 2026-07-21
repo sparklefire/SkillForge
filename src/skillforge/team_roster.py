@@ -7,11 +7,13 @@ import hashlib
 import json
 import os
 import stat
+import sys
 import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from .cli_hints import print_error_hints
 from .contracts import ContractValidationError, validate_document
 from .demo import ROOT
 
@@ -212,6 +214,34 @@ def verify_team_roster(
     )
 
 
+_TEAM_ROSTER_ERROR_HINTS = {
+    "团队名单私有输入不存在；请先使用--init": [
+        "── 团队名单待办（私有） ──",
+        "  1. 初始化空白名单：bash scripts/check_team_roster.sh --init",
+        "  2. 用编辑器打开私有名单，填写成员、资格声明、主联系人与角色映射，"
+        "并把 status 改为 READY_FOR_CHECK",
+        "  3. 重新运行 bash scripts/check_team_roster.sh 生成私有名单报告",
+    ],
+    "团队名单尚未填写完成": [
+        "  提示：用编辑器打开私有名单，补全成员、资格声明、主联系人与角色映射，"
+        "并把 status 改为 READY_FOR_CHECK，再重新运行本脚本。",
+    ],
+    "团队人数、资格声明、主联系人或角色映射尚未通过": [
+        "  提示：用编辑器打开私有名单，补全未通过的字段，"
+        "并把 status 改为 READY_FOR_CHECK，再重新运行本脚本。",
+    ],
+    "团队名单不符合严格Schema": [
+        "  提示：对照私有名单模板的字段名与取值检查并修正，再重新运行本脚本。",
+    ],
+    "团队名单私有目录权限必须为0700": [
+        "  提示：私有提交目录权限应为 0700；修正后重新运行本脚本。",
+    ],
+    "团队名单权限必须为目录0700、文件0600": [
+        "  提示：私有目录应为 0700、名单文件应为 0600；修正后重新运行本脚本。",
+    ],
+}
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input", type=Path, default=DEFAULT_INPUT)
@@ -226,6 +256,8 @@ def main() -> int:
         report = verify_team_roster(args.input)
         _write_private_json(report, args.output)
     except (ContractValidationError, OSError, TeamRosterError) as exc:
+        if isinstance(exc, TeamRosterError):
+            print_error_hints(str(exc), exact_hints=_TEAM_ROSTER_ERROR_HINTS)
         print(
             json.dumps(
                 {

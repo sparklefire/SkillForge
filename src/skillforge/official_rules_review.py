@@ -8,12 +8,14 @@ import json
 import os
 import shutil
 import stat
+import sys
 import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlsplit
 
+from .cli_hints import print_error_hints
 from .contracts import ContractValidationError, validate_document
 from .demo import ROOT
 
@@ -482,6 +484,46 @@ def official_rules_review_qa_issue(
     return None
 
 
+_OFFICIAL_RULES_ERROR_HINTS = {
+    "规则审核记录不存在；请先使用--init": [
+        "── 官方规则审核待办（私有） ──",
+        "  1. 初始化空白审核表：bash scripts/check_official_rules_review.sh --init",
+        "  2. 绑定官方规则来源：bash scripts/check_official_rules_review.sh"
+        " --attach-source /path/to/official_rules.pdf",
+        "  3. 逐项填写六项核对结论并把 status 改为 READY_FOR_CHECK，"
+        "再重新运行 bash scripts/check_official_rules_review.sh",
+    ],
+    "规则审核记录尚未填写完成": [
+        "  提示：用编辑器打开私有审核表，补全六项核对结论，"
+        "并把 status 改为 READY_FOR_CHECK，再重新运行本脚本。",
+    ],
+    "规则审核记录未绑定官方来源": [
+        "  提示：bash scripts/check_official_rules_review.sh"
+        " --attach-source /path/to/official_rules.pdf",
+    ],
+    "官方规则来源文件不存在或为空": [
+        "  提示：确认 --attach-source 指向真实且非空的文件后重试。",
+    ],
+    "官方规则来源文件类型不在允许范围": [
+        "  提示：来源仅支持 pdf/html/htm/txt/md/png/jpg/jpeg/pptx；"
+        "转换格式后重试。",
+    ],
+    "规则审核记录不符合严格Schema": [
+        "  提示：对照私有审核表模板的字段名与取值检查并修正，再重新运行本脚本。",
+    ],
+    "规则审核记录权限必须为目录0700、文件0600": [
+        "  提示：私有目录应为 0700、审核表文件应为 0600；修正后重新运行本脚本。",
+    ],
+}
+
+_OFFICIAL_RULES_PREFIX_HINTS = {
+    "官方规则六项核对未通过": [
+        "  提示：在私有审核表中补全上述未通过项的核对结论，"
+        "并把 status 改为 READY_FOR_CHECK，再重新运行本脚本。",
+    ],
+}
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input", type=Path, default=DEFAULT_INPUT)
@@ -518,6 +560,12 @@ def main() -> int:
                 "human_gate_status": report["human_gate_status"],
             }
     except (ContractValidationError, OSError, OfficialRulesReviewError) as exc:
+        if isinstance(exc, OfficialRulesReviewError):
+            print_error_hints(
+                str(exc),
+                exact_hints=_OFFICIAL_RULES_ERROR_HINTS,
+                prefix_hints=_OFFICIAL_RULES_PREFIX_HINTS,
+            )
         print(
             json.dumps(
                 {

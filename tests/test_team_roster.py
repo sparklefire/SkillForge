@@ -2,11 +2,13 @@ from __future__ import annotations
 
 import json
 import stat
+import sys
 from copy import deepcopy
 from pathlib import Path
 
 import pytest
 
+from skillforge import team_roster as team_roster_module
 from skillforge.contracts import ContractValidationError, validate_document
 from skillforge.submission import _check_team_roster_private_state
 from skillforge.team_roster import (
@@ -170,3 +172,19 @@ def test_team_roster_script_is_executable() -> None:
     script = ROOT / "scripts/check_team_roster.sh"
     assert script.is_file()
     assert script.stat().st_mode & 0o111
+def test_team_roster_error_prints_actionable_hints(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    def _boom(*args: object, **kwargs: object) -> object:
+        raise TeamRosterError("团队名单私有输入不存在；请先使用--init")
+
+    monkeypatch.setattr(team_roster_module, "verify_team_roster", _boom)
+    monkeypatch.setattr(sys, "argv", ["check_team_roster"])
+    exit_code = team_roster_module.main()
+    captured = capsys.readouterr()
+    assert exit_code == 1
+    payload = json.loads(captured.out)
+    assert payload["status"] == "ERROR"
+    assert payload["message"] == "团队名单私有输入不存在；请先使用--init"
+    assert "--init" in captured.err
+    assert "READY_FOR_CHECK" in captured.err

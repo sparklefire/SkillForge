@@ -2,11 +2,13 @@ from __future__ import annotations
 
 import json
 import stat
+import sys
 from copy import deepcopy
 from pathlib import Path
 
 import pytest
 
+from skillforge import official_rules_review as official_rules_module
 from skillforge.contracts import ContractValidationError, validate_document
 from skillforge.official_rules_review import (
     REQUIREMENT_IDS,
@@ -306,3 +308,34 @@ def test_official_rules_review_script_is_executable() -> None:
     script = ROOT / "scripts/check_official_rules_review.sh"
     assert script.is_file()
     assert script.stat().st_mode & 0o111
+def test_official_rules_error_prints_actionable_hints(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    def _boom(*args: object, **kwargs: object) -> object:
+        raise OfficialRulesReviewError("规则审核记录不存在；请先使用--init")
+
+    monkeypatch.setattr(official_rules_module, "verify_official_rules_review", _boom)
+    monkeypatch.setattr(sys, "argv", ["check_official_rules_review"])
+    exit_code = official_rules_module.main()
+    captured = capsys.readouterr()
+    assert exit_code == 1
+    payload = json.loads(captured.out)
+    assert payload["status"] == "ERROR"
+    assert "--init" in captured.err
+    assert "--attach-source" in captured.err
+
+
+def test_official_rules_dynamic_failure_uses_prefix_hint(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    def _boom(*args: object, **kwargs: object) -> object:
+        raise OfficialRulesReviewError("官方规则六项核对未通过：R1, R2")
+
+    monkeypatch.setattr(official_rules_module, "verify_official_rules_review", _boom)
+    monkeypatch.setattr(sys, "argv", ["check_official_rules_review"])
+    exit_code = official_rules_module.main()
+    captured = capsys.readouterr()
+    assert exit_code == 1
+    payload = json.loads(captured.out)
+    assert payload["message"] == "官方规则六项核对未通过：R1, R2"
+    assert "READY_FOR_CHECK" in captured.err
