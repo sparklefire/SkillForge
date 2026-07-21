@@ -17,14 +17,14 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
     font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-    background: var(--paper);
+    background: transparent;
     color: var(--ink);
     line-height: 1.9;
     font-size: 17px;
   }
   .header {
-    background: linear-gradient(135deg, #1a1a1a 0%, #2d2420 100%);
-    color: #fff;
+    background: transparent;
+    color: var(--ink);
     padding: 48px 24px 40px;
     text-align: left;
     max-width: 720px;
@@ -34,7 +34,7 @@
   .header .series {
     font-size: 13px;
     letter-spacing: 2px;
-    color: #e8a87c;
+    color: var(--accent);
     text-transform: uppercase;
     margin-bottom: 12px;
   }
@@ -46,8 +46,9 @@
   }
   .header .method {
     display: inline-block;
-    background: var(--accent);
-    color: #fff;
+    background: transparent;
+    border: 1.5px solid var(--accent);
+    color: var(--accent);
     padding: 4px 14px;
     border-radius: 3px;
     font-size: 14px;
@@ -75,7 +76,7 @@
   p { margin: 0 0 18px; }
   strong { color: var(--accent); font-weight: 700; }
   blockquote {
-    background: var(--accent-light);
+    background: transparent;
     border-left: 4px solid var(--accent);
     padding: 14px 20px;
     margin: 24px 0;
@@ -114,17 +115,18 @@
     padding: 10px 14px;
     text-align: left;
   }
-  th { background: var(--code-bg); font-weight: 600; }
+  th { background: transparent; font-weight: 600; }
   code {
-    background: var(--code-bg);
+    background: transparent;
     padding: 2px 6px;
     border-radius: 3px;
     font-size: 14px;
     font-family: "SF Mono", Menlo, monospace;
   }
   pre {
-    background: #1a1a1a;
-    color: #e8e8e8;
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--border);
     padding: 20px;
     border-radius: 6px;
     overflow-x: auto;
@@ -165,7 +167,7 @@
   }
   .nav a {
     flex: 1;
-    background: #fff;
+    background: transparent;
     border: 1px solid var(--border);
     border-radius: 6px;
     padding: 14px 18px;
