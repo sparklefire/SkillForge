@@ -117,3 +117,4 @@ print(json.dumps(result, ensure_ascii=False, sort_keys=True))
 PY
 
 echo "tunnel_smoke=passed local=http://127.0.0.1:$LOCAL_PORT remote=127.0.0.1:$REMOTE_PORT"
+echo "提示：smoke结束即关闭隧道；要在浏览器打开页面，请运行 bash scripts/dgx_demo_tunnel.sh（不带--smoke）并保持该终端开启。"

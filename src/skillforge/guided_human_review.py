@@ -674,10 +674,33 @@ def _interactive_media(kind: str, player: str | None) -> dict[str, Any]:
     }
 
 
+def _rehearsal_ppt_hint() -> str:
+    presentation_dir = DEFAULT_RUNBOOK.parents[2] / "output" / "presentation"
+    candidates = sorted(
+        path
+        for path in presentation_dir.glob("*v2.pptx")
+        if not path.name.startswith("~$")
+    )
+    if candidates:
+        return f"output/presentation/{candidates[0].name}"
+    return "output/presentation/ 目录下最新版路演PPT（v2）"
+
+
 def _interactive_rehearsal() -> dict[str, Any]:
     _require_tty()
     runbook = load_runbook()
-    print("将按7段运行单计时。先准备PPT、Web和DGX隧道；每段完成时按回车。")
+    total_seconds = int(runbook.get("total_duration_ms", 180_000)) // 1000
+    segment_count = len(runbook["segments"])
+    print(
+        f"═══ 最终舞台计时彩排：共{segment_count}段，全程预算{total_seconds}秒 ═══\n"
+        "开始前准备（约1分钟）：\n"
+        f"  1. PPT：演示模式打开 {_rehearsal_ppt_hint()}，停在第1页\n"
+        "  2. Web：浏览器打开 http://127.0.0.1:17860；若无法访问，另开终端运行 bash scripts/dgx_demo_tunnel.sh\n"
+        "  3. 布局：PPT与浏览器各占半屏（或Alt+Tab切换）；界面说明：PPT=演示文稿窗口，WEB=浏览器页面\n"
+        "  4. 不用录音、不用录屏——正式录屏已通过审核，本次只练节奏和切换\n"
+        f"  5. 计时自动进行：每段讲完按一次回车即可，建议全程落在{total_seconds - 5}~{total_seconds}秒\n"
+        "  6. 讲解词已写入PPT备注（演示者视图可见），下面再列一份供对照\n"
+    )
     for index, segment in enumerate(runbook["segments"], start=1):
         planned = (segment["end_ms"] - segment["start_ms"]) // 1000
         print(
@@ -687,12 +710,15 @@ def _interactive_rehearsal() -> dict[str, Any]:
             f"   证明：{'；'.join(segment['proof_points'])}\n"
             f"   兜底：{segment['fallback']}"
         )
-    input("准备完成后按回车开始计时。")
+    input("以上全部准备好后，按回车开始计时。")
     started_at = datetime.now(timezone.utc)
     started_mono = time.monotonic()
     boundaries = [0]
     for index, segment in enumerate(runbook["segments"], start=1):
-        input(f"正在执行第{index}段「{segment['label']}」；完成后按回车切换。")
+        input(
+            f"▶ 第{index}段「{segment['label']}」｜界面: {segment['surface']}｜操作: {segment['operator_action']}\n"
+            "  讲完按回车继续。"
+        )
         boundaries.append(round((time.monotonic() - started_mono) * 1000))
     print(f"计时结束：{boundaries[-1] / 1000:.3f}秒。现在核对人工事实。")
     segment_checks = []
