@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import hashlib
 import stat
+import sys
 from pathlib import Path
 
 import pytest
@@ -828,3 +829,37 @@ def test_human_gate_script_is_executable() -> None:
     script = ROOT / "scripts/manage_human_gates.sh"
     assert script.is_file()
     assert script.stat().st_mode & 0o111
+
+
+def test_status_cli_keeps_stdout_json_and_adds_stderr_summary(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    import skillforge.human_gates as human_gates_module
+
+    runbook = _copied_runbook(tmp_path)
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "manage_human_gates",
+            "--store",
+            str(tmp_path / "state.json"),
+            "--runbook",
+            str(runbook),
+            "status",
+        ],
+    )
+    exit_code = human_gates_module.main()
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    payload = json.loads(captured.out)
+    assert payload["store_state"] == "ABSENT"
+    assert payload["summary"]["total"] == len(GATE_IDS)
+    # stderr carries the human-readable summary with next-step guidance
+    assert "人工门禁" in captured.err
+    assert "bash scripts/run_guided_human_review.sh training-video" in captured.err
+    assert "outputs/submission/official_rules_review.json" in captured.err
+    # privacy: reviewer names never appear in the summary
+    assert "审核人" not in captured.err

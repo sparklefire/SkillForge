@@ -7,6 +7,7 @@ import hashlib
 import json
 import os
 import stat
+import sys
 import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
@@ -613,7 +614,67 @@ class HumanGateStore:
         return self.audit()
 
 
+_GUIDED_REVIEW_HINTS = {
+    "TRAINING_VIDEO_FULL_WATCH": "bash scripts/run_guided_human_review.sh training-video",
+    "FINAL_STAGE_REHEARSAL": "bash scripts/run_guided_human_review.sh final-rehearsal",
+    "FINAL_RECORDING_REVIEW": "bash scripts/run_guided_human_review.sh final-recording",
+}
+
+_DIRECT_CONFIRM_HINTS = {
+    "TEAM_ELIGIBILITY_CONFIRMED": (
+        "bash scripts/manage_human_gates.sh confirm --gate TEAM_ELIGIBILITY_CONFIRMED"
+        " --reviewer <你的姓名> --evidence-file outputs/submission/team_roster.json"
+        " --note <备注>"
+    ),
+    "OFFICIAL_RULES_VERIFIED": (
+        "bash scripts/manage_human_gates.sh confirm --gate OFFICIAL_RULES_VERIFIED"
+        " --reviewer <你的姓名> --evidence-file"
+        " outputs/submission/official_rules_review.json --note <备注>"
+    ),
+}
+
+
+def _print_human_summary(result: dict[str, Any]) -> None:
+    """Print a privacy-safe, human-readable summary to stderr.
+
+    stdout stays pure JSON so pipes and machine consumers are unaffected.
+    The summary only exposes gate ids, labels, statuses and store state;
+    reviewer names and evidence contents never appear here.
+    """
+    summary = result.get("summary", {})
+    passed = summary.get("passed", 0)
+    total = summary.get("total", 0)
+    state = result.get("store_state", "UNKNOWN")
+    lines = [f"══ 人工门禁 {passed}/{total} 已确认 · 存储状态 {state} ══"]
+    issues = result.get("issues") or []
+    if issues:
+        lines.append("⚠️  存储问题：" + "；".join(str(item) for item in issues))
+    if state == "STALE":
+        lines.append(
+            "   运行单已变化，先运行：bash scripts/manage_human_gates.sh reset-stale"
+            " --reviewer <你的姓名> --note <备注>"
+        )
+    for gate in result.get("gates", []):
+        done = gate.get("status") == "PASSED"
+        icon = "✅" if done else "⏳"
+        lines.append(f"{icon} {gate.get('gate_id')}　{gate.get('label', '')}")
+        if done:
+            continue
+        hint = _GUIDED_REVIEW_HINTS.get(gate.get("gate_id", "")) or _DIRECT_CONFIRM_HINTS.get(
+            gate.get("gate_id", "")
+        )
+        if hint:
+            lines.append(f"   → {hint}")
+    if total and passed == total and not issues:
+        lines.append(
+            "🎉 全部人工门禁已确认；可冻结最终预检：bash scripts/check_submission.sh"
+            " --output outputs/submission/submission_preflight_final.json"
+        )
+    print("\n".join(lines), file=sys.stderr)
+
+
 def _print_status(result: dict[str, Any]) -> None:
+    _print_human_summary(result)
     print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))
 
 
@@ -666,6 +727,7 @@ def main() -> int:
         else:
             result = store.reset_stale(reviewer=args.reviewer, note=args.note)
     except HumanGateError as exc:
+        print(f"❌ {exc}", file=sys.stderr)
         print(json.dumps({"status": "ERROR", "message": str(exc)}, ensure_ascii=False))
         return 1
     _print_status(result)
