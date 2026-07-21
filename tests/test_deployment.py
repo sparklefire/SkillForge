@@ -33,3 +33,12 @@ def test_dgx_deployment_shell_syntax() -> None:
     tunnel = scripts[1].read_text(encoding="utf-8")
     assert "unset STEP_API_KEY" in tunnel
     assert "set -a" not in tunnel
+
+
+def test_demo_mode_announces_selected_mode() -> None:
+    script_path = ROOT / "scripts/run_demo_mode.sh"
+    subprocess.run(["bash", "-n", str(script_path)], check=True)
+    script = script_path.read_text(encoding="utf-8")
+    assert "演示模式：live" in script
+    assert "演示模式：preprocessed" in script
+    assert "演示模式：offline" in script

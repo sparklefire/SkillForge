@@ -13,6 +13,8 @@ fi
 cd "$ROOT"
 case "$MODE" in
   live)
+    echo "▶ 演示模式：live（现场调用模型，需 Step Plan 连通）" >&2
+    echo "  正在运行 Gold 质检彩排…" >&2
     "$PYTHON" -m skillforge.gold_rehearsal \
       --gold-sop cases/n31/gold/gold_sop.json \
       --constraints cases/n31/gold/constraints.json \
@@ -21,6 +23,7 @@ case "$MODE" in
     export SKILLFORGE_N31_DIR="$ROOT/cases/n31/output/demo_live"
     ;;
   preprocessed)
+    echo "▶ 演示模式：preprocessed（本机重跑预处理流水线，不调用外部 API）" >&2
     bash scripts/run_n31_local.sh >/dev/null
     export SKILLFORGE_N31_DIR="$ROOT/cases/n31/output/gold_rehearsal_v1"
     ;;
@@ -29,6 +32,7 @@ case "$MODE" in
       echo "缺少离线演示包，请先运行 .venv/bin/python scripts/build_n31_demo_bundle.py" >&2
       exit 1
     fi
+    echo "▶ 演示模式：offline（离线演示包，最稳定）" >&2
     export SKILLFORGE_N31_DIR="$ROOT/cases/n31/demo_bundle"
     ;;
   *)

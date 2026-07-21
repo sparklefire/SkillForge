@@ -19,9 +19,9 @@ Shell 脚本自动加载项目 `.env`（不打印密钥）；Python 脚本需要
 
 | 脚本 | 说明 |
 |---|---|
-| `start_native.sh` | 启动 Web Demo（FastAPI，默认 `0.0.0.0:7860`） |
-| `run_demo_mode.sh` | 三种演示模式：`live` / `preprocessed` / `offline`（默认） |
-| `run_n31_local.sh` | N31 本地预处理模式重跑（不调用外部 API） |
+| `start_native.sh` | 启动 Web Demo（FastAPI，默认 `0.0.0.0:7860`），启动时提示本机访问地址 |
+| `run_demo_mode.sh` | 三种演示模式：`live` / `preprocessed` / `offline`（默认），启动时提示所选模式 |
+| `run_n31_local.sh` | N31 本地预处理模式重跑（不调用外部 API），输出分阶段进度 |
 | `dgx_demo_tunnel.sh` | SSH 隧道映射 DGX 演示到本机 `127.0.0.1:17860` |
 | `manage_dgx_demo_service.sh` | DGX 用户级 systemd 服务：`install` / `restart-test` / `status` |
 
