@@ -3,11 +3,13 @@ from __future__ import annotations
 import json
 import stat
 import subprocess
+import sys
 from copy import deepcopy
 from pathlib import Path
 
 import pytest
 
+from skillforge import submission_receipt as receipt_module
 from skillforge.contracts import ContractValidationError, validate_document
 from skillforge.publication_links import (
     _write_private_json as _write_publication_json,
@@ -326,3 +328,19 @@ def test_missing_default_receipt_fails_safely_and_script_is_executable() -> None
     assert completed.returncode == 1
     assert "/Users/" not in completed.stdout
     assert "READY_FOR_ARCHIVE" not in completed.stdout
+def test_receipt_error_prints_actionable_hints(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    def _boom(*args: object, **kwargs: object) -> object:
+        raise SubmissionReceiptError("提交回执审核记录缺失")
+
+    monkeypatch.setattr(receipt_module, "verify_submission_receipt_review", _boom)
+    monkeypatch.setattr(sys, "argv", ["check_submission_receipt"])
+    exit_code = receipt_module.main()
+    captured = capsys.readouterr()
+    assert exit_code == 1
+    payload = json.loads(captured.out)
+    assert payload["status"] == "ERROR"
+    assert payload["message"] == "提交回执审核记录缺失"
+    assert "--init" in captured.err
+    assert "--attach-receipt" in captured.err

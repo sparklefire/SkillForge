@@ -8,6 +8,7 @@ import json
 import os
 import shutil
 import stat
+import sys
 import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
@@ -521,6 +522,25 @@ def verify_saved_submission_receipt_qa(
     return saved
 
 
+_RECEIPT_ERROR_HINTS = {
+    "提交回执审核记录缺失": [
+        "── 提交回执审核待办（私有） ──",
+        "  1. 初始化空白审核表：bash scripts/check_submission_receipt.sh --init",
+        "  2. 提交成功后绑定截图或PDF：bash scripts/check_submission_receipt.sh"
+        " --attach-receipt /path/to/screenshot.png",
+        "  3. 重新运行 bash scripts/check_submission_receipt.sh 生成私有回执QA",
+    ],
+    "提交回执审核记录尚未填写完成": [
+        "  提示：用编辑器打开私有审核表，填写提交编号与检查结论并把 status 改为"
+        " READY_FOR_CHECK，再重新运行本脚本。",
+    ],
+    "提交回执审核记录未绑定成功截图或PDF": [
+        "  提示：bash scripts/check_submission_receipt.sh --attach-receipt"
+        " /path/to/screenshot.png",
+    ],
+}
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input", type=Path, default=DEFAULT_INPUT)
@@ -578,6 +598,9 @@ def main() -> int:
                 ],
             }
     except (ContractValidationError, OSError, SubmissionReceiptError) as exc:
+        if isinstance(exc, SubmissionReceiptError):
+            for line in _RECEIPT_ERROR_HINTS.get(str(exc), []):
+                print(line, file=sys.stderr)
         print(
             json.dumps(
                 {
