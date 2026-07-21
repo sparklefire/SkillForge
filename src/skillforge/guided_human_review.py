@@ -555,6 +555,35 @@ def review_status() -> dict[str, Any]:
     }
 
 
+_STATUS_LABELS = {
+    "training_video": ("80秒培训视频观看确认", "training-video"),
+    "final_recording": ("最终录屏观看确认", "final-recording"),
+    "final_rehearsal": ("最终舞台计时彩排", "final-rehearsal"),
+}
+_STATUS_DONE = {"FINAL_APPROVED", "READY_FOR_CHECK"}
+
+
+def _print_status_guidance(result: dict[str, Any]) -> None:
+    """Print a human-readable Chinese summary to stderr; stdout JSON stays unchanged."""
+    items = result.get("items", {})
+    lines = ["── 人工审核状态（仅供本人阅读，不会自动通过任何门禁）──"]
+    pending: list[str] = []
+    for key, (label, action) in _STATUS_LABELS.items():
+        entry = items.get(key, {})
+        status = entry.get("record_status", "ABSENT")
+        if status in _STATUS_DONE and entry.get("qa_present"):
+            lines.append(f"✅ {label}：已完成")
+        else:
+            lines.append(f"⏳ {label}：待完成（当前状态 {status}）")
+            pending.append(f"bash scripts/run_guided_human_review.sh {action}")
+    if pending:
+        lines.append("下一步（在本机交互式终端依次运行）：")
+        lines.extend(f"  {command}" for command in pending)
+    else:
+        lines.append("三项人工审核均已完成。")
+    print("\n".join(lines), file=sys.stderr)
+
+
 def _safe_player_environment() -> dict[str, str]:
     allowed = ("HOME", "PATH", "TMPDIR", "DISPLAY", "LANG", "LC_ALL", "LC_CTYPE")
     return {key: os.environ[key] for key in allowed if key in os.environ}
@@ -750,6 +779,8 @@ def main() -> int:
         )
         return 1
     print(json.dumps(result, ensure_ascii=False, sort_keys=True))
+    if args.action == "status":
+        _print_status_guidance(result)
     return 0
 
 
