@@ -55,7 +55,16 @@ SSH_BASE=(
 "${SSH_BASE[@]}" "$SSH_TARGET" \
   'systemctl --user start skillforge-demo.service && systemctl --user is-active --quiet skillforge-demo.service'
 
+local_demo_healthy() {
+  curl -fsS --max-time 3 "http://127.0.0.1:$LOCAL_PORT/health" >/dev/null 2>&1
+}
+
 if [[ "$MODE" == "tunnel" ]]; then
+  if local_demo_healthy; then
+    echo "✅ 演示隧道已在运行：http://127.0.0.1:${LOCAL_PORT}（端口 ${LOCAL_PORT} 已被占用）。"
+    echo "   直接在浏览器打开即可；如需重建，先关闭占用该端口的旧隧道进程再重跑。"
+    exit 0
+  fi
   echo "SkillForge DGX 演示地址: http://127.0.0.1:$LOCAL_PORT"
   echo "按 Ctrl+C 关闭隧道；DGX 服务不会暴露到公网。"
   exec "${SSH_BASE[@]}" \
@@ -64,16 +73,20 @@ if [[ "$MODE" == "tunnel" ]]; then
     "$SSH_TARGET"
 fi
 
-"${SSH_BASE[@]}" \
-  -N -T \
-  -L "127.0.0.1:$LOCAL_PORT:127.0.0.1:$REMOTE_PORT" \
-  "$SSH_TARGET" &
-tunnel_pid=$!
-trap 'kill "$tunnel_pid" 2>/dev/null || true; wait "$tunnel_pid" 2>/dev/null || true' EXIT
+# 若本机已有健康隧道则直接复用，避免重复绑定端口报 "Address already in use"。
+tunnel_pid=""
+if ! local_demo_healthy; then
+  "${SSH_BASE[@]}" \
+    -N -T \
+    -L "127.0.0.1:$LOCAL_PORT:127.0.0.1:$REMOTE_PORT" \
+    "$SSH_TARGET" &
+  tunnel_pid=$!
+fi
+trap 'if [[ -n "$tunnel_pid" ]]; then kill "$tunnel_pid" 2>/dev/null || true; wait "$tunnel_pid" 2>/dev/null || true; fi' EXIT
 
 health_file="$(mktemp)"
 case_file="$(mktemp)"
-trap 'rm -f "$health_file" "$case_file"; kill "$tunnel_pid" 2>/dev/null || true; wait "$tunnel_pid" 2>/dev/null || true' EXIT
+trap 'rm -f "$health_file" "$case_file"; if [[ -n "$tunnel_pid" ]]; then kill "$tunnel_pid" 2>/dev/null || true; wait "$tunnel_pid" 2>/dev/null || true; fi' EXIT
 
 for _ in $(seq 1 20); do
   if curl -fsS --max-time 3 "http://127.0.0.1:$LOCAL_PORT/health" >"$health_file" 2>/dev/null; then
