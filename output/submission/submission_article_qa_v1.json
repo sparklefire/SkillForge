@@ -1,274 +1,274 @@
 {
-  "version": 1,
-  "case_id": "n31_media_change",
-  "artifact_type": "SUBMISSION_ARTICLE_QA",
-  "status": "READY_FOR_MANUAL_PUBLICATION",
+  "article_bytes": 8414,
   "article_path": "docs/赛事征文.md",
   "article_sha256": "c35e1d48a97c1d24c7e43a7b4ab36c690e732c26501a72ee9838ac9a1ae19d00",
-  "article_bytes": 8414,
+  "artifact_type": "SUBMISSION_ARTICLE_QA",
+  "case_id": "n31_media_change",
+  "checks": {
+    "absolute_paths_absent": true,
+    "credentials_absent": true,
+    "forbidden_phrases_absent": true,
+    "manual_publication_only": true,
+    "minimum_length_met": true,
+    "private_submission_state_absent": true,
+    "repository_links_resolve": true,
+    "repository_links_safe": true,
+    "required_claims_source_backed": true,
+    "required_headings_exact": true,
+    "required_headings_ordered": true,
+    "title_present": true
+  },
   "chinese_character_count": 1960,
-  "heading_count": 9,
-  "repository_link_count": 12,
-  "source_checks": [
-    {
-      "source_id": "AGENT_TOOL_TRACE",
-      "path": "cases/n31/evaluations/agent_tool_trace_v1.json",
-      "sha256": "739adef1d1e5e14c818433e87ec416cda80b562fc2eba70512e2c0aa254468a5",
-      "status": "PASSED"
-    },
-    {
-      "source_id": "CHECKLIST",
-      "path": "cases/n31/demo_bundle/checklist.json",
-      "sha256": "6fd710aef2d7ecd139272a68cf0437bc5f42aac24cd34fa7a187d87b0ae40a88",
-      "status": "PASSED"
-    },
-    {
-      "source_id": "DGX_VISUAL",
-      "path": "cases/n31/evaluations/dgx_visual_compute_v1.json",
-      "sha256": "b475c03d34b4a5db8c423b97f72fdfc11d1d5e99e28c699ed2cac6fc912ab9fb",
-      "status": "PASSED"
-    },
-    {
-      "source_id": "GOLD_SOP",
-      "path": "cases/n31/gold/gold_sop.json",
-      "sha256": "a8f111a52f496f93e9934cedd493630d73732ad73e6e4e79832f0133c31c6f8a",
-      "status": "PASSED"
-    },
-    {
-      "source_id": "MULTISOURCE",
-      "path": "cases/n31/evaluations/multisource_comparison_v1.json",
-      "sha256": "f0adc9b6dbfd1f34d1e3e57ec3588d60b96562bea5b6b167fd05408040aac7af",
-      "status": "PASSED"
-    },
-    {
-      "source_id": "PDF_STRUCTURE",
-      "path": "cases/n31/evaluations/pdf_structure_v1.json",
-      "sha256": "0e40aea7fbdc3440a4c99e97e2a3db2e37f02b6e6a930445808ab2aee850aa97",
-      "status": "PASSED"
-    },
-    {
-      "source_id": "PITCH_RUNBOOK",
-      "path": "cases/n31/pitch_runbook.json",
-      "sha256": "e2404bc234e8d626b3cf1fbe16bb9cd0a3fa67b8a401fbcc0f4781a9b5e237e2",
-      "status": "PASSED"
-    },
-    {
-      "source_id": "POSTER",
-      "path": "output/pdf/n31_a4_training_poster.pdf",
-      "sha256": "d87dd874dc332d8057f0a1106b5b42085f6127f87ddeaa8f4b8a79eee08a8fba",
-      "status": "PASSED"
-    },
-    {
-      "source_id": "QUIZ",
-      "path": "cases/n31/demo_bundle/quiz.json",
-      "sha256": "28d2a117c621a82f228f6b56bdc719aea88e7390b0b2a85e871e89088d88f514",
-      "status": "PASSED"
-    },
-    {
-      "source_id": "REFERENCE_AUDIT",
-      "path": "external/teacher_he_reference/audit_v1.json",
-      "sha256": "eafdffff48b85bf60efc630c31d9f1a724a96e09471b2f39d2b15485b4734e5f",
-      "status": "PASSED"
-    },
-    {
-      "source_id": "REVISION_AUDIT",
-      "path": "cases/n31/demo_bundle/revision_audit.json",
-      "sha256": "e9e2d83a2b5d0ac5f59eb697ae624be8ec530f56756ae327badec4e2c279324b",
-      "status": "PASSED"
-    },
-    {
-      "source_id": "RUNTIME_BENCHMARK",
-      "path": "output/evaluation/runtime_benchmark_dgx.json",
-      "sha256": "1e0cded9d7a59b37387ca4d64668ed8cf10603042c6876362bb5a877b8bfbde7",
-      "status": "PASSED"
-    },
-    {
-      "source_id": "SELECTIVE_REBUILD",
-      "path": "cases/n31/evaluations/selective_rebuild_v1.json",
-      "sha256": "5d6b06f6fac263cfdad71e4aea687fb1ad1501e904e4169e0d4ad6ae396c568c",
-      "status": "PASSED"
-    },
-    {
-      "source_id": "SEMANTIC_REVIEW",
-      "path": "cases/n31/evaluations/semantic_review_v1.json",
-      "sha256": "7cc4676d14bc12aec676e7f34ec126edc8c88e52abeb7df128eaf41ffed04b6f",
-      "status": "PASSED"
-    },
-    {
-      "source_id": "SOURCE_CANDIDATES",
-      "path": "cases/n31/evaluations/source_candidate_synthesis_v1.json",
-      "sha256": "28708602befa289bb6a8ce97436b43384a2569a3de79c1b104011815d3c68ec3",
-      "status": "PASSED"
-    },
-    {
-      "source_id": "SUMMARY",
-      "path": "cases/n31/demo_bundle/summary.json",
-      "sha256": "26260afc7994667cff3a2de79e22a23182c94e248222dde39f21b95064503361",
-      "status": "PASSED"
-    },
-    {
-      "source_id": "VIDEO_MANIFEST",
-      "path": "output/video/n31_training_video_manifest_v1.json",
-      "sha256": "a3ffadcb54eeaf77948632fbaa88b20637b12fbafbd924f333f28c96d4f5892d",
-      "status": "PASSED"
-    }
-  ],
   "claim_checks": [
     {
       "claim_id": "TRACEABLE_REVISION_LOOP",
+      "fact_sha256": "20a942cc2d1560d1bb8adf4b2e7d444a2274a163e79cdc873ecd44de3135db0a",
       "source_ids": [
         "SUMMARY",
         "REVISION_AUDIT"
       ],
-      "fact_sha256": "20a942cc2d1560d1bb8adf4b2e7d444a2274a163e79cdc873ecd44de3135db0a",
       "status": "PASSED"
     },
     {
       "claim_id": "GOLD_13_STEPS",
+      "fact_sha256": "29ad6ffd191d6f4b6e4f9f2fc858c997813fb904a2643faa4f62957cf01c4ce3",
       "source_ids": [
         "GOLD_SOP",
         "SUMMARY"
       ],
-      "fact_sha256": "29ad6ffd191d6f4b6e4f9f2fc858c997813fb904a2643faa4f62957cf01c4ce3",
       "status": "PASSED"
     },
     {
       "claim_id": "ERRORS_5_TO_0",
+      "fact_sha256": "e784011c5437b694e3f1898cef26c77c3347fb778833dd8bb8f216af881a1487",
       "source_ids": [
         "SUMMARY"
       ],
-      "fact_sha256": "e784011c5437b694e3f1898cef26c77c3347fb778833dd8bb8f216af881a1487",
       "status": "PASSED"
     },
     {
       "claim_id": "COVERAGE_90_TO_100",
+      "fact_sha256": "70b0ed07f5bfb29aa18b4aedfe3a94acb000fec6ad2f84f7095c4bb116bd0f14",
       "source_ids": [
         "SUMMARY"
       ],
-      "fact_sha256": "70b0ed07f5bfb29aa18b4aedfe3a94acb000fec6ad2f84f7095c4bb116bd0f14",
       "status": "PASSED"
     },
     {
       "claim_id": "FOUR_LOCAL_REVISIONS",
+      "fact_sha256": "8098b5e1e88b2a6ed2e941826c1efa31585268a75be364ce84600c8fd9dcf4b1",
       "source_ids": [
         "SUMMARY",
         "REVISION_AUDIT"
       ],
-      "fact_sha256": "8098b5e1e88b2a6ed2e941826c1efa31585268a75be364ce84600c8fd9dcf4b1",
       "status": "PASSED"
     },
     {
       "claim_id": "TRAINING_OUTPUTS",
+      "fact_sha256": "51a267f71de4cee274e5ad9398d376221cdf9b9afa92522d71e833d46968244b",
       "source_ids": [
         "CHECKLIST",
         "QUIZ",
         "POSTER",
         "VIDEO_MANIFEST"
       ],
-      "fact_sha256": "51a267f71de4cee274e5ad9398d376221cdf9b9afa92522d71e833d46968244b",
       "status": "PASSED"
     },
     {
       "claim_id": "DGX_NATIVE_CUDA",
+      "fact_sha256": "f79126d98ac62a25433c106dad9a11cf251d96d38bcee8faeb0e39beb33462ba",
       "source_ids": [
         "DGX_VISUAL"
       ],
-      "fact_sha256": "f79126d98ac62a25433c106dad9a11cf251d96d38bcee8faeb0e39beb33462ba",
       "status": "PASSED"
     },
     {
       "claim_id": "PDF_STRUCTURE",
+      "fact_sha256": "2e164f959a802c07eb073dfdd7010f7f03477bbf7dbebe29e08d1fcb691ae98e",
       "source_ids": [
         "PDF_STRUCTURE"
       ],
-      "fact_sha256": "2e164f959a802c07eb073dfdd7010f7f03477bbf7dbebe29e08d1fcb691ae98e",
       "status": "PASSED"
     },
     {
       "claim_id": "MULTISOURCE_ABLATION",
+      "fact_sha256": "350b88ad4d4d9068e0e8f7a322c30e86c3c37401953731c554ec6fdf4435f887",
       "source_ids": [
         "MULTISOURCE"
       ],
-      "fact_sha256": "350b88ad4d4d9068e0e8f7a322c30e86c3c37401953731c554ec6fdf4435f887",
       "status": "PASSED"
     },
     {
       "claim_id": "SOURCE_CANDIDATE_SYNTHESIS",
+      "fact_sha256": "7ce56b5d16f61ad3a5300212f82912277a8862beccbb30c144d95814fdb3ce88",
       "source_ids": [
         "SOURCE_CANDIDATES"
       ],
-      "fact_sha256": "7ce56b5d16f61ad3a5300212f82912277a8862beccbb30c144d95814fdb3ce88",
       "status": "PASSED"
     },
     {
       "claim_id": "AGENT_TOOL_TRACE",
+      "fact_sha256": "7d4cd582e6b4db84cfee715752cf091affb7409a6f99a44b70a2e31949fc535b",
       "source_ids": [
         "AGENT_TOOL_TRACE"
       ],
-      "fact_sha256": "7d4cd582e6b4db84cfee715752cf091affb7409a6f99a44b70a2e31949fc535b",
       "status": "PASSED"
     },
     {
       "claim_id": "SELECTIVE_REBUILD",
+      "fact_sha256": "3959d1f1f36d3c582ba81e6b77eeec7dfcbfe7f2779739cda3018a57e854f2ba",
       "source_ids": [
         "SELECTIVE_REBUILD"
       ],
-      "fact_sha256": "3959d1f1f36d3c582ba81e6b77eeec7dfcbfe7f2779739cda3018a57e854f2ba",
       "status": "PASSED"
     },
     {
       "claim_id": "RUNTIME_SCOPE",
+      "fact_sha256": "47ea7f42bddc07d25b44ec5222d2311afef7fdc24e158ac2bede289c1d227e1c",
       "source_ids": [
         "RUNTIME_BENCHMARK"
       ],
-      "fact_sha256": "47ea7f42bddc07d25b44ec5222d2311afef7fdc24e158ac2bede289c1d227e1c",
       "status": "PASSED"
     },
     {
       "claim_id": "MODEL_AND_REFERENCE_BOUNDARY",
+      "fact_sha256": "6896c82d9363a9674d8246fec3e229bb17c85380795f2685bd6d728482bb0f61",
       "source_ids": [
         "SEMANTIC_REVIEW",
         "REFERENCE_AUDIT"
       ],
-      "fact_sha256": "6896c82d9363a9674d8246fec3e229bb17c85380795f2685bd6d728482bb0f61",
       "status": "PASSED"
     },
     {
       "claim_id": "DEMO_MODES",
+      "fact_sha256": "dfd448c533338e4174e2e814cbecf573c245edfef035ae5b3c223ee67f4ed14d",
       "source_ids": [
         "PITCH_RUNBOOK"
       ],
-      "fact_sha256": "dfd448c533338e4174e2e814cbecf573c245edfef035ae5b3c223ee67f4ed14d",
       "status": "PASSED"
     }
   ],
-  "checks": {
-    "title_present": true,
-    "minimum_length_met": true,
-    "required_headings_exact": true,
-    "required_headings_ordered": true,
-    "required_claims_source_backed": true,
-    "repository_links_safe": true,
-    "repository_links_resolve": true,
-    "forbidden_phrases_absent": true,
-    "absolute_paths_absent": true,
-    "credentials_absent": true,
-    "private_submission_state_absent": true,
-    "manual_publication_only": true
-  },
-  "publication_state": {
-    "article_content_ready": true,
-    "public_url_available": false,
-    "manual_publication_required": true,
-    "automatic_publication_performed": false
-  },
   "data_policy": {
-    "contains_credentials": false,
-    "contains_personal_data": false,
-    "contains_form_url": false,
     "contains_absolute_paths": false,
+    "contains_credentials": false,
+    "contains_form_url": false,
+    "contains_personal_data": false,
     "contains_private_submission_state": false,
     "contains_raw_media": false,
     "network_requests": 0
-  }
+  },
+  "heading_count": 9,
+  "publication_state": {
+    "article_content_ready": true,
+    "automatic_publication_performed": false,
+    "manual_publication_required": true,
+    "public_url_available": false
+  },
+  "repository_link_count": 12,
+  "source_checks": [
+    {
+      "path": "cases/n31/evaluations/agent_tool_trace_v1.json",
+      "sha256": "739adef1d1e5e14c818433e87ec416cda80b562fc2eba70512e2c0aa254468a5",
+      "source_id": "AGENT_TOOL_TRACE",
+      "status": "PASSED"
+    },
+    {
+      "path": "cases/n31/demo_bundle/checklist.json",
+      "sha256": "6fd710aef2d7ecd139272a68cf0437bc5f42aac24cd34fa7a187d87b0ae40a88",
+      "source_id": "CHECKLIST",
+      "status": "PASSED"
+    },
+    {
+      "path": "cases/n31/evaluations/dgx_visual_compute_v1.json",
+      "sha256": "b475c03d34b4a5db8c423b97f72fdfc11d1d5e99e28c699ed2cac6fc912ab9fb",
+      "source_id": "DGX_VISUAL",
+      "status": "PASSED"
+    },
+    {
+      "path": "cases/n31/gold/gold_sop.json",
+      "sha256": "a8f111a52f496f93e9934cedd493630d73732ad73e6e4e79832f0133c31c6f8a",
+      "source_id": "GOLD_SOP",
+      "status": "PASSED"
+    },
+    {
+      "path": "cases/n31/evaluations/multisource_comparison_v1.json",
+      "sha256": "f0adc9b6dbfd1f34d1e3e57ec3588d60b96562bea5b6b167fd05408040aac7af",
+      "source_id": "MULTISOURCE",
+      "status": "PASSED"
+    },
+    {
+      "path": "cases/n31/evaluations/pdf_structure_v1.json",
+      "sha256": "0e40aea7fbdc3440a4c99e97e2a3db2e37f02b6e6a930445808ab2aee850aa97",
+      "source_id": "PDF_STRUCTURE",
+      "status": "PASSED"
+    },
+    {
+      "path": "cases/n31/pitch_runbook.json",
+      "sha256": "e2404bc234e8d626b3cf1fbe16bb9cd0a3fa67b8a401fbcc0f4781a9b5e237e2",
+      "source_id": "PITCH_RUNBOOK",
+      "status": "PASSED"
+    },
+    {
+      "path": "output/pdf/n31_a4_training_poster.pdf",
+      "sha256": "d87dd874dc332d8057f0a1106b5b42085f6127f87ddeaa8f4b8a79eee08a8fba",
+      "source_id": "POSTER",
+      "status": "PASSED"
+    },
+    {
+      "path": "cases/n31/demo_bundle/quiz.json",
+      "sha256": "28d2a117c621a82f228f6b56bdc719aea88e7390b0b2a85e871e89088d88f514",
+      "source_id": "QUIZ",
+      "status": "PASSED"
+    },
+    {
+      "path": "external/teacher_he_reference/audit_v1.json",
+      "sha256": "eafdffff48b85bf60efc630c31d9f1a724a96e09471b2f39d2b15485b4734e5f",
+      "source_id": "REFERENCE_AUDIT",
+      "status": "PASSED"
+    },
+    {
+      "path": "cases/n31/demo_bundle/revision_audit.json",
+      "sha256": "e9e2d83a2b5d0ac5f59eb697ae624be8ec530f56756ae327badec4e2c279324b",
+      "source_id": "REVISION_AUDIT",
+      "status": "PASSED"
+    },
+    {
+      "path": "output/evaluation/runtime_benchmark_dgx.json",
+      "sha256": "1e0cded9d7a59b37387ca4d64668ed8cf10603042c6876362bb5a877b8bfbde7",
+      "source_id": "RUNTIME_BENCHMARK",
+      "status": "PASSED"
+    },
+    {
+      "path": "cases/n31/evaluations/selective_rebuild_v1.json",
+      "sha256": "5d6b06f6fac263cfdad71e4aea687fb1ad1501e904e4169e0d4ad6ae396c568c",
+      "source_id": "SELECTIVE_REBUILD",
+      "status": "PASSED"
+    },
+    {
+      "path": "cases/n31/evaluations/semantic_review_v1.json",
+      "sha256": "7cc4676d14bc12aec676e7f34ec126edc8c88e52abeb7df128eaf41ffed04b6f",
+      "source_id": "SEMANTIC_REVIEW",
+      "status": "PASSED"
+    },
+    {
+      "path": "cases/n31/evaluations/source_candidate_synthesis_v1.json",
+      "sha256": "28708602befa289bb6a8ce97436b43384a2569a3de79c1b104011815d3c68ec3",
+      "source_id": "SOURCE_CANDIDATES",
+      "status": "PASSED"
+    },
+    {
+      "path": "cases/n31/demo_bundle/summary.json",
+      "sha256": "26260afc7994667cff3a2de79e22a23182c94e248222dde39f21b95064503361",
+      "source_id": "SUMMARY",
+      "status": "PASSED"
+    },
+    {
+      "path": "output/video/n31_training_video_manifest_v1.json",
+      "sha256": "a3ffadcb54eeaf77948632fbaa88b20637b12fbafbd924f333f28c96d4f5892d",
+      "source_id": "VIDEO_MANIFEST",
+      "status": "PASSED"
+    }
+  ],
+  "status": "READY_FOR_MANUAL_PUBLICATION",
+  "version": 1
 }
