@@ -9,6 +9,7 @@ import json
 import os
 import shutil
 import stat
+import sys
 import tempfile
 from collections.abc import Callable
 from datetime import datetime, timezone
@@ -404,6 +405,41 @@ def _url_checks(
     return results
 
 
+_INCOMPLETE_INPUT_MESSAGE = "提交表单私有输入尚未填写完成"
+
+
+def _incomplete_input_guidance(input_path: Path) -> list[str]:
+    """Human-readable next steps when the private packet input is incomplete.
+
+    Only exposes field ids and emptiness; never field values.
+    """
+    lines = ["── 提交表单材料包待办（私有） ──"]
+    try:
+        packet = json.loads(input_path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        lines.append(f"  1. 检查私有输入文件是否存在且可读：{input_path}")
+        return lines
+    fields = packet.get("fields", {})
+    empty = [
+        key
+        for key, value in sorted(fields.items())
+        if value in (None, "", "PENDING_INPUT")
+    ]
+    lines.append(f"  私有输入：{input_path}（当前 status={packet.get('status')}）")
+    if empty:
+        lines.append("  仍为空的字段：" + "、".join(empty))
+    if packet.get("team_photo") is None:
+        lines.append(
+            "  团队照片未绑定：bash scripts/check_submission_form_packet.sh"
+            " --attach-photo /path/to/photo.jpg"
+        )
+    lines.append(
+        "  步骤：用编辑器打开上述私有输入，填入安全公开HTTPS网址并把 status 改为"
+        " READY_FOR_CHECK，再重新运行 bash scripts/check_submission_form_packet.sh"
+    )
+    return lines
+
+
 def build_submission_form_packet(
     input_path: Path = DEFAULT_INPUT,
     *,
@@ -428,7 +464,7 @@ def build_submission_form_packet(
     except ContractValidationError as exc:
         raise SubmissionFormPacketError("提交表单私有输入不符合严格Schema") from exc
     if packet["status"] != "READY_FOR_CHECK":
-        raise SubmissionFormPacketError("提交表单私有输入尚未填写完成")
+        raise SubmissionFormPacketError(_INCOMPLETE_INPUT_MESSAGE)
     snapshot, snapshot_sha256 = _load_form_snapshot(form_snapshot_path)
     if packet["form_snapshot_sha256"] != snapshot_sha256:
         raise SubmissionFormPacketError("官方提交表单快照已变化；私有输入需重新核对")
@@ -658,6 +694,15 @@ def main() -> int:
                 roster_qa_path=args.team_roster_qa,
             )
     except (ContractValidationError, OSError, SubmissionFormPacketError) as exc:
+        if (
+            isinstance(exc, SubmissionFormPacketError)
+            and str(exc) == _INCOMPLETE_INPUT_MESSAGE
+        ):
+            try:
+                for line in _incomplete_input_guidance(args.input):
+                    print(line, file=sys.stderr)
+            except Exception:  # guidance must never break the CLI
+                pass
         print(
             json.dumps(
                 {

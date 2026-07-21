@@ -331,3 +331,31 @@ def test_submission_form_packet_script_is_executable() -> None:
     script = ROOT / "scripts/check_submission_form_packet.sh"
     assert script.is_file()
     assert script.stat().st_mode & 0o111
+
+
+def test_incomplete_input_guidance_lists_empty_fields(tmp_path: Path) -> None:
+    from skillforge.submission_form_packet import _incomplete_input_guidance
+
+    input_path = tmp_path / "packet.json"
+    input_path.write_text(
+        json.dumps(
+            {
+                "status": "PENDING_INPUT",
+                "fields": {
+                    "team_name": "测试队名",
+                    "article_url": "",
+                    "demo_video_url": "PENDING_INPUT",
+                },
+                "team_photo": None,
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+    joined = "\n".join(_incomplete_input_guidance(input_path))
+    assert "仍为空的字段：article_url、demo_video_url" in joined
+    assert "status=PENDING_INPUT" in joined
+    assert "--attach-photo" in joined
+    assert "READY_FOR_CHECK" in joined
+    # privacy: filled-in values never appear in the guidance
+    assert "测试队名" not in joined
