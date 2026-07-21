@@ -15,6 +15,17 @@
 | 臧杰 | 队员 | [JZZ-max](https://github.com/JZZ-max) |
 | 与逢 | 队员 | [yufeng711](https://github.com/yufeng711) |
 
+## 快速开始（先看演示）
+
+```bash
+bash scripts/setup_native.sh            # 首次运行：创建 .venv 并安装依赖
+bash scripts/run_demo_mode.sh offline   # 启动离线演示（最稳定，不调用外部模型）
+```
+
+启动后按终端提示在浏览器打开 `http://127.0.0.1:7860`。离线演示只读取仓库内已脱敏的 Gold 演示包，不含任何原始素材，也不需要配置 `.env`。
+
+现场调用模型的演示用 `bash scripts/run_demo_mode.sh live`；DGX 远程演示与三种模式的完整说明见下文「三种 Web 演示模式」和「快速验证」。
+
 ## 当前目标
 
 在 2026-07-22 前交付一条稳定、可演示的主链路：
