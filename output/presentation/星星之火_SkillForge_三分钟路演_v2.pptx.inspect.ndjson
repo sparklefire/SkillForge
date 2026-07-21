@@ -1,10 +1,10 @@
-{"kind":"deck","id":"pr/aqcwho","name":"Deck"}
+{"kind":"deck","id":"pr/cyq8o0","name":"Deck"}
 {"kind":"layout","layoutId":"/ppt/slideMasters/slideMaster1.xml","name":"Master","type":"master"}
 {"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout1.xml","name":"Title Slide","type":"title"}
-{"kind":"slide","id":"sl/y90nupkv","slide":1,"title":"NVIDIA DGX SPARK 黑客松 2026 · 星星之火","textShapes":5}
+{"kind":"slide","id":"sl/y90nupkv","slide":1,"title":"NVIDIA DGX SPARK 黑客松 2026 · 星星之火 · SkillForge · 匠传","textShapes":5}
 {"kind":"shape","id":"sh/547294r6","slide":1,"name":"cover-white","bbox":[0,26.9,685,720]}
 {"kind":"shape","id":"sh/k3yl0zql","slide":1,"name":"cover-accent","bbox":[44,126,92,8]}
-{"kind":"textbox","id":"sh/7qp4be9c","slide":1,"name":"cover-kicker","text":"NVIDIA DGX SPARK 黑客松 2026 · 星星之火","textPreview":"NVIDIA DGX SPARK 黑客松 2026 · 星星之火","textChars":32,"textLines":1,"bbox":[44,44,560,28]}
+{"kind":"textbox","id":"sh/7qp4be9c","slide":1,"name":"cover-kicker","text":"NVIDIA DGX SPARK 黑客松 2026 · 星星之火 · SkillForge · 匠传","textPreview":"NVIDIA DGX SPARK 黑客松 2026 · 星星之火 · SkillForge · 匠传","textChars":50,"textLines":1,"bbox":[44,44,560,28]}
 {"kind":"textbox","id":"sh/65g3298r","slide":1,"name":"cover-title","text":"SkillForge\n匠传","textPreview":"SkillForge | 匠传","textChars":13,"textLines":2,"bbox":[44,160,560,205]}
 {"kind":"textbox","id":"sh/ts7md4r2","slide":1,"name":"cover-subtitle","text":"不让关键操作随人员流动而失真\n让专家经验成为可追溯、可验证、会自我修订的培训能力","textPreview":"不让关键操作随人员流动而失真 | 让专家经验成为可追溯、可验证、会自我修订的培训能力","textChars":40,"textLines":2,"bbox":[44,407,580,96]}
 {"kind":"shape","id":"sh/sryl4zqx","slide":1,"name":"cover-chip","bbox":[44,594,446,54]}
