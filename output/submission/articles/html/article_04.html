@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>改作文最蠢的做法：把整篇撕了重写 | SkillForge方法论04</title>
+<style>
+  :root {
+    --ink: #1a1a1a;
+    --paper: #fafaf8;
+    --accent: #c8501e;
+    --accent-light: #f5e6dd;
+    --muted: #6b6b6b;
+    --border: #e5e2dc;
+    --code-bg: #f0ede6;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.9;
+    font-size: 17px;
+  }
+  .header {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2420 100%);
+    color: #fff;
+    padding: 48px 24px 40px;
+    text-align: left;
+    max-width: 720px;
+    margin: 0 auto;
+    border-bottom: 4px solid var(--accent);
+  }
+  .header .series {
+    font-size: 13px;
+    letter-spacing: 2px;
+    color: #e8a87c;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .header h1 {
+    font-size: 28px;
+    line-height: 1.4;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+  .header .method {
+    display: inline-block;
+    background: var(--accent);
+    color: #fff;
+    padding: 4px 14px;
+    border-radius: 3px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+  h1 { display: none; }
+  h2 {
+    font-size: 22px;
+    font-weight: 700;
+    margin: 48px 0 20px;
+    padding-left: 14px;
+    border-left: 4px solid var(--accent);
+    line-height: 1.4;
+  }
+  h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 32px 0 14px;
+  }
+  p { margin: 0 0 18px; }
+  strong { color: var(--accent); font-weight: 700; }
+  blockquote {
+    background: var(--accent-light);
+    border-left: 4px solid var(--accent);
+    padding: 14px 20px;
+    margin: 24px 0;
+    border-radius: 0 6px 6px 0;
+    font-size: 15px;
+    color: #5a4a40;
+  }
+  blockquote p { margin: 0; }
+  ul, ol { margin: 0 0 18px 24px; }
+  li { margin-bottom: 8px; }
+  img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 28px auto;
+    border-radius: 6px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    border: 1px solid var(--border);
+  }
+  em {
+    display: block;
+    text-align: center;
+    font-size: 13px;
+    color: var(--muted);
+    margin: -18px 0 24px;
+    font-style: normal;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 24px 0;
+    font-size: 15px;
+  }
+  th, td {
+    border: 1px solid var(--border);
+    padding: 10px 14px;
+    text-align: left;
+  }
+  th { background: var(--code-bg); font-weight: 600; }
+  code {
+    background: var(--code-bg);
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 14px;
+    font-family: "SF Mono", Menlo, monospace;
+  }
+  pre {
+    background: #1a1a1a;
+    color: #e8e8e8;
+    padding: 20px;
+    border-radius: 6px;
+    overflow-x: auto;
+    margin: 24px 0;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  pre code { background: none; padding: 0; color: inherit; }
+  hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 40px 0;
+  }
+  a { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent-light); }
+  a:hover { border-bottom-color: var(--accent); }
+  .footer {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 32px 24px 60px;
+    border-top: 1px solid var(--border);
+    font-size: 14px;
+    color: var(--muted);
+    text-align: center;
+  }
+  .footer .brand {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+  .nav {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 24px 40px;
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .nav a {
+    flex: 1;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 14px 18px;
+    font-size: 14px;
+    transition: all 0.2s;
+  }
+  .nav a:hover {
+    border-color: var(--accent);
+    box-shadow: 0 2px 8px rgba(200,80,30,0.1);
+    transform: translateY(-1px);
+  }
+  .nav .label { font-size: 12px; color: var(--muted); display: block; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="series">SkillForge 方法论系列 04/05 · 星星之火</div>
+  <h1 style="display:block">改作文最蠢的做法：把整篇撕了重写</h1>
+  <span class="method">方法论：只改病句</span>
+</div>
+<div class="container">
+<blockquote>
+<p>SkillForge 方法论系列 04/05 · 星星之火 · NVIDIA DGX SPARK 黑客松 2026</p>
+</blockquote>
+<h2>一个你肯定经历过的场景</h2>
+<p>领导看完你写的方案，说："第三段逻辑有问题，第五段数据没来源，改一下。"</p>
+<p>你打开文档，改了第三段和第五段。然后你想了想，觉得第二段措辞不够好，顺手优化了。第六段的格式不太统一，也调了。第七段有个错别字，改了。</p>
+<p>改完发给领导。领导看了五分钟，皱眉："第二段怎么跟之前不一样了？第六段那个数据你动了没有？我记得之前不是这个数啊。"</p>
+<p>你一看——坏了。"顺手优化"的时候，把没问题的地方也改了。领导现在不确定你改了什么、没改什么，只好把整篇重新看一遍。</p>
+<p>本来只需要审两段，现在要审全文。你的"顺手"，把审核成本翻了五倍。</p>
+<h2>这不是个例，是系统性问题</h2>
+<p>"全部重写"看起来是最彻底的修改方式，但它有三个致命缺陷：</p>
+<p><strong>第一，引入新错误。</strong> 重写时，模型（或人）会"顺手优化"没问题的部分。每一次"优化"都是一次未经审核的变更。改得越多，引入新错误的概率越高。你修了5个bug，可能顺手制造了3个新的。</p>
+<p><strong>第二，审核成本爆炸。</strong> 改了4个地方，审核者看4条修订记录就行。重写13步，审核者要重读全部13步——因为他不知道你"顺手"改了什么。审核成本从O(k)变成O(n)，k是实际问题数，n是总步骤数。</p>
+<p><strong>第三，无法追溯。</strong> "为什么改？依据是什么？改前什么样？改后什么样？"——局部修订每条都有答案。整包重写没有。你没法向审核者证明"我只改了该改的"，因为你确实改了不该改的。</p>
+<h2>方法论：只改病句</h2>
+<p>SkillForge 的修订策略只有一句话：<strong>哪里有问题改哪里，其余一个字不动。</strong></p>
+<p>这不是偷懒，是工程纪律。</p>
+<p>真实案例：我们在操作者审核的Gold SOP副本中注入了5类受控错误（不在真实设备上制造危险操作）：</p>
+<ul>
+<li>缺少"介质学习"步骤（MISSING_STEP）</li>
+<li>前置依赖断裂（MISSING_PREREQUISITE）</li>
+<li>步骤顺序颠倒（ORDER_ERROR）</li>
+<li>参数无手册或视频依据（UNSUPPORTED_PARAMETER）</li>
+<li>工具名称无来源（UNSUPPORTED_TOOL）</li>
+</ul>
+<p>Verifier Agent 检测到5项严重问题。注意：它不是报告"质量不好请重写"，而是精确定位到哪个步骤、违反哪条规则、引用哪条证据。比如："第7步引用了'校准螺丝'，但当前步骤绑定的3条Evidence中没有任何一条提到该工具。"</p>
+<p>Revision Agent 拿到问题清单后，执行4项局部修订：</p>
+<ol>
+<li>插入缺失的"介质学习"步骤（引用手册第20页和视频第190-195秒）</li>
+<li>删除无依据参数</li>
+<li>删除无依据工具</li>
+<li>恢复正确步骤顺序</li>
+</ol>
+<p>复检结果：严重问题 5→0，必要步骤覆盖 90%→100%，证据覆盖 90%→100%。</p>
+<h2>"局部"不是口号，是可以验证的</h2>
+<p>怎么证明"只改了该改的"？我们做了选择性重建分析：</p>
+<p><img alt="修订前后对比：精准定位问题" src="../images/art04_revision.png" />
+<em>Web演示修订对比：红色标记问题、绿色标记修复，只改4处</em></p>
+<p>把修订前后的所有产出物逐项对比——13个步骤、5道测验题、15个视频镜头。结果：这4处修订只影响了7个步骤、1道题和7个视频镜头。<strong>其余6个步骤、4道题和8个镜头完全没变。</strong></p>
+<p>这不是"我们说没改就没改"，是逐字段哈希对比的结果。审核者可以只看那7个受影响的步骤，不需要重读全部13步。</p>
+<p>对培训管理者来说，这意味着：修订不会引入新错误，审核成本可控。不是"AI改完了你信不信"，是"改了哪里、为什么改、改完对不对，全部摆在这里你自己看"。</p>
+<h2>修订不是黑箱</h2>
+<p>每次修订保留完整审计记录：</p>
+<p><img alt="现场重算结果：严重错误5→0" src="../images/art04_live_run.png" />
+<em>现场重算完成：5项严重问题归零，4项局部修订</em></p>
+<ul>
+<li><strong>修改前</strong>：原来的内容是什么</li>
+<li><strong>问题描述</strong>：违反了哪条规则</li>
+<li><strong>引用证据</strong>：依据是哪条Evidence（精确到页码或时间点）</li>
+<li><strong>修改后</strong>：改成了什么</li>
+<li><strong>复检结果</strong>：改完之后问题是否消失</li>
+</ul>
+<p>在Web演示里，点一下问题编号，直接看到证据原文和修订前后对比。审核者逐条追溯"为什么改""凭什么改""改完对不对"。</p>
+<p>整个闭环在演示中是完全透明的：发现问题→展示证据→执行修订→复检归零。不是"AI说改好了"，是"证据链完整，你自己验证"。</p>
+<h2>为什么AI特别容易"全部重写"</h2>
+<p>大模型有一个天然倾向：当你让它"修改第三段"时，它倾向于把整篇文章重新生成一遍。因为它的生成机制是"给定前文，预测下一个token"——修改局部内容意味着它需要精确地"跳过"不需要改的部分，这对自回归模型来说并不自然。</p>
+<p><img alt="证据链：S09缝标学习三源印证" src="../images/ppt_slide5.png" />
+<em>证据链示例：手册P20 + 视频190-195s + 口述153-195s 三源印证</em></p>
+<p>所以"局部修订"不能靠prompt实现。你不能在prompt里写"只改第三段，其他不要动"然后期望模型真的只改第三段。它可能"不小心"就把第二段的措辞也"优化"了。</p>
+<p>SkillForge 的做法是在系统层面实现局部修订：Revision Agent 只接收"需要修改的步骤ID列表"，只对这些步骤执行修改操作，其余步骤直接从上一版本复制。不是"让模型重写然后对比差异"，是"从架构上保证不可能改到不该改的地方"。</p>
+<h2>你能带走的</h2>
+<p>不管是改文档、改代码还是改流程：</p>
+<p><strong>精准修改永远优于推倒重来。</strong></p>
+<p>具体操作：</p>
+<ol>
+<li>修改前先定位"哪几处有问题"，列出清单</li>
+<li>只改清单上的项目，不"顺手优化"其他部分</li>
+<li>每处修改记录：改前→问题→依据→改后</li>
+<li>改完后只验证清单上的项目是否修好，不需要全文重审</li>
+<li>如果用AI辅助修改，在系统层面限制修改范围，不要靠prompt约束</li>
+</ol>
+<p>把修订范围控制在最小，审核成本才能控制在可接受的范围。这不是偷懒，是对审核者时间的尊重。</p>
+<p>改作文最蠢的做法，就是把整篇撕了重写。最聪明的做法，是只改病句，然后告诉审核者："我只改了这四处，依据在这里。"</p>
+<hr />
+<p><em>SkillForge（匠传）· 团队：星星之火 · NVIDIA DGX SPARK 黑客松 2026</em>
+<em>代码：github.com/sparklefire/SkillForge</em>
+<em>数据：github.com/sparklefire/SkillForge/blob/main/cases/n31/demo_bundle/revision_audit.json</em>
+<em>下一篇：《跑通一次叫Demo，跑通40次叫产品》——可复现方法论</em></p>
+</div>
+<div class="nav">
+<a href="article_03.html"><span class="label">← 上一篇</span>给AI划边界，比写prompt重要一百倍</a>
+<a href="article_05.html" style="text-align:right"><span class="label">下一篇 →</span>跑通一次叫Demo，跑通40次叫产品</a>
+</div>
+<div class="footer">
+  <div class="brand">SkillForge（匠传）</div>
+  把专家操作视频、设备手册和口述经验，转化为可追溯、可验证、会自我修订的多模态培训包<br>
+  团队：星星之火 · NVIDIA DGX SPARK 黑客松 2026<br>
+  代码：<a href="https://github.com/sparklefire/SkillForge">github.com/sparklefire/SkillForge</a>
+</div>
+</body>
+</html>

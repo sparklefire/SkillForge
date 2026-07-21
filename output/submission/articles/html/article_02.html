@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>手册写了80%，师傅说了90%，合在一起才100% | SkillForge方法论02</title>
+<style>
+  :root {
+    --ink: #1a1a1a;
+    --paper: #fafaf8;
+    --accent: #c8501e;
+    --accent-light: #f5e6dd;
+    --muted: #6b6b6b;
+    --border: #e5e2dc;
+    --code-bg: #f0ede6;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.9;
+    font-size: 17px;
+  }
+  .header {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2420 100%);
+    color: #fff;
+    padding: 48px 24px 40px;
+    text-align: left;
+    max-width: 720px;
+    margin: 0 auto;
+    border-bottom: 4px solid var(--accent);
+  }
+  .header .series {
+    font-size: 13px;
+    letter-spacing: 2px;
+    color: #e8a87c;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .header h1 {
+    font-size: 28px;
+    line-height: 1.4;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+  .header .method {
+    display: inline-block;
+    background: var(--accent);
+    color: #fff;
+    padding: 4px 14px;
+    border-radius: 3px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+  h1 { display: none; }
+  h2 {
+    font-size: 22px;
+    font-weight: 700;
+    margin: 48px 0 20px;
+    padding-left: 14px;
+    border-left: 4px solid var(--accent);
+    line-height: 1.4;
+  }
+  h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 32px 0 14px;
+  }
+  p { margin: 0 0 18px; }
+  strong { color: var(--accent); font-weight: 700; }
+  blockquote {
+    background: var(--accent-light);
+    border-left: 4px solid var(--accent);
+    padding: 14px 20px;
+    margin: 24px 0;
+    border-radius: 0 6px 6px 0;
+    font-size: 15px;
+    color: #5a4a40;
+  }
+  blockquote p { margin: 0; }
+  ul, ol { margin: 0 0 18px 24px; }
+  li { margin-bottom: 8px; }
+  img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 28px auto;
+    border-radius: 6px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    border: 1px solid var(--border);
+  }
+  em {
+    display: block;
+    text-align: center;
+    font-size: 13px;
+    color: var(--muted);
+    margin: -18px 0 24px;
+    font-style: normal;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 24px 0;
+    font-size: 15px;
+  }
+  th, td {
+    border: 1px solid var(--border);
+    padding: 10px 14px;
+    text-align: left;
+  }
+  th { background: var(--code-bg); font-weight: 600; }
+  code {
+    background: var(--code-bg);
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 14px;
+    font-family: "SF Mono", Menlo, monospace;
+  }
+  pre {
+    background: #1a1a1a;
+    color: #e8e8e8;
+    padding: 20px;
+    border-radius: 6px;
+    overflow-x: auto;
+    margin: 24px 0;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  pre code { background: none; padding: 0; color: inherit; }
+  hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 40px 0;
+  }
+  a { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent-light); }
+  a:hover { border-bottom-color: var(--accent); }
+  .footer {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 32px 24px 60px;
+    border-top: 1px solid var(--border);
+    font-size: 14px;
+    color: var(--muted);
+    text-align: center;
+  }
+  .footer .brand {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+  .nav {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 24px 40px;
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .nav a {
+    flex: 1;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 14px 18px;
+    font-size: 14px;
+    transition: all 0.2s;
+  }
+  .nav a:hover {
+    border-color: var(--accent);
+    box-shadow: 0 2px 8px rgba(200,80,30,0.1);
+    transform: translateY(-1px);
+  }
+  .nav .label { font-size: 12px; color: var(--muted); display: block; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="series">SkillForge 方法论系列 02/05 · 星星之火</div>
+  <h1 style="display:block">手册写了80%，师傅说了90%，合在一起才100%</h1>
+  <span class="method">方法论：多源交叉印证</span>
+</div>
+<div class="container">
+<blockquote>
+<p>SkillForge 方法论系列 02/05 · 星星之火 · NVIDIA DGX SPARK 黑客松 2026</p>
+</blockquote>
+<h2>一个反直觉的实验结果</h2>
+<p>我们做汉印N31打印机换纸案例时，跑了一组消融实验——故意只给系统一种材料，看它能覆盖多少步骤：</p>
+<ul>
+<li>只给设备手册 → 步骤覆盖80%</li>
+<li>只给师傅口述 → 步骤覆盖90%</li>
+<li>两样合在一起 → 100%</li>
+</ul>
+<p>第一次看到这个数据，我们愣了一下。手册不是"官方权威"吗？怎么反而覆盖率最低？</p>
+<p>仔细想想就明白了。手册写的是"应该怎么做"——标准流程、参数范围、安全警告。但它不会写"导纸夹拧到什么手感刚好""试印时眼睛看哪条对齐线""这个批次的纸偏硬，走纸速度要调慢半档"。</p>
+<p>师傅口述覆盖90%，比手册高，但仍然不是100%。因为师傅说的是"我平时怎么做"，他可能省略了某些"太显然不需要说"的步骤——比如"打开打印机盖"这种他觉得"这还用说？"的动作。另外，师傅说的参数是经验值，不一定跟手册的官方规格完全一致。</p>
+<p>两样合在一起，互相补盲区，才到100%。</p>
+<h2>这说明了什么</h2>
+<p><strong>单一信息源永远不够。</strong> 这不是AI的问题，不是模型不够大的问题，是知识本身的分布规律。</p>
+<p><img alt="多源消融数据：手册80%/口述90%/联合100%" src="../images/ppt_slide7.png" />
+<em>多源消融实验：单一来源永远不够，联合覆盖才到100%</em></p>
+<p>工业现场的知识天然分散在三种载体里：</p>
+<ul>
+<li><strong>手册</strong>：精确的参数、官方警告、标准流程。优势是准确，劣势是不覆盖现场变体。</li>
+<li><strong>视频</strong>：真实的动作序列、手法细节、环境上下文。优势是直观，劣势是没有"为什么"。</li>
+<li><strong>口述</strong>：经验判断、踩坑记录、"顺便说一句"的诀窍。优势是覆盖盲区，劣势是不够精确。</li>
+</ul>
+<p>三者视角不同、颗粒度不同、盲区也不同。任何单一来源都有系统性盲区，而且你事先不知道盲区在哪里——只有交叉对比才能发现。</p>
+<h2>方法论：多源交叉印证</h2>
+<p>SkillForge 的 SOP 规划层有一条硬规则：每个步骤必须标注来源覆盖度。</p>
+<ul>
+<li>三类来源（视频+手册+口述）全覆盖 → 高置信，直接采信</li>
+<li>两类来源印证 → 可用，但标记"双源"</li>
+<li>只有一类来源 → 标记"覆盖不足"，提醒审核者注意</li>
+<li>零来源 → 拒绝进入最终SOP，不管模型觉得它"应该有"</li>
+</ul>
+<p>这不是保守，是工程纪律。你想想：如果一步操作只有口述来源，没有手册佐证也没有视频印证，你怎么知道师傅说的是对的？他可能记错了，可能那台设备跟你的不一样，可能他说的参数是上一批纸的经验。</p>
+<h2>真实规划过程</h2>
+<p>汉印N31案例中，视频、手册和口述分别产生18条、7条和8条候选，共33条。</p>
+<p>从33条变成13步，经过四步收敛：</p>
+<p><strong>第一步：粗粒度拆分。</strong> 有些证据片段太长，包含了多个动作。比如一段30秒的视频里，师傅既调了导纸夹又按了走纸键——这应该拆成两条独立证据。</p>
+<p><strong>第二步：细粒度合并。</strong> 描述同一动作的多条证据合并。比如视频第190秒"按下走纸键"和手册第20页"按走纸键进行标签学习"说的是同一件事，合并为一条。</p>
+<p><strong>第三步：同义项归并。</strong> 不同来源用不同说法描述同一件事。手册写"介质学习"，师傅说"让机器认纸"，视频里显示的是"按走纸键等灯闪三下"——三个说法，一个步骤。</p>
+<p><strong>第四步：依赖图检查。</strong> 确保每步的前置条件在前面已经出现。不允许"先试印再装纸"这种逻辑错误——听起来像笑话，但模型真的会生成这种顺序，因为它不理解物理世界的因果关系。</p>
+<p>最终结果：13个有序步骤，其中10步必需、3步按条件执行。12步至少两类来源印证，10步三类全覆盖。Gold SOP由实际操作者审核确认，不是模型自己给自己打分。</p>
+<h2>为什么"只靠手册"是最常见的错误</h2>
+<p>很多企业做培训标准化，第一反应是"把手册整理一下发给新人"。手册当然重要，但它有两个系统性盲区：</p>
+<p><img alt="证据绑定视图：三源交叉印证" src="../images/art02_grounding.png" />
+<em>Web演示中的证据绑定：每个步骤标注来源覆盖度</em></p>
+<p><strong>盲区一：现场变体。</strong> 手册写的是通用流程，但你车间那台设备可能因为批次、环境、耗材差异，需要微调。"标准是调到这个刻度，但我们这台偏紧，要回半格"——这种信息只存在于师傅的脑子里。</p>
+<p><strong>盲区二：隐性前提。</strong> 手册假设读者已经知道某些事情。"打开介质仓"——手册不会告诉你"打开之前先确认打印任务已经暂停，否则走纸电机还在转，你伸手进去会夹到"。师傅会随口说一句，但手册不会写这种"太显然"的警告。</p>
+<p>反过来，只靠口述也有盲区：师傅可能记错参数、省略"太简单"的步骤、或者把个人习惯当成标准操作。手册能纠正这些偏差。</p>
+<p>所以不是"手册好还是口述好"的问题，是"必须两个都要"的问题。</p>
+<h2>你能带走的</h2>
+<p>做任何知识整理——不管是写SOP、做培训、写技术文档还是做产品说明——<strong>至少找两个独立来源交叉验证。</strong></p>
+<p><img alt="Agent追踪面板：5类Agent/13种工具/14次调用" src="../images/art02_agents.png" />
+<em>完整Agent追踪：每次工具调用和产物哈希都可审计</em></p>
+<p>具体操作：</p>
+<ol>
+<li>列出所有可用来源，标注它们各自的优势和盲区</li>
+<li>关键结论至少两个独立来源印证才标记为"已确认"</li>
+<li>只有一个来源的结论，标记为"待确认"而不是直接采信</li>
+<li>零来源的结论，不管多"显然"，都要补来源或删除</li>
+<li>最终文档中标注每步的来源覆盖度，让读者知道"这条信息有多靠谱"</li>
+</ol>
+<p>这不是多此一举，是避免"看起来对但实际有坑"的最低成本方法。</p>
+<p>老师傅嘴上那句"顺便说一句"，可能就是新手卡住三天的那个坑。别让它只留在师傅嘴里。</p>
+<hr />
+<p><em>SkillForge（匠传）· 团队：星星之火 · NVIDIA DGX SPARK 黑客松 2026</em>
+<em>代码：github.com/sparklefire/SkillForge</em>
+<em>数据：github.com/sparklefire/SkillForge/blob/main/cases/n31/evaluations/multisource_comparison_v1.json</em>
+<em>下一篇：《给AI划边界，比写prompt重要一百倍》——约束即自由方法论</em></p>
+</div>
+<div class="nav">
+<a href="article_01.html"><span class="label">← 上一篇</span>为什么你让AI写的培训教程，老员工一看就说"不对"</a>
+<a href="article_03.html" style="text-align:right"><span class="label">下一篇 →</span>给AI划边界，比写prompt重要一百倍</a>
+</div>
+<div class="footer">
+  <div class="brand">SkillForge（匠传）</div>
+  把专家操作视频、设备手册和口述经验，转化为可追溯、可验证、会自我修订的多模态培训包<br>
+  团队：星星之火 · NVIDIA DGX SPARK 黑客松 2026<br>
+  代码：<a href="https://github.com/sparklefire/SkillForge">github.com/sparklefire/SkillForge</a>
+</div>
+</body>
+</html>
