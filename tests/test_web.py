@@ -16,7 +16,7 @@ def test_native_web_health_and_demo(tmp_path) -> None:
         "docker_required": False,
         "n31_rehearsal_available": False,
         "training_video_available": True,
-        "training_video_status": "READY_FOR_HUMAN_REVIEW",
+        "training_video_status": "FINAL_APPROVED",
         "artifact_stage_runner": True,
         "artifact_stage_release_available": False,
     }
@@ -100,10 +100,10 @@ def test_web_accepts_operator_reviewed_gold_result(tmp_path) -> None:
     )
     assert response.json()["visual_review"]["summary"]["contradicted_count"] == 0
     training_video = response.json()["training_video"]
-    assert training_video["status"] == "READY_FOR_HUMAN_REVIEW"
+    assert training_video["status"] == "FINAL_APPROVED"
     assert training_video["output"]["duration_ms"] == 80_000
     assert training_video["coverage"]["covered_gold_step_count"] == 13
-    assert training_video["final_human_review_required"] is True
+    assert training_video["final_human_review_required"] is False
     dgx_path = ROOT / "cases/n31/evaluations/dgx_visual_compute_v1.json"
     if dgx_path.is_file():
         dgx = response.json()["dgx_visual_compute"]

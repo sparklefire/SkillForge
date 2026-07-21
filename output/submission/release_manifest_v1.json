@@ -206,7 +206,7 @@
     },
     {
       "artifact_id": "TRAINING_VIDEO_MANIFEST",
-      "bytes": 3677,
+      "bytes": 3905,
       "final_checker_role": "EVIDENCE_OWNER",
       "kind": "JSON",
       "path": "output/video/n31_training_video_manifest_v1.json",
@@ -214,7 +214,7 @@
         "CODE_REPOSITORY"
       ],
       "responsible_role": "TECHNICAL_OWNER",
-      "sha256": "457dc6d3c4baecde0643d75bf3e3b62f7cc9b2b2787100a44aeaf653e8632a3a",
+      "sha256": "a3ffadcb54eeaf77948632fbaa88b20637b12fbafbd924f333f28c96d4f5892d",
       "status": "FROZEN_MACHINE_VERIFIED"
     },
     {
@@ -262,7 +262,7 @@
     "contains_personal_data": false,
     "contains_public_urls": false
   },
-  "generated_at": "2026-07-20T04:45:41.627662+00:00",
+  "generated_at": "2026-07-21T13:35:37.225161+00:00",
   "human_gates": [
     {
       "blocking_for_submission": true,
@@ -351,8 +351,8 @@
       "role_id": "FINAL_REVIEWER"
     }
   ],
-  "runbook_sha256": "ac4491ab282a245c090b941060e64a4e6a01b23637426f0cc434789352d115f4",
+  "runbook_sha256": "e2404bc234e8d626b3cf1fbe16bb9cd0a3fa67b8a401fbcc0f4781a9b5e237e2",
   "status": "TECHNICAL_ARTIFACTS_FROZEN_HUMAN_GATES_PENDING",
-  "technical_freeze_digest": "202dade8e7b3034a15d17f54c7f30b53d2660cd705eb9694f88da422fb1787c4",
+  "technical_freeze_digest": "ec63ab31ae3b2fa78dd8f955a610592c7199482efde891f778751a4f15b41395",
   "version": 1
 }

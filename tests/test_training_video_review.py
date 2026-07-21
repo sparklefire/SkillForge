@@ -37,6 +37,9 @@ def public_video_basis(tmp_path: Path) -> tuple[Path, Path]:
     manifest = json.loads(DEFAULT_MANIFEST.read_text(encoding="utf-8"))
     manifest["output"]["sha256"] = _sha256(video)
     manifest["output"]["bytes"] = video.stat().st_size
+    manifest["status"] = "READY_FOR_HUMAN_REVIEW"
+    manifest["final_human_review_required"] = True
+    manifest.pop("human_review", None)
     manifest_path = public / "n31_training_video_manifest_v1.json"
     manifest_path.write_text(
         json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",
@@ -122,8 +125,8 @@ def test_current_tracked_video_matches_its_manifest() -> None:
         "training_video_manifest.schema.json",
     )
 
-    assert manifest["status"] == "READY_FOR_HUMAN_REVIEW"
-    assert manifest["final_human_review_required"] is True
+    assert manifest["status"] == "FINAL_APPROVED"
+    assert manifest["final_human_review_required"] is False
     assert manifest["output"]["duration_ms"] == 80000
     assert manifest["output"]["sha256"] == _sha256(DEFAULT_VIDEO)
     assert manifest["output"]["bytes"] == DEFAULT_VIDEO.stat().st_size
@@ -236,7 +239,9 @@ def test_short_watch_interval_is_rejected(tmp_path: Path) -> None:
 def test_manifest_must_remain_at_human_review_boundary(tmp_path: Path) -> None:
     manifest_path, video_path = public_video_basis(tmp_path)
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-    manifest["status"] = "FINAL_APPROVED"
+    # READY_FOR_HUMAN_REVIEW with final_human_review_required=False is a
+    # mismatched combination that must fail the boundary check.
+    manifest["status"] = "READY_FOR_HUMAN_REVIEW"
     manifest["final_human_review_required"] = False
     manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
     document = ready_review_document(manifest_path, video_path)

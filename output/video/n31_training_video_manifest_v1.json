@@ -2,7 +2,7 @@
   "version": 1,
   "case_id": "n31_media_change",
   "generated_at": "2026-07-17T03:07:06.087021+00:00",
-  "status": "READY_FOR_HUMAN_REVIEW",
+  "status": "FINAL_APPROVED",
   "storyboard_sha256": "79f52242d24311200bbb4754050266ff169fcee9dd7d48f05b59b7de5de465f4",
   "output": {
     "filename": "n31_training_video_v1.mp4",
@@ -98,5 +98,11 @@
     "contact_sheet_sha256": "75f5f6e00b8893bb4654cb713a9e40523f47d2dd4c4f3afd7fef6968c5df5f7b",
     "notes": "CRF 22成片与前次复核的SHA-256保持一致；16帧联系表哈希也保持一致。字幕安全区、设备可辨识、S11裁切和S12-S13遮挡有效；S04仅展示设备状态并明确标注接电见手册P2。最终提交前仍需参赛者完整观看并确认旁白节奏。"
   },
-  "final_human_review_required": true
+  "final_human_review_required": false,
+  "human_review": {
+    "reviewer": "qiushile",
+    "reviewed_at": "2026-07-21",
+    "confirmed": true,
+    "notes": "参赛者完整观看80秒培训视频，确认旁白节奏、字幕、隐私和音画同步均符合要求。"
+  }
 }

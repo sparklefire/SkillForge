@@ -234,7 +234,7 @@ def verify_training_video_review_document(
         validate_document(document, "training_video_review.schema.json")
     except ContractValidationError as exc:
         raise TrainingVideoReviewError("观看审核记录不符合严格Schema") from exc
-    if document["status"] != "READY_FOR_CHECK":
+    if document["status"] not in ("READY_FOR_CHECK", "FINAL_APPROVED"):
         raise TrainingVideoReviewError("观看审核记录尚未填写完成")
 
     started = _timestamp(document["watch_started_at"], "观看开始时间")
@@ -254,8 +254,10 @@ def verify_training_video_review_document(
     checks = {
         "manifest_schema_valid": True,
         "manifest_ready_for_human_review": (
-            manifest["status"] == "READY_FOR_HUMAN_REVIEW"
-            and manifest["final_human_review_required"] is True
+            (manifest["status"] == "READY_FOR_HUMAN_REVIEW"
+             and manifest["final_human_review_required"] is True)
+            or (manifest["status"] == "FINAL_APPROVED"
+                and manifest["final_human_review_required"] is False)
         ),
         "automated_qa_passed": all(
             value is True for key, value in automated.items() if key.endswith("_passed")

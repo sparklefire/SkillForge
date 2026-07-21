@@ -126,42 +126,150 @@
       "priority": 1,
       "command": "bash scripts/run_demo_mode.sh live",
       "data_policy": "现场重算操作者审核Gold的结构化受控错误集；不发送原始素材，不调用外部模型。",
-      "expected": {"gold_status": "GOLD", "metrics_status": "FINAL", "before_errors": 5, "after_errors": 0, "revision_count": 4}
+      "expected": {
+        "gold_status": "GOLD",
+        "metrics_status": "FINAL",
+        "before_errors": 5,
+        "after_errors": 0,
+        "revision_count": 4
+      }
     },
     {
       "mode": "PREPROCESSED",
       "priority": 2,
       "command": "bash scripts/run_demo_mode.sh preprocessed",
       "data_policy": "复用本机已通过隐私检查的安全派生素材，重跑多源本地预处理与Gold闭环。",
-      "expected": {"gold_status": "GOLD", "metrics_status": "FINAL", "before_errors": 5, "after_errors": 0, "revision_count": 4}
+      "expected": {
+        "gold_status": "GOLD",
+        "metrics_status": "FINAL",
+        "before_errors": 5,
+        "after_errors": 0,
+        "revision_count": 4
+      }
     },
     {
       "mode": "OFFLINE",
       "priority": 3,
       "command": "bash scripts/run_demo_mode.sh offline",
       "data_policy": "只读取仓库内不含原始媒体和凭证的冻结Gold演示包。",
-      "expected": {"gold_status": "GOLD", "metrics_status": "FINAL", "before_errors": 5, "after_errors": 0, "revision_count": 4}
+      "expected": {
+        "gold_status": "GOLD",
+        "metrics_status": "FINAL",
+        "before_errors": 5,
+        "after_errors": 0,
+        "revision_count": 4
+      }
     }
   ],
   "required_artifacts": [
-    {"artifact_id": "DEMO_BUNDLE", "path": "cases/n31/demo_bundle/bundle.json", "kind": "JSON", "required": true},
-    {"artifact_id": "GOLD_SOP", "path": "cases/n31/gold/gold_sop.json", "kind": "JSON", "required": true},
-    {"artifact_id": "SOP_VIEWS", "path": "cases/n31/demo_bundle/sop_views.json", "kind": "JSON", "required": true},
-    {"artifact_id": "MULTISOURCE_EVAL", "path": "cases/n31/evaluations/multisource_comparison_v1.json", "kind": "JSON", "required": true},
-    {"artifact_id": "DGX_VISUAL", "path": "cases/n31/evaluations/dgx_visual_compute_v1.json", "kind": "JSON", "required": true},
-    {"artifact_id": "TEMPORAL_WINDOWS", "path": "cases/n31/evaluations/temporal_action_windows_v1.json", "kind": "JSON", "required": true},
-    {"artifact_id": "PDF_STRUCTURE", "path": "cases/n31/evaluations/pdf_structure_v1.json", "kind": "JSON", "required": true},
-    {"artifact_id": "SOURCE_CANDIDATES", "path": "cases/n31/evaluations/source_candidate_synthesis_v1.json", "kind": "JSON", "required": true},
-    {"artifact_id": "GROUNDING_GATE", "path": "cases/n31/evaluations/deterministic_grounding_gate_v1.json", "kind": "JSON", "required": true},
-    {"artifact_id": "SEMANTIC_REVIEW", "path": "cases/n31/evaluations/semantic_review_v1.json", "kind": "JSON", "required": true},
-    {"artifact_id": "SELECTIVE_REBUILD", "path": "cases/n31/evaluations/selective_rebuild_v1.json", "kind": "JSON", "required": true},
-    {"artifact_id": "AGENT_TOOL_TRACE", "path": "cases/n31/evaluations/agent_tool_trace_v1.json", "kind": "JSON", "required": true},
-    {"artifact_id": "RUNTIME_BENCHMARK", "path": "output/evaluation/runtime_benchmark_dgx.json", "kind": "JSON", "required": true},
-    {"artifact_id": "POSTER", "path": "output/pdf/n31_a4_training_poster.pdf", "kind": "PDF", "required": true},
-    {"artifact_id": "TRAINING_VIDEO", "path": "output/video/n31_training_video_v1.mp4", "kind": "MP4", "required": true},
-    {"artifact_id": "TRAINING_VIDEO_MANIFEST", "path": "output/video/n31_training_video_manifest_v1.json", "kind": "JSON", "required": true},
-    {"artifact_id": "TRAINING_VIDEO_EVIDENCE", "path": "output/video/n31_training_video_evidence_pack_v1.json", "kind": "JSON", "required": true},
-    {"artifact_id": "PITCH_DECK", "path": "output/presentation/SkillForge_三分钟路演_v1.pptx", "kind": "PPTX", "required": true}
+    {
+      "artifact_id": "DEMO_BUNDLE",
+      "path": "cases/n31/demo_bundle/bundle.json",
+      "kind": "JSON",
+      "required": true
+    },
+    {
+      "artifact_id": "GOLD_SOP",
+      "path": "cases/n31/gold/gold_sop.json",
+      "kind": "JSON",
+      "required": true
+    },
+    {
+      "artifact_id": "SOP_VIEWS",
+      "path": "cases/n31/demo_bundle/sop_views.json",
+      "kind": "JSON",
+      "required": true
+    },
+    {
+      "artifact_id": "MULTISOURCE_EVAL",
+      "path": "cases/n31/evaluations/multisource_comparison_v1.json",
+      "kind": "JSON",
+      "required": true
+    },
+    {
+      "artifact_id": "DGX_VISUAL",
+      "path": "cases/n31/evaluations/dgx_visual_compute_v1.json",
+      "kind": "JSON",
+      "required": true
+    },
+    {
+      "artifact_id": "TEMPORAL_WINDOWS",
+      "path": "cases/n31/evaluations/temporal_action_windows_v1.json",
+      "kind": "JSON",
+      "required": true
+    },
+    {
+      "artifact_id": "PDF_STRUCTURE",
+      "path": "cases/n31/evaluations/pdf_structure_v1.json",
+      "kind": "JSON",
+      "required": true
+    },
+    {
+      "artifact_id": "SOURCE_CANDIDATES",
+      "path": "cases/n31/evaluations/source_candidate_synthesis_v1.json",
+      "kind": "JSON",
+      "required": true
+    },
+    {
+      "artifact_id": "GROUNDING_GATE",
+      "path": "cases/n31/evaluations/deterministic_grounding_gate_v1.json",
+      "kind": "JSON",
+      "required": true
+    },
+    {
+      "artifact_id": "SEMANTIC_REVIEW",
+      "path": "cases/n31/evaluations/semantic_review_v1.json",
+      "kind": "JSON",
+      "required": true
+    },
+    {
+      "artifact_id": "SELECTIVE_REBUILD",
+      "path": "cases/n31/evaluations/selective_rebuild_v1.json",
+      "kind": "JSON",
+      "required": true
+    },
+    {
+      "artifact_id": "AGENT_TOOL_TRACE",
+      "path": "cases/n31/evaluations/agent_tool_trace_v1.json",
+      "kind": "JSON",
+      "required": true
+    },
+    {
+      "artifact_id": "RUNTIME_BENCHMARK",
+      "path": "output/evaluation/runtime_benchmark_dgx.json",
+      "kind": "JSON",
+      "required": true
+    },
+    {
+      "artifact_id": "POSTER",
+      "path": "output/pdf/n31_a4_training_poster.pdf",
+      "kind": "PDF",
+      "required": true
+    },
+    {
+      "artifact_id": "TRAINING_VIDEO",
+      "path": "output/video/n31_training_video_v1.mp4",
+      "kind": "MP4",
+      "required": true
+    },
+    {
+      "artifact_id": "TRAINING_VIDEO_MANIFEST",
+      "path": "output/video/n31_training_video_manifest_v1.json",
+      "kind": "JSON",
+      "required": true
+    },
+    {
+      "artifact_id": "TRAINING_VIDEO_EVIDENCE",
+      "path": "output/video/n31_training_video_evidence_pack_v1.json",
+      "kind": "JSON",
+      "required": true
+    },
+    {
+      "artifact_id": "PITCH_DECK",
+      "path": "output/presentation/SkillForge_三分钟路演_v1.pptx",
+      "kind": "PPTX",
+      "required": true
+    }
   ],
   "human_gates": [
     {

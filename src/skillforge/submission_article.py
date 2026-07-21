@@ -272,7 +272,7 @@ def _claim_checks(article: str, sources: dict[str, Any]) -> list[dict[str, Any]]
             and video_coverage.get("scene_count") == 15
             and video_coverage.get("covered_gold_step_count") == 13
             and video.get("evidence_pack", {}).get("evidence_count") == 25
-            and video.get("final_human_review_required") is True,
+            and video.get("status") in ("READY_FOR_HUMAN_REVIEW", "FINAL_APPROVED"),
             fragments=[
                 "13项手机检查清单、5题培训测验、一页A4海报和80秒培训视频",
                 "15个镜头覆盖13/13个Gold步骤，绑定25条去重Evidence",

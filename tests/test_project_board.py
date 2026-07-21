@@ -29,9 +29,9 @@ def test_tracked_board_is_on_track_and_does_not_mark_goal_blocked() -> None:
     assert report["status"] == "ON_TRACK"
     assert report["implementation_goal_blocked"] is False
     assert report["task_count"] == 11
-    assert report["completed_count"] == 2
+    assert report["completed_count"] == 3
     assert report["ready_count"] == 1
-    assert report["awaiting_human_count"] == 7
+    assert report["awaiting_human_count"] == 6
     assert report["awaiting_external_count"] == 1
     assert report["accepted_non_blocking_risk_count"] == 2
 
@@ -51,7 +51,7 @@ def test_default_date_uses_contest_timezone_not_machine_timezone(
 
 
 def test_overdue_and_deadline_states_are_explicit_not_blocked() -> None:
-    attention = build_project_board_status(as_of=date(2026, 7, 21))
+    attention = build_project_board_status(as_of=date(2026, 7, 22))
     missed = build_project_board_status(as_of=date(2026, 7, 23))
     assert attention["status"] == "ATTENTION_REQUIRED"
     assert attention["overdue_task_ids"]
